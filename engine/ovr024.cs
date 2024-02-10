@@ -583,13 +583,26 @@ namespace engine
         }
 
 
-        internal static byte roll_dice(int dice_size, int dice_count)
+        internal static byte roll_dice(int dice_size, int dice_count, int min_roll = 1)
         {
             int roll_total = 0;
 
             for (int i = 0; i < dice_count; i++)
             {
-                roll_total += seg051.Random(dice_size) + 1;
+                int roll_current;
+
+                // don't bother rolling if we can't roll over the min_roll
+                if (min_roll >= dice_size)
+                {
+                    roll_current = dice_size;
+                }
+                else
+                {
+                    roll_current = seg051.Random(dice_size) + 1;
+                    if (roll_current < min_roll)
+                        roll_current = min_roll;
+                }
+                roll_total += roll_current;
             }
 
             byte byte_total = (byte)roll_total;
