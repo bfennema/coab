@@ -326,8 +326,8 @@ namespace engine
         {
             bool menuRedraw;
             bool showExit;
-            byte var_20;
-            short var_1E;
+            byte class_count;
+            short con_hp_adj;
             byte var_1B;
 
             char input_key;
@@ -753,7 +753,7 @@ namespace engine
                 player.attack1_DiceSizeBase = 2;
                 player.field_125 = 1;
                 player.base_movement = 12;
-                var_20 = 0;
+                class_count = 0;
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -761,8 +761,7 @@ namespace engine
                     player.spellCastCount[1, i] = 0;
                     player.spellCastCount[2, i] = 0;
                 }
-
-                for (int class_idx = 0; class_idx <= 7; class_idx++)
+                for (int class_idx = (byte)ClassId.cleric; class_idx <= (byte)ClassId.monk; class_idx++)
                 {
                     if (player.ClassLevel[class_idx] > 0)
                     {
@@ -800,7 +799,7 @@ namespace engine
                             player.LearnSpell(Spells.sleep);
                         }
 
-                        var_20++;
+                        class_count++;
                     }
                 }
 
@@ -808,13 +807,13 @@ namespace engine
                 player.hit_point_rolled = sub_509E0(0xff, player);
                 player.hit_point_max = player.hit_point_rolled;
 
-                var_1E = get_con_hp_adj(player);
+                con_hp_adj = get_con_hp_adj(player);
 
-                if (var_1E < 0)
+                if (con_hp_adj < 0)
                 {
-                    if (player.hit_point_max > (System.Math.Abs(var_1E) + var_20))
+                    if (player.hit_point_max > (-con_hp_adj + class_count))
                     {
-                        player.hit_point_max = (byte)((player.hit_point_max + var_1E) / var_20);
+                        player.hit_point_max = (byte)((player.hit_point_max + con_hp_adj) / class_count);
                     }
                     else
                     {
@@ -823,11 +822,11 @@ namespace engine
                 }
                 else
                 {
-                    player.hit_point_max = (byte)((player.hit_point_max + var_1E) / var_20);
+                    player.hit_point_max = (byte)((player.hit_point_rolled + con_hp_adj) / class_count);
                 }
 
                 player.hit_point_current = player.hit_point_max;
-                player.hit_point_rolled = (byte)(player.hit_point_rolled / var_20);
+                player.hit_point_rolled = (byte)(player.hit_point_max / class_count);
                 byte trainingClassMaskBackup = gbl.area2_ptr.training_class_mask;
 
                 ovr017.SilentTrainPlayer();
