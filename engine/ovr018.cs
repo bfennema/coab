@@ -1966,28 +1966,6 @@ namespace engine
         }
 
 
-        internal static sbyte get_con_hp_adj(Player player)
-        {
-            sbyte hp_adj = 0;
-
-            for (int class_index = (byte)ClassId.cleric; class_index <= (byte)ClassId.monk; class_index++)
-            {
-                if (player.ClassLevel[class_index] > 0 &&
-                    player.ClassLevel[class_index] < gbl.max_class_hit_dice[class_index])
-                {
-                    hp_adj += (sbyte)con_bonus(player._class, player.stats2.Con.full);
-
-                    if (class_index == (byte)ClassId.ranger &&
-                        player.ClassLevel[class_index] == 1)
-                    {
-                        hp_adj *= 2;
-                    }
-                }
-            }
-
-            return hp_adj;
-        }
-
         class hp_calc
         {
             public hp_calc(int _size, int _lvl, int _hit_die, int _mult) { size = _size; lvl_bonus = _lvl; max_hit_die = _hit_die; max_mult = _mult; }
@@ -2009,29 +1987,83 @@ namespace engine
             new hp_calc(4, 1, 18, 0),  // Monk
         };
 
-        internal static int calc_min_hp(Player player) /* sub_506BA */
+        internal static sbyte get_con_hp_adj(Player player)
+        {
+            sbyte hp_adj = 0;
+
+            for (SkillType classId = SkillType.Cleric; classId <= SkillType.Monk; classId++)
+            {
+                byte classLvl = player.ClassLevel[(int)classId];
+
+                if (classLvl > 0 && classLvl < gbl.max_class_hit_dice[(int)classId])
+                {
+                    hp_adj += (sbyte)con_bonus(classId, player.stats2.Con.full);
+
+                    if (player.ClassLevel[(int)classId] == 1 && hp_calc_table[(int)classId].lvl_bonus == 1)
+                    {
+                        hp_adj *= 2;
+                    }
+                }
+            }
+
+            return hp_adj;
+        }
+
+        static int calc_hp(Player player, int lvl_adj)
         {
             int class_count = 0;
             int min_hp = 0;
 
-            for (int class_index = (byte)ClassId.cleric; class_index <= (byte)ClassId.monk; class_index++)
+            for (SkillType classId = SkillType.Cleric; classId <= SkillType.Monk; classId++)
             {
-                if (player.ClassLevel[class_index] > 0)
+                byte classLvl = player.ClassLevelsOld[(int)classId];
+
+                if (classLvl > 0)
                 {
-                    hp_calc hpt = hp_calc_table[class_index];
+                    hp_calc hpt = hp_calc_table[(int)classId];
 
-                    int con_hp_bonus = con_bonus((ClassId)class_index, player.stats2.Con.full);
+                    int con_hp_bonus = con_bonus(classId, player.stats2.Con.full);
 
-                    if (player.ClassLevel[class_index] + hpt.lvl_bonus <= hpt.max_hit_die)
+                    if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
                     {
-                        min_hp += (con_hp_bonus + 1) * (player.ClassLevel[class_index] + hpt.lvl_bonus);
+                        min_hp += (con_hp_bonus + lvl_adj) * (classLvl + hpt.lvl_bonus);
                     }
                     else
                     {
-                        int over_count = player.ClassLevel[class_index] + hpt.lvl_bonus - hpt.max_hit_die;
+                        int over_count = classLvl + hpt.lvl_bonus - hpt.max_hit_die;
 
                         // con hp bonus only applies to hit dice
-                        min_hp += ((con_hp_bonus + 1) * hpt.max_hit_die) + (over_count * hpt.max_mult);
+                        min_hp += ((con_hp_bonus + lvl_adj) * hpt.max_hit_die) + (over_count * hpt.max_mult);
+                    }
+                }
+
+                classLvl = player.ClassLevel[(int)classId];
+
+                if (classLvl > 0)
+                {
+                    hp_calc hpt = hp_calc_table[(int)classId];
+
+                    int con_hp_bonus = con_bonus(classId, player.stats2.Con.full);
+
+                    if (classLvl > player.multiclassLevel)
+                    {
+                        if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
+                        {
+                            min_hp += (con_hp_bonus + lvl_adj) * (classLvl + hpt.lvl_bonus - player.multiclassLevel);
+                        }
+                        else if (player.multiclassLevel > hpt.max_hit_die)
+                        {
+                            min_hp += (classLvl + hpt.lvl_bonus - player.multiclassLevel) * hpt.max_mult;
+
+                    }
+                    else
+                    {
+                            int over_count = classLvl + hpt.lvl_bonus - hpt.max_hit_die;
+
+                        // con hp bonus only applies to hit dice
+                            min_hp += ((con_hp_bonus + lvl_adj) * (hpt.max_hit_die - player.multiclassLevel)) + (over_count * hpt.max_mult);
+                        }
+
                     }
                     class_count++;
                 }
@@ -2042,29 +2074,71 @@ namespace engine
             return min_hp;
         }
 
+        internal static int calc_min_hp(Player player) /* sub_50793 */
+        {
+            return calc_hp(player, 1);
+        }
+
+        static int calc_fixed_hp_bonus(Player player)
+        {
+            return calc_hp(player, 0);
+        }
+
         internal static int calc_max_hp(Player player) /* sub_50793 */
         {
             int class_count = 0;
             int max_hp = 0;
 
-            for (int class_index = (byte)ClassId.cleric; class_index <= (byte)ClassId.monk; class_index++)
+            for (SkillType classId = SkillType.Cleric; classId <= SkillType.Monk; classId++)
             {
-                if (player.ClassLevel[class_index] > 0)
+                byte classLvl = player.ClassLevelsOld[(int)classId];
+
+                if (classLvl > 0)
                 {
-                    hp_calc hpt = hp_calc_table[class_index];
+                    hp_calc hpt = hp_calc_table[(int)classId];
 
-                    int con_hp_bonus = con_bonus((ClassId)class_index, player.stats2.Con.full);
+                    int con_hp_bonus = con_bonus(classId, player.stats2.Con.full);
 
-                    if (player.ClassLevel[class_index] + hpt.lvl_bonus <= hpt.max_hit_die)
+                    if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
                     {
-                        max_hp += (con_hp_bonus + hpt.size) * (player.ClassLevel[class_index] + hpt.lvl_bonus);
+                        max_hp += (con_hp_bonus + hpt.size) * (classLvl + hpt.lvl_bonus);
                     }
                     else
                     {
-                        int over_count = player.ClassLevel[class_index] + hpt.lvl_bonus - hpt.max_hit_die;
+                        int over_count = classLvl + hpt.lvl_bonus - hpt.max_hit_die;
 
                         // con hp bonus only applies to hit dice
                         max_hp += ((con_hp_bonus + hpt.size) * hpt.max_hit_die) + (over_count * hpt.max_mult);
+                    }
+                }
+
+                classLvl = player.ClassLevel[(int)classId];
+
+                if (classLvl > 0)
+                {
+                    hp_calc hpt = hp_calc_table[(int)classId];
+
+                    int con_hp_bonus = con_bonus(classId, player.stats2.Con.full);
+
+                    if (classLvl > player.multiclassLevel)
+                    {
+                        if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
+                        {
+                            max_hp += (con_hp_bonus + hpt.size) * (classLvl + hpt.lvl_bonus - player.multiclassLevel);
+                        }
+                        else if (player.multiclassLevel > hpt.max_hit_die)
+                        {
+                            max_hp += (classLvl + hpt.lvl_bonus - player.multiclassLevel) * hpt.max_mult;
+
+                        }
+                        else
+                        {
+                            int over_count = classLvl + hpt.lvl_bonus - hpt.max_hit_die;
+
+                            // con hp bonus only applies to hit dice
+                            max_hp += ((con_hp_bonus + hpt.size) * (hpt.max_hit_die - player.multiclassLevel)) + (over_count * hpt.max_mult);
+                        }
+
                     }
                     class_count++;
                 }
