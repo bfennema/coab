@@ -103,6 +103,7 @@ namespace Main
 			Classes.Cheats.AlwayShowAreaMapSet(Settings.Default.AlwayShowAreaMap);
 			Classes.Cheats.FreeTrainingSet(Settings.Default.FreeTraining);
 			Classes.Cheats.SkipCopyProtectionSet(Settings.Default.SkipCopyProtection);
+			Classes.Cheats.AllowPlayerModifySet(Settings.Default.AllowPlayerModify);
 			Classes.Cheats.AllowGodsInterveneSet(Settings.Default.AllowGodsIntervene);
 			Classes.Cheats.DisplayFullItemNamesSet(Settings.Default.DisplayFullItemNames);
 			Classes.Cheats.ViewItemStatsSet(Settings.Default.ViewItemsStats);
@@ -159,6 +160,15 @@ namespace Main
 			Settings.Default.Save();
 
 			Classes.Cheats.SkipTitleScreenSet(flipped);
+		}
+
+		private void allowPlayerModifyToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			bool flipped = !Settings.Default.AllowPlayerModify;
+			Settings.Default.AllowPlayerModify = flipped;
+			Settings.Default.Save();
+
+			Classes.Cheats.AllowPlayerModifySet(flipped);
 		}
 
 		private void allowGodsInterveneToolStripMenuItem_Click(object sender, EventArgs e)
