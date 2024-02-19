@@ -826,7 +826,7 @@ namespace engine
                 }
 
                 player.hit_point_current = player.hit_point_max;
-                player.hit_point_rolled = (byte)(player.hit_point_max / class_count);
+                player.hit_point_rolled = (byte)(player.hit_point_rolled / class_count);
                 byte trainingClassMaskBackup = gbl.area2_ptr.training_class_mask;
 
                 ovr017.SilentTrainPlayer();
@@ -893,13 +893,13 @@ namespace engine
         static sbyte[] con_hp_adj = { 0, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
         static sbyte[] con_hp_adj_warrior = { 0, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 6, 6, 6, 7, 7 };
 
-        internal static int con_bonus(ClassId classId, int stat)
+        internal static int con_bonus(SkillType classId, int stat)
         {
             int bonus = 0;
 
-            if (classId == ClassId.fighter ||
-                classId == ClassId.ranger ||
-                classId == ClassId.paladin)
+            if (classId == SkillType.Fighter ||
+                classId == SkillType.Ranger ||
+                classId == SkillType.Paladin)
             {
                 bonus = con_hp_adj_warrior[stat];
             }
@@ -912,7 +912,7 @@ namespace engine
         }
 
 
-        internal static int con_bonus(ClassId classId)
+        internal static int con_bonus(SkillType classId)
         {
             return con_bonus(classId, gbl.SelectedPlayer.stats2.Con.full);
         }
@@ -1413,7 +1413,7 @@ namespace engine
             //    gbl.SelectedPlayer.stats2[stat_var].cur = gbl.SelectedPlayer.stats2[stat_var].full;
             //}
 
-            //gbl.SelectedPlayer.stats2.Str00.full = gbl.SelectedPlayer.stats2.Str00.cur;
+            player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats2.Con.cur));
         }
 
 
@@ -2009,7 +2009,7 @@ namespace engine
             return hp_adj;
         }
 
-        static int calc_hp(Player player, int lvl_adj)
+        static int calc_hp(Player player, int con, int lvl_adj)
         {
             int class_count = 0;
             int min_hp = 0;
@@ -2022,7 +2022,7 @@ namespace engine
                 {
                     hp_calc hpt = hp_calc_table[(int)classId];
 
-                    int con_hp_bonus = con_bonus(classId, player.stats2.Con.full);
+                    int con_hp_bonus = con_bonus(classId, con);
 
                     if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
                     {
@@ -2043,7 +2043,7 @@ namespace engine
                 {
                     hp_calc hpt = hp_calc_table[(int)classId];
 
-                    int con_hp_bonus = con_bonus(classId, player.stats2.Con.full);
+                    int con_hp_bonus = con_bonus(classId, con);
 
                     if (classLvl > player.multiclassLevel)
                     {
@@ -2076,12 +2076,12 @@ namespace engine
 
         internal static int calc_min_hp(Player player) /* sub_50793 */
         {
-            return calc_hp(player, 1);
+            return calc_hp(player, player.stats2.Con.full, 1);
         }
 
-        static int calc_fixed_hp_bonus(Player player)
+        public static int calc_fixed_hp_bonus(Player player, int con)
         {
-            return calc_hp(player, 0);
+            return calc_hp(player, con, 0);
         }
 
         internal static int calc_max_hp(Player player) /* sub_50793 */

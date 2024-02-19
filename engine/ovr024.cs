@@ -1065,41 +1065,11 @@ namespace engine
             }
             else if (stat_index == Stat.CON)
             {
-                int hitPointBonus = 0;
-                byte classCount = 0;
                 byte orig_max_hp = player.hit_point_max;
                 player.hit_point_max = player.hit_point_rolled;
 
-                for (SkillType classId = SkillType.Cleric; classId <= SkillType.Monk; classId++)
-                {
-                    byte classLvl = player.ClassLevelsOld[(int)classId];
+                int hitPointBonus = ovr018.calc_fixed_hp_bonus(player, stat_a);
 
-                    if (classLvl > 0)
-                    {
-                        hitPointBonus += ConHitPointBonus(classLvl, classId, stat_a, player);
-                    }
-
-                    classLvl = player.ClassLevel[(int)classId];
-
-                    if (classLvl > 0)
-                    {
-                        classCount++;
-                    }
-
-                    if (gbl.max_class_hit_dice[(int)classId] < classLvl)
-                    {
-                        classLvl = gbl.max_class_hit_dice[(int)classId];
-                    }
-
-                    if (classLvl > player.multiclassLevel)
-                    {
-                        classLvl -= player.multiclassLevel;
-
-                        hitPointBonus += ConHitPointBonus(classLvl, classId, stat_a, player);
-                    }
-                }
-
-                hitPointBonus /= classCount;
                 player.hit_point_max += (byte)hitPointBonus;
 
                 if (player.hit_point_max > orig_max_hp)
