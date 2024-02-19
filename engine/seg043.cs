@@ -253,7 +253,7 @@ namespace engine
             dw.WriteLine("");
 
             dw.WriteLine("monsterType == 1");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.type_1));
+            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.humanoid));
             dw.WriteLine("");
 
             dw.WriteLine("monsterType == giant");
@@ -297,7 +297,7 @@ namespace engine
             dw.WriteLine("");
 
             dw.WriteLine("monsterType > type_1");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType > MonsterType.type_1));
+            DumpMonstersFilteredSub(dw, p => (p.monsterType > MonsterType.humanoid));
             dw.WriteLine("");
 
 

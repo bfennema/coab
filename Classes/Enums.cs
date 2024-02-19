@@ -19,7 +19,7 @@ namespace Classes
 
     public enum MonsterType
     {
-        type_1 = 1,
+        humanoid = 1,
         giant = 2,
         dragon = 3,
         animated_dead = 4,

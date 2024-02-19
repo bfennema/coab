@@ -261,7 +261,7 @@ namespace engine
                     calc_affect_effect(Affects.bestow_curse, player);
                     calc_affect_effect(Affects.prayer, player);
                     calc_affect_effect(Affects.affect_06, player);
-                    calc_affect_effect(Affects.gnome_vs_man_sized_giant, player);
+                    calc_affect_effect(Affects.gnome_vs_goblin_kobold, player);
                     calc_affect_effect(Affects.dwarf_vs_orc, player);
                     calc_affect_effect(Affects.weap_dragon_slayer, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
@@ -330,7 +330,7 @@ namespace engine
                     calc_affect_effect(Affects.invisible, player);
                     calc_affect_effect(Affects.blink, player);
                     calc_affect_effect(Affects.dwarf_and_gnome_vs_giants, player);
-                    calc_affect_effect(Affects.affect_30, player);
+                    calc_affect_effect(Affects.gnome_vs_gnoll, player);
                     calc_affect_effect(Affects.displace, player);
                     calc_affect_effect(Affects.dispel_evil, player);
                     break;

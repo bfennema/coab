@@ -267,7 +267,7 @@ namespace engine
 		}
 
 
-		internal static void AffectGnomeVsManSizedGiant(Effect arg_0, object param, Player player) // sub_3A44A
+		internal static void AffectGnomeVsGoblinKobold(Effect arg_0, object param, Player player) // sub_3A44A
 		{
 			if (player.actions != null &&
 				player.actions.target != null &&
@@ -699,9 +699,9 @@ namespace engine
 		}
 
 
-		internal static void sub_3B1A2(Effect arg_0, object param, Player player)
+		internal static void AffectGnomeVsGnoll(Effect arg_0, object param, Player player)
 		{
-			if (gbl.SelectedPlayer.monsterType == MonsterType.type_1 &&
+			if (gbl.SelectedPlayer.monsterType == MonsterType.humanoid &&
 				(gbl.SelectedPlayer.field_DE & 0x7F) == 2)
 			{
 				gbl.attack_roll -= 4;
@@ -1804,7 +1804,7 @@ namespace engine
 			affect_table.Add(Affects.poison_damage, ovr013.AffectPoisonDamage);
 			affect_table.Add(Affects.read_magic, ovr013.empty);
 			affect_table.Add(Affects.shield, ovr013.AffectShield);
-			affect_table.Add(Affects.gnome_vs_man_sized_giant, ovr013.AffectGnomeVsManSizedGiant);
+			affect_table.Add(Affects.gnome_vs_goblin_kobold, ovr013.AffectGnomeVsGoblinKobold);
 			affect_table.Add(Affects.find_traps, ovr013.empty);
 			affect_table.Add(Affects.resist_fire, ovr013.AffectResistFire);
 			affect_table.Add(Affects.silence_15_radius, ovr013.is_silenced1);
@@ -1834,7 +1834,7 @@ namespace engine
 			affect_table.Add(Affects.prot_from_evil_10_radius, ovr013.affect_protect_evil);
 			affect_table.Add(Affects.prot_from_good_10_radius, ovr013.affect_protect_good);
 			affect_table.Add(Affects.dwarf_and_gnome_vs_giants, ovr013.AffectDwarfGnomeVsGiants);
-			affect_table.Add(Affects.affect_30, ovr013.sub_3B1A2);
+			affect_table.Add(Affects.gnome_vs_gnoll, ovr013.AffectGnomeVsGnoll);
 			affect_table.Add(Affects.prayer, ovr013.AffectPrayer);
 			affect_table.Add(Affects.hot_fire_shield, ovr013.HotFireShield);
 			affect_table.Add(Affects.snake_charm, ovr013.sub_3A071);
