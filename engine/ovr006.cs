@@ -82,6 +82,14 @@ namespace engine
                             }
                             break;
 
+                        case ClassId.druid:
+                            if (player.stats2.Wis.full > 15 &&
+                                player.stats2.Cha.full > 15)
+                            {
+                                new_exp = exp_to_add + (exp_to_add / 10);
+                            }
+                            break;
+
                         case ClassId.fighter:
                             if (player.stats2.Str.full > 15)
                             {

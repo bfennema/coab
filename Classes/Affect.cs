@@ -153,7 +153,11 @@ namespace Classes
         owlbear_hug_round_attack = 0x90,
         dispel_evil_banish = 0x91,
         strength_spell = 0x92,
-        do_items_affect = 0x93
+        do_items_affect = 0x93,
+        barkskin = 0xa2,
+        protection_from_fire = 0xa3,
+        resist_lightning = 0xa4,
+        protection_from_lightning = 0xa5,
     }
 
     /// <summary>

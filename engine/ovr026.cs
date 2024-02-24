@@ -22,6 +22,22 @@ namespace engine
 			{1, 1, 1, 0, 1}, // 15
 		};
 
+        static byte[,] DruidSpellLevels = {
+			{0, 1, 0, 0, 0}, // 2
+			{1, 1, 1, 0, 0}, // 3
+			{1, 0, 1, 0, 0}, // 4
+			{0, 1, 0, 0, 0}, // 5
+			{0, 0, 0, 1, 0}, // 6
+			{0, 1, 1, 0, 0}, // 7
+			{0, 0, 0, 1, 0}, // 8
+			{1, 0, 0, 0, 1}, // 9
+			{0, 0, 0, 1, 1}, // 10
+			{0, 1, 0, 0, 0}, // 11
+			{0, 0, 1, 1, 1}, // 12
+			{1, 0, 1, 1, 1}, // 13
+			{0, 1, 1, 1, 1}, // 14
+		};
+
         static byte[,] /*seg600:43E5*/ PaladinSpellLevels = { // unk_1A6F5
 			{1, 0, 0, 0, 0}, // 10
 			{0, 1, 0, 0, 0}, // 11
@@ -83,6 +99,34 @@ namespace engine
                                 if (se.spellClass == SpellClass.Cleric &&
                                     player.spellCastCount[sp_class, sp_lvl] > 0 &&
                                     spell != Spells.animate_dead)
+                                {
+                                    player.spellBook.LearnSpell(spell);
+                                }
+                            }
+                            break;
+
+                        case SkillType.Druid:
+                            player.spellCastCount[1, 0] += 2;
+
+                            for (int TblIndex = 0; TblIndex <= (skillLevel - 2); TblIndex++)
+                            {
+                                for (int sp_lvl = 0; sp_lvl < 5; sp_lvl++)
+                                {
+                                    player.spellCastCount[1, sp_lvl] += DruidSpellLevels[TblIndex, sp_lvl];
+                                }
+                            }
+
+                            calc_druid_spells(false, player);
+
+                            foreach (Spells spell in System.Enum.GetValues(typeof(Spells)))
+                            {
+                                SpellEntry se = gbl.spellCastingTable[(int)spell];
+
+                                int sp_class = (se.spellLevel - 1) / 5;
+                                int sp_lvl = (se.spellLevel - 1) % 5;
+
+                                if (se.spellClass == SpellClass.Druid &&
+                                    player.spellCastCount[sp_class+1, sp_lvl] > 0)
                                 {
                                     player.spellBook.LearnSpell(spell);
                                 }
@@ -286,60 +330,132 @@ namespace engine
         }
 
 
-        internal static void calc_cleric_spells(bool ResetSpellLevels, Player player) /* sub_6A686 */
+        internal static void calc_wis_spells(SkillType type, int index, byte[,] spellLevels, Player player, bool ResetSpellLevels, byte spellCountLvl1)
         {
-            int clericLvl = player.SkillLevel(SkillType.Cleric);
+            int level = player.SkillLevel(type);
 
-            if (clericLvl > 0)
+            if (level > 0)
             {
                 if (ResetSpellLevels == true)
                 {
                     for (int sp_lvl = 1; sp_lvl < 5; sp_lvl++)
                     {
-                        player.spellCastCount[0, sp_lvl] = 0;
+                        player.spellCastCount[index, sp_lvl] = 0;
                     }
 
-                    player.spellCastCount[0, 0] = 1;
+                    player.spellCastCount[index, 0] = spellCountLvl1;
 
-                    for (int playerLvl = 0; playerLvl <= (clericLvl - 2); playerLvl++)
+                    for (int playerLvl = 0; playerLvl <= (level - 2); playerLvl++)
                     {
                         for (int spellLvl = 0; spellLvl < 5; spellLvl++)
                         {
-                            player.spellCastCount[0, spellLvl] += ClericSpellLevels[playerLvl, spellLvl];
+                            player.spellCastCount[index, spellLvl] += spellLevels[playerLvl, spellLvl];
                         }
                     }
                 }
 
-                if (player.stats2.Wis.full > 12 && player.spellCastCount[0, 0] > 0)
+                if (player.stats2.Wis.full > 12 && player.spellCastCount[index, 0] > 0)
                 {
-                    player.spellCastCount[0, 0] += 1;
+                    player.spellCastCount[index, 0] += 1;
                 }
 
-                if (player.stats2.Wis.full > 13 && player.spellCastCount[0, 0] > 0)
+                if (player.stats2.Wis.full > 13 && player.spellCastCount[index, 0] > 0)
                 {
-                    player.spellCastCount[0, 0] += 1;
+                    player.spellCastCount[index, 0] += 1;
                 }
 
-                if (player.stats2.Wis.full > 14 && player.spellCastCount[0, 1] > 0)
+                if (player.stats2.Wis.full > 14 && player.spellCastCount[index, 1] > 0)
                 {
-                    player.spellCastCount[0, 1] += 1;
+                    player.spellCastCount[index, 1] += 1;
                 }
 
-                if (player.stats2.Wis.full > 15 && player.spellCastCount[0, 1] > 0)
+                if (player.stats2.Wis.full > 15 && player.spellCastCount[index, 1] > 0)
                 {
-                    player.spellCastCount[0, 1] += 1;
+                    player.spellCastCount[index, 1] += 1;
                 }
 
-                if (player.stats2.Wis.full > 16 && player.spellCastCount[0, 2] > 0)
+                if (player.stats2.Wis.full > 16 && player.spellCastCount[index, 2] > 0)
                 {
-                    player.spellCastCount[0, 2] += 1;
+                    player.spellCastCount[index, 2] += 1;
                 }
 
-                if (player.stats2.Wis.full > 17 && player.spellCastCount[0, 3] > 0)
+                if (player.stats2.Wis.full > 17 && player.spellCastCount[index, 3] > 0)
                 {
-                    player.spellCastCount[0, 3] += 1;
+                    player.spellCastCount[index, 3] += 1;
+                }
+
+                if (player.stats2.Wis.full > 18)
+                {
+                    if (player.spellCastCount[index, 0] > 0)
+                    {
+                        player.spellCastCount[index, 0] += 1;
+                    }
+
+                    if (player.spellCastCount[index, 3] > 0)
+                    {
+                        player.spellCastCount[index, 3] += 1;
+                    }
+                }
+
+                if (player.stats2.Wis.full > 19)
+                {
+                    if (player.spellCastCount[index, 1] > 0)
+                    {
+                        player.spellCastCount[index, 1] += 1;
+                    }
+
+                    if (player.spellCastCount[index, 3] > 0)
+                    {
+                        player.spellCastCount[index, 3] += 1;
+                    }
+                }
+
+                if (player.stats2.Wis.full > 20)
+                {
+                    if (player.spellCastCount[index, 2] > 0)
+                    {
+                        player.spellCastCount[index, 2] += 1;
+                    }
+
+                    if (player.spellCastCount[index, 4] > 0)
+                    {
+                        player.spellCastCount[index, 4] += 1;
+                    }
+                }
+
+                if (player.stats2.Wis.full > 21)
+                {
+                    if (player.spellCastCount[index, 3] > 0)
+                    {
+                        player.spellCastCount[index, 3] += 1;
+                    }
+
+                    if (player.spellCastCount[index, 4] > 0)
+                    {
+                        player.spellCastCount[index, 4] += 1;
+                    }
+                }
+
+                if (player.stats2.Wis.full > 22)
+                {
+                    if (player.spellCastCount[index, 3] > 0)
+                    {
+                        player.spellCastCount[index, 4] += 2;
+                    }
                 }
             }
+        }
+
+
+        internal static void calc_cleric_spells(bool ResetSpellLevels, Player player) /* sub_6A686 */
+        {
+            calc_wis_spells(SkillType.Cleric, 0, ClericSpellLevels, player, ResetSpellLevels, 1);
+        }
+
+
+        internal static void calc_druid_spells(bool ResetSpellLevels, Player player)
+        {
+            calc_wis_spells(SkillType.Druid, 1, DruidSpellLevels, player, ResetSpellLevels, 2);
         }
         /*    0                     1                     2                     3                     4                     5                     6                     7                     8                     9                     10                    11                    12                    13                  14                  15                  16                  17                 18                */
         static byte[, ,] SaveThrowValues = { // [8,13,5] class, level, save_type      
@@ -695,6 +811,10 @@ namespace engine
             {
                 player.spellCastCount[0, 0] = 1;
             }
+            else if (newClass == SkillType.Druid)
+            {
+                player.spellCastCount[1, 0] = 2;
+            }
             else if (newClass == SkillType.MagicUser)
             {
                 player.spellCastCount[2, 0] = 1;
@@ -711,6 +831,7 @@ namespace engine
 
             ReclacClassBonuses(player);
             calc_cleric_spells(true, player);
+            calc_druid_spells(true, player);
             recalc_saving_throws(player);
             recalc_thief_skills(player);
 

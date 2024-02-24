@@ -80,7 +80,7 @@ namespace engine
 
                 player.affects.Remove(affect);
 
-                if (affect_id == Affects.resist_fire)
+                if (affect_id == Affects.friends)
                 {
                     CalcStatBonuses(Stat.CHA, player);
                 }
@@ -198,11 +198,14 @@ namespace engine
                     break;
 
                 case CheckType.PreDamage:
+                    calc_affect_effect(Affects.protection_from_fire, player);
+                    calc_affect_effect(Affects.protection_from_lightning, player);
                     calc_affect_effect(Affects.efreeti_fire_resist, player);
                     calc_affect_effect(Affects.fire_resist, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
                     calc_affect_effect(Affects.resist_cold, player);
                     calc_affect_effect(Affects.resist_fire, player);
+                    calc_affect_effect(Affects.resist_lightning, player);
                     calc_affect_effect(Affects.resist_magic_50_percent, player);
                     calc_affect_effect(Affects.resist_magic_15_percent, player);
                     calc_affect_effect(Affects.immune_to_fire, player);
@@ -277,6 +280,7 @@ namespace engine
                     calc_affect_effect(Affects.prot_from_good_10_radius, player);
                     calc_affect_effect(Affects.stinking_cloud, player);
                     calc_affect_effect(Affects.faerie_fire, player);
+                    calc_affect_effect(Affects.barkskin, player);
                     break;
 
                 case CheckType.SavingThrow:
@@ -285,6 +289,7 @@ namespace engine
                     calc_affect_effect(Affects.resist_cold, player);
                     calc_affect_effect(Affects.shield, player);
                     calc_affect_effect(Affects.resist_fire, player);
+                    calc_affect_effect(Affects.resist_lightning, player);
                     calc_affect_effect(Affects.blinded, player);
                     calc_affect_effect(Affects.bestow_curse, player);
                     calc_affect_effect(Affects.prot_from_evil_10_radius, player);
@@ -297,6 +302,7 @@ namespace engine
                     calc_affect_effect(Affects.con_saving_bonus, player);
                     calc_affect_effect(Affects.hot_fire_shield, player);
                     calc_affect_effect(Affects.cold_fire_shield, player);
+                    calc_affect_effect(Affects.barkskin, player);
                     break;
 
                 case CheckType.Death:
