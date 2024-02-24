@@ -670,11 +670,12 @@ namespace engine
                 player.spellCastCount[0, 0] = 1;
             }
             else if (newClass == 5)
+            else if (newClass == (byte)ClassId.magic_user)
             {
                 player.spellCastCount[2, 0] = 1;
-                player.LearnSpell(Spells.detect_magic_MU);
-                player.LearnSpell(Spells.read_magic);
-                player.LearnSpell(Spells.sleep);
+                player.spellBook.LearnSpell(Spells.detect_magic_MU);
+                player.spellBook.LearnSpell(Spells.read_magic);
+                player.spellBook.LearnSpell(Spells.sleep);
             }
 
             player._class = (ClassId)newClass;
