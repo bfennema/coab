@@ -126,9 +126,17 @@ namespace engine
         {
             string full_path = Path.Combine(Config.GetSavePath(), seg042.clean_string(player.name));
 
-            seg042.delete_file(full_path + ".guy");
-            seg042.delete_file(full_path + ".swg");
-            seg042.delete_file(full_path + ".fx");
+            seg042.delete_file(full_path + ".GUY");
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                seg042.delete_file(full_path + ".ITM");
+                seg042.delete_file(full_path + ".SPC");
+            }
+            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            {
+                seg042.delete_file(full_path + ".SWG");
+                seg042.delete_file(full_path + ".FX");
+            }
         }
 
         internal static void SavePlayer(string arg_0, Player player) // sub_47DFC
@@ -143,12 +151,12 @@ namespace engine
 
             if (arg_0 == "")
             {
-                ext_text = ".guy";
+                ext_text = ".GUY";
                 file_text = seg042.clean_string(player.name);
             }
             else
             {
-                ext_text = ".sav";
+                ext_text = ".SAV";
                 file_text = arg_0;
             }
 
@@ -177,34 +185,78 @@ namespace engine
 
             seg051.Rewrite(file);
 
-            seg051.BlockWrite(Player.StructSize, new CursePlayer(player).Save(), file);
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                seg051.BlockWrite(PoolRadPlayer.StructSize, new PoolRadPlayer(player).Save(), file);
+            }
+            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            {
+                seg051.BlockWrite(CursePlayer.StructSize, new CursePlayer(player).Save(), file);
+            }
             seg051.Close(file);
 
-            seg042.delete_file(filePath + ".swg");
-
-            if (player.items.Count > 0)
+            if (gbl.game == Game.PoolOfRadiance)
             {
-                file.Assign(filePath + ".swg");
-                seg051.Rewrite(file);
+                seg042.delete_file(filePath + ".ITM");
 
-                player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, item.ToByteArray(), file));
+                if (player.items.Count > 0)
+                {
+                    file.Assign(filePath + ".ITM");
+                    seg051.Rewrite(file);
 
-                seg051.Close(file);
+                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, item.ToByteArray(), file));
+
+                    seg051.Close(file);
+                }
+            }
+            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            {
+                seg042.delete_file(filePath + ".SWG");
+
+                if (player.items.Count > 0)
+                {
+                    file.Assign(filePath + ".SWG");
+                    seg051.Rewrite(file);
+
+                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, item.ToByteArray(), file));
+
+                    seg051.Close(file);
+                }
             }
 
-            seg042.delete_file(filePath + ".fx");
-
-            if (player.affects.Count > 0)
+            if (gbl.game == Game.PoolOfRadiance)
             {
-                file.Assign(filePath + ".fx");
-                seg051.Rewrite(file);
+                seg042.delete_file(filePath + ".SPC");
 
-                foreach (Affect affect in player.affects)
+                if (player.affects.Count > 0)
                 {
-                    seg051.BlockWrite(Affect.StructSize, new CurseAffect(affect, player).Save(), file);
-                }
+                    file.Assign(filePath + ".SPC");
+                    seg051.Rewrite(file);
 
-                seg051.Close(file);
+                    foreach (Affect affect in player.affects)
+                    {
+                        seg051.BlockWrite(Affect.StructSize, new PoolRadAffect(affect, player).Save(), file);
+                    }
+
+                    seg051.Close(file);
+                }
+            }
+            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            {
+                seg042.delete_file(filePath + ".FX");
+
+                if (player.affects.Count > 0)
+                {
+                    file.Assign(filePath + ".FX");
+                    seg051.Rewrite(file);
+
+                    foreach (Affect affect in player.affects)
+                    {
+                        seg051.BlockWrite(Affect.StructSize, new CurseAffect(affect, player).Save(), file);
+                    }
+
+                    seg051.Close(file);
+                }
             }
         }
 
@@ -355,9 +407,12 @@ namespace engine
                 seg051.Close(file);
 
                 player = new PoolRadPlayer(data).Load();
-                player.spellBook.UnlearnSpell(Spells.animate_dead);
-                player.Money.ClearAll();
-                player.Money.SetCoins(Money.Platinum, 300);
+                if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    player.spellBook.UnlearnSpell(Spells.animate_dead);
+                    player.Money.ClearAll();
+                    player.Money.SetCoins(Money.Platinum, 300);
+                }
             }
             else if (gbl.import_from == ImportSource.Hillsfar)
             {
@@ -372,7 +427,9 @@ namespace engine
                 var_1C4 = null;
             }
 
-            if (gbl.import_from == ImportSource.Curse)
+
+            if ((gbl.game == Game.PoolOfRadiance && gbl.import_from == ImportSource.Pool) ||
+                (gbl.game == Game.CurseOfTheAzureBonds && gbl.import_from == ImportSource.Curse))
             {
                 arg_8 = System.IO.Path.GetFileNameWithoutExtension(arg_8);
             }
@@ -381,7 +438,15 @@ namespace engine
                 arg_8 = seg042.clean_string(player.name);
             }
 
-            string filename = Path.Combine(Config.GetSavePath(), arg_8 + ".swg");
+            string filename;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                filename = Path.Combine(Config.GetSavePath(), arg_8 + ".itm");
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                filename = Path.Combine(Config.GetSavePath(), arg_8 + ".swg");
+            }
             if (seg042.file_find(filename) == true)
             {
                 byte[] data = new byte[Item.StructSize];
@@ -697,7 +762,15 @@ namespace engine
                 }
             }
 
-            Player player = new CursePlayer(data, 0).Load();
+            Player player;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                player = new PoolRadPlayer(data).Load();
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                player = new CursePlayer(data, 0).Load();
+            }
 
             seg042.load_decode_dax(out data, out decode_size, monster_id, "MON" + area_text + "SPC.dax");
 
@@ -741,7 +814,27 @@ namespace engine
 
                 AssignPlayerIconId(player);
 
-                ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+
+                    if (player.icon_size == 0)
+                    {
+                        player.icon_size = 2;
+
+                        for (int i = 0; i < 6; i++)
+                        {
+                            byte colour = i == 3 ? gbl.default_icon_colours[i] : ovr024.roll_dice(7, 1);
+
+                            player.icon_colours[i] = (byte)(((colour + 8) << 4) + colour);
+                        }
+                    }
+
+                    player.combat_team = CombatTeam.Ours;
+                }
+                else // if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                }
             }
         }
 
@@ -784,13 +877,20 @@ namespace engine
 
         internal static void loadGameMenu() // loadGame
         {
-            gbl.import_from = ImportSource.Curse;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                gbl.import_from = ImportSource.Pool;
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                gbl.import_from = ImportSource.Curse;
+            }
 
             string games_list = string.Empty;
 
             for (char save_letter = 'A'; save_letter <= 'J'; save_letter++)
             {
-                string file_name = Path.Combine(Config.GetSavePath(), "savgam" + save_letter.ToString() + ".dat");
+                string file_name = Path.Combine(Config.GetSavePath(), "SAVGAM" + save_letter.ToString() + ".DAT");
 
                 if (seg042.file_find(file_name) == true)
                 {
@@ -815,14 +915,14 @@ namespace engine
                     if (save_game_keys.MemberOf(input_key) == true)
                     {
                         save_letter = input_key;
-                        string file_name = Path.Combine(Config.GetSavePath(), "savgam" + save_letter.ToString() + ".dat");
+                        string file_name = Path.Combine(Config.GetSavePath(), "SAVGAM" + save_letter.ToString() + ".DAT");
                         stop_loop = seg042.file_find(file_name);
                     }
                 } while (stop_loop == false);
 
                 if (save_letter != '\0')
                 {
-                    string file_name = Path.Combine(Config.GetSavePath(), "savgam" + save_letter.ToString() + ".dat");
+                    string file_name = Path.Combine(Config.GetSavePath(), "SAVGAM" + save_letter.ToString() + ".DAT");
 
                     loadSaveGame(file_name);
                 }
@@ -868,13 +968,16 @@ namespace engine
             seg051.BlockRead(1, data, file);
             gbl.game_state = (GameState)data[0];
 
-            for (int i = 0; i < 3; i++)
+            if (gbl.game == Game.CurseOfTheAzureBonds)
             {
-                seg051.BlockRead(2, data, file);
-                gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
+                for (int i = 0; i < 3; i++)
+                {
+                    seg051.BlockRead(2, data, file);
+                    gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
 
-                seg051.BlockRead(2, data, file);
-                gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
+                    seg051.BlockRead(2, data, file);
+                    gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
+                }
             }
 
             seg051.BlockRead(1, data, file);
@@ -927,7 +1030,7 @@ namespace engine
 
             if (gbl.area_ptr.inDungeon != 0)
             {
-                if (gbl.game_state != GameState.StartGameMenu)
+                if (gbl.game_state != GameState.StartGameMenu && gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     if (gbl.setBlocks[0].blockId > 0)
                     {
@@ -951,9 +1054,12 @@ namespace engine
             seg043.clear_keyboard();
             ovr027.ClearPromptArea();
 
-            gbl.last_game_state = gbl.game_state;
+            if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                gbl.last_game_state = gbl.game_state;
 
-            gbl.game_state = GameState.StartGameMenu;
+                gbl.game_state = GameState.StartGameMenu;
+            }
         }
 
         static Set unk_4AEA0 = new Set(0, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74); 
@@ -980,7 +1086,7 @@ namespace engine
 
                 do
                 {
-                    save_file.Assign(Path.Combine(Config.GetSavePath(), "savgam" + inputKey + ".dat"));
+                    save_file.Assign(Path.Combine(Config.GetSavePath(), "SAVGAM" + inputKey + ".DAT"));
                     seg051.Rewrite(save_file);
                     var_1FC = gbl.FIND_result;
 
@@ -1021,18 +1127,21 @@ namespace engine
                 data[0] = (byte)gbl.game_state;
                 seg051.BlockWrite(1, data, save_file);
 
-                for (int i = 0; i < 3; i++)
+                if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
-                    Sys.ShortToArray((short)gbl.setBlocks[i].blockId, data, (i * 4) + 0);
-                    Sys.ShortToArray((short)gbl.setBlocks[i].setId, data, (i * 4) + 2);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Sys.ShortToArray((short)gbl.setBlocks[i].blockId, data, (i * 4) + 0);
+                        Sys.ShortToArray((short)gbl.setBlocks[i].setId, data, (i * 4) + 2);
+                    }
+                    seg051.BlockWrite(12, data, save_file);
                 }
-                seg051.BlockWrite(12, data, save_file);
 
                 int party_count = 0;
                 foreach (Player tmp_player in gbl.TeamList)
                 {
                     party_count++;
-                    var_171[party_count - 1] = "CHRDAT" + inputKey + party_count.ToString();
+                    var_171[party_count - 1] = "CHRDAT" + Char.ToUpper(inputKey) + party_count.ToString();
                 }
 
                 data[0] = (byte)party_count;
@@ -1040,7 +1149,7 @@ namespace engine
 
                 for (int i = 0; i < party_count; i++)
                 {
-                    Sys.StringToArray(data, 0x29 * i, 0x29, var_171[i]);
+                    Sys.StringToArray(data, 0x29 * i, var_171[i].Length, var_171[i]);
                 }
                 seg051.BlockWrite(0x148, data, save_file);
                 seg051.Close(save_file);
@@ -1049,7 +1158,7 @@ namespace engine
                 foreach (Player tmp_player in gbl.TeamList)
                 {
                     party_count++;
-                    SavePlayer("CHRDAT" + inputKey + party_count.ToString(), tmp_player);
+                    SavePlayer("CHRDAT" + Char.ToUpper(inputKey) + party_count.ToString(), tmp_player);
                     remove_player_file(tmp_player);
                 }
 

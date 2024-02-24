@@ -50,7 +50,7 @@ namespace Classes.DaxFiles
                 DaxHeaderEntry dhe = new DaxHeaderEntry();
                 dhe.id = fileA.ReadByte();
                 dhe.offset = fileA.ReadInt32();
-                dhe.rawSize = fileA.ReadInt16();
+                dhe.rawSize = fileA.ReadUInt16();
                 dhe.compSize = fileA.ReadUInt16();
 
                 headers.Add(dhe);

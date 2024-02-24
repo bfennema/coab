@@ -272,6 +272,9 @@ namespace Classes
         [DataOffset(0x348, DataType.Byte)]
         public byte field_348;
 
+        [DataOffset(0x366, DataType.Byte)]
+        public byte field_366;
+
         [DataOffset(0x3C2, DataType.Word)]
         public ushort field_3C2;
         [DataOffset(0x3CA, DataType.Word)]
@@ -321,6 +324,12 @@ namespace Classes
             /* ovr021:0482 */
             switch (loc)
             {
+                case 0x186:
+                    field_186 = (byte)value;
+                    break;
+                case 0x188:
+                    field_188 = (byte)value;
+                    break;
                 case 0x18C:
                     field_18C = value;
                     break;
@@ -676,6 +685,10 @@ namespace Classes
                     field_348 = (byte)value;
                     break;
 
+                case 0x366:
+                    field_366 = (byte)value;
+                    break;
+
                 case 0x3C2:
                     field_3C2 = value;
                     break;
@@ -751,6 +764,10 @@ namespace Classes
             /* ovr021:0482 */
             switch (loc)
             {
+                case 0x186:
+                    return field_186; // world last x
+                case 0x188:
+                    return field_188; // world last y
                 case 0x18C:
                     return field_18C;
                 case 0x18E:
@@ -994,6 +1011,9 @@ namespace Classes
                     return field_344;
                 case 0x346:
                     return field_346;
+
+                case 0x366:
+                    return field_366;
 
                 case 0x3C2:
                     return field_3C2;

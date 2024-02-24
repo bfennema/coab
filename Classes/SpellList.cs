@@ -80,7 +80,10 @@ namespace Classes
 
         public void AddLearnt(int id)
         {
-            spells.Add(new SpellItem(id & 0x7F, id > 0x7f));
+            if (gbl.game != Game.CurseOfTheAzureBonds || (id & 0x7F) != (int)Spells.animate_dead)
+            {
+                spells.Add(new SpellItem(id & 0x7F, id > 0x7f));
+            }
         }
 
         public void MarkLearnt(int id)

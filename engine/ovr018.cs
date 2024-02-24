@@ -224,6 +224,37 @@ namespace engine
                             if (menuFlags[allow_load] == true)
                             {
                                 ovr017.loadGameMenu();
+                                if (gbl.game == Game.PoolOfRadiance)
+                                {
+                                    if (gbl.game == Game.PoolOfRadiance && gbl.area_ptr.field_3FA == 1)
+                                    {
+                                        if (gbl.reload_ecl_and_pictures == false &&
+                                            gbl.lastDaxBlockId != 0x50)
+                                        {
+                                            if (gbl.game_state == GameState.WildernessMap)
+                                            {
+                                                seg037.DrawFrame_WildernessMap();
+                                            }
+                                            else
+                                            {
+                                                seg037.DrawFrame_Dungeon();
+                                            }
+                                            ovr025.PartySummary(gbl.SelectedPlayer);
+                                        }
+                                        else
+                                        {
+                                            if (gbl.area_ptr.LastEclBlockId == 0)
+                                            {
+                                                seg037.DrawFrame_Dungeon();
+                                            }
+                                        }
+
+                                        ovr027.ClearPromptArea();
+                                        gbl.area2_ptr.training_class_mask = 0;
+
+                                        return;
+                                    }
+                                }
                             }
                             break;
 
@@ -240,7 +271,9 @@ namespace engine
                             if (menuFlags[allow_begin] == true)
                             {
                                 if ((gbl.TeamList.Count > 0 && gbl.inDemo == true) ||
-                                    gbl.area_ptr.field_3FA == 0 || gbl.inDemo == true)
+                                    (gbl.game == Game.PoolOfRadiance && gbl.area_ptr.field_3FA == 1) ||
+                                    (gbl.game == Game.CurseOfTheAzureBonds && gbl.area_ptr.field_3FA == 0) ||
+                                    gbl.inDemo == true)
                                 {
                                     gbl.game_state = gameStateBackup;
 
@@ -307,8 +340,8 @@ namespace engine
 
         internal static byte[] /*seg600:3EA2 */ unk_1A1B2 = { 0x02, 0x10, 0x08, 0x40, 0x40, 0x01, 0x04, 0x20 };
 
-        //static byte[] /*seg600:45B3 */ unk_1A8C3 = { 3, 3, 5, 5, 5, 2, 2, 5 };
-        //static byte[] /*seg600:45B4 */ unk_1A8C4 = { 6, 6, 4, 4, 4, 4, 6, 4 };
+        static byte[] /*seg600:45B3 unk_1A8C3 */ gold_count = { 3, 3, 5, 5, 5, 2, 2, 5 };
+        static byte[] /*seg600:45B4 unk_1A8C4 */ gold_size = { 6, 6, 4, 4, 4, 4, 6, 4 };
 
         internal static sbyte[,] /* seg600:3E3A unk_1A14A */ thac0_table = {
             {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46, 48, 48, 48, 50, 50, 50},
@@ -480,7 +513,14 @@ namespace engine
                 }
             } while (input_key != 'S');
 
-            player.exp = 25000;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                player.exp = 0;
+            }
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                player.exp = 25000;
+            }
             player._class = ClassList[index - 1];
             player.HitDice = 1;
 
@@ -507,58 +547,58 @@ namespace engine
             {
                 player.cleric_lvl = 1;
                 player.fighter_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_f_m)
             {
                 player.cleric_lvl = 1;
                 player.fighter_lvl = 1;
                 player.magic_user_lvl = 1;
-                player.exp = 8333;
+                player.exp /= 3;
             }
             else if (player._class == ClassId.mc_c_r)
             {
                 player.cleric_lvl = 1;
                 player.ranger_lvl = 1;
                 ovr024.add_affect(false, 0xff, 0, Affects.ranger_vs_giant, player);
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_mu)
             {
                 player.cleric_lvl = 1;
                 player.magic_user_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_t)
             {
                 player.cleric_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_f_mu)
             {
                 player.fighter_lvl = 1;
                 player.magic_user_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_f_t)
             {
                 player.fighter_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_f_mu_t)
             {
                 player.fighter_lvl = 1;
                 player.magic_user_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 8333;
+                player.exp /= 3;
             }
             else if (player._class == ClassId.mc_mu_t)
             {
                 player.magic_user_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 8333;
+                player.exp /= 2;
             }
 
             if (player.thief_lvl > 0)
@@ -754,6 +794,7 @@ namespace engine
                 player.field_125 = 1;
                 player.base_movement = 12;
                 class_count = 0;
+                int gold = 0;
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -778,8 +819,12 @@ namespace engine
                             player.spellCastCount[2, 0] = 1;
                         }
 
-                        //var_21 += ovr024.roll_dice(unk_1A8C4[class_idx], unk_1A8C3[class_idx]);
-                        //TODO this was not used in original code.
+                        int gold_roll = ovr024.roll_dice(gold_size[(byte)skill], gold_count[(byte)skill]);
+                        if (skill != SkillType.Monk)
+                        {
+                            gold_roll *= 10;
+                        }
+                        gold += gold_roll;
 
                         if (skill == SkillType.Cleric)
                         {
@@ -813,7 +858,14 @@ namespace engine
                         {
                             player.spellBook.LearnSpell(Spells.detect_magic_MU);
                             player.spellBook.LearnSpell(Spells.read_magic);
-                            player.spellBook.LearnSpell(Spells.enlarge);
+                            if (gbl.game == Game.PoolOfRadiance)
+                            {
+                                player.spellBook.LearnSpell(Spells.shield);
+                            }
+                            else if (gbl.game == Game.CurseOfTheAzureBonds)
+                            {
+                                player.spellBook.LearnSpell(Spells.enlarge);
+                            }
                             player.spellBook.LearnSpell(Spells.sleep);
                         }
 
@@ -821,7 +873,14 @@ namespace engine
                     }
                 }
 
-                player.Money.SetCoins(Money.Platinum, 300);
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+                    player.Money.SetCoins(Money.Gold, gold / class_count);
+                }
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    player.Money.SetCoins(Money.Platinum, 300);
+                }
                 player.hit_point_rolled = roll_hp(0xff, player);
                 player.hit_point_max = player.hit_point_rolled;
 
