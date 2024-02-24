@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 
 namespace Classes.DaxFiles
@@ -15,20 +16,26 @@ namespace Classes.DaxFiles
             LoadFile(filename);
         }
 
-        private void LoadFile(string filename)
+        private void LoadFile(string fileName)
         {
             int dataOffset = 0;
+            string filePath = Path.Combine(gbl.exe_path, fileName);
 
-            if (System.IO.File.Exists(filename) == false)
+            if (System.IO.File.Exists(filePath) == false)
             {
-                return;
+                filePath = Path.Combine(Path.Combine(gbl.exe_path, "Data"), fileName);
+
+                if (System.IO.File.Exists(filePath) == false)
+                {
+                    filePath = Path.Combine(Path.Combine(gbl.exe_path, "..\\..\\..\\Data"), fileName);
+                }
             }
 
             System.IO.BinaryReader fileA;
 
             try
             {
-                System.IO.FileStream fsA = new System.IO.FileStream(filename, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+                System.IO.FileStream fsA = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
 
                 fileA = new System.IO.BinaryReader(fsA);
             }
