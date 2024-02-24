@@ -777,7 +777,7 @@ namespace engine
                     item._value += (short)(var_1 * 300);
                 }
             }
-            else if (type == ItemType.Gauntlets || type == ItemType.Type_67)
+            else if (type == ItemType.Gauntlets || type == ItemType.CloakOfProt)
             {
                 var_4 = 5;
             }
@@ -785,7 +785,7 @@ namespace engine
             {
                 var_4 = 4;
             }
-            else if (type == ItemType.Type_89 || type == ItemType.Cloak)
+            else if (type == ItemType.FireGiantBoulder || type == ItemType.Cloak)
             {
                 var_4 = 1;
             }

@@ -664,7 +664,7 @@ namespace engine
                 {
                     Item newItem = new Item(0, Affects.helpless, (Affects)hf_player.field_86,
                         (short)(hf_player.field_86 * 0xc8), 0, 0,
-                        false, 0, false, 0, 0, 0x42, 0xa7, 0xa8, ItemType.RingInvis, true);
+                        false, 0, false, 0, 0, 0x42, 0xa7, 0xa8, ItemType.Ring, true);
 
                     player.items.Add(newItem);
                 }

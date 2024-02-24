@@ -830,7 +830,7 @@ namespace engine
                 rating += itemData.bonusNormal * 2;
             }
 
-            if (item.type == ItemType.Type_85 &&
+            if (item.type == ItemType.HolyWater &&
                 player.actions.target != null &&
                 player.actions.target.field_E9 > 0)
             {
@@ -896,7 +896,7 @@ namespace engine
             {
                 ItemType item_type = item.type;
 
-                if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.slot_0 &&
+                if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.Weapon &&
                     (gbl.ItemDataTable[item_type].classFlags & player.classFlags) != 0)
                 {
                     int power_rating = CalcItemPowerRating(item, player);
