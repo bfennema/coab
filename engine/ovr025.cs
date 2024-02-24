@@ -1347,6 +1347,7 @@ namespace engine
 			}
 
 			if (gbl.SelectedPlayer.cleric_lvl == 0 &&
+				gbl.SelectedPlayer.druid_lvl == 0 &&
 				gbl.SelectedPlayer.magic_user_lvl == 0 &&
 				gbl.SelectedPlayer.paladin_lvl < 9 &&
 				gbl.SelectedPlayer.ranger_lvl < 8)
@@ -1365,9 +1366,10 @@ namespace engine
 						break;
 
 					case SpellClass.Druid:
+						int druid_count = gbl.SelectedPlayer.SkillLevel(SkillType.Druid);
 						int ranger_count = gbl.SelectedPlayer.SkillLevel(SkillType.Ranger) - 7;
 
-						target_count = Math.Max(ranger_count, 0);
+						target_count = Math.Max(druid_count, ranger_count);
 						break;
 
 					case SpellClass.MagicUser:

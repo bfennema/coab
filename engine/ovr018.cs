@@ -769,6 +769,10 @@ namespace engine
                         {
                             player.spellCastCount[0, 0] = 1;
                         }
+                        else if (skill == SkillType.Druid)
+                        {
+                            player.spellCastCount[1, 0] = 2;
+                        }
                         else if (skill == SkillType.MagicUser)
                         {
                             player.spellCastCount[2, 0] = 1;
@@ -785,7 +789,21 @@ namespace engine
                             {
                                 SpellEntry stru = gbl.spellCastingTable[(int)spell];
 
-                                if (stru.spellClass == 0 && stru.spellLevel == 1)
+                                if (stru.spellClass == SpellClass.Cleric && stru.spellLevel == 1)
+                                {
+                                    player.spellBook.LearnSpell(spell);
+                                }
+                            }
+                        }
+                        else if (skill == SkillType.Druid)
+                        {
+                            ovr026.calc_druid_spells(false, player);
+
+                            foreach (Spells spell in System.Enum.GetValues(typeof(Spells)))
+                            {
+                                SpellEntry stru = gbl.spellCastingTable[(int)spell];
+
+                                if (stru.spellClass == SpellClass.Druid && stru.spellLevel == 1)
                                 {
                                     player.spellBook.LearnSpell(spell);
                                 }
@@ -1376,6 +1394,7 @@ namespace engine
             } while (controlkey == true || inputkey != 0x4B);
 
             ovr026.calc_cleric_spells(true, gbl.SelectedPlayer);
+            ovr026.calc_druid_spells(true, gbl.SelectedPlayer);
 
             gbl.SelectedPlayer.npcTreasureShareCount = 1;
 
@@ -2177,7 +2196,7 @@ namespace engine
 
         internal static int[,] exp_table = { /* seg600:4293 unk_1A5A3 */
             /* Cleric */    { 0, 1501, 3001,  6001, 13001, 27501, 55001, 110001, 225001, 450001, 675001, 900001, 1125001, 1350001, 1575001, -1, -1, -1, -1 },
-            /* Druid */     { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
+            /* Druid */     { 0, 2001, 4001,  7501, 12501, 20001, 35001,  60001,  90001, 235001,  200001,  300001, 750001, 1500001, -1, -1, -1, -1, -1 },
             /* Fighter */   { 0, 2001, 4001,  8001, 18001, 35001, 70001, 125001, 250001, 500001,  750001, 1000001, 1250001, 1500001, 1750001, -1, -1, -1, -1  },
             /* Paladin */   { 0, 2751, 5501, 12001, 24001, 45001, 95001, 175001, 350001, 700001, 1050001, 1400001, 1750001, 2100001, 2450001, -1, -1, -1, -1 },
             /* Ranger */    { 0, 2251, 4501, 10001, 20001, 40001, 90001, 150001, 225001, 325001,  650001, 975001, 1300001, 1625001, 1950001, -1, -1, -1, -1 },

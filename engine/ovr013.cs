@@ -265,11 +265,73 @@ namespace engine
 
 		internal static void AffectResistFire(Effect add_remove, object param, Player player) /* sub_3A480 */
 		{
+			Affect affect = (Affect)param;
 			if (add_remove == Effect.Add &&
 				(gbl.damage_flags & DamageType.Fire) != 0)
 			{
 				gbl.damage /= 2;
-				gbl.savingThrowRoll += 3;
+				if (affect.affect_data > 1)
+					gbl.savingThrowRoll += affect.affect_data;
+				else
+					gbl.savingThrowRoll += 3;
+			}
+		}
+
+		internal static void AffectProtectFire(Effect add_remove, object param, Player player) /* sub_3A480 */
+		{
+			Affect affect = (Affect)param;
+			if (add_remove == Effect.Add &&
+				(gbl.damage_flags & DamageType.Fire) != 0)
+			{
+				if (affect.affect_data > gbl.damage)
+				{
+					affect.affect_data -= (byte)gbl.damage;
+					gbl.damage = 0;
+				}
+				else
+				{
+					gbl.damage -= affect.affect_data;
+					affect.affect_data = 0;
+					player.affects.Remove(affect);
+					//ovr024.remove_affect(affect, Affects.protection_from_fire, player);
+				}
+			}
+		}
+
+
+        internal static void AffectResistLightning(Effect add_remove, object param, Player player) /* sub_3A480 */
+		{
+			Affect affect = (Affect)param;
+			if (add_remove == Effect.Add &&
+				(gbl.damage_flags & DamageType.Electricity) != 0)
+			{
+				gbl.damage /= 2;
+                if (affect.affect_data > 1)
+                    gbl.savingThrowRoll += affect.affect_data;
+                else
+                    gbl.savingThrowRoll += 3;
+            }
+		}
+
+
+		internal static void AffectProtectLightning(Effect add_remove, object param, Player player) /* sub_3A480 */
+		{
+			Affect affect = (Affect)param;
+			if (add_remove == Effect.Add &&
+				(gbl.damage_flags & DamageType.Electricity) != 0)
+			{
+				if (affect.affect_data > gbl.damage)
+				{
+					affect.affect_data -= (byte)gbl.damage;
+					gbl.damage = 0;
+				}
+				else
+				{
+					gbl.damage -= affect.affect_data;
+					affect.affect_data = 0;
+					player.affects.Remove(affect);
+					//ovr024.remove_affect(affect, Affects.protection_from_fire, player);
+				}
 			}
 		}
 
@@ -1309,7 +1371,8 @@ namespace engine
 
 			if (gbl.spell_target.HasAffect(Affects.resist_fire) == false &&
 				gbl.spell_target.HasAffect(Affects.cold_fire_shield) == false &&
-				gbl.spell_target.HasAffect(Affects.fire_resist) == false)
+				gbl.spell_target.HasAffect(Affects.fire_resist) == false &&
+				gbl.spell_target.HasAffect(Affects.protection_from_fire) == false)
 			{
 				gbl.damage += ovr024.roll_dice(6, 1);
 			}
@@ -1778,6 +1841,17 @@ namespace engine
 		{
 		}
 
+		internal static void AffectBarkskin(Effect arg_0, object param, Player player)
+		{
+			player.ac += 1;
+			player.ac_behind += 1;
+
+			if (gbl.saveVerseType != SaveVerseType.Spell)
+			{
+				gbl.savingThrowRoll += 1;
+			}
+		}
+
 		static System.Collections.Generic.Dictionary<Affects, affectDelegate> affect_table;
 
 		internal static void SetupAffectTables() // setup_spells2
@@ -1931,6 +2005,10 @@ namespace engine
 			affect_table.Add(Affects.dispel_evil_banish, ovr013.AffectDispelEvilBanish);
 			affect_table.Add(Affects.strength_spell, ovr013.empty);
 			affect_table.Add(Affects.do_items_affect, ovr013.do_items_affect);
+			affect_table.Add(Affects.barkskin, ovr013.AffectBarkskin);
+			affect_table.Add(Affects.protection_from_fire, ovr013.AffectProtectFire);
+			affect_table.Add(Affects.resist_lightning, ovr013.AffectResistLightning);
+			affect_table.Add(Affects.protection_from_lightning, ovr013.AffectProtectLightning);
 		}
 
 		internal static void CallAffectTable(Effect add_remove, object parameter, Player player, Affects affect) /* sub_630C7 */
