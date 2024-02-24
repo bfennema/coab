@@ -102,11 +102,11 @@ namespace engine
                                 int sp_class = (se.spellLevel - 1) / 5;
                                 int sp_lvl = (se.spellLevel - 1) % 5;
 
-                                if (se.spellClass == 0 &&
+                                if (se.spellClass == SpellClass.Cleric &&
                                     player.spellCastCount[sp_class, sp_lvl] > 0 &&
                                     spell != Spells.animate_dead)
                                 {
-                                    player.LearnSpell(spell);
+                                    player.spellBook.LearnSpell(spell);
                                 }
                             }
                             break;
@@ -159,7 +159,7 @@ namespace engine
                                     if (se.spellClass == 0 &&
                                         player.spellCastCount[sp_class, sp_lvl] > 0)
                                     {
-                                        player.LearnSpell(spell);
+                                        player.spellBook.LearnSpell(spell);
                                     }
                                 }
                             }
@@ -185,7 +185,7 @@ namespace engine
                                 {
                                     if (gbl.spellCastingTable[(int)spell].spellClass == SpellClass.Druid)
                                     {
-                                        player.LearnSpell(spell);
+                                        player.spellBook.LearnSpell(spell);
                                     }
                                 }
                             }
@@ -377,12 +377,12 @@ namespace engine
                     if (player.spellCastCount[index, 1] > 0)
                     {
                         player.spellCastCount[index, 1] += 1;
-                }
+                    }
 
                     if (player.spellCastCount[index, 3] > 0)
-                {
+                    {
                         player.spellCastCount[index, 3] += 1;
-                }
+                    }
                 }
 
                 if (player.stats2.Wis.full > 20)
@@ -390,12 +390,12 @@ namespace engine
                     if (player.spellCastCount[index, 2] > 0)
                     {
                         player.spellCastCount[index, 2] += 1;
-                }
+                    }
 
                     if (player.spellCastCount[index, 4] > 0)
-                {
+                    {
                         player.spellCastCount[index, 4] += 1;
-                }
+                    }
                 }
 
                 if (player.stats2.Wis.full > 21)
@@ -403,7 +403,7 @@ namespace engine
                     if (player.spellCastCount[index, 3] > 0)
                     {
                         player.spellCastCount[index, 3] += 1;
-                }
+                    }
 
                     if (player.spellCastCount[index, 4] > 0)
                     {
@@ -414,18 +414,18 @@ namespace engine
                 if (player.stats2.Wis.full > 22)
                 {
                     if (player.spellCastCount[index, 3] > 0)
-                {
+                    {
                         player.spellCastCount[index, 4] += 2;
                     }
                 }
             }
-                }
+        }
 
 
         internal static void calc_cleric_spells(bool ResetSpellLevels, Player player) /* sub_6A686 */
         {
             calc_wis_spells(SkillType.Cleric, 0, ClericSpellLevels, ResetSpellLevels, player);
-            }
+        }
 
 
         internal static void calc_druid_spells(bool ResetSpellLevels, Player player)
@@ -466,15 +466,15 @@ namespace engine
                         }
                     }
 
-                if (player.ClassLevel[_class] > player.ClassLevelsOld[_class])
-                {
-                    byte dl = SaveThrowValues[_class, player.ClassLevelsOld[_class], save];
-
-                    if (player.saveVerse[save] > dl)
+                    if (player.ClassLevel[_class] > player.ClassLevelsOld[_class])
                     {
-                        player.saveVerse[save] = dl;
+                        byte dl = SaveThrowValues[_class, player.ClassLevelsOld[_class], save];
+
+                        if (player.saveVerse[save] > dl)
+                        {
+                            player.saveVerse[save] = dl;
+                        }
                     }
-                }
                 }
 
                 if (save == 0)

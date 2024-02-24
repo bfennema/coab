@@ -600,7 +600,7 @@ namespace engine
 				ovr025.DisplayPlayerStatusString(true, 10, "Avoids it", player);
 				gbl.damage = 0;
 				gbl.attack_roll = -1;
-                gbl.bytes_1D2C9[1] -= 1;
+                gbl.attacksHit[1] -= 1;
 			}
 		}
 
@@ -1103,6 +1103,23 @@ namespace engine
 			}
 		}
 
+		internal static void AffectStrength(Effect arg_00, object param, Player player)
+		{
+			Affect affect = player.GetAffect(Affects.strength);
+
+			if (arg_00 == Effect.Add && affect != null)
+			{
+				int encodedStrength;
+
+				if (ovr024.TryEncodeStrength(out encodedStrength, 100, 18, player) == true)
+				{
+					ovr025.DisplayPlayerStatusString(true, 10, "is stronger", player);
+					affect.affect_data = (byte)encodedStrength;
+                }
+
+				ovr024.CalcStatBonuses(Stat.STR, player);
+			}
+        }
 
 		internal static void AffectDisplace(Effect arg_0, object param, Player player) /*sub_3BA55*/
 		{
@@ -1824,7 +1841,7 @@ namespace engine
 			affect_table.Add(Affects.confuse, ovr013.AffectConfuse);
 			affect_table.Add(Affects.bestow_curse, ovr013.affect_curse);
 			affect_table.Add(Affects.blink, ovr013.AffectBlink);
-			affect_table.Add(Affects.strength, ovr013.empty);
+			affect_table.Add(Affects.strength, ovr013.AffectStrength);
 			affect_table.Add(Affects.haste, ovr013.AffectHaste);
 			affect_table.Add(Affects.affect_in_stinking_cloud, ovr013.StinkingCloudAffect);
 			affect_table.Add(Affects.prot_from_normal_missiles, ovr013.AffectProtNormalMissles);

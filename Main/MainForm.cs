@@ -171,7 +171,7 @@ namespace Main
             Classes.Cheats.AllowPlayerModifySet(flipped);
         }
 
-		private void allowGodsInterveneToolStripMenuItem_Click(object sender, EventArgs e)
+        private void allowGodsInterveneToolStripMenuItem_Click(object sender, EventArgs e)
 		{
 			bool flipped = !Settings.Default.AllowGodsIntervene;
 			Settings.Default.AllowGodsIntervene = flipped;

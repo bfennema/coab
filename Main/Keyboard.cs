@@ -38,7 +38,7 @@ namespace Main
 
             if (key == Keys.Home || key == Keys.NumPad7 || key == Keys.OemOpenBrackets)
             {
-                return 0x4700;
+                return 0x4700; // "G"
             }
 
             if (key == Keys.Up || key == Keys.NumPad8)
@@ -48,7 +48,7 @@ namespace Main
 
             if (key == Keys.PageUp || key == Keys.NumPad9)
             {
-                return 0x4900;
+                return 0x4900; // "I"
             }
 
             if (key == Keys.Left || key == Keys.NumPad4)
@@ -69,7 +69,7 @@ namespace Main
 
             if (key == Keys.End || key == Keys.NumPad1 || key == Keys.OemCloseBrackets)
             {
-                return 0x4F00;
+                return 0x4F00; // "O"
             }
 
             if (key == Keys.Down || key == Keys.NumPad2)
@@ -79,7 +79,7 @@ namespace Main
 
             if (key == Keys.PageDown || key == Keys.NumPad3)
             {
-                return 0x5100;
+                return 0x5100; // "Q"
             }
 
             if (key == Keys.OemMinus)
