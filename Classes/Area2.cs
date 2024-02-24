@@ -166,6 +166,7 @@ namespace Classes
                 case 0x58e: return (ushort)field_58E;
                 case 0x592: return (ushort)field_592;
                 case 0x594: return search_flags;
+                case 0x5a6: return (ushort)rest_incounter_percentage;
                 case 0x5aa: return tried_to_exit_map ? (ushort)1 : (ushort)0;
                 case 0x67e: return (ushort)field_67E;
 
@@ -206,6 +207,9 @@ namespace Classes
 
                 case 0x580:
                     max_encounter_distance = value;
+                    break;
+                case 0x582:
+                    encounter_distance = value;
                     break;
 
                 case 0x58C:
