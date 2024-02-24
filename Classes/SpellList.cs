@@ -80,7 +80,10 @@ namespace Classes
 
         public void AddLearnt(int id)
         {
-            spells.Add(new SpellItem(id & 0x7F, id > 0x7f));
+            if (gbl.game != Game.CurseOfTheAzureBonds || (id & 0x7F) != (int)Spells.animate_dead)
+            {
+                spells.Add(new SpellItem(id & 0x7F, id > 0x7f));
+            }
         }
 
         public void MarkLearnt(int id)
@@ -108,9 +111,9 @@ namespace Classes
             spells.RemoveAll(sp => sp.Learning == true);
         }
 
-        public void Load(byte[] data, int offset)
+        public void Load(byte[] data, int offset, int size = SpellListSize)
         {
-            for (int i = 0; i < SpellListSize; i++)
+            for (int i = 0; i < size; i++)
             {
                 if (data[offset + i] > 0)
                 {
