@@ -46,7 +46,7 @@ namespace Classes
         public static string ArrayToString(byte[] data, int offset, int maxLen)
         {
             int len = data[offset];
-            len = Math.Min(len, maxLen);
+            len = Math.Min(len, maxLen-1);
 
             StringBuilder sb = new StringBuilder(len);
 

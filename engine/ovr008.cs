@@ -712,6 +712,10 @@ namespace engine
                 }
 
                 gbl.area_ptr.field_6A00_Set((location - gbl.vm_mem0_offset) * 2, value);
+                if (gbl.game == Game.PoolOfRadiance && (location - gbl.vm_mem0_offset) == 0xFB)
+                {
+                    ovr029.RedrawView();
+                }
             }
             else if (memType == 1)
             {
@@ -733,12 +737,15 @@ namespace engine
                     switch (location)
                     {
                         case 0xFB:
+                            gbl.word_1D914 = (short)value;
                             break;
 
                         case 0xFC:
+                            gbl.word_1D916 = (short)value;
                             break;
 
                         case 0xB1:
+                            gbl.word_1D918 = (short)value;
                             break;
 
                         case 0x3DE:

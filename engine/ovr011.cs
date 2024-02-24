@@ -758,14 +758,14 @@ namespace engine
         {
             if (gbl.area_ptr.inDungeon != 0)
             {
-                ovr034.Load24x24Set(0x19, 0, 1, "DungCom");
+                ovr034.Load24x24Set(25, 0, 1, "DungCom");
             }
             else
             {
-                ovr034.Load24x24Set(0x21, 0, 1, "WildCom");
+                 ovr034.Load24x24Set(34, 0, 1, "WildCom");
             }
 
-            ovr034.Load24x24Set(6, 0x22, 1, "RandCom");
+            ovr034.Load24x24Set(6, 34, 1, "RandCom");
 
             gbl.mapToBackGroundTile = new Struct_1D1BC();
 

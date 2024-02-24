@@ -265,13 +265,18 @@ namespace engine
             player.stats2.Str00.Load(bp_var_1C0.stat_str00);
             player.stats2.Str00.EnforceRaceSexLimits(race, sex);
 
+            player.spellList.Load(bp_var_1C0.field_17, 0, 0x15);
+
             player.thac0 = bp_var_1C0.thac0;
             player._class = (ClassId)bp_var_1C0._class;
             player.age = bp_var_1C0.age;
             player.hit_point_max = bp_var_1C0.hp_max;
 
             player.spellBook.Load(bp_var_1C0.field_33, 0x38);
-            player.spellBook.UnlearnSpell(Spells.animate_dead);
+            if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                player.spellBook.UnlearnSpell(Spells.animate_dead);
+            }
 
             player.attackLevel = bp_var_1C0.field_6B;
             player.icon_dimensions = bp_var_1C0.icon_dimensions;
@@ -293,7 +298,13 @@ namespace engine
             player.field_F9 = bp_var_1C0.field_86;
             player.field_FA = bp_var_1C0.field_87;
 
-            player.Money.SetCoins(Money.Platinum, 300);
+            player.Money.SetCoins(Money.Copper, bp_var_1C0.field_88);
+            player.Money.SetCoins(Money.Silver, bp_var_1C0.field_8A);
+            player.Money.SetCoins(Money.Electrum, bp_var_1C0.field_8C);
+            player.Money.SetCoins(Money.Gold, bp_var_1C0.field_8E);
+            player.Money.SetCoins(Money.Platinum, bp_var_1C0.field_90);
+            player.Money.SetCoins(Money.Gems, bp_var_1C0.field_92);
+            player.Money.SetCoins(Money.Jewelry, bp_var_1C0.field_94);
 
             System.Array.Copy(bp_var_1C0.field_96, player.ClassLevel, 8);
 
@@ -358,6 +369,7 @@ namespace engine
             player.health_status = (Status)bp_var_1C0.field_10C;
             player.in_combat = bp_var_1C0.field_10D != 0;
             player.combat_team = (CombatTeam)bp_var_1C0.field_10E;
+            player.quick_fight = (QuickFight)bp_var_1C0.field_10F;
             player.hitBonus = bp_var_1C0.field_110;
 
             player.ac = bp_var_1C0.field_111;
@@ -510,6 +522,11 @@ namespace engine
                 PoolRadPlayer poolRadPlayer = new PoolRadPlayer(data);
 
                 player = ConvertPoolRadPlayer(poolRadPlayer);
+                if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    player.Money.ClearAll();
+                    player.Money.SetCoins(Money.Platinum, 300);
+                }
             }
             else if (gbl.import_from == ImportSource.Hillsfar)
             {
@@ -524,7 +541,9 @@ namespace engine
                 var_1C4 = null;
             }
 
-            if (gbl.import_from == ImportSource.Curse)
+
+            if ((gbl.game == Game.PoolOfRadiance && gbl.import_from == ImportSource.Pool) ||
+                (gbl.game == Game.CurseOfTheAzureBonds && gbl.import_from == ImportSource.Curse))
             {
                 arg_8 = System.IO.Path.GetFileNameWithoutExtension(arg_8);
             }
@@ -533,7 +552,15 @@ namespace engine
                 arg_8 = seg042.clean_string(player.name);
             }
 
-            string filename = Path.Combine(Config.GetSavePath(), arg_8 + ".swg");
+            string filename;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                filename = Path.Combine(Config.GetSavePath(), arg_8 + ".itm");
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                filename = Path.Combine(Config.GetSavePath(), arg_8 + ".swg");
+            }
             if (seg042.file_find(filename) == true)
             {
                 byte[] data = new byte[Item.StructSize];
@@ -590,10 +617,27 @@ namespace engine
                     {
                         if (seg051.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
                         {
-                            if (asc_49280.MemberOf(data[0]) == true)
+                            if (gbl.game == Game.PoolOfRadiance)
                             {
-                                Affect tmpAffect = new Affect(data, 0);
-                                player.affects.Add(tmpAffect);
+                                Affect tmp_affect = new Affect(data, 0);
+                                if (tmp_affect.type == Affects.strength)
+                                {
+                                    int str_00;
+                                    int str;
+                                    ovr024.decode_strength(out str_00, out str, tmp_affect);
+                                    player.stats2.Str.cur = str;
+                                    player.stats2.Str00.cur = str_00;
+                                }
+
+                                player.affects.Add(new Affect(data, 0));
+                            }
+                            else if (gbl.game == Game.CurseOfTheAzureBonds)
+                            {
+                                if (asc_49280.MemberOf(data[0]) == true)
+                                {
+                                    Affect tmpAffect = new Affect(data, 0);
+                                    player.affects.Add(tmpAffect);
+                                }
                             }
                         }
                         else
@@ -696,6 +740,8 @@ namespace engine
                     PoolRadPlayer poolRadPlayer = new PoolRadPlayer(data);
 
                     player = ConvertPoolRadPlayer(poolRadPlayer);
+                    player.Money.ClearAll();
+                    player.Money.SetCoins(Money.Platinum, 300);
 
                     Player PreviousSelectedPlayer = gbl.SelectedPlayer;
                     gbl.SelectedPlayer = player;
@@ -842,7 +888,16 @@ namespace engine
                 }
             }
 
-            Player player = new Player(data, 0);
+            Player player;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                PoolRadPlayer poolRadPlayer = new PoolRadPlayer(data);
+                player = ConvertPoolRadPlayer(poolRadPlayer);
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                player = new Player(data, 0);
+            }
 
             seg042.load_decode_dax(out data, out decode_size, monster_id, "MON" + area_text + "SPC.dax");
 
@@ -885,7 +940,27 @@ namespace engine
 
                 AssignPlayerIconId(player);
 
-                ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+
+                    if (player.icon_size == 0)
+                    {
+                        player.icon_size = 2;
+
+                        for (int i = 0; i < 6; i++)
+                        {
+                            byte colour = i == 3 ? gbl.default_icon_colours[i] : ovr024.roll_dice(7, 1);
+
+                            player.icon_colours[i] = (byte)(((colour + 8) << 4) + colour);
+                        }
+                    }
+
+                    player.combat_team = CombatTeam.Ours;
+                }
+                else // if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                }
             }
         }
 
@@ -928,7 +1003,14 @@ namespace engine
 
         internal static void loadGameMenu() // loadGame
         {
-            gbl.import_from = ImportSource.Curse;
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                gbl.import_from = ImportSource.Pool;
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                gbl.import_from = ImportSource.Curse;
+            }
 
             string games_list = string.Empty;
 
@@ -1012,13 +1094,16 @@ namespace engine
             seg051.BlockRead(1, data, file);
             gbl.game_state = (GameState)data[0];
 
-            for (int i = 0; i < 3; i++)
+            if (gbl.game == Game.CurseOfTheAzureBonds)
             {
-                seg051.BlockRead(2, data, file);
-                gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
+                for (int i = 0; i < 3; i++)
+                {
+                    seg051.BlockRead(2, data, file);
+                    gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
 
-                seg051.BlockRead(2, data, file);
-                gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
+                    seg051.BlockRead(2, data, file);
+                    gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
+                }
             }
 
             seg051.BlockRead(1, data, file);

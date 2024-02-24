@@ -105,6 +105,15 @@ namespace engine
             //Logging.Logger.Debug("");
 
 
+            gbl.game = Game.PoolOfRadiance;
+            //gbl.game = Game.CurseOfTheAzureBonds;
+
+            if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                gbl.sky_dax_250 = seg040.LoadDax(13, 1, 250, "SKY");
+                gbl.sky_dax_251 = seg040.LoadDax(13, 1, 251, "SKY");
+                gbl.sky_dax_252 = seg040.LoadDax(13, 1, 252, "SKY");
+            }
 
             if (Cheats.skip_title_screen == false)
             {
@@ -139,14 +148,29 @@ namespace engine
                 }
                 else
                 {
-                    gbl.game_area = 2;
-                    gbl.vm_mem0_offset = 0x4B00;
-                    gbl.vm_mem0_size = 0x0400;
-                    gbl.vm_mem1_offset = 0x7C00;
-                    gbl.vm_mem1_size = 0x0400;
-                    gbl.vm_mem2_offset = 0x7A00;
-                    gbl.vm_mem2_size = 0x0200;
-                    gbl.initial_ecl_offset = 0x8000;
+                    switch (gbl.game)
+                    {
+                        case Game.PoolOfRadiance:
+                            gbl.game_area = 3;
+                            gbl.vm_mem0_offset = 0x4900;
+                            gbl.vm_mem0_size = 0x0400;
+                            gbl.vm_mem1_offset = 0x6B00;
+                            gbl.vm_mem1_size = 0x0400;
+                            gbl.vm_mem2_offset = 0x9800;
+                            gbl.vm_mem2_size = 0x0100;
+                            gbl.initial_ecl_offset = 0x9900;
+                            break;
+                        case Game.CurseOfTheAzureBonds:
+                            gbl.game_area = 2;
+                            gbl.vm_mem0_offset = 0x4B00;
+                            gbl.vm_mem0_size = 0x0400;
+                            gbl.vm_mem1_offset = 0x7C00;
+                            gbl.vm_mem1_size = 0x0400;
+                            gbl.vm_mem2_offset = 0x7A00;
+                            gbl.vm_mem2_size = 0x0200;
+                            gbl.initial_ecl_offset = 0x8000;
+                            break;
+                    }
                 }
 
                 if (gbl.inDemo == false)
@@ -218,7 +242,7 @@ namespace engine
             gbl.dax24x24Set = null;
             gbl.dword_1C8FC = null;
 
-            gbl.dax24x24Set = new DaxBlock(0, 0x30, 3, 0x18);
+            gbl.dax24x24Set = new DaxBlock(0, 0x80, 3, 24);
 
             gbl.area_ptr.Clear();
 
@@ -320,8 +344,8 @@ namespace engine
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-            ovr038.Load8x8D(4, 0xca);
-            ovr038.Load8x8D(0, 0xcb);
+            ovr038.Load8x8D(4, 202);
+            ovr038.Load8x8D(0, 203);
 
             for (gbl.byte_1AD44 = 0; gbl.byte_1AD44 <= 0x0b; gbl.byte_1AD44++)
             {
@@ -329,10 +353,6 @@ namespace engine
             }
 
             ovr034.chead_cbody_comspr_icon(0x19, 0x19, "COMSPR");
-
-            gbl.sky_dax_250 = seg040.LoadDax(13, 1, 250, "SKY");
-            gbl.sky_dax_251 = seg040.LoadDax(13, 1, 251, "SKY");
-            gbl.sky_dax_252 = seg040.LoadDax(13, 1, 252, "SKY");
 
             gbl.ItemDataTable = new ItemDataTable("ITEMS");
 

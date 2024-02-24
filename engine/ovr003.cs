@@ -8,7 +8,7 @@ namespace engine
     {
         internal static void CMD_Exit()
         {
-            VmLog.WriteLine("CMD_Exit: byte_1AB0A {0}", gbl.restore_player_ptr);
+            VmLog.WriteLine("CMD_Exit: restore_player_ptr {0}", gbl.restore_player_ptr);
             VmLog.WriteLine("");
 
             if (gbl.restore_player_ptr == true)
@@ -342,7 +342,8 @@ namespace engine
             }
             else
             {
-                if ((gbl.last_game_state != GameState.DungeonMap || gbl.game_state == GameState.DungeonMap) &&
+                if ((gbl.last_game_state != GameState.DungeonMap || gbl.game_state == GameState.DungeonMap ||
+                    (gbl.game == Game.PoolOfRadiance && gbl.game_state == GameState.WildernessMap)) &&
                     (gbl.spriteChanged == true || gbl.displayPlayerSprite))
                 {
                     gbl.can_draw_bigpic = true;
@@ -588,18 +589,36 @@ namespace engine
             }
 
 
-            if (gbl.byte_1AB0C == true &&
-                gbl.filesLoaded == true &&
-                gbl.last_game_state == GameState.WildernessMap)
+            if (gbl.game == Game.PoolOfRadiance)
             {
-                if (gbl.game_state != GameState.WildernessMap &&
-                    gbl.byte_1EE98 == true)
+                if (gbl.byte_1AB0C == true)
                 {
-                    seg037.DrawFrame_Dungeon();
-                    ovr025.PartySummary(gbl.SelectedPlayer);
-                    ovr025.display_map_position_time();
+                    if (gbl.game_state != GameState.WildernessMap &&
+                        gbl.byte_1EE98 == true)
+                    {
+                        seg037.DrawFrame_Dungeon();
+                        ovr025.PartySummary(gbl.SelectedPlayer);
+                        ovr029.RedrawView();
+                        ovr025.display_map_position_time();
+                    }
+                    gbl.byte_1EE98 = false;
                 }
-                gbl.byte_1EE98 = false;
+            }
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                if (gbl.byte_1AB0C == true &&
+                    gbl.filesLoaded == true &&
+                    gbl.last_game_state == GameState.WildernessMap)
+                {
+                    if (gbl.game_state != GameState.WildernessMap &&
+                        gbl.byte_1EE98 == true)
+                    {
+                        seg037.DrawFrame_Dungeon();
+                        ovr025.PartySummary(gbl.SelectedPlayer);
+                        ovr025.display_map_position_time();
+                    }
+                    gbl.byte_1EE98 = false;
+                }
             }
         }
 
@@ -1744,13 +1763,25 @@ namespace engine
 
             VmLog.WriteLine("CMD_ClearBox:");
 
-            seg037.DrawFrame_Dungeon();
-            ovr025.PartySummary(gbl.SelectedPlayer);
-            ovr025.display_map_position_time();
+            if (gbl.game == Game.PoolOfRadiance && gbl.area_ptr.inDungeon == 1)
+            {
+                seg037.DrawFrame_Wilderness();
+                ovr025.PartySummary(gbl.SelectedPlayer);
+                ovr025.display_map_position_time();
 
-            ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
-            ovr025.display_map_position_time();
-            gbl.byte_1EE98 = false;
+                gbl.byte_1EE98 = true;
+                gbl.byte_1AB0C = false;
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                seg037.DrawFrame_Dungeon();
+                ovr025.PartySummary(gbl.SelectedPlayer);
+                ovr025.display_map_position_time();
+
+                ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
+                ovr025.display_map_position_time();
+                gbl.byte_1EE98 = false;
+            }
         }
 
 
@@ -1834,13 +1865,17 @@ namespace engine
             ovr008.vm_LoadCmdSets(1);
 
             ushort var_2 = gbl.cmd_opps[1].Word;
-            ushort var_4 = (ushort)(var_2 - 0x7fff);
+            //ushort var_4 = (ushort)(var_2 - 0x7fff);
+            ushort var_4 = var_2;
 
             VmLog.WriteLine("CMD_Call: {0:X}", var_4);
 
             switch (var_4)
             {
-                case 0xAE11:
+                case 0x0806: // por
+                    break;
+                case 0x2C90: // por
+                case 0x2E10: // coab
                     gbl.mapWallRoof = ovr031.get_wall_x2(gbl.mapPosY, gbl.mapPosX);
 
                     if (gbl.byte_1AB0B == true)
@@ -1865,15 +1900,16 @@ namespace engine
                     }
                     break;
 
-                case 1:
+                case 0x8000: // por, coab
                     ovr008.SetupDuel(true);
                     break;
 
-                case 2:
+                case 0x8001: // por, coab
                     ovr008.SetupDuel(false);
                     break;
 
-                case 0x3201:
+                case 0xB200: // coab
+                case 0xBA03: // por
                     if (gbl.word_1EE76 == 8)
                     {
                         seg044.PlaySound(Sound.sound_a);
@@ -1888,7 +1924,10 @@ namespace engine
                     }
                     break;
 
-                case 0x401F:
+                case 0xC018: // por
+                    break;
+
+                case 0xC01E: // coab, por
                     ovr008.MovePositionForward();
                     break;
 
@@ -1905,6 +1944,9 @@ namespace engine
                     gbl.byte_1D556.NextFrame();
 
                     seg041.GameDelay();
+                    break;
+
+                default:
                     break;
             }
         }
@@ -2250,7 +2292,15 @@ namespace engine
                 }
                 else
                 {
-                    gbl.EclBlockId = 1;
+                    switch (gbl.game)
+                    {
+                        case Game.PoolOfRadiance:
+                            gbl.EclBlockId = 0;
+                            break;
+                        case Game.CurseOfTheAzureBonds:
+                            gbl.EclBlockId = 1;
+                            break;
+                    }
 
                     ovr025.PartySummary(gbl.SelectedPlayer);
                 }
@@ -2333,7 +2383,10 @@ namespace engine
                         else
                         {
                             gbl.search_flag_bkup = gbl.area2_ptr.search_flags & 1;
-                            gbl.area2_ptr.search_flags = 1;
+                            if (gbl.game == Game.CurseOfTheAzureBonds || gbl.game_state != GameState.WildernessMap)
+                            {
+                                gbl.area2_ptr.search_flags = 1;
+                            }
                             gbl.can_draw_bigpic = true;
                             ovr029.RedrawView();
 
@@ -2368,24 +2421,48 @@ namespace engine
                     {
                         if (gbl.party_killed == false)
                         {
-                            gbl.area_ptr.lastXPos = (short)gbl.mapPosX;
-                            gbl.area_ptr.lastYPos = (short)gbl.mapPosY;
-
-                            ovr015.locked_door();
-                            ovr029.RedrawView();
-
-                            if (gbl.area_ptr.lastXPos != gbl.mapPosX ||
-                                gbl.area_ptr.lastYPos != gbl.mapPosY)
+                            if (gbl.game != Game.PoolOfRadiance || gbl.game_state == GameState.DungeonMap)
                             {
-                                seg044.PlaySound(Sound.sound_a);
+                                gbl.area_ptr.lastXPos = (short)gbl.mapPosX;
+                                gbl.area_ptr.lastYPos = (short)gbl.mapPosY;
+
+                                ovr015.locked_door();
+                                ovr029.RedrawView();
+
+                                if (gbl.area_ptr.lastXPos != gbl.mapPosX ||
+                                    gbl.area_ptr.lastYPos != gbl.mapPosY)
+                                {
+                                    seg044.PlaySound(Sound.sound_a);
+                                }
+
+                                gbl.spriteChanged = false;
+                                gbl.byte_1EE8D = true;
+                                RunEclVm(gbl.SearchLocationAddr);
+                                if (gbl.vmFlag01 == true)
+                                {
+                                    sub_29677();
+                                }
                             }
-
-                            gbl.spriteChanged = false;
-                            gbl.byte_1EE8D = true;
-                            RunEclVm(gbl.SearchLocationAddr);
-                            if (gbl.vmFlag01 == true)
+                            else if (gbl.game == Game.PoolOfRadiance && gbl.game_state == GameState.WildernessMap)
                             {
-                                sub_29677();
+                                if (gbl.area2_ptr.field_592 < 0xff)
+                                {
+                                    gbl.area_ptr.field_186 = (byte)gbl.word_1D914;
+                                    gbl.area_ptr.field_188 = (byte)gbl.word_1D916;
+
+                                    ovr021.step_game_time(3, 12);
+                                    ovr025.display_map_position_time();
+                                }
+                                else
+                                {
+                                    gbl.area2_ptr.field_592 = 0;
+                                }
+
+                                ovr029.RedrawView();
+
+                                gbl.spriteChanged = false;
+                                gbl.byte_1EE8D = true;
+                                RunEclVm(gbl.SearchLocationAddr);
                             }
                         }
                     }
