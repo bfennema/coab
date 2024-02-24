@@ -710,8 +710,13 @@ namespace engine
                     ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
                     break;
 
-                case 1: // ring of wizardy
-                    if (add_item == true)
+                case 1: // ring of wizardy, ring of fire resistance (POR)
+                    if (gbl.game == Game.PoolOfRadiance && (Affects)item.affect_2 == Affects.fire_resist)
+                    {
+                        gbl.applyItemAffect = true;
+                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    }
+                    else if (add_item == true)
                     {
                         player.spellCastCount[2, 0] *= 2;
                         player.spellCastCount[2, 1] *= 2;
@@ -770,6 +775,14 @@ namespace engine
                     ovr026.reclac_thief_skills(player);
                     break;
 
+                case 3: // Gauntlets of Ogre Power (POR)
+                    if (gbl.game == Game.PoolOfRadiance && (Affects)item.affect_2 == Affects.strength)
+                    {
+                        gbl.applyItemAffect = true;
+                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    }
+                    break;
+
                 case 4:
                     if (((int)item.affect_2 & 0x0f) != player.alignment)
                     {
@@ -787,8 +800,16 @@ namespace engine
                     }
                     break;
 
-                case 5:
+                case 5: // Girdle of Giant Strength, Cloak of Displacement (POR)
+                    if (gbl.game == Game.PoolOfRadiance && (Affects)item.affect_2 == Affects.displace)
+                    {
+                        gbl.applyItemAffect = true;
+                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    }
+                    else
+                    {
                     ovr024.CalcStatBonuses(Stat.STR, player);
+                    }
                     break;
 
                 case 6: // Girdle of the Dwarves

@@ -105,6 +105,8 @@ namespace engine
             //Logging.Logger.Debug("");
 
 
+            //gbl.game = Game.PoolOfRadiance;
+            gbl.game = Game.CurseOfTheAzureBonds;
 
             if (Cheats.skip_title_screen == false)
             {
@@ -139,7 +141,20 @@ namespace engine
                 }
                 else
                 {
-                    gbl.game_area = 2;
+                    switch (gbl.game)
+                    {
+                        case Game.PoolOfRadiance:
+                            gbl.game_area = 3;
+                            gbl.vm_mem0_offset = 0x4900;
+                            gbl.vm_mem0_size = 0x0400;
+                            gbl.vm_mem1_offset = 0x6B00;
+                            gbl.vm_mem1_size = 0x0400;
+                            gbl.vm_mem2_offset = 0x9800;
+                            gbl.vm_mem2_size = 0x0100;
+                            gbl.initial_ecl_offset = 0x9900;
+                            break;
+                        case Game.CurseOfTheAzureBonds:
+                            gbl.game_area = 2;
                             gbl.vm_mem0_offset = 0x4B00;
                             gbl.vm_mem0_size = 0x0400;
                             gbl.vm_mem1_offset = 0x7C00;
@@ -147,6 +162,12 @@ namespace engine
                             gbl.vm_mem2_offset = 0x7A00;
                             gbl.vm_mem2_size = 0x0200;
                             gbl.initial_ecl_offset = 0x8000;
+                            break;
+                        case Game.SecretOfTheSilverBlades:
+                            break;
+                        case Game.PoolOfDarkness:
+                            break;
+                    }
                 }
 
                 if (gbl.inDemo == false)
@@ -308,7 +329,7 @@ namespace engine
             gbl.focusCombatAreaOnPlayer = true;
             gbl.bigpic_block_id = 0x0FF;
             gbl.silent_training = false;
-            gbl.menuSelectedWord = 1;
+            gbl.menuSelectedWord = 0;
             gbl.game_state = GameState.DungeonMap;
             gbl.last_game_state = 0;
             gbl.applyItemAffect = false;
@@ -316,12 +337,13 @@ namespace engine
             gbl.sky_dax_251 = null;
             gbl.sky_dax_252 = null;
             gbl.gameWon = false;
+            gbl.game = Game.CurseOfTheAzureBonds;
             seg041.Load8x8Tiles();
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-            ovr038.Load8x8D(4, 0xca);
-            ovr038.Load8x8D(0, 0xcb);
+            ovr038.Load8x8D(4, 202);
+            ovr038.Load8x8D(0, 203);
 
             for (gbl.byte_1AD44 = 0; gbl.byte_1AD44 <= 0x0b; gbl.byte_1AD44++)
             {
@@ -409,11 +431,12 @@ namespace engine
             gbl.bigpic_block_id = 0x0FF;
             gbl.silent_training = false;
             ovr027.ClearPromptArea();
-            gbl.menuSelectedWord = 1;
+            gbl.menuSelectedWord = 0;
             gbl.game_state = GameState.DungeonMap;
             gbl.last_game_state = 0;
             gbl.applyItemAffect = false;
             gbl.gameWon = false;
+            gbl.game = Game.CurseOfTheAzureBonds;
         }
     }
 }

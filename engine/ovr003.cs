@@ -1834,13 +1834,15 @@ namespace engine
             ovr008.vm_LoadCmdSets(1);
 
             ushort var_2 = gbl.cmd_opps[1].Word;
-            ushort var_4 = (ushort)(var_2 - 0x7fff);
+            //ushort var_4 = (ushort)(var_2 - 0x7fff);
+            ushort var_4 = var_2;
 
             VmLog.WriteLine("CMD_Call: {0:X}", var_4);
 
             switch (var_4)
             {
-                case 0xAE11:
+                case 0x2C90: // por
+                case 0x2E10: // coab
                     gbl.mapWallRoof = ovr031.get_wall_x2(gbl.mapPosY, gbl.mapPosX);
 
                     if (gbl.byte_1AB0B == true)
@@ -1865,15 +1867,16 @@ namespace engine
                     }
                     break;
 
-                case 1:
+                case 0x8000: // por, coab
                     ovr008.SetupDuel(true);
                     break;
 
-                case 2:
+                case 0x8001: // por, coab
                     ovr008.SetupDuel(false);
                     break;
 
-                case 0x3201:
+                case 0xB200: // coab
+                case 0xBA03: // por
                     if (gbl.word_1EE76 == 8)
                     {
                         seg044.PlaySound(Sound.sound_a);
@@ -1888,7 +1891,7 @@ namespace engine
                     }
                     break;
 
-                case 0x401F:
+                case 0xC01E: // coab, por
                     ovr008.MovePositionForward();
                     break;
 
@@ -1905,6 +1908,9 @@ namespace engine
                     gbl.byte_1D556.NextFrame();
 
                     seg041.GameDelay();
+                    break;
+
+                default:
                     break;
             }
         }
@@ -2250,7 +2256,19 @@ namespace engine
                 }
                 else
                 {
+                    switch (gbl.game)
+                    {
+                        case Game.PoolOfRadiance:
+                            gbl.EclBlockId = 0;
+                            break;
+                        case Game.CurseOfTheAzureBonds:
                     gbl.EclBlockId = 1;
+                            break;
+                        case Game.SecretOfTheSilverBlades:
+                            break;
+                        case Game.PoolOfDarkness:
+                            break;
+                    }
 
                     ovr025.PartySummary(gbl.SelectedPlayer);
                 }

@@ -572,7 +572,7 @@ namespace Classes
         public static Opperation[] cmd_opps = new Opperation[cmdOppsLimit];
 
         public static SpellEntry[] spellCastingTable = { /* seg600:37DC asc_19AEC */
-			null, 
+			null,
             new SpellEntry((byte)Spells.bless,                        SpellClass.Cleric,    1, 6, 0, 6, 0, 10, SpellTargets.WholeParty, DamageOnSave.Normal, SaveVerseType.Spell, Affects.bless, SpellWhen.Both, 10, 1, 0, 0),
             new SpellEntry((byte)Spells.curse,                        SpellClass.Cleric,    1, 6, 0, 6, 0, 10, SpellTargets.Combat, DamageOnSave.Normal,  SaveVerseType.Spell, Affects.cursed, SpellWhen.Combat, 10, 3, 1, 0),
             new SpellEntry((byte)Spells.cure_light_wounds_CL,         SpellClass.Cleric,    1, 0, 0, 0, 0, 4, SpellTargets.PartyMember, DamageOnSave.Normal,   SaveVerseType.Spell, Affects.none, SpellWhen.Both, 5, 1, 0, 0),
@@ -733,6 +733,7 @@ namespace Classes
 			new ClassStatsMin(9, 9, 0, 9, 0, 0), 
 			new ClassStatsMin(0, 9, 0, 9, 0, 0) };
 
+        public static Game game;
         public static string exe_path; // unk_1B21A
         public static string data_path; // unk_1B26A
 

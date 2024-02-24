@@ -95,45 +95,51 @@ namespace engine
             seg040.DrawColorBlock(gbl.sky_colour, 0x2c, 11, 16, 2);
             seg040.DrawColorBlock(0, 2, 11, 0x3c, 2);
             seg040.DrawColorBlock(8, 0x2a, 11, 0x3e, 2);
-
-            if (get_wall_x2(gbl.mapPosY, gbl.mapPosY) < 0x80 &&
-                gbl.sky_colour == 11)
+            if (gbl.game == Game.PoolOfRadiance)
             {
-                int col_x = 2;
-                int row_y = 2;
-
-                int hour = gbl.area_ptr.time_hour;
-
-                if (hour >= 1 && hour <= 5)
-                {
-                    if (gbl.mapDirection == 2)
-                    {
-                        seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + 5) - hour, 12 - 3);
-                    }
-                    else if (gbl.mapDirection == 4 && hour > 2)
-                    {
-                        seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + 5) - hour, (col_x + hour) - 3);
-                    }
-                }
-                else if (hour >= 13 && hour <= 18)
-                {
-                    if (gbl.mapDirection == 6)
-                    {
-                        seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + hour) - 13, col_x);
-                    }
-                    else if (gbl.mapDirection == 4 && hour >= 16)
-                    {
-                        seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + hour) - 13, (col_x + hour) - 8);
-                    }
-                }
-
-                if (gbl.mapDirection == 0)
-                {
-                    seg040.OverlayBounded(gbl.sky_dax_250, 1, 0, row_y, col_x);
-                }
+                seg040.DrawColorBlock(6, 0x30, 11, 0x38, 2);
             }
+            else
+            {
+                if (get_wall_x2(gbl.mapPosY, gbl.mapPosY) < 0x80 &&
+                    gbl.sky_colour == 11)
+                {
+                    int col_x = 2;
+                    int row_y = 2;
 
-            seg040.OverlayBounded(gbl.sky_dax_252, 1, 0, 7, 2);
+                    int hour = gbl.area_ptr.time_hour;
+
+                    if (hour >= 1 && hour <= 5)
+                    {
+                        if (gbl.mapDirection == 2)
+                        {
+                            seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + 5) - hour, 12 - 3);
+                        }
+                        else if (gbl.mapDirection == 4 && hour > 2)
+                        {
+                            seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + 5) - hour, (col_x + hour) - 3);
+                        }
+                    }
+                    else if (hour >= 13 && hour <= 18)
+                    {
+                        if (gbl.mapDirection == 6)
+                        {
+                            seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + hour) - 13, col_x);
+                        }
+                        else if (gbl.mapDirection == 4 && hour >= 16)
+                        {
+                            seg040.OverlayBounded(gbl.sky_dax_251, 1, 0, (row_y + hour) - 13, (col_x + hour) - 8);
+                        }
+                    }
+
+                    if (gbl.mapDirection == 0)
+                    {
+                        seg040.OverlayBounded(gbl.sky_dax_250, 1, 0, row_y, col_x);
+                    }
+                }
+
+                seg040.OverlayBounded(gbl.sky_dax_252, 1, 0, 7, 2);
+            }
         }
 
 
@@ -672,7 +678,14 @@ namespace engine
 
                         if (blockCount > 1)
                         {
-                            ovr038.Load8x8D(idx, (block_id * 10) + block + 1);
+                            if (block_id == 0)
+                            {
+                                ovr038.Load8x8D(idx, (10 * 10) + block + 1);
+                            }
+                            else
+                            {
+                                ovr038.Load8x8D(idx, (block_id * 10) + block + 1);
+                            }
                         }
                         else
                         {

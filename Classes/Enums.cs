@@ -99,4 +99,12 @@ namespace Classes
         Ours = 0,
         Enemy = 1
     }
+
+    public enum Game
+    {
+        PoolOfRadiance,
+        CurseOfTheAzureBonds,
+        SecretOfTheSilverBlades,
+        PoolOfDarkness,
+    }
 }

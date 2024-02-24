@@ -267,7 +267,7 @@ namespace engine
 		}
 
 
-		internal static void display_hp(bool hightlighted, int y_pos, int x_pos, Player player)
+        internal static void display_hp(bool hightlighted, int y_pos, int x_pos, Player player)
 		{
 			int colour;
 
