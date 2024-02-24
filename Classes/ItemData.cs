@@ -43,6 +43,11 @@ namespace Classes
         {
             string filePath = Path.Combine(gbl.exe_path, fileName);
 
+            if (System.IO.File.Exists(filePath) == false)
+            {
+                filePath = Path.Combine(Path.Combine(gbl.exe_path, "Data"), fileName);
+            }
+
             FileStream stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read);
 
             stream.Seek(2, SeekOrigin.Begin);
