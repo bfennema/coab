@@ -28,8 +28,13 @@ namespace GoldBoxPlayer
         public bool sortTreasure = false;
         public bool pictureOn = true;
         public bool animationOn = true;
+        public Logging.Game game = Logging.Game.None;
+        public string poolOfRadianceDataPath = "";
+        public string poolOfRadianceSavePath = "";
         public string curseOfTheAzureBondsDataPath = "";
         public string curseOfTheAzureBondsSavePath = "";
+        public string secretOfTheSilverBladesDataPath = "";
+        public string secretOfTheSilverBladesSavePath = "";
 
         static public Settings? LoadSettings(string appDataPath, string defaultDataPath, string defaultSavePath)
         {
@@ -78,8 +83,12 @@ namespace GoldBoxPlayer
         public Settings(string appDataPath, string defaultDataPath, string defaultSavePath)
         {
             configFile = Path.Combine(appDataPath, "Settings.xml");
+            //poolOfRadianceDataPath = Path.Combine(defaultDataPath, "POOLRAD");
+            poolOfRadianceSavePath = Path.Combine(defaultSavePath, Enum.GetName<Logging.Game>(Logging.Game.PoolOfRadiance));
             //curseOfTheAzureBondsDataPath = Path.Combine(defaultDataPath, "CURSE");
-            curseOfTheAzureBondsSavePath = defaultSavePath;
+            curseOfTheAzureBondsSavePath = Path.Combine(defaultSavePath, Enum.GetName<Logging.Game>(Logging.Game.CurseOfTheAzureBonds));
+            //secretOfTheSilverBladesDataPath = Path.Combine(defaultDataPath, "SECRET");
+            secretOfTheSilverBladesSavePath = Path.Combine(defaultSavePath, Enum.GetName<Logging.Game>(Logging.Game.SecretOfTheSilverBlades));
         }
 
         private void Save()
@@ -104,8 +113,27 @@ namespace GoldBoxPlayer
         }
         private void UpdateGameDataSave()
         {
-            Logging.Config.DataPath = curseOfTheAzureBondsDataPath;
-            Logging.Config.SavePath = curseOfTheAzureBondsSavePath;
+            Logging.Config.Game = game;
+            if (game == Logging.Game.PoolOfRadiance)
+            {
+                Logging.Config.DataPath = poolOfRadianceDataPath;
+                Logging.Config.SavePath = poolOfRadianceSavePath;
+            }
+            else if (game == Logging.Game.CurseOfTheAzureBonds)
+            {
+                Logging.Config.DataPath = curseOfTheAzureBondsDataPath;
+                Logging.Config.SavePath = curseOfTheAzureBondsSavePath;
+            }
+            else if (game == Logging.Game.SecretOfTheSilverBlades)
+            {
+                Logging.Config.DataPath = secretOfTheSilverBladesDataPath;
+                Logging.Config.SavePath = secretOfTheSilverBladesSavePath;
+            }
+            else
+            {
+                Logging.Config.DataPath = "";
+                Logging.Config.SavePath = "";
+            }
         }
         public void Set()
         {
@@ -305,7 +333,45 @@ namespace GoldBoxPlayer
                 engine.seg044.SetAnimation(value);
             }
         }
-
+        [XmlIgnore]
+        public Logging.Game Game
+        {
+            get => game;
+            set
+            {
+                game = value;
+                Save();
+                UpdateGameDataSave();
+            }
+        }
+        [XmlIgnore]
+        public string PoolOfRadianceDataPath
+        {
+            get => poolOfRadianceDataPath;
+            set
+            {
+                poolOfRadianceDataPath = value;
+                Save();
+                if (game == Logging.Game.PoolOfRadiance)
+                {
+                    Logging.Config.DataPath = poolOfRadianceDataPath;
+                }
+            }
+        }
+        [XmlIgnore]
+        public string PoolOfRadianceSavePath
+        {
+            get => poolOfRadianceSavePath;
+            set
+            {
+                poolOfRadianceSavePath = value;
+                Save();
+                if (game == Logging.Game.PoolOfRadiance)
+                {
+                    Logging.Config.SavePath = poolOfRadianceSavePath;
+                }
+            }
+        }
         [XmlIgnore]
         public string CurseOfTheAzureBondsDataPath
         {
@@ -314,7 +380,10 @@ namespace GoldBoxPlayer
             {
                 curseOfTheAzureBondsDataPath = value;
                 Save();
-                Logging.Config.DataPath = curseOfTheAzureBondsDataPath;
+                if (game == Logging.Game.CurseOfTheAzureBonds)
+                {
+                    Logging.Config.DataPath = curseOfTheAzureBondsDataPath;
+                }
             }
         }
         [XmlIgnore]
@@ -325,7 +394,38 @@ namespace GoldBoxPlayer
             {
                 curseOfTheAzureBondsSavePath = value;
                 Save();
-                Logging.Config.SavePath = curseOfTheAzureBondsSavePath;
+                if (game == Logging.Game.CurseOfTheAzureBonds)
+                {
+                    Logging.Config.SavePath = curseOfTheAzureBondsSavePath;
+                }
+            }
+        }
+        [XmlIgnore]
+        public string SecretOfTheSilverBladesDataPath
+        {
+            get => secretOfTheSilverBladesDataPath;
+            set
+            {
+                secretOfTheSilverBladesDataPath = value;
+                Save();
+                if (game == Logging.Game.SecretOfTheSilverBlades)
+                {
+                    Logging.Config.DataPath = secretOfTheSilverBladesDataPath;
+                }
+            }
+        }
+        [XmlIgnore]
+        public string SecretOfTheSilverBladesSavePath
+        {
+            get => secretOfTheSilverBladesSavePath;
+            set
+            {
+                secretOfTheSilverBladesSavePath = value;
+                Save();
+                if (game == Logging.Game.SecretOfTheSilverBlades)
+                {
+                    Logging.Config.SavePath = secretOfTheSilverBladesSavePath;
+                }
             }
         }
     }

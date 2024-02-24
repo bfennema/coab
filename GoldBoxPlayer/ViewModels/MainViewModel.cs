@@ -16,24 +16,42 @@ public class MainViewModel : ViewModelBase
 {
     private WriteableBitmap _bitmap;
     private Image? _image;
+    IStorageFolder? _PoolRadData;
+    IStorageFolder? _PoolRadSave;
     IStorageFolder? _CurseData;
     IStorageFolder? _CurseSave;
+    IStorageFolder? _SecretData;
+    IStorageFolder? _SecretSave;
     Settings _settings;
 
     public MainViewModel()
     {
         _bitmap = new WriteableBitmap(new Avalonia.PixelSize(320, 200), new Avalonia.Vector(96, 96), Avalonia.Platform.PixelFormats.Bgr24);
         SelectDirectoryCommand = ReactiveCommand.CreateFromTask<string>(RunSelectDirectoryCommand);
+        SelectGameCommand = ReactiveCommand.Create<Logging.Game>(RunSelectGameCommand);
         _settings = Settings.LoadSettings(Logging.Config.AppDataPath, "", Logging.Config.SaveBasePath);
         _settings.Set();
     }
 
     public ReactiveCommand<string, Unit> SelectDirectoryCommand { get; }
+    public ReactiveCommand<Logging.Game, Unit> SelectGameCommand { get; }
 
     public async void LoadConfigs(TopLevel top)
     {
+        string path = _settings.PoolOfRadianceSavePath;
         IStorageFolder folder;
-        string path = _settings.CurseOfTheAzureBondsSavePath;
+        if (path != "")
+        {
+            folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
+            this.RaiseAndSetIfChanged(ref _PoolRadSave, folder, nameof(PoolRadSave));
+        }
+        path = _settings.PoolOfRadianceDataPath;
+        if (path != "")
+        {
+            folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
+            this.RaiseAndSetIfChanged(ref _PoolRadData, folder, nameof(PoolRadData));
+        }
+        path = _settings.CurseOfTheAzureBondsSavePath;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
@@ -45,6 +63,18 @@ public class MainViewModel : ViewModelBase
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _CurseData, folder, nameof(CurseData));
         }
+        path = _settings.SecretOfTheSilverBladesSavePath;
+        if (path != "")
+        {
+            folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
+            this.RaiseAndSetIfChanged(ref _SecretSave, folder, nameof(SecretSave));
+        }
+        path = _settings.SecretOfTheSilverBladesDataPath;
+        if (path != "")
+        {
+            folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
+            this.RaiseAndSetIfChanged(ref _SecretData, folder, nameof(SecretData));
+        }
     }
 
     public async Task RunSelectDirectoryCommand(string parameter)
@@ -54,7 +84,15 @@ public class MainViewModel : ViewModelBase
 
         if (filesService is null) throw new NullReferenceException("Missing File Service instance.");
 
-        if (parameter == "CurseSave")
+        if (parameter == "PoolRadSave")
+        {
+            startLocation = _PoolRadSave;
+        }
+        else if (parameter == "PoolRadData")
+        {
+            startLocation = _PoolRadData;
+        }
+        else if (parameter == "CurseSave")
         {
             startLocation = _CurseSave;
         }
@@ -62,13 +100,31 @@ public class MainViewModel : ViewModelBase
         {
             startLocation = _CurseData;
         }
+        else if (parameter == "SecretSave")
+        {
+            startLocation = _SecretSave;
+        }
+        else if (parameter == "SecretData")
+        {
+            startLocation = _SecretData;
+        }
 
         var folder = await filesService.OpenFolderAsync(parameter, startLocation);
         if (folder is null) return;
 
         string path = folder.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped);
 
-        if (parameter == "CurseSave")
+        if (parameter == "PoolRadSave")
+        {
+            this.RaiseAndSetIfChanged(ref _PoolRadSave, folder, nameof(PoolRadSave));
+            _settings.PoolOfRadianceSavePath = await folder.SaveBookmarkAsync();
+        }
+        else if (parameter == "PoolRadData")
+        {
+            this.RaiseAndSetIfChanged(ref _PoolRadData, folder, nameof(PoolRadData));
+            _settings.PoolOfRadianceDataPath = await folder.SaveBookmarkAsync();
+        }
+        else if (parameter == "CurseSave")
         {
             this.RaiseAndSetIfChanged(ref _CurseSave, folder, nameof(CurseSave));
             _settings.CurseOfTheAzureBondsSavePath = await folder.SaveBookmarkAsync();
@@ -78,6 +134,21 @@ public class MainViewModel : ViewModelBase
             this.RaiseAndSetIfChanged(ref _CurseData, folder, nameof(CurseData));
             _settings.CurseOfTheAzureBondsDataPath = await folder.SaveBookmarkAsync();
         }
+        else if (parameter == "SecretSave")
+        {
+            this.RaiseAndSetIfChanged(ref _SecretSave, folder, nameof(SecretSave));
+            _settings.SecretOfTheSilverBladesSavePath = await folder.SaveBookmarkAsync();
+        }
+        else if (parameter == "SecretData")
+        {
+            this.RaiseAndSetIfChanged(ref _SecretData, folder, nameof(SecretData));
+            _settings.SecretOfTheSilverBladesDataPath = await folder.SaveBookmarkAsync();
+        }
+    }
+
+    public void RunSelectGameCommand(Logging.Game parameter)
+    {
+        _settings.Game = parameter;
     }
 
     internal Settings Settings
@@ -143,6 +214,14 @@ public class MainViewModel : ViewModelBase
         private set => this.RaiseAndSetIfChanged(ref _bitmap, value);
     }
 
+    public string PoolRadData
+    {
+        get => "Data - " + (_PoolRadData != null ? _PoolRadData.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+    }
+    public string PoolRadSave
+    {
+        get => "Save - " + (_PoolRadSave != null ? _PoolRadSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+    }
     public string CurseData
     {
         get => "Data - " + (_CurseData != null ? _CurseData.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
@@ -150,5 +229,13 @@ public class MainViewModel : ViewModelBase
     public string CurseSave
     {
         get => "Save - " + (_CurseSave != null ? _CurseSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+    }
+    public string SecretData
+    {
+        get => "Data - " + (_SecretData != null ? _SecretData.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+    }
+    public string SecretSave
+    {
+        get => "Save - " + (_SecretSave != null ? _SecretSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
     }
 }

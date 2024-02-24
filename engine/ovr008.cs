@@ -730,12 +730,15 @@ namespace engine
                     switch (location)
                     {
                         case 0xFB:
+                            gbl.word_1D914 = (short)value;
                             break;
 
                         case 0xFC:
+                            gbl.word_1D916 = (short)value;
                             break;
 
                         case 0xB1:
+                            gbl.word_1D918 = (short)value;
                             break;
 
                         case 0x3DE:

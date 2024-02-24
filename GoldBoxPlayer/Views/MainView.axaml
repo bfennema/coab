@@ -107,15 +107,47 @@
                   PointerPressed="Options_PointerPressed"/>
       </MenuItem>
       <MenuItem Header="Games">
+        <MenuItem x:Name="PoolRadMenu"
+                  Header="Pool of Radiance"
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.PoolOfRadiance}">
+          <MenuItem Header="{Binding PoolRadData}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="PoolRadData"/>
+          <MenuItem Header="{Binding PoolRadSave}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="PoolRadSave"/>
+        </MenuItem>
         <MenuItem x:Name="CurseMenu"
                   Header="Curse of the Azure Bonds"
-                  GroupName="Games">
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.CurseOfTheAzureBonds}">
           <MenuItem Header="{Binding CurseData}"
                     Command="{Binding SelectDirectoryCommand}"
                     CommandParameter="CurseData"/>
           <MenuItem Header="{Binding CurseSave}"
                     Command="{Binding SelectDirectoryCommand}"
                     CommandParameter="CurseSave"/>
+        </MenuItem>
+        <MenuItem x:Name="SecretMenu"
+                  Header="Secret of the Silver Blades"
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.SecretOfTheSilverBlades}">
+          <MenuItem Header="{Binding SecretData}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="SecretData"/>
+          <MenuItem Header="{Binding SecretSave}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="SecretSave"/>
         </MenuItem>
       </MenuItem>
     </ContextMenu>

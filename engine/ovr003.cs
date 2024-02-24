@@ -1,6 +1,7 @@
 using Classes;
 using Logging;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 
 namespace engine
 {
@@ -8,7 +9,7 @@ namespace engine
     {
         internal static void CMD_Exit()
         {
-            VmLog.WriteLine("CMD_Exit: byte_1AB0A {0}", gbl.restore_player_ptr);
+            VmLog.WriteLine("CMD_Exit: restore_player_ptr {0}", gbl.restore_player_ptr);
             VmLog.WriteLine("");
 
             if (gbl.restore_player_ptr == true)
@@ -342,8 +343,7 @@ namespace engine
             }
             else
             {
-                if ((gbl.last_game_state != GameState.DungeonMap || gbl.game_state == GameState.DungeonMap) &&
-                    (gbl.spriteChanged == true || gbl.displayPlayerSprite))
+                if (gbl.spriteChanged == true || gbl.displayPlayerSprite)
                 {
                     gbl.can_draw_bigpic = true;
                     ovr029.RedrawView();
@@ -588,9 +588,7 @@ namespace engine
             }
 
 
-            if (gbl.byte_1AB0C == true &&
-                gbl.filesLoaded == true &&
-                gbl.last_game_state == GameState.WildernessMap)
+            if (gbl.byte_1AB0C == true && gbl.filesLoaded == true)
             {
                 if (gbl.game_state != GameState.WildernessMap &&
                     gbl.byte_1EE98 == true)
@@ -1744,9 +1742,11 @@ namespace engine
             VmLog.WriteLine("CMD_ClearBox:");
 
             gbl.game.DrawFrame_Dungeon();
-            ovr025.PartySummary(gbl.SelectedPlayer);
+            if (!gbl.monstersLoaded)
+            {
+                ovr025.PartySummary(gbl.SelectedPlayer);
+            }
             ovr025.display_map_position_time();
-
             ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
             ovr025.display_map_position_time();
             gbl.byte_1EE98 = false;
@@ -1995,7 +1995,40 @@ namespace engine
 
             if (Cheats.skip_copy_protection == false)
             {
-                ovr004.copy_protection();
+                var sb = new System.Text.StringBuilder();
+                ushort addr = gbl.cmd_ops[1].Word;
+                ushort character = ovr008.vm_GetMemoryValue(addr);
+
+                if (gbl.byte_1AB0C)
+                {
+                    gbl.game.DrawFrame_Wilderness();
+                    gbl.byte_1EE98 = true;
+                    gbl.byte_1AB0C = false;
+                }
+
+                for (int i = 1; character != 0x00; i++)
+                {
+                    if (character < 0x40 || character >= 0x40 + translation.Length)
+                    {
+                        sb.Append(character);
+                    }
+                    else if (translation[character - 0x40] != ' ')
+                    {
+                        sb.Append(translation[character - 0x40]);
+                    }
+                    character = ovr008.vm_GetMemoryValue((ushort)(addr + i));
+                }
+                gbl.textYCol += 1;
+                gbl.textXCol += 1;
+                seg041.press_any_key(sb.ToString(), false, 15, 16, 16, 5, 2);
+            }
+            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                if (Cheats.skip_copy_protection == false)
+                {
+                    ovr004.copy_protection();
+                    ovr025.LoadPic();
+                }
             }
             ovr025.LoadPic();
         }
@@ -2233,10 +2266,12 @@ namespace engine
             gbl.byte_1AB0C = false;
             gbl.filesLoaded = false;
             gbl.restore_player_ptr = false;
-            gbl.byte_1AB0B = false;
             gbl.byte_1EE98 = true;
-            gbl.game_state = GameState.DungeonMap;
             gbl.vmFlag01 = false;
+            if (gbl.game_state == GameState.Camping)
+            {
+                gbl.game_state = GameState.DungeonMap;
+            }
 
             if (gbl.area_ptr.LastEclBlockId == 0)
             {
@@ -2256,11 +2291,6 @@ namespace engine
             else
             {
                 gbl.EclBlockId = (byte)(gbl.area_ptr.LastEclBlockId);
-            }
-
-            if (gbl.area_ptr.inDungeon == 0)
-            {
-                gbl.game_state = GameState.WildernessMap;
             }
 
             if (gbl.reload_ecl_and_pictures == true ||
@@ -2296,8 +2326,7 @@ namespace engine
                     sub_29677();
                 }
 
-                if (gbl.game_state != GameState.WildernessMap &&
-                    gbl.reload_ecl_and_pictures == true)
+                if (gbl.reload_ecl_and_pictures == true)
                 {
                     if (gbl.byte_1EE98 == true)
                     {
@@ -2331,7 +2360,10 @@ namespace engine
                         else
                         {
                             gbl.search_flag_bkup = gbl.area2_ptr.search_flags & 1;
-                            gbl.area2_ptr.search_flags = 1;
+                            if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds || gbl.game_state != GameState.WildernessMap)
+                            {
+                                gbl.area2_ptr.search_flags = 1;
+                            }
                             gbl.can_draw_bigpic = true;
                             ovr029.RedrawView();
 
@@ -2366,17 +2398,38 @@ namespace engine
                     {
                         if (gbl.party_killed == false)
                         {
-                            gbl.area_ptr.lastXPos = (short)gbl.mapPosX;
-                            gbl.area_ptr.lastYPos = (short)gbl.mapPosY;
-
-                            ovr015.locked_door();
-                            ovr029.RedrawView();
-
-                            if (gbl.area_ptr.lastXPos != gbl.mapPosX ||
-                                gbl.area_ptr.lastYPos != gbl.mapPosY)
+                            if (gbl.game_state == GameState.WildernessMap)
                             {
-                                seg044.PlaySound(Sound.sound_a);
+                                if (gbl.area2_ptr.field_592 < 0xff)
+                                {
+                                    if (!ovr031.TerrainImpassable())
+                                    {
+                                        gbl.area_ptr.field_186 = (byte)gbl.word_1D914;
+                                        gbl.area_ptr.field_188 = (byte)gbl.word_1D916;
+
+                                        ovr021.step_game_time(3, 12);
+                                        ovr025.display_map_position_time();
+                                    }
+                                }
+                                else
+                                {
+                                    gbl.area2_ptr.field_592 = 0;
+                                }
                             }
+                            else
+                            {
+                                gbl.area_ptr.lastXPos = (short)gbl.mapPosX;
+                                gbl.area_ptr.lastYPos = (short)gbl.mapPosY;
+
+                                ovr015.locked_door();
+
+                                if (gbl.area_ptr.lastXPos != gbl.mapPosX ||
+                                    gbl.area_ptr.lastYPos != gbl.mapPosY)
+                                {
+                                    seg044.PlaySound(Sound.sound_a);
+                                }
+                            }
+                            ovr029.RedrawView();
 
                             gbl.spriteChanged = false;
                             gbl.byte_1EE8D = true;
@@ -2384,6 +2437,7 @@ namespace engine
                             if (gbl.vmFlag01 == true)
                             {
                                 sub_29677();
+
                             }
                         }
                     }

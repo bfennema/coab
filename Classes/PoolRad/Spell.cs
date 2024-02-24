@@ -75,7 +75,7 @@
                 {
                     Spells id = (Spells)(data[i] & 0x7F);
                     bool learning = data[i] > 0x7F;
-                    if (id > Spells.bless)
+                    if (spells_map[id].Count > 0)
                     {
                         spellList.AddLearnt(spells_map[id][0], learning);
                     }
@@ -90,7 +90,10 @@
                 if (data[i] != 0)
                 {
                     Spells id = (Spells)(i + 1);
-                    spellBook.LearnSpell(spells_map[id][0]);
+                    if (spells_map[id].Count > 0)
+                    {
+                        spellBook.LearnSpell(spells_map[id][0]);
+                    }
                 }
             }
         }

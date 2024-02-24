@@ -4,8 +4,22 @@ namespace Classes.Curse
 {
     public class Game : Classes.Game
     {
+        public override Logging.Game Name { get => Logging.Game.CurseOfTheAzureBonds; }
+        public override ImportSource ImportFrom { get => Classes.ImportSource.Curse; }
         public override int InitialExp { get => 25000; }
         public override MoneySet InitialMoney { get => new MoneySet(Money.Platinum, 300); }
+        public override string DemoString
+        {
+            get
+            {
+                gbl.displayInputSecondsToWait = 30;
+                gbl.displayInputTimeoutValue = 'D';
+                return "Curse of the Azure Bonds v1.3 ";
+            }
+        }
+        public override string SaveItemExt { get => "SWG"; }
+        public override string SaveAffectExt { get => "FX"; }
+
         public override byte DemoGameArea { get => 1; }
         public override int DemoGameSpeed { get => 6; }
         public override byte DemoEclBlockId { get => 82; }

@@ -154,6 +154,7 @@
             affect_table.Add(Classes.Affects.dispel_evil_banish, ovr013.AffectDispelEvilBanish);
             affect_table.Add(Classes.Affects.strength_spell, ovr013.empty);
             affect_table.Add(Classes.Affects.do_items_affect, ovr013.do_items_affect);
+            affect_table.Add(Classes.Affects.weap_undead_slayer, Weapon.UndeadSlayer);
         }
         internal static void Setup() // setup_spells2
         {
@@ -213,6 +214,7 @@
                     ovr024.calc_affect_effect(Classes.Affects.weap_dragon_slayer, player);
                     ovr024.calc_affect_effect(Classes.Affects.weap_frost_brand, player);
                     ovr024.calc_affect_effect(Classes.Affects.ranger_vs_giant, player);
+                    ovr024.calc_affect_effect(Classes.Affects.weap_undead_slayer, player);
                     break;
 
                 case CheckType.Type_5:
@@ -303,6 +305,7 @@
                     ovr024.calc_affect_effect(Classes.Affects.dwarf_vs_orc_goblin, player);
                     ovr024.calc_affect_effect(Classes.Affects.weap_dragon_slayer, player);
                     ovr024.calc_affect_effect(Classes.Affects.weap_frost_brand, player);
+                    ovr024.calc_affect_effect(Classes.Affects.weap_undead_slayer, player);
                     break;
 
                 case CheckType.Type_11:

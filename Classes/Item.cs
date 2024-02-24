@@ -68,14 +68,17 @@ namespace Classes
         public Affects Affect_1
         {
             get => (Affects)affect_1;
+            set => affect_1 = (byte)value;
         }
         public Affects Affect_2
         {
             get => (Affects)affect_2;
+            set => affect_2 = (byte)value;
         }
         public Affects Affect_3
         {
             get => (Affects)affect_3;
+            set => affect_3 = (byte)value;
         }
         public void setAffect(int i, Affects value)
         {

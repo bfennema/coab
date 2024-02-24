@@ -372,7 +372,8 @@ namespace engine
                 var_1C4 = null;
             }
 
-            if (gbl.import_from == ImportSource.Curse)
+
+            if (gbl.import_from == gbl.game.ImportFrom)
             {
                 arg_8 = System.IO.Path.GetFileNameWithoutExtension(arg_8);
             }
@@ -381,83 +382,51 @@ namespace engine
                 arg_8 = seg042.clean_string(player.name);
             }
 
-            string filename = filename = string.Format("{0}.SWG", arg_8);
+            string filename = filename = string.Format("{0}.{1}", arg_8, gbl.game.SaveItemExt);
 
             if (await gbl.file.Find(Config.SavePath, filename) == true)
             {
-                byte[] data = new byte[Item.StructSize];
                 file = await seg042.find_and_open_file(false, Config.SavePath, filename);
 
-                while (true)
+                if (gbl.import_from == ImportSource.Curse)
                 {
-                    if (gbl.file.BlockRead(Item.StructSize, data, file) == Item.StructSize)
-                    {
-                        player.items.Add(new Classes.Curse.Item(data, 0).Load());
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    Classes.Curse.Player.LoadItems(player, file);
+                }
+                else if (gbl.import_from == ImportSource.Pool)
+                {
+                    Classes.PoolRad.Player.LoadItems(player, file);
                 }
 
                 gbl.file.Close(file);
             }
 
 
-            filename = string.Format("{0}.FX", arg_8);
+            filename = string.Format("{0}.{1}", arg_8, gbl.game.SaveAffectExt);
+
             if (await gbl.file.Find(Config.SavePath, filename) == true)
             {
-                byte[] data = new byte[Affect.StructSize];
                 file = await seg042.find_and_open_file(false, Config.SavePath, filename);
 
-                while (true)
+                if (gbl.import_from == ImportSource.Curse)
                 {
-                    if (gbl.file.BlockRead(Classes.Curse.Affect.StructSize, data, file) == Classes.Curse.Affect.StructSize)
-                    {
-                        new Classes.Curse.Affect(data, 0).Load(player);
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    Classes.Curse.Player.LoadAffects(player, file);
+                }
+                else if (gbl.import_from == ImportSource.Pool)
+                {
+                    Classes.PoolRad.Player.LoadAffects(player, file);
+
+                    ovr024.CalcStatBonuses(Stat.STR, player);
+                    ovr024.CalcStatBonuses(Stat.CHA, player);
+                    player.stats2.Str.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats2.Int.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats2.Wis.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats2.Dex.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats2.Con.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats2.Cha.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats2.Str00.EnforceRaceSexLimits(player.race, player.sex);
                 }
 
                 gbl.file.Close(file);
-            }
-
-            filename = string.Format("{0}.SPC", arg_8);
-            if (gbl.import_from == ImportSource.Pool)
-            {
-                if (await gbl.file.Find(Config.SavePath, filename) == true)
-                {
-                    byte[] data = new byte[Affect.StructSize];
-                    file = await seg042.find_and_open_file(false, Config.SavePath, filename);
-
-                    while (true)
-                    {
-                        if (gbl.file.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
-                        {
-                            new Classes.PoolRad.Affect(data, 0).Load(player);
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    gbl.file.Close(file);
-
-                }
-
-                ovr024.CalcStatBonuses(Stat.STR, player);
-                ovr024.CalcStatBonuses(Stat.CHA, player);
-                player.stats2.Str.EnforceRaceSexLimits(player.race, player.sex);
-                player.stats2.Int.EnforceRaceSexLimits(player.race, player.sex);
-                player.stats2.Wis.EnforceRaceSexLimits(player.race, player.sex);
-                player.stats2.Dex.EnforceRaceSexLimits(player.race, player.sex);
-                player.stats2.Con.EnforceRaceSexLimits(player.race, player.sex);
-                player.stats2.Cha.EnforceRaceSexLimits(player.race, player.sex);
-                player.stats2.Str00.EnforceRaceSexLimits(player.race, player.sex);
             }
 
             seg043.clear_keyboard();
@@ -735,7 +704,27 @@ namespace engine
 
                 AssignPlayerIconId(player);
 
-                ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                {
+
+                    if (player.icon_size == 0)
+                    {
+                        player.icon_size = 2;
+
+                        for (int i = 0; i < 6; i++)
+                        {
+                            byte colour = i == 3 ? gbl.default_icon_colours[i] : ovr024.roll_dice(7, 1);
+
+                            player.icon_colours[i] = (byte)(((colour + 8) << 4) + colour);
+                        }
+                    }
+
+                    player.combat_team = CombatTeam.Ours;
+                }
+                else // if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                }
             }
         }
 
@@ -778,7 +767,7 @@ namespace engine
 
         internal static async void loadGameMenu() // loadGame
         {
-            gbl.import_from = ImportSource.Curse;
+            gbl.import_from = gbl.game.ImportFrom;
 
             string games_list = string.Empty;
 
@@ -859,13 +848,16 @@ namespace engine
             gbl.file.BlockRead(1, data, file);
             gbl.game_state = (GameState)data[0];
 
-            for (int i = 0; i < 3; i++)
+            if (gbl.game.Name != Logging.Game.PoolOfRadiance)
             {
-                gbl.file.BlockRead(2, data, file);
-                gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
+                for (int i = 0; i < 3; i++)
+                {
+                    gbl.file.BlockRead(2, data, file);
+                    gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
 
-                gbl.file.BlockRead(2, data, file);
-                gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
+                    gbl.file.BlockRead(2, data, file);
+                    gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
+                }
             }
 
             gbl.file.BlockRead(1, data, file);
@@ -900,14 +892,13 @@ namespace engine
             foreach (Player tmp_player in gbl.TeamList)
             {
                 gbl.SelectedPlayer = tmp_player;
-
-                if (gbl.SelectedPlayer.control_morale < Control.NPC_Base)
+                if (tmp_player.head_portrait == 0xFF && tmp_player.body_portrait == 0x00)
                 {
-                    LoadPlayerCombatIcon(true);
+                    ovr034.chead_cbody_comspr_icon(tmp_player.icon_id, tmp_player.mod_id, "CPIC");
                 }
                 else
                 {
-                    ovr034.chead_cbody_comspr_icon(gbl.SelectedPlayer.icon_id, gbl.SelectedPlayer.mod_id, "CPIC");
+                    LoadPlayerCombatIcon(true);
                 }
             }
 
@@ -922,6 +913,7 @@ namespace engine
                 {
                     if (gbl.setBlocks[0].blockId > 0)
                     {
+                        gbl.byte_1AB0B = true;
                         ovr031.Load3DMap(gbl.area_ptr.current_3DMap_block_id);
                     }
 
@@ -942,9 +934,12 @@ namespace engine
             seg043.clear_keyboard();
             ovr027.ClearPromptArea();
 
-            gbl.last_game_state = gbl.game_state;
+            if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+            {
+                gbl.last_game_state = gbl.game_state;
 
-            gbl.game_state = GameState.StartGameMenu;
+                gbl.game_state = GameState.StartGameMenu;
+            }
         }
 
         static Set save_slots = new Set(0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // unk_4AEA0
@@ -1009,12 +1004,15 @@ namespace engine
                 data[0] = (byte)gbl.game_state;
                 gbl.file.BlockWrite(1, data, save_file);
 
-                for (int i = 0; i < 3; i++)
+                if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
                 {
-                    Sys.ShortToArray((short)gbl.setBlocks[i].blockId, data, (i * 4) + 0);
-                    Sys.ShortToArray((short)gbl.setBlocks[i].setId, data, (i * 4) + 2);
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Sys.ShortToArray((short)gbl.setBlocks[i].blockId, data, (i * 4) + 0);
+                        Sys.ShortToArray((short)gbl.setBlocks[i].setId, data, (i * 4) + 2);
+                    }
+                    gbl.file.BlockWrite(12, data, save_file);
                 }
-                gbl.file.BlockWrite(12, data, save_file);
 
                 int party_count = 0;
                 foreach (Player tmp_player in gbl.TeamList)
@@ -1028,7 +1026,7 @@ namespace engine
 
                 for (int i = 0; i < party_count; i++)
                 {
-                    Sys.StringToArray(data, 0x29 * i, 0x29, var_171[i]);
+                    Sys.StringToArray(data, 0x29 * i, var_171[i].Length, var_171[i]);
                 }
                 gbl.file.BlockWrite(0x148, data, save_file);
                 gbl.file.Close(save_file);

@@ -1109,7 +1109,7 @@ namespace engine
         /// </summary>
         internal static bool MakeCamp() // make_camp
         {
-            var game_state_bkup = gbl.game_state;
+            gbl.last_game_state = gbl.game_state;
             gbl.game_state = GameState.Camping;
             gbl.rest_10_seconds = 0;
 
@@ -1184,7 +1184,8 @@ namespace engine
 
             cancel_spells();
             gbl.lastSelectetSpellTarget = null;
-            gbl.game_state = game_state_bkup;
+            gbl.game_state = gbl.last_game_state;
+            gbl.last_game_state = GameState.Camping;
             ovr025.display_map_position_time();
             ovr025.ClearPlayerTextArea();
             ovr027.ClearPromptArea();

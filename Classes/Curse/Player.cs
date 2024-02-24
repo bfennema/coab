@@ -1,3 +1,6 @@
+using Classes.PoolRad;
+using Logging;
+
 namespace Classes.Curse
 {
     /// <summary>
@@ -595,6 +598,41 @@ namespace Classes.Curse
             player.movement = movement;
 
             return player;
+        }
+
+        public static void LoadItems(Classes.Player player, System.IO.Stream file)
+        {
+            byte[] data = new byte[Item.StructSize];
+
+            while (true)
+            {
+                if (gbl.file.BlockRead(Item.StructSize, data, file) == Item.StructSize)
+                {
+                    player.items.Add(new Item(data, 0).Load());
+                }
+                else
+                {
+                    break;
+                }
+            }
+            gbl.file.Close(file);
+        }
+        public static void LoadAffects(Classes.Player player, System.IO.Stream file)
+        {
+            byte[] data = new byte[Affect.StructSize];
+
+            while (true)
+            {
+                if (gbl.file.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
+                {
+                    new Affect(data, 0).Load(player);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            gbl.file.Close(file);
         }
 
         public byte[] Save()

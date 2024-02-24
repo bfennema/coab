@@ -18,6 +18,18 @@ public partial class MainView : UserControl
     public void UpdateMenuIsChecked(Settings _settings)
     {
         settings = _settings;
+        if (settings.Game == Logging.Game.PoolOfRadiance)
+        {
+            PoolRadMenu.IsChecked = true;
+        }
+        else if (settings.Game == Logging.Game.CurseOfTheAzureBonds)
+        {
+            CurseMenu.IsChecked = true;
+        }
+        else if (settings.Game == Logging.Game.SecretOfTheSilverBlades)
+        {
+            SecretMenu.IsChecked = true;
+        }
 
         if (settings.PlayerAlwaysSaves)
         {

@@ -63,19 +63,19 @@ namespace Classes.PoolRad
         public byte field_87; // 0x87
 
         [DataOffset(0x88, DataType.Word)]
-        public ushort field_88; // 0x88 - 0x89
+        public ushort Copper; // 0x88 - 0x89
         [DataOffset(0x8A, DataType.Word)]
-        public ushort field_8A; // 0x8A - 0x8B
+        public ushort Silver; // 0x8A - 0x8B
         [DataOffset(0x8C, DataType.Word)]
-        public ushort field_8C; // 0x8C - 0x8D
+        public ushort Electrum; // 0x8C - 0x8D
         [DataOffset(0x8E, DataType.Word)]
-        public ushort field_8E; // 0x8E - 0x8F
+        public ushort Gold; // 0x8E - 0x8F
         [DataOffset(0x90, DataType.Word)]
-        public ushort field_90; // 0x90 - 0x91
+        public ushort Platinum; // 0x90 - 0x91
         [DataOffset(0x92, DataType.Word)]
-        public ushort field_92; // 0x92 - 0x93
+        public ushort Gems; // 0x92 - 0x93
         [DataOffset(0x94, DataType.Word)]
-        public ushort field_94; // 0x94 - 0x95
+        public ushort Jewelry; // 0x94 - 0x95
 
         [DataOffset(0x96, DataType.ByteArray, 8)]
         public byte[] ClassLevel = new byte[8]; // 0x96 Array 8 0x96 - 0x9D
@@ -193,6 +193,122 @@ namespace Classes.PoolRad
             DataIO.ReadObject(this, data, 0);
         }
 
+        public Player(Classes.Player player)
+        {
+            race = (byte)player.race;
+            sex = player.sex;
+
+            name = player.name;
+
+            player.stats2.Save(stats);
+
+            Spell.Save(player.spellList, memorizedSpells, memorizedSpells.Length);
+
+            thac0 = player.thac0;
+            _class = (byte)player._class;
+            age = player.age;
+            hp_max = player.hit_point_max;
+
+            Spell.Save(player.spellBook, spellBook, spellBook.Length);
+
+            attackLevel = player.attackLevel;
+            icon_dimensions = player.icon_dimensions;
+
+            System.Array.Copy(player.saveVerse, saveVerse, 5);
+
+            base_movement = player.base_movement;
+            HitDice = player.HitDice;
+            lost_lvls = player.lost_lvls;
+            lost_hp = player.lost_hp;
+            level_undead = player.level_undead;
+
+            System.Array.Copy(player.thief_skills, thief_skills, 8);
+
+            field_83 = player.field_F6;
+            control_morale = player.control_morale;
+            npcTreasureShareCount = player.npcTreasureShareCount;
+            field_86 = player.field_F9;
+            field_87 = player.field_FA;
+
+            Copper = (ushort)player.Money.GetCoins(Money.Copper);
+            Silver = (ushort)player.Money.GetCoins(Money.Silver);
+            Electrum = (ushort)player.Money.GetCoins(Money.Electrum);
+            Gold = (ushort)player.Money.GetCoins(Money.Gold);
+            Platinum = (ushort)player.Money.GetCoins(Money.Platinum);
+            Gems = (ushort)player.Money.GetCoins(Money.Gems);
+            Jewelry = (ushort)player.Money.GetCoins(Money.Jewelry);
+
+            System.Array.Copy(player.ClassLevel, ClassLevel, 8);
+
+            alignment = player.alignment;
+
+            attacksCount = player.attacksCount;
+            baseHalfMoves = player.baseHalfMoves;
+            attack1_DiceCountBase = player.attack1_DiceCountBase;
+            attack2_DiceCountBase = player.attack2_DiceCountBase;
+            attack1_DiceSizeBase = player.attack1_DiceSizeBase;
+            attack2_DiceSizeBase = player.attack2_DiceSizeBase;
+            attack1_DamageBonusBase = player.attack1_DamageBonusBase;
+            attack2_DamageBonusBase = player.attack2_DamageBonusBase;
+
+            base_ac = player.base_ac;
+            useStrBonus = player.useStrBonus;
+            mod_id = player.mod_id;
+
+            exp = player.exp;
+            classFlags = player.classFlags;
+            hit_point_rolled = player.hit_point_rolled;
+
+            for (int var_2 = 1; var_2 <= 3; var_2++)
+            {
+                field_B2[var_2 - 1] = player.spellCastCount[0, var_2 - 1];
+                field_B5[var_2 - 1] = player.spellCastCount[2, var_2 - 1];
+            }
+
+            field_B8 = player.field_13C;
+
+            field_BA = player.field_13E;
+
+            field_BB = player.field_13F;
+            field_BC = player.field_140;
+
+            head_icon = player.head_icon;
+            weapon_icon = player.weapon_icon;
+            icon_size = player.icon_size;
+
+            System.Array.Copy(player.icon_colours, icon_colours, 6);
+
+            monsterType = 0;
+
+            weaponsHandsUsed = player.weaponsHandsUsed;
+            field_101 = (byte)player.field_186;
+            weight = player.weight;
+
+            health_status = (byte)player.health_status;
+            field_10D = (byte)(player.in_combat ? 1 : 0);
+            combat_team = (byte)player.combat_team;
+            quick_fight = (byte)player.quick_fight;
+            hitBonus = (sbyte)player.hitBonus;
+
+            ac = player.ac;
+            ac_behind = player.ac_behind;
+
+            attack1_AttacksLeft = player.attack1_AttacksLeft;
+            attack2_AttacksLeft = player.attack2_AttacksLeft;
+
+            attack1_DiceCount = player.attack1_DiceCount;
+            attack2_DiceCount = player.attack2_DiceCount;
+
+            attack1_DiceSize = player.attack1_DiceSize;
+            attack2_DiceSize = player.attack2_DiceSize;
+
+            attack1_DamageBonus = (byte)player.attack1_DamageBonus;
+            attack2_DamageBonus = player.attack2_DamageBonus;
+            hit_point_current = player.hit_point_current;
+            movement = (sbyte)player.movement;
+        }
+
+
         public Classes.Player Load()
         {
             Classes.Player player = new();
@@ -233,7 +349,13 @@ namespace Classes.PoolRad
             player.field_F9 = field_86;
             player.field_FA = field_87;
 
-            player.Money.SetCoins(Money.Platinum, 300);
+            player.Money.SetCoins(Money.Copper, Copper);
+            player.Money.SetCoins(Money.Silver, Silver);
+            player.Money.SetCoins(Money.Electrum, Electrum);
+            player.Money.SetCoins(Money.Gold, Gold);
+            player.Money.SetCoins(Money.Platinum, Platinum);
+            player.Money.SetCoins(Money.Gems, Gems);
+            player.Money.SetCoins(Money.Jewelry, Jewelry);
 
             System.Array.Copy(ClassLevel, player.ClassLevel, 8);
 
@@ -395,6 +517,40 @@ namespace Classes.PoolRad
             player.movement = (byte)movement;
 
             return player;
+        }
+        public static void LoadItems(Classes.Player player, System.IO.Stream file)
+        {
+            byte[] data = new byte[Item.StructSize];
+
+            while (true)
+            {
+                if (gbl.file.BlockRead(Item.StructSize, data, file) == Item.StructSize)
+                {
+                    player.items.Add(new Item(data, 0).Load());
+                }
+                else
+                {
+                    break;
+                }
+            }
+            gbl.file.Close(file);
+        }
+        public static void LoadAffects(Classes.Player player, System.IO.Stream file)
+        {
+            byte[] data = new byte[Affect.StructSize];
+
+            while (true)
+            {
+                if (gbl.file.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
+                {
+                    new Affect(data, 0).Load(player);
+                }
+                else
+                {
+                    break;
+                }
+            }
+            gbl.file.Close(file);
         }
     }
 }

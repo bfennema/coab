@@ -826,6 +826,22 @@ namespace engine
                     ovr026.recalc_thief_skills(player);
                     break;
 
+                case 3: // Gauntlets of Ogre Power
+                    if (add_item)
+                    {
+                        int encodedStrength = 0;
+                        if (ovr024.TryEncodeStrength(out encodedStrength, 100, 18, player) == true)
+                        {
+                            ovr025.DisplayPlayerStatusString(true, 10, "is stronger", player);
+                            ovr024.CalcStatBonuses(Stat.STR, player);
+                        }
+                    }
+                    else
+                    {
+                        ovr024.CalcStatBonuses(Stat.STR, player);
+                    }
+                    break;
+
                 case 4:
                     if (((int)item.affect_2 & 0x0f) != player.alignment)
                     {

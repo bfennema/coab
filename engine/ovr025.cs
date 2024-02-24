@@ -220,7 +220,7 @@ namespace engine
 
 		internal static void PartySummary(Player player)
 		{
-			if (gbl.game_state == GameState.WildernessMap)
+			if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds && gbl.game_state == GameState.WildernessMap)
 			{
 				return;
 			}
@@ -1444,7 +1444,15 @@ namespace engine
 					break;
 
 				case GameState.WildernessMap:
-					if (gbl.lastDaxBlockId != 0x50)
+					if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+					{
+						gbl.game.DrawFrame_Wilderness();
+						ovr029.RedrawView();
+						PartySummary(gbl.SelectedPlayer);
+						display_map_position_time();
+						gbl.byte_1EE98 = false;
+					}
+					else if (gbl.lastDaxBlockId != 0x50)
 					{
 						ovr029.RedrawView();
 					}
@@ -1478,7 +1486,54 @@ namespace engine
 
 		internal static void display_map_position_time() // camping_search
 		{
-			if (gbl.game_state != GameState.WildernessMap)
+			if (gbl.game.Name == Logging.Game.PoolOfRadiance &&
+				(gbl.game_state == GameState.WildernessMap || gbl.last_game_state == GameState.WildernessMap))
+			{
+				string output = string.Empty;
+
+				string hours = gbl.area_ptr.time_hour.ToString("00");
+				string minutes = ((gbl.area_ptr.time_minutes_tens * 10) + gbl.area_ptr.time_minutes_ones).ToString("00");
+
+				if (gbl.area_ptr.block_area_view == 0 ||
+					Cheats.always_show_areamap)
+				{
+					int x = gbl.area_ptr.field_186;
+					if (gbl.EclBlockId == 25)
+					{
+						x += 0;
+					}
+					else if (gbl.EclBlockId == 26)
+					{
+						x += 13;
+					}
+					else if (gbl.EclBlockId == 27)
+					{
+						x += 26;
+					}
+					output = string.Format("{0},{1} ", x, gbl.area_ptr.field_188);
+				}
+
+				output += direction(gbl.mapDirection) + " " + hours + ":" + minutes;
+
+				if (gbl.printCommands == true)
+				{
+					output += "*";
+				}
+
+				if (gbl.game_state == GameState.Camping)
+				{
+					output += " camping";
+				}
+				else if ((gbl.area2_ptr.search_flags & 1) > 0)
+				{
+					output += " search";
+				}
+
+				seg037.draw8x8_clear_area(15, 0x26, 15, 17);
+
+				seg041.displayString(output, 0, 10, 15, 17);
+			}
+			else if (gbl.game_state != GameState.WildernessMap)
 			{
 				string output = string.Empty;
 

@@ -5,6 +5,24 @@ using System.Xml.Serialization;
 
 namespace Logging
 {
+    public enum Game
+    {
+        None = 0,
+        PoolOfRadiance,
+        CurseOfTheAzureBonds,
+        SecretOfTheSilverBlades,
+        PoolsOfDarkness,
+        ChampionsOfKrynn,
+        DeathKnightsOfKrynn,
+        TheDarkQueenOfKrynn,
+        GatewayToTheSavageFrontier,
+        TreasuresOfTheSavageFrontier,
+        UnlimitedAdventures,
+        CountdownToDoomsday,
+        MatrixCubed,
+        MaxGames,
+    }
+
     public static class Config
     {
         static string basePath;
@@ -13,6 +31,7 @@ namespace Logging
         static string saveBasePath;
         static string savePath;
         static string dataPath;
+        static Game game;
 
         static Config()
         {
@@ -42,6 +61,7 @@ namespace Logging
 
             savePath = "";
             dataPath = "";
+            game = Game.None;
         }
         public static string BasePath
         {
@@ -68,6 +88,11 @@ namespace Logging
         {
             get => dataPath;
             set => dataPath = value;
+        }
+        public static Game Game
+        {
+            get => game;
+            set => game = value;
         }
     }
 }

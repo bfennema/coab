@@ -224,6 +224,37 @@ namespace engine
                             if (menuFlags[allow_load] == true)
                             {
                                 ovr017.loadGameMenu();
+                                if (gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.game_state != GameState.StartGameMenu)
+                                {
+                                    if (gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.area_ptr.field_3FA == 1)
+                                    {
+                                        if (gbl.reload_ecl_and_pictures == false &&
+                                            gbl.lastDaxBlockId != 0x50)
+                                        {
+                                            if (gbl.game_state == GameState.WildernessMap)
+                                            {
+                                                gbl.game.DrawFrame_Wilderness();
+                                            }
+                                            else
+                                            {
+                                                gbl.game.DrawFrame_Dungeon();
+                                            }
+                                            ovr025.PartySummary(gbl.SelectedPlayer);
+                                        }
+                                        else
+                                        {
+                                            if (gbl.area_ptr.LastEclBlockId == 0)
+                                            {
+                                                gbl.game.DrawFrame_Dungeon();
+                                            }
+                                        }
+
+                                        ovr027.ClearPromptArea();
+                                        gbl.area2_ptr.training_class_mask = 0;
+
+                                        return;
+                                    }
+                                }
                             }
                             break;
 
@@ -240,7 +271,8 @@ namespace engine
                             if (menuFlags[allow_begin] == true)
                             {
                                 if ((gbl.TeamList.Count > 0 && gbl.inDemo == true) ||
-                                    gbl.area_ptr.field_3FA == 0 || gbl.inDemo == true)
+                                    gbl.area_ptr.gameOver == 0 ||
+                                    gbl.inDemo == true)
                                 {
                                     gbl.game_state = gameStateBackup;
 
@@ -307,18 +339,19 @@ namespace engine
 
         internal static byte[] /*seg600:3EA2 */ unk_1A1B2 = { 0x02, 0x10, 0x08, 0x40, 0x40, 0x01, 0x04, 0x20 };
 
-        //static byte[] /*seg600:45B3 */ unk_1A8C3 = { 3, 3, 5, 5, 5, 2, 2, 5 };
-        //static byte[] /*seg600:45B4 */ unk_1A8C4 = { 6, 6, 4, 4, 4, 4, 6, 4 };
+        static byte[] /*seg600:45B3 unk_1A8C3 */ gold_count = { 3, 3, 5, 5, 5, 2, 2, 5 };
+        static byte[] /*seg600:45B4 unk_1A8C4 */ gold_size = { 6, 6, 4, 4, 4, 4, 6, 4 };
 
         internal static sbyte[,] /* seg600:3E3A unk_1A14A */ thac0_table = {
-            {40, 40, 40, 40, 0x2A, 0x2A, 0x2A, 0x2C, 0x2C, 0x2C, 0x2E, 0x2E, 0x2E},
-            {40, 40, 40, 40, 0x2A, 0x2A, 0x2A, 0x2C, 0x2C, 0x2C, 0x2E, 0x2E, 0x2E},
-            {0x27, 40, 40, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33},
-            {40, 40, 40, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33},
-            {40, 40, 40, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33},
-            {0x27, 0x27, 0x27, 0x27, 0x27, 0x27, 0x29, 0x29, 0x29, 0x29, 0x29, 0x2B, 0x2B},
-            {40, 40, 40, 40, 40, 0x29, 0x29, 0x29, 0x29, 0x2C, 0x2C, 0x2C, 0x2C},
-            {40, 40, 40, 40, 0x2A, 0x2A, 0x2A, 0x2C, 0x2C, 0x2C, 0x2E, 0x2E, 0x2E} };
+            {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 },
+            {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 },
+            {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 },
+            {40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 },
+            {40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 },
+            {39, 39, 39, 39, 39, 39, 41, 41, 41, 41, 41, 43, 43 },
+            {40, 40, 40, 40, 40, 41, 41, 41, 41, 44, 44, 44, 44 },
+            {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 },
+        };
 
 
 
@@ -753,6 +786,7 @@ namespace engine
                 player.useStrBonus = 1;
                 player.base_movement = 12;
                 class_count = 0;
+                int gold = 0;
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -773,8 +807,12 @@ namespace engine
                             player.spellCastCount[2, 0] = 1;
                         }
 
-                        //var_21 += ovr024.roll_dice(unk_1A8C4[class_idx], unk_1A8C3[class_idx]);
-                        //TODO this was not used in original code.
+                        int gold_roll = ovr024.roll_dice(gold_size[(byte)skill], gold_count[(byte)skill]);
+                        if (skill != SkillType.Monk)
+                        {
+                            gold_roll *= 10;
+                        }
+                        gold += gold_roll;
 
                         if (skill == SkillType.Cleric)
                         {

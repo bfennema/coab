@@ -44,6 +44,15 @@ namespace engine
 
             ovr003.SetupCommandTable();
 
+            while (Logging.Config.DataPath.Length == 0)
+            {
+                if (gbl.Exit == true)
+                {
+                    return;
+                }
+                seg041.GameDelay();
+            }
+
             InitFirst();
 
             ItemLibrary.Read();
@@ -105,24 +114,38 @@ namespace engine
             //}
             //Logging.Logger.Debug("");
 
-            gbl.game = new Classes.Curse.Game();
+            if (Logging.Config.Game == Logging.Game.PoolOfRadiance)
+            {
+                gbl.game = new Classes.PoolRad.Game();
+            }
+            else if (Logging.Config.Game == Logging.Game.CurseOfTheAzureBonds)
+            {
+                gbl.game = new Classes.Curse.Game();
+
+                gbl.sky_dax_250 = seg040.LoadDax(13, 1, 250, "SKY");
+                gbl.sky_dax_251 = seg040.LoadDax(13, 1, 251, "SKY");
+                gbl.sky_dax_252 = seg040.LoadDax(13, 1, 252, "SKY");
+            }
 
             if (Cheats.skip_title_screen == false)
             {
                 ovr002.title_screen();
             }
 
-            gbl.displayInputSecondsToWait = 30;
-            gbl.displayInputTimeoutValue = 'D';
+            string demoString = gbl.game.DemoString;
 
-            char inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
-
-            gbl.displayInputSecondsToWait = 0;
-            gbl.displayInputTimeoutValue = '\0';
-
-            if (inputKey == 'D')
+            if (demoString != null)
             {
-                gbl.inDemo = true;
+                char inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", demoString);
+
+                gbl.displayInputSecondsToWait = 0;
+                gbl.displayInputTimeoutValue = '\0';
+
+                if (inputKey == 'D')
+                {
+                    gbl.inDemo = true;
+
+                }
             }
 
             if (Cheats.skip_copy_protection == false &&
@@ -168,15 +191,25 @@ namespace engine
                     ovr002.title_screen();
                     seg043.clear_keyboard();
 
-                    gbl.displayInputSecondsToWait = 10;
-                    gbl.displayInputTimeoutValue = 'D';
+                    demoString = gbl.game.DemoString;
 
-                    inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
+                    if (demoString != null)
+                    {
+                        char inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", demoString);
 
-                    gbl.displayInputSecondsToWait = 0;
-                    gbl.displayInputTimeoutValue = '\0';
+                        gbl.displayInputSecondsToWait = 0;
+                        gbl.displayInputTimeoutValue = '\0';
 
-                    gbl.inDemo = (inputKey == 'D');
+                        if (inputKey == 'D')
+                        {
+                            gbl.inDemo = true;
+
+                        }
+                    }
+                    else
+                    {
+                        gbl.inDemo = false;
+                    }
 
                     if (Cheats.skip_copy_protection == false &&
                         gbl.inDemo == false)
@@ -226,7 +259,7 @@ namespace engine
             gbl.dax24x24Set = null;
             gbl.dword_1C8FC = null;
 
-            gbl.dax24x24Set = new DaxBlock(0, 0x30, 3, 0x18);
+            gbl.dax24x24Set = new DaxBlock(0, 0x80, 3, 24);
 
             gbl.area_ptr.Clear();
 
@@ -239,8 +272,8 @@ namespace engine
             gbl.ecl_ptr.Clear();
 
 
-            gbl.combat_icons = new CombatIcon[26];
-            for (int i = 0; i < 26; i++)
+            gbl.combat_icons = new CombatIcon[29];
+            for (int i = 0; i < 29; i++)
             {
                 gbl.combat_icons[i] = new CombatIcon();
             }
@@ -305,6 +338,7 @@ namespace engine
             gbl.search_flag_bkup = 0;
             gbl.spriteChanged = false;
             gbl.party_killed = false;
+            gbl.byte_1AB0B = false;
             gbl.byte_1BF12 = 1;
             gbl.displayPlayerSprite = false;
             gbl.lastDaxFile = string.Empty;
@@ -324,12 +358,13 @@ namespace engine
             gbl.sky_dax_251 = null;
             gbl.sky_dax_252 = null;
             gbl.gameWon = false;
+            gbl.worldIcon = 0;
             seg041.Load8x8Tiles();
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-            ovr038.Load8x8D(4, 0xca);
-            ovr038.Load8x8D(0, 0xcb);
+            ovr038.Load8x8D(4, 202);
+            ovr038.Load8x8D(0, 203);
 
             for (gbl.byte_1AD44 = 0; gbl.byte_1AD44 <= 0x0b; gbl.byte_1AD44++)
             {
@@ -337,10 +372,6 @@ namespace engine
             }
 
             ovr034.chead_cbody_comspr_icon(0x19, 0x19, "COMSPR");
-
-            gbl.sky_dax_250 = seg040.LoadDax(13, 1, 250, "SKY");
-            gbl.sky_dax_251 = seg040.LoadDax(13, 1, 251, "SKY");
-            gbl.sky_dax_252 = seg040.LoadDax(13, 1, 252, "SKY");
 
             gbl.ItemDataTable = new ItemDataTable("ITEMS");
 
@@ -405,6 +436,7 @@ namespace engine
             gbl.search_flag_bkup = 0;
             gbl.spriteChanged = false;
             gbl.party_killed = false;
+            gbl.byte_1AB0B = false;
             gbl.byte_1BF12 = 1;
             gbl.displayPlayerSprite = false;
             gbl.lastDaxFile = string.Empty;
@@ -422,6 +454,7 @@ namespace engine
             gbl.last_game_state = 0;
             gbl.applyItemAffect = false;
             gbl.gameWon = false;
+            gbl.worldIcon = 0;
         }
     }
 }

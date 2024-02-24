@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 
 namespace Classes
 {
-    public struct StatValue : IDataIO
+    public struct StatValue
     {
         readonly int[, ,] raceSexMinMax;
         readonly int[] classMin;
@@ -33,11 +32,6 @@ namespace Classes
         public void Load(int val)
         {
             full = cur = val;
-        }
-        public void Load(byte[] data, int offset)
-        {
-            // enforce values in valid range
-            full = cur = Math.Max(Math.Min((int)data[offset], max), min);
         }
 
         public void Assign(StatValue sv)
@@ -98,17 +92,31 @@ namespace Classes
             full = cur + delta;
         }
 
-        public void Write(byte[] data, int offset)
+        public void Write(byte[] data, int offset, int len)
         {
-            data[offset + cur_offset] = (byte)cur;
-            data[offset + full_offset] = (byte)full;
+            if (len == 1)
+            {
+                data[offset] = (byte)full;
+            }
+            else
+            {
+                data[offset + cur_offset] = (byte)cur;
+                data[offset + full_offset] = (byte)full;
+            }
         }
 
-        public void Read(byte[] data, int offset)
+        public void Read(byte[] data, int offset, int len)
         {
             // enforce values in valid range
-            cur = Math.Max(Math.Min((int)data[offset + cur_offset], max), min);
-            full = Math.Max(Math.Min((int)data[offset + full_offset], max), min);
+            if (len == 1)
+            {
+                full = cur = Math.Max(Math.Min((int)data[offset], max), min);
+            }
+            else
+            {
+                cur = Math.Max(Math.Min((int)data[offset + cur_offset], max), min);
+                full = Math.Max(Math.Min((int)data[offset + full_offset], max), min);
+            }
         }
 
         public override string ToString()
@@ -135,58 +143,71 @@ namespace Classes
 
         void IDataIO.Write(byte[] data, int offset)
         {
-            Str.Write(data, offset + 0x00);
-            Int.Write(data, offset + 0x02);
-            Wis.Write(data, offset + 0x04);
-            Dex.Write(data, offset + 0x06);
-            Con.Write(data, offset + 0x08);
-            Cha.Write(data, offset + 0x0a);
-            Str00.Write(data, offset + 0x0c);
+            Str.Write(data, offset + 0x00, 2);
+            Int.Write(data, offset + 0x02, 2);
+            Wis.Write(data, offset + 0x04, 2);
+            Dex.Write(data, offset + 0x06, 2);
+            Con.Write(data, offset + 0x08, 2);
+            Cha.Write(data, offset + 0x0a, 2);
+            Str00.Write(data, offset + 0x0c, 2);
         }
 
         void IDataIO.Read(byte[] data, int offset)
         {
-            Str.Read(data, offset + 0x00);
-            Int.Read(data, offset + 0x02);
-            Wis.Read(data, offset + 0x04);
-            Dex.Read(data, offset + 0x06);
-            Con.Read(data, offset + 0x08);
-            Cha.Read(data, offset + 0x0a);
-            Str00.Read(data, offset + 0x0c);
+            Str.Read(data, offset + 0x00, 2);
+            Int.Read(data, offset + 0x02, 2);
+            Wis.Read(data, offset + 0x04, 2);
+            Dex.Read(data, offset + 0x06, 2);
+            Con.Read(data, offset + 0x08, 2);
+            Cha.Read(data, offset + 0x0a, 2);
+            Str00.Read(data, offset + 0x0c, 2);
         }
 
         public void Save(byte[] data)
         {
-            Str.Write(data, 0x00);
-            Int.Write(data, 0x02);
-            Wis.Write(data, 0x04);
-            Dex.Write(data, 0x06);
-            Con.Write(data, 0x08);
-            Cha.Write(data, 0x0a);
-            Str00.Write(data, 0x0c);
+            if (data.Length == 14)
+            {
+                Str.Write(data, 0x00, 2);
+                Int.Write(data, 0x02, 2);
+                Wis.Write(data, 0x04, 2);
+                Dex.Write(data, 0x06, 2);
+                Con.Write(data, 0x08, 2);
+                Cha.Write(data, 0x0a, 2);
+                Str00.Write(data, 0x0c, 2);
+            }
+            else if (data.Length == 7)
+            {
+                Str.Write(data, 0x00, 1);
+                Int.Write(data, 0x01, 1);
+                Wis.Write(data, 0x02, 1);
+                Dex.Write(data, 0x03, 1);
+                Con.Write(data, 0x04, 1);
+                Cha.Write(data, 0x05, 1);
+                Str00.Write(data, 0x06, 1);
+            }
         }
 
         public void Load(byte[] data)
         {
             if (data.Length == 14)
             {
-                Str.Read(data, 0x00);
-                Int.Read(data, 0x02);
-                Wis.Read(data, 0x04);
-                Dex.Read(data, 0x06);
-                Con.Read(data, 0x08);
-                Cha.Read(data, 0x0a);
-                Str00.Read(data, 0x0c);
+                Str.Read(data, 0x00, 2);
+                Int.Read(data, 0x02, 2);
+                Wis.Read(data, 0x04, 2);
+                Dex.Read(data, 0x06, 2);
+                Con.Read(data, 0x08, 2);
+                Cha.Read(data, 0x0a, 2);
+                Str00.Read(data, 0x0c, 2);
             }
             else if (data.Length == 7)
             {
-                Str.Load(data, 0x00);
-                Int.Load(data, 0x01);
-                Wis.Load(data, 0x02);
-                Dex.Load(data, 0x03);
-                Con.Load(data, 0x04);
-                Cha.Load(data, 0x05);
-                Str00.Load(data, 0x06);
+                Str.Read(data, 0x00, 1);
+                Int.Read(data, 0x01, 1);
+                Wis.Read(data, 0x02, 1);
+                Dex.Read(data, 0x03, 1);
+                Con.Read(data, 0x04, 1);
+                Cha.Read(data, 0x05, 1);
+                Str00.Read(data, 0x06, 1);
             }
         }
 

@@ -349,7 +349,7 @@ namespace engine
 
             gbl.area2_ptr.field_592 = 0;
 
-            if (gbl.game_state == GameState.DungeonMap)
+            if (gbl.game_state == GameState.DungeonMap && (gbl.game.Name != Logging.Game.PoolOfRadiance || gbl.last_game_state != GameState.WildernessMap))
             {
                 bool stop_loop = false;
 
@@ -438,6 +438,85 @@ namespace engine
 
                                 gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
                                 ovr031.Draw3dWorld(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
+                                break;
+
+                            default:
+                                ovr020.scroll_team_list(input_key);
+                                ovr025.PartySummary(gbl.SelectedPlayer);
+                                break;
+                        }
+                    }
+
+                    ovr025.display_map_position_time();
+
+                } while (gbl.Exit == false && stop_loop == false);
+            }
+            else if (gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.game_state == GameState.WildernessMap)
+            {
+                bool stop_loop = false;
+
+                do
+                {
+                    bool special_key;
+
+                    input_key = ovr027.displayInput(out special_key, false, 1, gbl.defaultMenuColors, "Cast View Encamp Search Look", string.Empty);
+
+                    if (special_key == false)
+                    {
+                        switch (input_key)
+                        {
+                            case 'C':
+                                if (gbl.SelectedPlayer.health_status == Status.okey)
+                                {
+                                    gbl.menuSelectedWord = 1;
+                                    ovr016.cast_spell();
+                                }
+                                break;
+
+                            case 'V':
+                                gbl.menuSelectedWord = 1;
+                                ovr020.viewPlayer();
+                                break;
+
+                            case 'E':
+                                stop_loop = true;
+                                gbl.menuSelectedWord = 1;
+                                break;
+
+                            case 'S':
+                                gbl.area2_ptr.search_flags ^= 1;
+                                break;
+
+                            case 'L':
+                                gbl.area2_ptr.search_flags |= 2;
+                                ovr021.step_game_time(2, 1);
+                                gbl.ecl_offset = gbl.SearchLocationAddr;
+                                stop_loop = true;
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        switch (input_key)
+                        {
+                            case 'H': // north
+                                gbl.mapDirection = 0;
+                                stop_loop = true;
+                                break;
+
+                            case 'P': // south
+                                gbl.mapDirection = 4;
+                                stop_loop = true;
+                                break;
+
+                            case 'K': // west
+                                gbl.mapDirection = 6;
+                                stop_loop = true;
+                                break;
+
+                            case 'M': // east
+                                gbl.mapDirection = 2;
+                                stop_loop = true;
                                 break;
 
                             default:

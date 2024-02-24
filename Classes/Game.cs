@@ -4,8 +4,13 @@ namespace Classes
 {
     public abstract class Game
     {
+        public abstract Logging.Game Name { get; }
+        public abstract ImportSource ImportFrom { get; }
         public abstract int InitialExp { get; }
         public abstract MoneySet InitialMoney { get; }
+        public abstract string DemoString { get; }
+        public abstract string SaveItemExt { get; }
+        public abstract string SaveAffectExt { get; }
         public abstract byte DemoGameArea { get; }
         public abstract int DemoGameSpeed { get; }
         public abstract byte DemoEclBlockId { get; }
