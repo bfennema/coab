@@ -111,6 +111,13 @@ namespace engine
                             "Bestow Curse",
 							string.Empty,
 							"Charm Person or Mammal",
+		                    "Cure Light Wounds",
+		                    "Cause Light Wounds",
+		                    "Neutralize Poison",
+                            "Cure Serious Wounds",
+                            "Cause Serious Wounds",
+		                    "Dispel Magic",
+		                    "Sticks to Snakes"};
 
 		static string[] LevelStrings = {
                             string.Empty,
@@ -588,7 +595,7 @@ namespace engine
 				{
 					bool saved;
 
-					if (gbl.spellCastingTable[spell_id].damageOnSave == 0)
+					if (gbl.spellCastingTable[spell_id].damageOnSave == DamageOnSave.Normal)
 					{
 						saved = false;
 					}
@@ -1078,29 +1085,29 @@ namespace engine
 		}
 
         internal static void SpellCharmPersonMammal() // is_charmed
-		{
-			Player target = gbl.spellTargets[0];
+        {
+            Player target = gbl.spellTargets[0];
 
             if ((target.monsterType > MonsterType.humanoid && target.monsterType < MonsterType.animal) ||
                 target.icon_dimensions > 1)
-			{
-				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
-			}
-			else
-			{
-				DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
+            {
+                ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
+            }
+            else
+            {
+                DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
 
-				Affect affect = target.GetAffect(Affects.charm_person);
+                Affect affect = target.GetAffect(Affects.charm_person);
 
-				if (affect != null)
-				{
-					ovr013.CallAffectTable(Effect.Add, affect, target, Affects.shield);
-				}
-			}
-		}
+                if (affect != null)
+                {
+                    ovr013.CallAffectTable(Effect.Add, affect, target, Affects.shield);
+                }
+            }
+        }
 
 
-		internal static void SpellEnlarge() // is_stronger
+        internal static void SpellEnlarge() // is_stronger
 		{
 			Player target = gbl.spellTargets[0];
 			int new_str = 18;
@@ -3280,6 +3287,6 @@ namespace engine
             gbl.spellTable.Add(Spells.dispel_magic_DR, ovr023.SpellDispelMagic);
             gbl.spellTable.Add(Spells.sticks_to_snakes_DR, ovr023.SpellSticksToSnakes);
 
-		}
+        }
 	}
 }
