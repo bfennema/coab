@@ -2,6 +2,7 @@ using Classes;
 using System.Collections.Generic;
 using System;
 using Classes.Combat;
+using System.Data.SqlTypes;
 
 namespace engine
 {
@@ -361,7 +362,7 @@ namespace engine
             var_C.Add(new MenuItem("  " + ovr020.raceString[5]));
             var_C.Add(new MenuItem("  " + ovr020.raceString[7]));
 
-            index = 0;
+            index = 1;
             menuRedraw = true;
             showExit = true;
 
@@ -746,7 +747,7 @@ namespace engine
                             break;
                     }
 
-                    ovr020.display_stat(false, var_1B);
+                    ovr020.display_stat(false, var_1B, true);
                 }
 
                 player.hit_point_current = player.hit_point_max;
@@ -793,7 +794,7 @@ namespace engine
 
                                 if (stru.spellClass == 0 && stru.spellLevel == 1)
                                 {
-                                    player.LearnSpell(spell);
+                                    player.spellBook.LearnSpell(spell);
                                 }
                             }
                         }
@@ -808,7 +809,7 @@ namespace engine
                                 if (stru.spellClass == 0 && stru.spellLevel == 1)
                                 {
                                     player.spellBook.LearnSpell(spell);
-                        }
+                                }
                             }
                         }
                         else if (class_idx == (byte)ClassId.magic_user)
@@ -971,11 +972,11 @@ namespace engine
         /// <summary>
         /// nested function, has not been fix to be not nested.
         /// </summary>
-        internal static void draw_highlight_stat(bool highlighted, byte edited_stat, int name_cursor_pos) /* sub_4E6F2 */
+        internal static void draw_highlight_stat(bool highlighted, byte edited_stat, int name_cursor_pos, bool cur) /* sub_4E6F2 */
         {
             if (edited_stat >= 0 && edited_stat <= 5)
             {
-                ovr020.display_stat(highlighted, edited_stat);
+                ovr020.display_stat(highlighted, edited_stat, cur);
             }
             else if (edited_stat == 6)
             {
@@ -1011,17 +1012,17 @@ namespace engine
             char inputkey;
 
             if (Cheats.allow_player_modify == false &&
-                (gbl.SelectedPlayer.exp != 0 &&
+                ((gbl.SelectedPlayer.exp != 0 &&
                 gbl.SelectedPlayer.exp != 8333 &&
                 gbl.SelectedPlayer.exp != 12500 &&
                 gbl.SelectedPlayer.exp != 25000) ||
-                gbl.SelectedPlayer.multiclassLevel != 0)
+                gbl.SelectedPlayer.multiclassLevel != 0))
             {
                 seg041.DisplayStatusText(0, 14, gbl.SelectedPlayer.name + " can't be modified.");
                 return;
             }
 
-            ovr020.playerDisplayFull(gbl.SelectedPlayer);
+            ovr020.playerDisplayFull(gbl.SelectedPlayer, true);
 
             PlayerStats stats_bkup = new PlayerStats();
             stats_bkup.Assign(gbl.SelectedPlayer.stats2);
@@ -1032,9 +1033,9 @@ namespace engine
 
             int name_cursor_pos = 1;
             byte edited_stat = 7;
-            draw_highlight_stat(false, edited_stat, name_cursor_pos);
+            draw_highlight_stat(false, edited_stat, name_cursor_pos, true);
             edited_stat = 0;
-            draw_highlight_stat(true, edited_stat, name_cursor_pos);
+            draw_highlight_stat(true, edited_stat, name_cursor_pos, true);
             Player player = gbl.SelectedPlayer;
 
             do
@@ -1068,7 +1069,7 @@ namespace engine
                     inputkey = ovr027.displayInput(out controlkey, false, 1, gbl.defaultMenuColors, "Keep Exit", "Modify: ");
                 }
 
-                draw_highlight_stat(false, edited_stat, name_cursor_pos);
+                draw_highlight_stat(false, edited_stat, name_cursor_pos, true);
 
                 if (controlkey == true)
                 {
@@ -1165,7 +1166,7 @@ namespace engine
 
                                         player.hit_point_current = player.hit_point_max;
                                         edited_stat = 6;
-                                        draw_highlight_stat(false, edited_stat, name_cursor_pos);
+                                        draw_highlight_stat(false, edited_stat, name_cursor_pos, true);
                                         edited_stat = 4;
                                         break;
 
@@ -1174,6 +1175,7 @@ namespace engine
                                         player.stats2.Cha.EnforceClassLimits((int)player._class);
                                         break;
                                 }
+                                ovr024.CalcStatBonuses((Stat)stat_var, player);
                             }
                             else if (edited_stat == 6)
                             {
@@ -1212,8 +1214,11 @@ namespace engine
                                     case Stat.STR:
                                         player.stats2.Str.EnforceRaceSexLimits(race, sex);
 
-                                        if( player.stats2.Str.full == 18 &&
-                                            (player.fighter_lvl >0 || player.ranger_lvl > 0 || player.paladin_lvl > 0) )
+                                        if( player.stats2.Str.cur == 18 &&
+                                            ((player.multiclassLevel == 0 &&
+                                              (player.fighter_lvl > 0 || player.ranger_lvl > 0 || player.paladin_lvl > 0)) ||
+                                             (player.multiclassLevel > 0 &&
+                                              (player.fighter_old_lvl > 0 || player.ranger_old_lvl > 0 || player.paladin_old_lvl > 0))))
                                         {
                                             player.stats2.Str00.Inc();
                                             player.stats2.Str00.EnforceRaceSexLimits(race, sex);
@@ -1251,7 +1256,7 @@ namespace engine
 
                                         player.hit_point_current = player.hit_point_max;
                                         edited_stat = 6;
-                                        draw_highlight_stat(false, edited_stat, name_cursor_pos);
+                                        draw_highlight_stat(false, edited_stat, name_cursor_pos, true);
                                         edited_stat = 4;
                                         break;
 
@@ -1259,30 +1264,28 @@ namespace engine
                                         player.stats2.Cha.EnforceRaceSexLimits(race, sex);
                                         break;
                                 }
+                                ovr024.CalcStatBonuses((Stat)stat_var, player);
+                            }
+                            else if (edited_stat == 6)
+                            {
+                                player.hit_point_max += 1;
+
+                                if (calc_max_hp(gbl.SelectedPlayer) < player.hit_point_max)
+                                {
+                                    player.hit_point_max = (byte)calc_max_hp(gbl.SelectedPlayer);
+                                }
+
+                                player.hit_point_current = player.hit_point_max;
                             }
                             else
                             {
-                                if (edited_stat == 6)
+                                if (name_cursor_pos == player.name.Length + 1)
                                 {
-                                    player.hit_point_max += 1;
-
-                                    if (calc_max_hp(gbl.SelectedPlayer) < player.hit_point_max)
-                                    {
-                                        player.hit_point_max = (byte)calc_max_hp(gbl.SelectedPlayer);
-                                    }
-
-                                    player.hit_point_current = player.hit_point_max;
+                                    name_cursor_pos = 1;
                                 }
                                 else
                                 {
-                                    if (name_cursor_pos == player.name.Length + 1)
-                                    {
-                                        name_cursor_pos = 1;
-                                    }
-                                    else
-                                    {
-                                        name_cursor_pos++;
-                                    }
+                                    name_cursor_pos++;
                                 }
                             }
                             break;
@@ -1390,48 +1393,15 @@ namespace engine
                 ovr025.reclac_player_values(gbl.SelectedPlayer);
                 ovr020.display_player_stats01();
 
-                draw_highlight_stat(true, edited_stat, name_cursor_pos);
+                draw_highlight_stat(true, edited_stat, name_cursor_pos, true);
             } while (controlkey == true || inputkey != 0x4B);
 
             ovr026.calc_cleric_spells(true, gbl.SelectedPlayer);
+            ovr026.calc_druid_spells(true, gbl.SelectedPlayer);
 
             gbl.SelectedPlayer.npcTreasureShareCount = 1;
 
             player = gbl.SelectedPlayer;
-            orig_hp_max = 0;
-            byte hp_count = 0;
-
-            for (int class_index = (byte)ClassId.cleric; class_index <= (byte)ClassId.monk; class_index++)
-            {
-                if (player.ClassLevel[class_index] > 0)
-                {
-                    if (player.ClassLevel[class_index] < gbl.max_class_hit_dice[class_index])
-                    {
-                        if ((ClassId)class_index == ClassId.ranger)
-                        {
-                            orig_hp_max += (byte)((player.ClassLevel[class_index] + 1) * (con_bonus((ClassId)class_index)));
-                        }
-                        else
-                        {
-                            orig_hp_max += (byte)(player.ClassLevel[class_index] * (con_bonus((ClassId)class_index)));
-                        }
-                    }
-                    else
-                    {
-                        orig_hp_max += (byte)((gbl.max_class_hit_dice[class_index] - 1) * con_bonus((ClassId)class_index));
-                    }
-                    hp_count++;
-                }
-            }
-
-            orig_hp_max /= hp_count;
-
-            player.hit_point_rolled = (byte)(player.hit_point_max - orig_hp_max);
-
-            //for (int stat_var = 0; stat_var <= 5; stat_var++)
-            //{
-            //    gbl.SelectedPlayer.stats2[stat_var].cur = gbl.SelectedPlayer.stats2[stat_var].full;
-            //}
 
             player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats2.Con.cur));
         }
@@ -2075,12 +2045,12 @@ namespace engine
                         {
                             min_hp += (classLvl + hpt.lvl_bonus - player.multiclassLevel) * hpt.max_mult;
 
-                    }
-                    else
-                    {
+                        }
+                        else
+                        {
                             int over_count = classLvl + hpt.lvl_bonus - hpt.max_hit_die;
 
-                        // con hp bonus only applies to hit dice
+                            // con hp bonus only applies to hit dice
                             min_hp += ((con_hp_bonus + lvl_adj) * (hpt.max_hit_die - player.multiclassLevel)) + (over_count * hpt.max_mult);
                         }
 
