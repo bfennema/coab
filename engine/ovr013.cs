@@ -107,7 +107,7 @@ namespace engine
 				{
 					bonus = 1;
 				}
-				else if (gbl.spell_target.monsterType == MonsterType.type_9 || gbl.spell_target.monsterType == MonsterType.type_12)
+				else if (gbl.spell_target.monsterType == MonsterType.cold || gbl.spell_target.monsterType == MonsterType.avian)
 				{
 					bonus = 2;
 				}
