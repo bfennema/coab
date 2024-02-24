@@ -744,7 +744,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 6, 0), 
 			new SubStruct_1A35E( 0x502, 6, 3), 
 			new SubStruct_1A35E( 4, 0, 0), 
-			new SubStruct_1A35E( 0, 0, 0) });
+			new SubStruct_1A35E( 0, 0, 0),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E dwarf_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 0xfa, 2, 0x14), 
@@ -753,7 +754,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 0, 0), 
 			new SubStruct_1A35E( 0, 0, 0), 
 			new SubStruct_1A35E( 0, 0, 0), 
-			new SubStruct_1A35E( 0x4B, 3, 6) });
+			new SubStruct_1A35E( 0x4B, 3, 6),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E elf_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 0x28a, 10, 10), 
@@ -762,7 +764,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 0, 0), 
 			new SubStruct_1A35E( 0, 0, 0), 
 			new SubStruct_1A35E( 0x96, 5, 6), 
-			new SubStruct_1A35E( 100, 5, 6) });
+			new SubStruct_1A35E( 100, 5, 6),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E gnome_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 0x12C, 3, 0xC),
@@ -771,7 +774,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0, 0, 0), 
 			new SubStruct_1A35E( 100, 2, 0x0C),
-			new SubStruct_1A35E( 0x50, 5, 4)});
+			new SubStruct_1A35E( 0x50, 5, 4),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E halfelf_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 0x28, 2, 4),
@@ -780,7 +784,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0x1E, 2,  8),
-			new SubStruct_1A35E( 0x16, 3, 8)});
+			new SubStruct_1A35E( 0x16, 3, 8),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E halfling_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 0, 0, 0),
@@ -789,7 +794,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0, 0, 0),
-			new SubStruct_1A35E( 0x28, 2, 4)});
+			new SubStruct_1A35E( 0x28, 2, 4),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E halforc_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 20, 1, 4),
@@ -798,7 +804,8 @@ namespace Classes
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0, 0, 0),
 			new SubStruct_1A35E( 0, 0, 0),
-			new SubStruct_1A35E( 20, 2, 4)});
+			new SubStruct_1A35E( 20, 2, 4),
+            new SubStruct_1A35E( 0, 0, 0)});
 
         static Struct_1A35E human_ages = new Struct_1A35E(new SubStruct_1A35E[] {
 			new SubStruct_1A35E( 18, 1, 4),
@@ -807,7 +814,8 @@ namespace Classes
 			new SubStruct_1A35E( 17, 1, 4),
 			new SubStruct_1A35E( 20, 1, 4),
 			new SubStruct_1A35E( 0x18, 2, 4),
-			new SubStruct_1A35E( 18 , 1, 4)});
+			new SubStruct_1A35E( 18 , 1, 4),
+            new SubStruct_1A35E( 21, 1, 4)});
 
         public static Struct_1A35E[] race_ages = new Struct_1A35E[] { monster_ages, dwarf_ages, elf_ages, gnome_ages, halfelf_ages, halfling_ages, halforc_ages, human_ages }; // unk_1A35E
 

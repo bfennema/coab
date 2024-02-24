@@ -556,11 +556,11 @@ namespace Classes
             get { return ClassLevelsOld[6]; }
             set { ClassLevelsOld[6] = value; }
         }
-        //public byte monk_old_level // 0x118;
-        //{
-        //    get { return ClassLevelsOld[7]; }
-        //    set { ClassLevelsOld[7] = value; }
-        //}
+        public byte monk_old_level // 0x118;
+        {
+            get { return ClassLevelsOld[7]; }
+            set { ClassLevelsOld[7] = value; }
+        }
 
         public int SkillLevel(SkillType skill)
         {

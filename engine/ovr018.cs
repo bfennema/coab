@@ -563,7 +563,7 @@ namespace engine
                 player.exp = 8333;
             }
 
-            if (player.thief_lvl > 0)
+            if (player.thief_lvl > 0 || player.monk_lvl > 0)
             {
                 ovr026.reclac_thief_skills(player);
             }
