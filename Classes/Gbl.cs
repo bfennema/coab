@@ -278,11 +278,11 @@ namespace Classes
         new ClassId[] /*Dwarf*/{ ClassId.fighter, ClassId.thief, ClassId.mc_f_t},
         new ClassId[] /*Elf*/{ ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t},
         new ClassId[] /*Gnome*/{ ClassId.fighter, ClassId.thief, ClassId.mc_f_t},
-        new ClassId[] /*Half-Elf*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t},
+        new ClassId[] /*Half-Elf*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t, ClassId.druid},
         new ClassId[] /*Halfling*/{ ClassId.fighter, ClassId.thief, ClassId.mc_f_t},
         new ClassId[] /*Half-Orc*/{ ClassId.cleric, ClassId.fighter, ClassId.thief, ClassId.mc_c_f, ClassId.mc_c_t,ClassId.mc_f_t},
-        new ClassId[] /*Human*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.paladin, ClassId.ranger},
-        new ClassId[] /*Cheaters*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t}};
+        new ClassId[] /*Human*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.paladin, ClassId.ranger, ClassId.druid},
+        new ClassId[] /*Cheaters*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t, ClassId.druid}};
 
 
         public static bool stopVM = false; //byte_1AB08
@@ -674,6 +674,16 @@ namespace Classes
             new SpellEntry(Spells.potion_extra_healing,         SpellClass.Monster,   6, 0, 0, 0, 0, 0, SpellTargets.Self, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Both, 0, 1, 0, 0),
             new SpellEntry(Spells.bestow_curse_MU,              SpellClass.MagicUser, 4, 0, 0, 0, 10, 4, SpellTargets.Combat, DamageOnSave.Zero, SaveVerseType.Spell, Affects.none, SpellWhen.Combat, 4, 4, 1, 0),
             new SpellEntry(Spells.unknown_10,                   SpellClass.Unknown10, 0, 10, 0, 6, 0, 24, SpellTargets.Combat, DamageOnSave.Unknown_1E, SaveVerseType.Poison, Affects.enlarge, SpellWhen.Camp, 0, 1, 0x28, 0x28),
+            new SpellEntry(Spells.barkskin,                     SpellClass.Druid,     2, 0, 0, 4, 1, 4, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.barkskin, SpellWhen.Both, 3, 2, 0, 0),
+            new SpellEntry(Spells.charm_person_mammal,          SpellClass.Druid,     2, 12, 0, 0, 0, 4, SpellTargets.Combat, DamageOnSave.Zero, SaveVerseType.Spell, Affects.charm_person, SpellWhen.Combat, 4, 1, 1, 0),
+            new SpellEntry(Spells.cure_light_wounds_DR,         SpellClass.Druid,     2, 0, 0, 0, 0, 4, SpellTargets.PartyMember, DamageOnSave.Normal,   SaveVerseType.Spell, Affects.none, SpellWhen.Both, 4, 1, 0, 0),
+            new SpellEntry(Spells.cause_light_wounds_DR,        SpellClass.Druid,     2, -1, 0, 0, 0, 4, SpellTargets.Combat, DamageOnSave.Normal,  SaveVerseType.Spell, Affects.none, SpellWhen.Combat, 4, 2, 1, 0),
+            new SpellEntry(Spells.hold_animal,                  SpellClass.Druid,     3, 8, 0, 0, 2, 7, SpellTargets.Combat, DamageOnSave.Zero, SaveVerseType.Spell, Affects.paralyze, SpellWhen.Combat, 5, 7, 1, 0),
+            new SpellEntry(Spells.neutralize_poison_DR,         SpellClass.Druid,     3, 0, 0, 0, 0, 0, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Camp, 6, 0, 0, 0),
+            new SpellEntry(Spells.cure_serious_wounds_DR,       SpellClass.Druid,     4, 0, 0, 0, 0, 4, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Both, 6, 1, 0, 0),
+            new SpellEntry(Spells.cause_serious_wounds_DR,      SpellClass.Druid,     4, 0, 0, 0, 0, 4, SpellTargets.Combat, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Combat, 6, 5, 1, 0),
+            new SpellEntry(Spells.dispel_magic_DR,              SpellClass.Druid,     4, 8, 0, 0, 0, 10, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Both, 6, 3, 1, 1),
+            new SpellEntry(Spells.sticks_to_snakes_DR,          SpellClass.Druid,     5, 4, 0, 0, 2, 4, SpellTargets.Combat, DamageOnSave.Normal, SaveVerseType.Spell, Affects.sticks_to_snakes, SpellWhen.Combat, 7, 4, 1, 0),
         };
 
         public static ItemDataTable ItemDataTable; // unk_1C020
@@ -708,7 +718,7 @@ namespace Classes
 
         public static ClassStatsMin[] class_stats_min = new ClassStatsMin[] { // unk_1A484
 			new ClassStatsMin(6, 6, 9, 0, 0, 0), 
-			new ClassStatsMin(0, 0, 0xC, 0, 0, 0xF), 
+			new ClassStatsMin(0, 0, 12, 0, 0, 15),
 			new ClassStatsMin(9, 0, 6, 6, 7, 0), 
 			new ClassStatsMin(0xC, 9, 0xD, 0, 9, 0x11),
 			new ClassStatsMin(0xD, 0xD, 0xE, 0, 0xE, 0),
@@ -808,7 +818,7 @@ namespace Classes
 
         public readonly static byte[,] class_alignments = { // unk_1A4EA
 			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 5,1,3,4,5,7,0,0,0,0},
+			{ 1,4,0,0,0,0,0,0,0,0},
 			{ 9,0,1,2,3,4,5,6,7,8},
 			{ 1,0,0,0,0,0,0,0,0,0},
 			{ 3,0,3,6,0,0,0,0,0,0},

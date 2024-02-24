@@ -148,6 +148,16 @@ namespace Classes
         potion_extra_healing = 0x63,
         bestow_curse_MU = 0x64,
         unknown_10 = 0x65,
+        barkskin = 0x66,
+        charm_person_mammal = 0x67,
+        cure_light_wounds_DR = 0x68,
+        cause_light_wounds_DR = 0x69,
+        hold_animal = 0x6a,
+        neutralize_poison_DR = 0x6b,
+        cure_serious_wounds_DR = 0x6c,
+        cause_serious_wounds_DR = 0x6d,
+        dispel_magic_DR = 0x6e,
+        sticks_to_snakes_DR = 0x6f,
         //spell_88 = 0x88,
     }
 

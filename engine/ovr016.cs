@@ -881,17 +881,19 @@ namespace engine
                 {
                     foreach (int id in player.spellList.LearntList())
                     {
-                        switch (id)
+                        switch ((Spells)id)
                         {
-                            case 3:
+                            case Spells.cure_light_wounds_CL:
+                            case Spells.cure_light_wounds_DR:
                                 HealingAvailable += ovr024.roll_dice(8, 1);
                                 break;
 
-                            case 0x3A:
+                            case Spells.cure_serious_wounds_CL:
+                            case Spells.cure_serious_wounds_DR:
                                 HealingAvailable += ovr024.roll_dice(8, 2) + 1;
                                 break;
 
-                            case 0x47:
+                            case Spells.cure_critical_wounds:
                                 HealingAvailable += ovr024.roll_dice(8, 3) + 3;
                                 break;
                         }
@@ -952,10 +954,10 @@ namespace engine
 
                 if (player.health_status == Status.okey)
                 {
-                    numCureLight += player.spellCastCount[0, 0];
+                    numCureLight += player.spellCastCount[0, 0] + player.spellCastCount[1, 1];
                     var_A = player.spellCastCount[0, 0] * 15;
 
-                    numCureSerious += player.spellCastCount[0, 3];
+                    numCureSerious += player.spellCastCount[0, 3] + player.spellCastCount[1, 3];
                     var_C = player.spellCastCount[0, 3] * 60;
 
                     numCureCritical += player.spellCastCount[0, 4];

@@ -276,6 +276,7 @@ namespace engine
                     calc_affect_effect(Affects.prot_from_good_10_radius, player);
                     calc_affect_effect(Affects.stinking_cloud, player);
                     calc_affect_effect(Affects.faerie_fire, player);
+                    calc_affect_effect(Affects.barkskin, player);
                     break;
 
                 case CheckType.SavingThrow:
@@ -295,6 +296,7 @@ namespace engine
                     calc_affect_effect(Affects.con_saving_bonus, player);
                     calc_affect_effect(Affects.hot_fire_shield, player);
                     calc_affect_effect(Affects.cold_fire_shield, player);
+                    calc_affect_effect(Affects.barkskin, player);
                     break;
 
                 case CheckType.Death:

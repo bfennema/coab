@@ -1774,6 +1774,17 @@ namespace engine
 		{
 		}
 
+		internal static void AffectBarkskin(Effect arg_0, object param, Player player)
+		{
+			player.ac += 1;
+			player.ac_behind += 1;
+
+			if (gbl.saveVerseType != SaveVerseType.Spell)
+			{
+				gbl.savingThrowRoll += 1;
+			}
+		}
+
 		static System.Collections.Generic.Dictionary<Affects, affectDelegate> affect_table;
 
 		internal static void SetupAffectTables() // setup_spells2
@@ -1927,6 +1938,7 @@ namespace engine
 			affect_table.Add(Affects.dispel_evil_banish, ovr013.AffectDispelEvilBanish);
 			affect_table.Add(Affects.strength_spell, ovr013.empty);
 			affect_table.Add(Affects.do_items_affect, ovr013.do_items_affect);
+			affect_table.Add(Affects.barkskin, ovr013.AffectBarkskin);
 		}
 
 		internal static void CallAffectTable(Effect add_remove, object parameter, Player player, Affects affect) /* sub_630C7 */
