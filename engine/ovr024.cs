@@ -171,7 +171,7 @@ namespace engine
 
                 case CheckType.SpecialAttacks:
                     calc_affect_effect(Affects.ray_of_enfeeblement, player);
-                    calc_affect_effect(Affects.affect_06, player);
+                    calc_affect_effect(Affects.weap_flame_tongue, player);
                     calc_affect_effect(Affects.salamander_heat_damage, player);
                     calc_affect_effect(Affects.weap_dragon_slayer, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
@@ -260,7 +260,7 @@ namespace engine
                     calc_affect_effect(Affects.blinded, player);
                     calc_affect_effect(Affects.bestow_curse, player);
                     calc_affect_effect(Affects.prayer, player);
-                    calc_affect_effect(Affects.affect_06, player);
+                    calc_affect_effect(Affects.weap_flame_tongue, player);
                     calc_affect_effect(Affects.gnome_vs_goblin_kobold, player);
                     calc_affect_effect(Affects.dwarf_vs_orc, player);
                     calc_affect_effect(Affects.weap_dragon_slayer, player);
