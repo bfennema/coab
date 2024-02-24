@@ -541,6 +541,7 @@ namespace engine
             EffectNameMap.Add(Affects.poisoned, "Poisoned");
             EffectNameMap.Add(Affects.regenerate, "Regenerating");
             EffectNameMap.Add(Affects.fire_resist, "Fire Resistance");
+            EffectNameMap.Add(Affects.resist_lightning, "Resist Lightning");
             EffectNameMap.Add(Affects.minor_globe_of_invulnerability, "Minor Globe of Invulnerability");
             EffectNameMap.Add(Affects.feeblemind, "enfeebled");
             EffectNameMap.Add(Affects.invisible_to_animals, "invisible to animals");
@@ -881,17 +882,19 @@ namespace engine
                 {
                     foreach (int id in player.spellList.LearntList())
                     {
-                        switch (id)
+                        switch ((Spells)id)
                         {
-                            case 3:
+                            case Spells.cure_light_wounds_CL:
+                            case Spells.cure_light_wounds_DR:
                                 HealingAvailable += ovr024.roll_dice(8, 1);
                                 break;
 
-                            case 0x3A:
+                            case Spells.cure_serious_wounds_CL:
+                            case Spells.cure_serious_wounds_DR:
                                 HealingAvailable += ovr024.roll_dice(8, 2) + 1;
                                 break;
 
-                            case 0x47:
+                            case Spells.cure_critical_wounds:
                                 HealingAvailable += ovr024.roll_dice(8, 3) + 3;
                                 break;
                         }
@@ -947,6 +950,7 @@ namespace engine
             {
                 int var_10 = 0;
                 int var_A = 0;
+                int var_B = 0;
                 int var_C = 0;
                 int var_E = 0;
 
@@ -954,15 +958,23 @@ namespace engine
                 {
                     numCureLight += player.spellCastCount[0, 0];
                     var_A = player.spellCastCount[0, 0] * 15;
+                    numCureLight += player.spellCastCount[1, 1];
+                    var_B = player.spellCastCount[1, 1] * 30;
 
-                    numCureSerious += player.spellCastCount[0, 3];
-                    var_C = player.spellCastCount[0, 3] * 60;
+                    numCureSerious += player.spellCastCount[0, 3] + player.spellCastCount[1, 3];
+                    var_C = (player.spellCastCount[0, 3] + player.spellCastCount[1,3]) * 60;
 
                     numCureCritical += player.spellCastCount[0, 4];
                     var_E = player.spellCastCount[0, 4] * 75;
                 }
 
                 if (var_A > 0)
+                {
+                    var_10 = 240;
+                    maxHealing += 27;
+                }
+
+                if (var_B > 0)
                 {
                     var_10 = 240;
                     maxHealing += 27;
@@ -982,7 +994,7 @@ namespace engine
                     }
                 }
 
-                var_10 += var_A + var_C + var_E;
+                var_10 += var_A + var_B + var_C + var_E;
 
                 if (maxTime < var_10)
                 {

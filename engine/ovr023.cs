@@ -5,9 +5,9 @@ using Classes.Combat;
 
 namespace engine
 {
-	class ovr023
-	{
-		internal static string[] SpellNames = { /* AffectNames */
+    class ovr023
+    {
+        internal static string[] SpellNames = { /* AffectNames */
                             string.Empty,
                             "Bless",
                             "Curse",
@@ -110,7 +110,23 @@ namespace engine
                             string.Empty,
                             "Bestow Curse",
                             string.Empty,
+                            "Barkskin",
+                            "Charm Person/Mammal",
+                            "Cure Light Wounds",
+                            "Cause Light Wounds",
+                            "Cure Disease",
+                            "Cause Disease",
+                            "Hold Animal",
+                            "Neutralize Poison",
+                            "Protection From Fire",
+                            "Cure Serious Wounds",
+                            "Cause Serious Wounds",
+                            "Dispel Magic",
+                            "Hold Plant",
+                            "Protection From Lightning",
+                            "Sticks to Snakes",
                         };
+
 
 		static string[] LevelStrings = {
                             string.Empty,
@@ -133,7 +149,7 @@ namespace engine
 			switch (gbl.spellCastingTable[spell_id].spellClass)
 			{
 				case SpellClass.Cleric:
-                    if (player.stats2.Wis.full > 8 &&
+					if (player.stats2.Wis.full > 8 &&
 						(player.SkillLevel(SkillType.Cleric) > 0 ||
 						 player.SkillLevel(SkillType.Paladin) > 8))
 					{
@@ -142,7 +158,9 @@ namespace engine
 					break;
 
 				case SpellClass.Druid:
-                    if ((player.stats2.Wis.full > 8 && player.SkillLevel(SkillType.Ranger) > 6))
+					if (player.stats2.Wis.full > 8 &&
+						(player.SkillLevel(SkillType.Druid) > 0 ||
+						 player.SkillLevel(SkillType.Ranger) > 6))
 					{
 						can_learn = true;
 					}
@@ -538,7 +556,7 @@ namespace engine
 		{
 			int var_4;
 
-			if (spellId == Spells.cause_disease)
+			if (spellId == Spells.cause_disease_CL || spellId == Spells.cause_disease_DR)
 			{
 				var_4 = ovr024.roll_dice(6, 1) * 10;
 			}
@@ -561,7 +579,7 @@ namespace engine
 					var_4 = (ovr024.roll_dice(10, 1) + 10) * 10;
 				}
 			}
-			else if (spellId == Spells.neutralize_poison_CL)
+			else if (spellId == Spells.neutralize_poison_CL || spellId == Spells.neutralize_poison_DR)
 			{
 				var_4 = 1440;
 			}
@@ -972,6 +990,12 @@ namespace engine
 					saved = true;
 					can_save_flag = DamageOnSave.Zero;
 				}
+				else if ((gbl.spell_id == (byte)Spells.hold_animal && target.monsterType != MonsterType.animal) ||
+					(gbl.spell_id == (byte)Spells.hold_plant && target.monsterType != MonsterType.plant))
+				{
+					saved = true;
+					can_save_flag = DamageOnSave.Zero;
+				}
 				else
 				{
 					saved = ovr024.RollSavingThrow(save_bonus, gbl.spellCastingTable[gbl.spell_id].saveVerse, target);
@@ -1052,6 +1076,28 @@ namespace engine
 			Player target = gbl.spellTargets[0];
 
 			if (target.monsterType > MonsterType.humanoid ||
+				target.icon_dimensions > 1)
+			{
+				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
+			}
+			else
+			{
+				DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
+
+				Affect affect = target.GetAffect(Affects.charm_person);
+
+				if (affect != null)
+				{
+					ovr013.CallAffectTable(Effect.Add, affect, target, Affects.shield);
+				}
+			}
+		}
+
+		internal static void SpellCharmPersonMammal() // is_charmed
+		{
+			Player target = gbl.spellTargets[0];
+
+			if ((target.monsterType > MonsterType.humanoid && target.monsterType < MonsterType.animal) ||
 				target.icon_dimensions > 1)
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
@@ -1250,16 +1296,38 @@ namespace engine
 				{
 					save_bonus = -2;
 				}
-				else
+				else if (gbl.spell_id == (byte)Spells.hold_person_MU || gbl.spell_id == (byte)Spells.hold_monsters)
 				{
 					save_bonus = -3;
+				}
+				else
+				{
+					save_bonus = -4;
 				}
 			}
 			else if (gbl.spellTargets.Count == 2)
 			{
-				save_bonus = -1;
+				if (gbl.spell_id == (byte)Spells.hold_animal || gbl.spell_id == (byte)Spells.hold_plant)
+				{
+					save_bonus = -2;
+				}
+				else
+				{
+					save_bonus = -1;
+				}
 			}
-			else if (gbl.spellTargets.Count == 3 || gbl.spellTargets.Count == 4)
+			else if (gbl.spellTargets.Count == 3)
+			{
+				if (gbl.spell_id == (byte)Spells.hold_animal || gbl.spell_id == (byte)Spells.hold_plant)
+				{
+					save_bonus = -1;
+				}
+				else
+				{
+					save_bonus = 0;
+				}
+			}
+			else if (gbl.spellTargets.Count == 4)
 			{
 				save_bonus = 0;
 			}
@@ -1275,6 +1343,42 @@ namespace engine
 		internal static void SpellFireResistant() // is_fire_resistant
 		{
 			DoSpellCastingWork("is fire resistant", 0, 0, false, 0, gbl.spell_id);
+		}
+
+		internal static void SpellProtectFire()
+		{
+			if (gbl.spellTargets[0] == gbl.SelectedPlayer)
+			{
+				int lvl = Math.Max(gbl.SelectedPlayer.SkillLevel(SkillType.Druid), gbl.SelectedPlayer.SkillLevel(SkillType.Ranger) - 7);
+
+				ovr024.ApplyAttackSpellAffect("is fire protected", true, gbl.spellCastingTable[gbl.spell_id].damageOnSave,
+					false, lvl * 12, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.protection_from_fire,
+					gbl.spellTargets[0]);
+			}
+			else
+			{
+				ovr024.ApplyAttackSpellAffect("is fire resistant", true, gbl.spellCastingTable[gbl.spell_id].damageOnSave,
+					false, 4, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.resist_fire,
+					gbl.spellTargets[0]);
+			}
+		}
+
+		internal static void SpellProtectLightning()
+		{
+			if (gbl.spellTargets[0] == gbl.SelectedPlayer)
+			{
+				int lvl = Math.Max(gbl.SelectedPlayer.SkillLevel(SkillType.Druid), gbl.SelectedPlayer.SkillLevel(SkillType.Ranger) - 7);
+
+				ovr024.ApplyAttackSpellAffect("is lightning protected", true, gbl.spellCastingTable[gbl.spell_id].damageOnSave,
+					false, lvl * 12, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.protection_from_lightning,
+					gbl.spellTargets[0]);
+			}
+			else
+			{
+				ovr024.ApplyAttackSpellAffect("is lightning resistant", true, gbl.spellCastingTable[gbl.spell_id].damageOnSave,
+					false, 4, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.resist_lightning,
+					gbl.spellTargets[0]);
+			}
 		}
 
 
@@ -2776,6 +2880,12 @@ namespace engine
 		}
 
 
+		internal static void SpellBarkskin()
+		{
+			DoSpellCastingWork("skin hardends", 0, 0, false, 0, gbl.spell_id);
+		}
+
+
 		internal static void SpellCastSpellIdAffect()
 		{
 			DoSpellCastingWork("", 0, 0, false, 0, gbl.spell_id);
@@ -3179,8 +3289,8 @@ namespace engine
 			gbl.spellTable.Add(Spells.animate_dead, ovr023.SpellAnimateDead);
 			gbl.spellTable.Add(Spells.cure_blindness, ovr023.SpellCureBlindness);
 			gbl.spellTable.Add(Spells.cause_blindness, ovr023.SpellCauseBlindness);
-			gbl.spellTable.Add(Spells.cure_disease, ovr023.SpellCureDisease);
-			gbl.spellTable.Add(Spells.cause_disease, ovr023.SpellCauseDisease);
+			gbl.spellTable.Add(Spells.cure_disease_CL, ovr023.SpellCureDisease);
+			gbl.spellTable.Add(Spells.cause_disease_CL, ovr023.SpellCauseDisease);
 			gbl.spellTable.Add(Spells.dispel_magic_CL, ovr023.SpellDispelMagic);
 			gbl.spellTable.Add(Spells.prayer, ovr023.SpellPrayer);
 			gbl.spellTable.Add(Spells.remove_curse_CL, ovr023.SpellRemoveCurse);
@@ -3241,6 +3351,21 @@ namespace engine
 			gbl.spellTable.Add(Spells.wand_of_defoliation, ovr023.SpellDefoliation);
 			gbl.spellTable.Add(Spells.potion_extra_healing, ovr023.cast_heal2);
 			gbl.spellTable.Add(Spells.bestow_curse_MU, ovr023.curse);
+			gbl.spellTable.Add(Spells.barkskin, ovr023.SpellBarkskin);
+			gbl.spellTable.Add(Spells.charm_person_mammal, ovr023.SpellCharmPersonMammal);
+			gbl.spellTable.Add(Spells.cure_light_wounds_DR, ovr023.SpellCureLight);
+			gbl.spellTable.Add(Spells.cause_light_wounds_DR, ovr023.SpellCauseLight);
+            gbl.spellTable.Add(Spells.cure_disease_DR, ovr023.SpellCureDisease);
+            gbl.spellTable.Add(Spells.cause_disease_DR, ovr023.SpellCauseDisease);
+            gbl.spellTable.Add(Spells.hold_animal, ovr023.SpellHoldX);
+			gbl.spellTable.Add(Spells.neutralize_poison_DR, ovr023.SpellNeutralizePoison);
+			gbl.spellTable.Add(Spells.protection_from_fire, ovr023.SpellProtectFire);
+			gbl.spellTable.Add(Spells.cure_serious_wounds_DR, ovr023.SpellCureSeriousWounds);
+			gbl.spellTable.Add(Spells.cause_serious_wounds_DR, ovr023.SpellCauseSeriousWounds);
+			gbl.spellTable.Add(Spells.dispel_magic_DR, ovr023.SpellDispelMagic);
+            gbl.spellTable.Add(Spells.hold_plant, ovr023.SpellHoldX);
+			gbl.spellTable.Add(Spells.protection_from_lightning, ovr023.SpellProtectLightning);
+            gbl.spellTable.Add(Spells.sticks_to_snakes_DR, ovr023.SpellSticksToSnakes);
 		}
 	}
 }
