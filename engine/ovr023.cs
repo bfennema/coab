@@ -110,6 +110,7 @@ namespace engine
                             string.Empty,
                             "Bestow Curse",
 							string.Empty,
+							"Charm Person or Mammal",
 
 		static string[] LevelStrings = {
                             string.Empty,
@@ -141,7 +142,9 @@ namespace engine
 					break;
 
 				case SpellClass.Druid:
-                    if ((player.stats2.Wis.full > 8 && player.SkillLevel(SkillType.Ranger) > 6))
+					if (player.stats2.Wis.full > 8 &&
+						(player.SkillLevel(SkillType.Druid) > 0 ||
+						 player.SkillLevel(SkillType.Ranger) > 6))
 					{
 						can_learn = true;
 					}
@@ -560,7 +563,7 @@ namespace engine
 					var_4 = (ovr024.roll_dice(10, 1) + 10) * 10;
 				}
 			}
-			else if (spellId == Spells.neutralize_poison)
+			else if (spellId == Spells.neutralize_poison_CL || spellId == Spells.neutralize_poison_DR)
 			{
 				var_4 = 1440;
 			}
@@ -1052,7 +1055,29 @@ namespace engine
 		}
 
 
-		internal static void SpellCharm() // is_charmed
+		internal static void SpellCharmPerson() // is_charmed
+		{
+			Player target = gbl.spellTargets[0];
+
+			if (target.monsterType > MonsterType.humanoid ||
+				target.icon_dimensions > 1)
+			{
+				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
+			}
+			else
+			{
+				DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
+
+				Affect affect = target.GetAffect(Affects.charm_person);
+
+				if (affect != null)
+				{
+					ovr013.CallAffectTable(Effect.Add, affect, target, Affects.shield);
+				}
+			}
+		}
+
+        internal static void SpellCharmPersonMammal() // is_charmed
 		{
 			Player target = gbl.spellTargets[0];
 
@@ -3246,6 +3271,15 @@ namespace engine
 			gbl.spellTable.Add(Spells.spell_62, ovr023.sub_61727);
 			gbl.spellTable.Add(Spells.spell_63, ovr023.cast_heal2);
 			gbl.spellTable.Add(Spells.bestow_curse_MU, ovr023.curse);
+			gbl.spellTable.Add(Spells.charm_person_mammal, ovr023.SpellCharmPersonMammal);
+            gbl.spellTable.Add(Spells.cure_light_wounds_DR, ovr023.SpellCureLight);
+            gbl.spellTable.Add(Spells.cause_light_wounds_DR, ovr023.SpellCauseLight);
+            gbl.spellTable.Add(Spells.neutralize_poison_DR, ovr023.SpellNeutralizePoison);
+            gbl.spellTable.Add(Spells.cure_serious_wounds_DR, ovr023.SpellCureSeriousWounds);
+            gbl.spellTable.Add(Spells.cause_serious_wounds_DR, ovr023.SpellCauseSeriousWounds);
+            gbl.spellTable.Add(Spells.dispel_magic_DR, ovr023.SpellDispelMagic);
+            gbl.spellTable.Add(Spells.sticks_to_snakes_DR, ovr023.SpellSticksToSnakes);
+
 		}
 	}
 }

@@ -310,15 +310,17 @@ namespace engine
         //static byte[] /*seg600:45B3 */ unk_1A8C3 = { 3, 3, 5, 5, 5, 2, 2, 5 };
         //static byte[] /*seg600:45B4 */ unk_1A8C4 = { 6, 6, 4, 4, 4, 4, 6, 4 };
 
+        //     0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12
         internal static sbyte[,] /* seg600:3E3A unk_1A14A */ thac0_table = { 
-            {40, 40, 40, 40, 0x2A, 0x2A, 0x2A, 0x2C, 0x2C, 0x2C, 0x2E, 0x2E, 0x2E},
-            {40, 40, 40, 40, 0x2A, 0x2A, 0x2A, 0x2C, 0x2C, 0x2C, 0x2E, 0x2E, 0x2E},
-            {0x27, 40, 40, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33},
-            {40, 40, 40, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33},
-            {40, 40, 40, 0x2A, 0x2B, 0x2C, 0x2D, 0x2E, 0x2F, 0x30, 0x31, 0x32, 0x33},
-            {0x27, 0x27, 0x27, 0x27, 0x27, 0x27, 0x29, 0x29, 0x29, 0x29, 0x29, 0x2B, 0x2B},
-            {40, 40, 40, 40, 40, 0x29, 0x29, 0x29, 0x29, 0x2C, 0x2C, 0x2C, 0x2C},
-            {40, 40, 40, 40, 0x2A, 0x2A, 0x2A, 0x2C, 0x2C, 0x2C, 0x2E, 0x2E, 0x2E} };
+            { 40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 }, // cleric
+            { 40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 }, // druid
+            { 39, 40, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // fighter
+            { 40, 40, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // paladin
+            { 40, 40, 40, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // ranger
+            { 39, 39, 39, 39, 39, 39, 41, 41, 41, 41, 41, 43, 43 }, // magic-user
+            { 40, 40, 40, 40, 40, 41, 41, 41, 41, 44, 44, 44, 44 }, // thief
+            { 40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 }, // monk
+        };
 
 
 
@@ -569,7 +571,7 @@ namespace engine
             player.classFlags = 0;
             player.thac0 = 0;
 
-            for (int class_idx = 0; class_idx <= 7; class_idx++)
+            for (int class_idx = (byte)ClassId.cleric; class_idx <= (byte)ClassId.monk; class_idx++)
             {
                 if (player.ClassLevel[class_idx] > 0)
                 {
@@ -765,11 +767,15 @@ namespace engine
                 {
                     if (player.ClassLevel[class_idx] > 0)
                     {
-                        if (class_idx == 0)
+                        if (class_idx == (byte)ClassId.cleric)
                         {
                             player.spellCastCount[0, 0] = 1;
                         }
-                        else if (class_idx == 5)
+                        else if (class_idx == (byte)ClassId.druid)
+                        {
+                            player.spellCastCount[0, 0] = 1;
+                        }
+                        else if (class_idx == (byte)ClassId.magic_user)
                         {
                             player.spellCastCount[2, 0] = 1;
                         }
@@ -777,7 +783,7 @@ namespace engine
                         //var_21 += ovr024.roll_dice(unk_1A8C4[class_idx], unk_1A8C3[class_idx]);
                         //TODO this was not used in original code.
 
-                        if (class_idx == 0)
+                        if (class_idx == (byte)ClassId.cleric)
                         {
                             ovr026.calc_cleric_spells(false, player);
 
@@ -791,12 +797,17 @@ namespace engine
                                 }
                             }
                         }
-                        else if (class_idx == 5)
+                        else if (class_idx == (byte)ClassId.druid)
                         {
-                            player.LearnSpell(Spells.detect_magic_MU);
-                            player.LearnSpell(Spells.read_magic);
-                            player.LearnSpell(Spells.enlarge);
-                            player.LearnSpell(Spells.sleep);
+                            ovr026.calc_druid_spells(false, player);
+
+                            foreach (Spells spell in System.Enum.GetValues(typeof(Spells)))
+                            {
+                                SpellEntry stru = gbl.spellCastingTable[(int)spell];
+
+                                if (stru.spellClass == 0 && stru.spellLevel == 1)
+                                {
+                                    player.spellBook.LearnSpell(spell);
                         }
                             }
                         }
@@ -806,6 +817,7 @@ namespace engine
                             player.spellBook.LearnSpell(Spells.read_magic);
                             player.spellBook.LearnSpell(Spells.enlarge);
                             player.spellBook.LearnSpell(Spells.sleep);
+                        }
 
                         class_count++;
                     }
@@ -2218,14 +2230,14 @@ namespace engine
 
 
         internal static int[,] exp_table = { /* seg600:4293 unk_1A5A3 */ 
-            /* Cleric */    { 0, 1501, 3001,  6001, 13001, 27501, 55001, 110001, 225001, 450001, -1, -1, -1 },
-            /* Druid */     { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-            /* Fighter */   { 0, 2001, 4001,  8001, 18001, 35001, 70001, 125001, 250001, 500001,  750001, 1000001, -1  },
-            /* Paladin */   { 0, 2751, 5501, 12001, 24001, 45001, 95001, 175001, 350001, 700001, 1050001, -1, -1 },
-            /* Ranger */    { 0, 2251, 4501, 10001, 20001, 40001, 90001, 150001, 225001, 325001,  650001, -1, -1 },
-            /* MU */        { 0, 2501, 5001, 10001, 22501, 40001, 60001,  90001, 135001, 250001,  375001, -1, -1 }, 
-            /* Thief */     { 0, 1251, 2501,  5001, 10001, 20001, 42501,  70001, 110001, 160001,  220001, 440001, -1}, 
-            /* Monk */      { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }};
+            /* Cleric */    { 0, 1501, 3001,  6001, 13001, 27501, 55001, 110001, 225001, 450001,      -1,      -1, -1 },
+            /* Druid */     { 0, 2001, 4001,  7501, 12501, 20001, 35001,  60001,  90001, 235001,  200001,  300001, -1 },
+            /* Fighter */   { 0, 2001, 4001,  8001, 18001, 35001, 70001, 125001, 250001, 500001,  750001, 1000001, -1 },
+            /* Paladin */   { 0, 2751, 5501, 12001, 24001, 45001, 95001, 175001, 350001, 700001, 1050001,      -1, -1 },
+            /* Ranger */    { 0, 2251, 4501, 10001, 20001, 40001, 90001, 150001, 225001, 325001,  650001,      -1, -1 },
+            /* MU */        { 0, 2501, 5001, 10001, 22501, 40001, 60001,  90001, 135001, 250001,  375001,      -1, -1 }, 
+            /* Thief */     { 0, 1251, 2501,  5001, 10001, 20001, 42501,  70001, 110001, 160001,  220001,  440001, -1 }, 
+            /* Monk */      { 0, 2251, 4751, 10001, 22501, 47501, 98001, 200001, 350001, 500001,  700001,  950001, -1 }};
 
         internal static void train_player()
         {

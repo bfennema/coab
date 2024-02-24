@@ -526,11 +526,11 @@ namespace Classes
             get { return ClassLevelsOld[0]; }
             set { ClassLevelsOld[0] = value; }
         }
-        //public byte druid_old_lvl // 0x112;
-        //{
-        //    get { return ClassLevelsOld[1]; }
-        //    set { ClassLevelsOld[1] = value; }
-        //}
+        public byte druid_old_lvl // 0x112;
+        {
+            get { return ClassLevelsOld[1]; }
+            set { ClassLevelsOld[1] = value; }
+        }
         public byte fighter_old_lvl // 0x113;
         {
             get { return ClassLevelsOld[2]; }

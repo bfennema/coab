@@ -148,6 +148,14 @@ namespace Classes
         spell_63 = 0x63,
         bestow_curse_MU = 0x64,
         unknown_10 = 0x65,
+        charm_person_mammal = 0x66,
+        cure_light_wounds_DR = 0x67,
+        cause_light_wounds_DR = 0x68,
+        neutralize_poison_DR = 0x69,
+        cure_serious_wounds_DR = 0x6a,
+        cause_serious_wounds_DR = 0x6b,
+        dispel_magic_DR = 0x6c,
+        sticks_to_snakes_DR = 0x6d,
         //spell_88 = 0x88,
     }
 
