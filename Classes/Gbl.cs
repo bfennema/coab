@@ -608,7 +608,7 @@ namespace Classes
             new SpellEntry(Spells.ray_of_enfeeblement,          SpellClass.MagicUser, 2, 1, 1, 0, 1, 4, SpellTargets.Combat, DamageOnSave.Zero, SaveVerseType.Spell, Affects.ray_of_enfeeblement, SpellWhen.Combat, 2, 2, 1, 0),
             new SpellEntry(Spells.stinking_cloud,               SpellClass.MagicUser, 2, 3, 0, 0, 1, 9, SpellTargets.Combat, DamageOnSave.Unknown_3, SaveVerseType.Poison, Affects.stinking_cloud, SpellWhen.Combat, 2, 5, 1, 1),
             new SpellEntry(Spells.strength,                     SpellClass.MagicUser, 2, 0, 0, 0, 60, 0, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.strength, SpellWhen.Camp, 10, 0, 0, 0),
-            new SpellEntry(Spells.animate_dead,                 SpellClass.Monster,   7, 4, 0, 0, 0, 8, SpellTargets.WholeParty, DamageOnSave.Zero, SaveVerseType.Spell, Affects.none, SpellWhen.Both, 0, 2, 0, 0),
+            new SpellEntry(Spells.animate_dead,                 SpellClass.Cleric,    3, 4, 0, 0, 0, 8, SpellTargets.WholeParty, DamageOnSave.Zero, SaveVerseType.Spell, Affects.none, SpellWhen.Both, 0, 2, 0, 0),
             new SpellEntry(Spells.cure_blindness,               SpellClass.Cleric,    3, 0, 0, 0, 0, 4, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Both, 10, 0, 0, 0),
             new SpellEntry(Spells.cause_blindness,              SpellClass.Cleric,    3, -1, 0, 0, 0, 4, SpellTargets.Combat, DamageOnSave.Zero, SaveVerseType.Spell, Affects.blinded, SpellWhen.Combat, 10, 3, 1, 0),
             new SpellEntry(Spells.cure_disease,                 SpellClass.Cleric,    3, 0, 0, 0, 0, 0, SpellTargets.PartyMember, DamageOnSave.Normal, SaveVerseType.Spell, Affects.none, SpellWhen.Camp, 100, 0, 0, 0),
@@ -725,6 +725,7 @@ namespace Classes
 			new ClassStatsMin(9, 9, 0, 9, 0, 0), 
 			new ClassStatsMin(0, 9, 0, 9, 0, 0) };
 
+        public static Game game;
         public static string exe_path; // unk_1B21A
         public static string data_path; // unk_1B26A
 

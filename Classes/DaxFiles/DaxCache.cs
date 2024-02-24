@@ -1,6 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.IO;
 
 namespace Classes.DaxFiles
 {
@@ -16,7 +15,14 @@ namespace Classes.DaxFiles
 
             if (!fileCache.TryGetValue(file_name, out dfc))
             {
-                dfc = new DaxFileCache(file_name);
+                try
+                {
+                    dfc = new DaxFileCache(file_name);
+                }
+                catch (FileNotFoundException)
+                {
+                    return null;
+                }
                 fileCache.Add(file_name, dfc);
             }
 

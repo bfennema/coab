@@ -826,6 +826,11 @@ namespace engine
                     ovr026.recalc_thief_skills(player);
                     break;
 
+                case 3: // Gauntlets of Ogre Power
+                    gbl.applyItemAffect = true;
+                    ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    break;
+
                 case 4:
                     if (((int)item.affect_2 & 0x0f) != player.alignment)
                     {
@@ -844,7 +849,15 @@ namespace engine
                     break;
 
                 case 5:
-                    ovr024.CalcStatBonuses(Stat.STR, player);
+                    if (item.affect_2 == Affects.displace)
+                    {
+                        gbl.applyItemAffect = true;
+                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    }
+                    else
+                    {
+                        ovr024.CalcStatBonuses(Stat.STR, player);
+                    }
                     break;
 
                 case 6: // Girdle of the Dwarves
@@ -878,8 +891,16 @@ namespace engine
                     ovr024.CalcStatBonuses(Stat.DEX, player);
                     break;
 
-                case 11: // Gloves of Thievery
-                    ovr026.recalc_thief_skills(player);
+                case 11: // Ring of Invisibility (por)
+                    if (item.affect_2 > 0)
+                    {
+                        gbl.applyItemAffect = true;
+                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    }
+                    else // Gloves of Thievery
+                    {
+                        ovr026.recalc_thief_skills(player);
+                    }
                     break;
 
                 case 12:

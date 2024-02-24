@@ -208,6 +208,12 @@ namespace Classes
             /* ovr021:0482 */
             switch (loc)
             {
+                case 0x186:
+                    field_186 = (byte)value;
+                    break;
+                case 0x188:
+                    field_188 = (byte)value;
+                    break;
                 case 0x18C:
                     field_18C = value;
                     break;
@@ -471,6 +477,10 @@ namespace Classes
             /* ovr021:0482 */
             switch (loc)
             {
+                case 0x186:
+                    return field_186; // world last x
+                case 0x188:
+                    return field_188; // world last y
                 case 0x18C:
                     return field_18C;
                 case 0x18E:

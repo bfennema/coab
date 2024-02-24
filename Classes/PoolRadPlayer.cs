@@ -16,6 +16,7 @@ namespace Classes
         public byte stat_con; // 0x14
         public byte stat_cha; // 0x15
         public byte stat_str00; // 0x16
+        public byte[] field_17; // 0x17 Array 0x15, 0x17 - 0x2B
         public sbyte thac0; // 0x2D
         public byte race; // 0x2e
         public byte _class; // 0x2F
@@ -36,6 +37,14 @@ namespace Classes
         public byte field_85; // 0x85
         public byte field_86; // 0x86
         public byte field_87; // 0x87
+
+        public ushort field_88; // 0x88 - 0x89
+        public ushort field_8A; // 0x8A - 0x8B
+        public ushort field_8C; // 0x8C - 0x8D
+        public ushort field_8E; // 0x8E - 0x8F
+        public ushort field_90; // 0x90 - 0x91
+        public ushort field_92; // 0x92 - 0x93
+        public ushort field_94; // 0x94 - 0x95
 
         public byte[] field_96; // 0x96 Array 8 0x96 - 0x9D
         public byte sex; // 0x9E
@@ -80,6 +89,7 @@ namespace Classes
         public byte field_10C; // 0x10C
         public byte field_10D; // 0x10D
         public byte field_10E; // 0x10E
+        public byte field_10F; // 0x10F
         public sbyte field_110; // 0x110
 
         public byte field_111; // 0x111
@@ -98,6 +108,7 @@ namespace Classes
 
         public PoolRadPlayer()
         {
+            field_17 = new byte[0x15];
             field_33 = new byte[0x38];
             saveVerse = new byte[5];
             field_77 = new byte[8];
@@ -119,6 +130,9 @@ namespace Classes
             stat_con = data[0x14]; // 0x14
             stat_cha = data[0x15]; // 0x15
             stat_str00 = data[0x16]; // 0x16
+
+            System.Array.Copy(data, 0x17, field_17, 0, 0x15);
+
             thac0 = (sbyte)data[0x2D];
             race = data[0x2e];
             _class = data[0x2F];
@@ -141,6 +155,13 @@ namespace Classes
             field_85 = data[0x85];
             field_86 = data[0x86];
             field_87 = data[0x87];
+            field_88 = (ushort)((data[0x89] << 8) | data[0x88]);
+            field_8A = (ushort)((data[0x8B] << 8) | data[0x8A]);
+            field_8C = (ushort)((data[0x8D] << 8) | data[0x8C]);
+            field_8E = (ushort)((data[0x8F] << 8) | data[0x8E]);
+            field_90 = (ushort)((data[0x91] << 8) | data[0x90]);
+            field_92 = (ushort)((data[0x93] << 8) | data[0x92]);
+            field_94 = (ushort)((data[0x95] << 8) | data[0x94]);
             System.Array.Copy(data, 0x96, field_96, 0, 8);
 
             sex = data[0x9E];
@@ -185,6 +206,7 @@ namespace Classes
             field_10C = data[0x10C];
             field_10D = data[0x10D];
             field_10E = data[0x10E];
+            field_10F = data[0x10F];
             field_110 = (sbyte)data[0x110];
 
             field_111 = data[0x111];
