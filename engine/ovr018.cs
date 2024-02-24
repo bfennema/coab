@@ -664,22 +664,22 @@ namespace engine
                     }
                 }
 
-                player.stats2.Str.full = 0;
-                player.stats2.Int.full = 0;
-                player.stats2.Wis.full = 0;
-                player.stats2.Dex.full = 0;
-                player.stats2.Con.full = 0;
-                player.stats2.Cha.full = 0;
-                player.stats2.Str00.full = 0;
+                player.stats2.Str.Load(0);
+                player.stats2.Str00.Load(0);
+                player.stats2.Int.Load(0);
+                player.stats2.Wis.Load(0);
+                player.stats2.Dex.Load(0);
+                player.stats2.Con.Load(0);
+                player.stats2.Cha.Load(0);
 
-                for(int i = 0; i < 6; i++)
+                for (int i = 0; i < 6; i++)
                 {
-                    player.stats2.Str.full = Math.Max(player.stats2.Str.full, ovr024.roll_dice(6, 3) + 1);
-                    player.stats2.Int.full = Math.Max(player.stats2.Int.full, ovr024.roll_dice(6, 3) + 1);
-                    player.stats2.Wis.full = Math.Max(player.stats2.Wis.full, ovr024.roll_dice(6, 3) + 1);
-                    player.stats2.Dex.full = Math.Max(player.stats2.Dex.full, ovr024.roll_dice(6, 3) + 1);
-                    player.stats2.Con.full = Math.Max(player.stats2.Con.full, ovr024.roll_dice(6, 3) + 1);
-                    player.stats2.Cha.full = Math.Max(player.stats2.Cha.full, ovr024.roll_dice(6, 3) + 1);
+                    player.stats2.Str.Load(Math.Max(player.stats2.Str.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats2.Int.Load(Math.Max(player.stats2.Int.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats2.Wis.Load(Math.Max(player.stats2.Wis.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats2.Dex.Load(Math.Max(player.stats2.Dex.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats2.Con.Load(Math.Max(player.stats2.Con.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats2.Cha.Load(Math.Max(player.stats2.Cha.cur, ovr024.roll_dice(6, 3)+1));
                 }
 
                 int race = (int)player.race;
@@ -694,7 +694,7 @@ namespace engine
                             player.stats2.Str.EnforceRaceSexLimits(race, sex);
                             player.stats2.Str.EnforceClassLimits((int)player._class);
 
-                            if (player.stats2.Str.full == 18)
+                            if (player.stats2.Str.cur == 18)
                             {
                                 if (player.fighter_lvl > 0 ||
                                     player.ranger_lvl > 0 ||
@@ -717,11 +717,11 @@ namespace engine
                             player.stats2.Wis.EnforceRaceSexLimits(race, sex);
                             player.stats2.Wis.EnforceClassLimits((int)player._class);
 
-                            if (player.stats2.Wis.full < 13 &&
+                            if (player.stats2.Wis.cur < 13 &&
                                 player._class >= ClassId.mc_c_f && player._class <= ClassId.mc_c_t)
                             {
                                 // Multi-Class Cleric
-                                player.stats2.Wis.full = 13;
+                                player.stats2.Wis.cur = 13;
                             }
                             break;
 

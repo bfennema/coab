@@ -271,7 +271,7 @@ namespace engine
             seg041.displayString(s, 0, color, stat_index + 7, col_x);
 
             if (stat_index == 0 &&
-                gbl.SelectedPlayer.stats2.Str.full == 18 &&
+                    gbl.SelectedPlayer.stats2.Str.cur == 18 &&
                 gbl.SelectedPlayer.stats2.Str00.cur > 0)
             {
                 string text = gbl.SelectedPlayer.stats2.Str00.cur.ToString();
