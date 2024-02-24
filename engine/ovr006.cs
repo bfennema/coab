@@ -462,7 +462,7 @@ namespace engine
             gbl.items_pointer.ForEach(item =>
                 {
                     ovr025.ItemDisplayNameBuild(false, false, 0, 0, item);
-                    list.Insert(0, new MenuItem(item.name, item));
+                    list.Add(new MenuItem(item.name, item));
                 });
 
             bool redrawMenuItems = true;

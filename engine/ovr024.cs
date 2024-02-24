@@ -869,7 +869,12 @@ namespace engine
 
                     if (stat_index == Stat.STR)
                     {
-                        if (var_12 == 5)
+                        if (var_12 == 3 && (int)item.affect_2 == 0) // Gauntlets of Ogre Power
+                        {
+                            stat_b = 18;
+                            str_00_b = 100;
+                        }
+                        else if (var_12 == 5) // Girdle of Giant Strength
                         {
                             switch ((int)item.affect_2)
                             {
@@ -909,7 +914,7 @@ namespace engine
                                     break;
                             }
                         }
-                        else if (var_12 == 8)
+                        else if (var_12 == 8) // pale blue ioun stone
                         {
                             if (player.stats2.Str.cur < 18 &&
                                 item.affect_2 == 0)
@@ -933,14 +938,14 @@ namespace engine
                         }
                         else if (var_12 == 8 &&
                             player.stats2.Con.cur < 18 &&
-                            (int)item.affect_2 == 4)
+                            (int)item.affect_2 == 4) // pink ioun stone
                         {
                             stat_a++;
                         }
                     }
                     else if (stat_index == Stat.INT)
                     {
-                        if (var_12 == 8)
+                        if (var_12 == 8) // scarlet and blue ioun stone
                         {
                             if (player.stats2.Int.cur < 18 &&
                                 (int)item.affect_2 == 1)
@@ -961,7 +966,7 @@ namespace engine
                     {
                         if (var_12 == 8 &&
                             (int)item.affect_2 == 2 &&
-                            player.stats2.Wis.cur < 18)
+                            player.stats2.Wis.cur < 18) // incandescent blue ioun stone
                         {
                             stat_a++;
                         }
@@ -983,7 +988,7 @@ namespace engine
                                 stat_a++;
                             }
                         }
-                        else if (var_12 == 8)
+                        else if (var_12 == 8) // deep red ioun stone
                         {
                             if (player.stats2.Dex.cur < 18 &&
                                 (int)item.affect_2 == 3)
@@ -1004,7 +1009,7 @@ namespace engine
                         }
                         else if (var_12 == 8 &&
                             player.stats2.Cha.cur < 18 &&
-                            (int)item.affect_2 == 5)
+                            (int)item.affect_2 == 5) // ping and green ioun stone
                         {
                             stat_a += 1;
                         }

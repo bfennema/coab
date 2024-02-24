@@ -111,4 +111,10 @@ namespace Classes
         ClimbWalls = 6,
         ReadLanguages = 7,
     }
+
+    public enum Game
+    {
+        PoolOfRadiance,
+        CurseOfTheAzureBonds,
+    }
 }

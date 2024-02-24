@@ -162,7 +162,8 @@ namespace engine
             display_highlighed_text(gbl.menuSelectedWord, colors.highlight,
                 displayInputString, displayInputXOffset, colors.foreground, highlights);
 
-            if (gbl.game_state == GameState.WildernessMap &&
+            if (gbl.game == Game.CurseOfTheAzureBonds &&
+                gbl.game_state == GameState.WildernessMap &&
                 gbl.bigpic_block_id == 0x79 &&
                 gbl.lastDaxBlockId != 0x50)
             {
@@ -173,7 +174,8 @@ namespace engine
 
             do
             {
-                if (gbl.game_state == GameState.WildernessMap &&
+                if (gbl.game == Game.CurseOfTheAzureBonds &&
+                    gbl.game_state == GameState.WildernessMap &&
                     gbl.bigpic_block_id == 0x79 &&
                     gbl.lastDaxBlockId != 0x50 &&
                     DateTime.Now >= timeCursorOn)
@@ -312,7 +314,8 @@ namespace engine
                     }
                 }
 
-                if (gbl.game_state == GameState.WildernessMap &&
+                if (gbl.game == Game.CurseOfTheAzureBonds &&
+                    gbl.game_state == GameState.WildernessMap &&
                     gbl.bigpic_block_id == 0x79 &&
                     gbl.lastDaxBlockId != 0x50 &&
                     DateTime.Now >= timeCursorOff)
@@ -328,7 +331,8 @@ namespace engine
 
             gbl.area_ptr.picture_fade = 0;
 
-            if (gbl.game_state == GameState.WildernessMap &&
+            if (gbl.game == Game.CurseOfTheAzureBonds &&
+                gbl.game_state == GameState.WildernessMap &&
                 gbl.bigpic_block_id == 0x79 &&
                 gbl.lastDaxBlockId != 0x50)
             {
