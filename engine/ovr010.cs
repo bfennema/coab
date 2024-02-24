@@ -920,7 +920,7 @@ namespace engine
                 }
 
 
-                if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.slot_1)
+                if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.Shield)
                 {
                     if ((gbl.ItemDataTable[item_type].classFlags & player.classFlags) != 0)
                     {
