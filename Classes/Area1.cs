@@ -69,6 +69,9 @@ namespace Classes
         [DataOffset(0x1D0, DataType.SWord)]
         public short field_1D0;
 
+        [DataOffset(0x1D6, DataType.Byte)]
+        public byte field_1D6;
+
         [DataOffset(0x1E0, DataType.SWord)]
         public short lastXPos;
         [DataOffset(0x1E2, DataType.SWord)]
@@ -116,6 +119,14 @@ namespace Classes
         public ushort field_25E;
         [DataOffset(0x260, DataType.Word)]
         public ushort field_260;
+        [DataOffset(0x262, DataType.Byte)]
+        public byte field_262;
+        [DataOffset(0x264, DataType.Byte)]
+        public byte field_264;
+        [DataOffset(0x266, DataType.Byte)]
+        public byte field_266;
+        [DataOffset(0x268, DataType.Byte)]
+        public byte field_268;
 
         [DataOffset(0x26A, DataType.Word)]
         public ushort field_26A;
@@ -126,6 +137,10 @@ namespace Classes
         public ushort field_298;
         [DataOffset(0x29A, DataType.Word)]
         public ushort field_29A;
+
+        [DataOffset(0x29E, DataType.Byte)]
+        public byte field_29E;
+
         [DataOffset(0x2B2, DataType.Word)]
         public ushort field_2B2;
         [DataOffset(0x2B4, DataType.Word)]
@@ -138,7 +153,31 @@ namespace Classes
         [DataOffset(0x2CA, DataType.Word)]
         public ushort field_2CA;
 
+        [DataOffset(0x300, DataType.Byte)]
+        public byte field_300;
+        [DataOffset(0x302, DataType.Byte)]
+        public byte field_302;
 
+        [DataOffset(0x308, DataType.Byte)]
+        public byte field_308;
+
+        [DataOffset(0x314, DataType.Byte)]
+        public byte field_314;
+        [DataOffset(0x316, DataType.Byte)]
+        public byte field_316;
+        [DataOffset(0x318, DataType.Byte)]
+        public byte field_318;
+        [DataOffset(0x31A, DataType.Byte)]
+        public byte field_31A;
+        [DataOffset(0x31C, DataType.Byte)]
+        public byte field_31C;
+        [DataOffset(0x31E, DataType.Byte)]
+        public byte field_31E;
+
+        [DataOffset(0x332, DataType.Byte)]
+        public byte field_332;
+        [DataOffset(0x334, DataType.Byte)]
+        public byte field_334;
         [DataOffset(0x336, DataType.Byte)]
         public byte field_336;
         [DataOffset(0x338, DataType.Byte)]
@@ -158,6 +197,28 @@ namespace Classes
         public byte field_346;
         [DataOffset(0x348, DataType.Byte)]
         public byte field_348;
+
+        [DataOffset(0x34E, DataType.Byte)]
+        public byte field_34E;
+
+        [DataOffset(0x366, DataType.Byte)]
+        public byte field_366;
+
+        [DataOffset(0x374, DataType.Byte)]
+        public byte field_374;
+        [DataOffset(0x376, DataType.Byte)]
+        public byte field_376;
+
+        [DataOffset(0x388, DataType.Byte)]
+        public byte field_388;
+        [DataOffset(0x38A, DataType.Byte)]
+        public byte field_38A;
+
+        [DataOffset(0x38C, DataType.Byte)]
+        public byte field_38C;
+
+        [DataOffset(0x390, DataType.Byte)]
+        public byte field_390;
 
         [DataOffset(0x3C2, DataType.Word)]
         public ushort field_3C2;
@@ -242,6 +303,10 @@ namespace Classes
                     field_1D0 = (short)value;
                     break;
 
+                case 0x1D6:
+                    field_1D6 = (byte)value;
+                    break;
+
                 case 0x1E0:
                     lastXPos = (short)value;
                     break;
@@ -267,6 +332,10 @@ namespace Classes
 
                 case 0x1FC:
                     indoor_sky_colour = value;
+                    break;
+
+                case 0x1FE:
+                    pics_on = (byte)value;
                     break;
 
                 case 0x200:
@@ -339,6 +408,18 @@ namespace Classes
                 case 0x260:
                     field_260 = value;
                     break;
+                case 0x262:
+                    field_262 = (byte)value;
+                    break;
+                case 0x264:
+                    field_264 = (byte)value;
+                    break;
+                case 0x266:
+                    field_266 = (byte)value;
+                    break;
+                case 0x268:
+                    field_268 = (byte)value;
+                    break;
 
                 case 0x26A:
                     field_26A = value;
@@ -352,6 +433,10 @@ namespace Classes
                     break;
                 case 0x29A:
                     field_29A = value;
+                    break;
+
+                case 0x29E:
+                    field_29E = (byte)value;
                     break;
 
                 case 0x2B2:
@@ -371,6 +456,43 @@ namespace Classes
                     field_2CA = value;
                     break;
 
+                case 0x300:
+                    field_300 = (byte)value;
+                    break;
+
+                case 0x302:
+                    field_302 = (byte)value;
+                    break;
+
+                case 0x308:
+                    field_308 = (byte)value;
+                    break;
+
+                case 0x314:
+                    field_314 = (byte)value;
+                    break;
+                case 0x316:
+                    field_316 = (byte)value;
+                    break;
+                case 0x318:
+                    field_318 = (byte)value;
+                    break;
+                case 0x31A:
+                    field_31A = (byte)value;
+                    break;
+                case 0x31C:
+                    field_31C = (byte)value;
+                    break;
+                case 0x31E:
+                    field_31E = (byte)value;
+                    break;
+
+                case 0x332:
+                    field_332 = (byte)value;
+                    break;
+                case 0x334:
+                    field_334 = (byte)value;
+                    break;
                 case 0x336:
                     field_336 = (byte)value;
                     break;
@@ -395,6 +517,36 @@ namespace Classes
                     break;
                 case 0x348:
                     field_348 = (byte)value;
+                    break;
+
+                case 0x34E:
+                    field_34E = (byte)value;
+                    break;
+
+                case 0x366:
+                    field_366 = (byte)value;
+                    break;
+
+                case 0x374:
+                    field_374 = (byte)value;
+                    break;
+                case 0x376:
+                    field_376 = (byte)value;
+                    break;
+
+                case 0x388:
+                    field_388 = (byte)value;
+                    break;
+                case 0x38A:
+                    field_38A = (byte)value;
+                    break;
+
+                case 0x38C:
+                    field_38C = (byte)value;
+                    break;
+
+                case 0x390:
+                    field_390 = (byte)value;
                     break;
 
                 case 0x3C2:
@@ -495,6 +647,9 @@ namespace Classes
                 case 0x1CC:
                     return (ushort)inDungeon;
 
+                case 0x1D6:
+                    return field_1D6;
+
                 case 0x1E4:
                     return LastEclBlockId;
 
@@ -506,6 +661,9 @@ namespace Classes
 
                 case 0x1FC:
                     return indoor_sky_colour;
+
+                case 0x1FE:
+                    return pics_on;
 
                 case 0x200:
                 case 0x202:
@@ -565,6 +723,14 @@ namespace Classes
                     return field_25E;
                 case 0x260:
                     return field_260;
+                case 0x262:
+                    return field_262;
+                case 0x264:
+                    return field_264;
+                case 0x266:
+                    return field_266;
+                case 0x268:
+                    return field_268;
 
                 case 0x26A:
                     return field_26A;
@@ -573,9 +739,11 @@ namespace Classes
                     return field_296;
                 case 0x298:
                     return field_298;
-
                 case 0x29A:
                     return field_29A;
+
+                case 0x29E:
+                    return field_29E;
 
                 case 0x2B2:
                     return field_2B2;
@@ -589,6 +757,31 @@ namespace Classes
                 case 0x2CA:
                     return field_2CA;
 
+                case 0x300:
+                    return field_300;
+                case 0x302:
+                    return field_302;
+
+                case 0x308:
+                    return field_308;
+
+                case 0x314:
+                    return field_314;
+                case 0x316:
+                    return field_316;
+                case 0x318:
+                    return field_318;
+                case 0x31A:
+                    return field_31A;
+                case 0x31C:
+                    return field_31C;
+                case 0x31E:
+                    return field_31E;
+
+                case 0x332:
+                    return field_332;
+                case 0x334:
+                    return field_334;
                 case 0x336:
                     return field_336;
                 case 0x338:
@@ -602,6 +795,28 @@ namespace Classes
                     return field_344;
                 case 0x346:
                     return field_346;
+
+                case 0x34E:
+                    return field_34E;
+
+                case 0x366:
+                    return field_366;
+
+                case 0x374:
+                    return field_374;
+                case 0x376:
+                    return field_376;
+
+                case 0x388:
+                    return field_388;
+                case 0x38A:
+                    return field_38A;
+
+                case 0x38C:
+                    return field_38C;
+
+                case 0x390:
+                    return field_390;
 
                 case 0x3C2:
                     return field_3C2;
