@@ -23,11 +23,17 @@ namespace Classes
         giant = 2,
         dragon = 3,
         animated_dead = 4,
-        fire = 8,
-        type_9 = 9,
+        efreeti = 7, // quickling, displacer beast (gateway), margoyle
+        fire = 8, // otyugh, salamander, hell hound, fire giant (gateway)
+        cold = 9, // unused
         troll = 10,
-        type_12 = 12,
-        snake = 14,
+        reptile = 11,
+        avian = 12, // griffon, manticore, stirge
+        squid = 13,
+        snake = 14, // scorpion, snake
+        wolf = 15, // centaur, tiger, boar (por)
+        giant_bug = 16, // giant slug, anhkheg, thri-kreen, drider
+        magic_beast = 17,
         plant = 18,
         animal = 19,
     }
