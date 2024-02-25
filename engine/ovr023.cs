@@ -2132,7 +2132,7 @@ namespace engine
 				player.lost_lvls -= 1;
 
 				SkillType restored_skill = SkillType.Monk;
-				int max_lvl = 13;
+				int max_lvl = 15;
 				int max_exp = 10000000;
 
 				for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
