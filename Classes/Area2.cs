@@ -1,3 +1,4 @@
+using Logging;
 using System;
 
 namespace Classes
@@ -166,6 +167,7 @@ namespace Classes
                 case 0x58e: return (ushort)field_58E;
                 case 0x592: return (ushort)field_592;
                 case 0x594: return search_flags;
+                case 0x5a6: return (ushort)rest_incounter_percentage;
                 case 0x5aa: return tried_to_exit_map ? (ushort)1 : (ushort)0;
                 case 0x67e: return (ushort)field_67E;
 
@@ -181,6 +183,7 @@ namespace Classes
                 case 0x704: return field_704;
 
                 default:
+                    Logger.Log("field_800_Get @{0}:{1:X} {2:X}",  gbl.game_area, gbl.ecl_offset, index);
                     return DataIO.GetObjectUShort(this, origData, loc);
             }
         }
@@ -208,6 +211,10 @@ namespace Classes
                     max_encounter_distance = value;
                     break;
 
+                case 0x582:
+                    encounter_distance = value;
+                    break;
+
                 case 0x58C:
                     field_58C = value;
                     break;
@@ -226,6 +233,10 @@ namespace Classes
 
                 case 0x5a6:
                     rest_incounter_percentage = (short)value;
+                    break;
+
+                case 0x5aa:
+                    tried_to_exit_map = value != 0;
                     break;
 
                 case 0x5c2:
@@ -312,6 +323,7 @@ namespace Classes
 
 
                 default:
+                    Logger.Log("field_800_Set @{0}:{1:X} {2:X} = {3:X}", gbl.game_area, gbl.ecl_offset, loc, value);
                     DataIO.SetObjectUShort(this, origData, loc, value);
                     break;
             }
