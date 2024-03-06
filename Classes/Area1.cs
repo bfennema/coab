@@ -1,3 +1,4 @@
+using Logging;
 using System;
 
 namespace Classes
@@ -95,6 +96,8 @@ namespace Classes
 
         [DataOffset(0x244, DataType.Word)]
         public ushort field_244;
+        [DataOffset(0x244, DataType.Word)]
+        public ushort field_246;
 
         [DataOffset(0x24E, DataType.Word)]
         public ushort field_24E;
@@ -116,9 +119,49 @@ namespace Classes
         public ushort field_25E;
         [DataOffset(0x260, DataType.Word)]
         public ushort field_260;
-
+        [DataOffset(0x262, DataType.Word)]
+        public ushort field_262;
+        [DataOffset(0x264, DataType.Word)]
+        public ushort field_264;
+        [DataOffset(0x266, DataType.Word)]
+        public ushort field_266;
+        [DataOffset(0x268, DataType.Word)]
+        public ushort field_268;
         [DataOffset(0x26A, DataType.Word)]
         public ushort field_26A;
+
+        [DataOffset(0x26E, DataType.Word)]
+        public ushort field_26E;
+        [DataOffset(0x270, DataType.Word)]
+        public ushort field_270;
+
+        [DataOffset(0x276, DataType.Word)]
+        public ushort field_276;
+        [DataOffset(0x278, DataType.Word)]
+        public ushort field_278;
+        [DataOffset(0x27A, DataType.Word)]
+        public ushort field_27A;
+
+        [DataOffset(0x27E, DataType.Word)]
+        public ushort field_27E;
+
+        [DataOffset(0x280, DataType.Word)]
+        public ushort field_280;
+        [DataOffset(0x282, DataType.Word)]
+        public ushort field_282;
+        [DataOffset(0x284, DataType.Word)]
+        public ushort field_284;
+
+        [DataOffset(0x288, DataType.Word)]
+        public ushort field_288;
+        [DataOffset(0x28A, DataType.Word)]
+        public ushort field_28A;
+        [DataOffset(0x28C, DataType.Word)]
+        public ushort field_28C;
+        [DataOffset(0x28E, DataType.Word)]
+        public ushort field_28E;
+        [DataOffset(0x290, DataType.Word)]
+        public ushort field_290;
 
         [DataOffset(0x296, DataType.Word)]
         public ushort field_296;
@@ -126,6 +169,21 @@ namespace Classes
         public ushort field_298;
         [DataOffset(0x29A, DataType.Word)]
         public ushort field_29A;
+        [DataOffset(0x29C, DataType.Word)]
+        public ushort field_29C;
+        [DataOffset(0x29E, DataType.Word)]
+        public ushort field_29E;
+        [DataOffset(0x2A0, DataType.Word)]
+        public ushort field_2A0;
+        [DataOffset(0x2A2, DataType.Word)]
+        public ushort field_2A2;
+        [DataOffset(0x2A4, DataType.Word)]
+        public ushort field_2A4;
+        [DataOffset(0x2A6, DataType.Word)]
+        public ushort field_2A6;
+        [DataOffset(0x2A8, DataType.Word)]
+        public ushort field_2A8;
+
         [DataOffset(0x2B2, DataType.Word)]
         public ushort field_2B2;
         [DataOffset(0x2B4, DataType.Word)]
@@ -133,11 +191,66 @@ namespace Classes
         [DataOffset(0x2B6, DataType.Word)]
         public ushort field_2B6;
 
+        [DataOffset(0x2BC, DataType.Word)]
+        public ushort field_2BC;
+        [DataOffset(0x2BE, DataType.Word)]
+        public ushort field_2BE;
         [DataOffset(0x2C0, DataType.Word)]
         public ushort field_2C0;
+        [DataOffset(0x2C2, DataType.Word)]
+        public ushort field_2C2;
+        [DataOffset(0x2C4, DataType.Word)]
+        public ushort field_2C4;
+        [DataOffset(0x2C6, DataType.Word)]
+        public ushort field_2C6;
+        [DataOffset(0x2C8, DataType.Word)]
+        public ushort field_2C8;
         [DataOffset(0x2CA, DataType.Word)]
         public ushort field_2CA;
+        [DataOffset(0x2CC, DataType.Word)]
+        public ushort field_2CC;
 
+        [DataOffset(0x2D0, DataType.Word)]
+        public ushort field_2D0;
+        [DataOffset(0x2D2, DataType.Word)]
+        public ushort field_2D2;
+        [DataOffset(0x2D4, DataType.Word)]
+        public ushort field_2D4;
+        [DataOffset(0x2D6, DataType.Word)]
+        public ushort field_2D6;
+        [DataOffset(0x2D8, DataType.Word)]
+        public ushort field_2D8;
+        [DataOffset(0x2DA, DataType.Word)]
+        public ushort field_2DA;
+        [DataOffset(0x2DC, DataType.Word)]
+        public ushort field_2DC;
+        [DataOffset(0x2DE, DataType.Word)]
+        public ushort field_2DE;
+        [DataOffset(0x2E0, DataType.Word)]
+        public ushort field_2E0;
+
+        [DataOffset(0x302, DataType.Word)]
+        public ushort field_302;
+        [DataOffset(0x304, DataType.Word)]
+        public ushort field_304;
+
+        [DataOffset(0x308, DataType.Word)]
+        public ushort field_308;
+
+        [DataOffset(0x30C, DataType.Word)]
+        public ushort field_30C;
+
+        [DataOffset(0x318, DataType.Word)]
+        public ushort field_318;
+        [DataOffset(0x31A, DataType.Word)]
+        public ushort field_31A;
+        [DataOffset(0x31C, DataType.Word)]
+        public ushort field_31C;
+        [DataOffset(0x31E, DataType.Word)]
+        public ushort field_31E;
+
+        [DataOffset(0x332, DataType.Word)]
+        public ushort field_332;
 
         [DataOffset(0x336, DataType.Byte)]
         public byte field_336;
@@ -314,6 +427,9 @@ namespace Classes
                 case 0x244:
                     field_244 = value;
                     break;
+                case 0x246:
+                    field_246 = value;
+                    break;
 
                 case 0x24E:
                     field_24E = value;
@@ -345,9 +461,67 @@ namespace Classes
                 case 0x260:
                     field_260 = value;
                     break;
-
+                case 0x262:
+                    field_262 = value;
+                    break;
+                case 0x264:
+                    field_264 = value;
+                    break;
+                case 0x266:
+                    field_266 = value;
+                    break;
+                case 0x268:
+                    field_268 = value;
+                    break;
                 case 0x26A:
                     field_26A = value;
+                    break;
+
+                case 0x26E:
+                    field_26E = value;
+                    break;
+                case 0x270:
+                    field_270 = value;
+                    break;
+
+                case 0x276:
+                    field_276 = value;
+                    break;
+                case 0x278:
+                    field_278 = value;
+                    break;
+                case 0x27A:
+                    field_27A = value;
+                    break;
+
+                case 0x27E:
+                    field_27E = value;
+                    break;
+
+                case 0x280:
+                    field_280 = value;
+                    break;
+                case 0x282:
+                    field_282 = value;
+                    break;
+                case 0x284:
+                    field_284 = value;
+                    break;
+
+                case 0x288:
+                    field_288 = value;
+                    break;
+                case 0x28A:
+                    field_28A = value;
+                    break;
+                case 0x28C:
+                    field_28C = value;
+                    break;
+                case 0x28E:
+                    field_28E = value;
+                    break;
+                case 0x290:
+                    field_290 = value;
                     break;
 
                 case 0x296:
@@ -358,6 +532,27 @@ namespace Classes
                     break;
                 case 0x29A:
                     field_29A = value;
+                    break;
+                case 0x29C:
+                    field_29C = value;
+                    break;
+                case 0x29E:
+                    field_29E = value;
+                    break;
+                case 0x2A0:
+                    field_2A0 = value;
+                    break;
+                case 0x2A2:
+                    field_2A2 = value;
+                    break;
+                case 0x2A4:
+                    field_2A4 = value;
+                    break;
+                case 0x2A6:
+                    field_2A6 = value;
+                    break;
+                case 0x2A8:
+                    field_2A8 = value;
                     break;
 
                 case 0x2B2:
@@ -370,11 +565,92 @@ namespace Classes
                     field_2B6 = value;
                     break;
 
+                case 0x2BC:
+                    field_2BC = value;
+                    break;
+                case 0x2BE:
+                    field_2BE = value;
+                    break;
                 case 0x2C0:
                     field_2C0 = value;
                     break;
+                case 0x2C2:
+                    field_2C2 = value;
+                    break;
+                case 0x2C4:
+                    field_2C4 = value;
+                    break;
+                case 0x2C6:
+                    field_2C6 = value;
+                    break;
+                case 0x2C8:
+                    field_2C8 = value;
+                    break;
                 case 0x2CA:
                     field_2CA = value;
+                    break;
+                case 0x2CC:
+                    field_2CC = value;
+                    break;
+
+                case 0x2D0:
+                    field_2D0 = value;
+                    break;
+                case 0x2D2:
+                    field_2D2 = value;
+                    break;
+                case 0x2D4:
+                    field_2D4 = value;
+                    break;
+                case 0x2D6:
+                    field_2D6 = value;
+                    break;
+                case 0x2D8:
+                    field_2D8 = value;
+                    break;
+                case 0x2DA:
+                    field_2DA = value;
+                    break;
+                case 0x2DC:
+                    field_2DC = value;
+                    break;
+                case 0x2DE:
+                    field_2DE = value;
+                    break;
+                case 0x2E0:
+                    field_2E0 = value;
+                    break;
+
+                case 0x302:
+                    field_302 = value;
+                    break;
+                case 0x304:
+                    field_304 = value;
+                    break;
+
+                case 0x308:
+                    field_308 = value;
+                    break;
+
+                case 0x30C:
+                    field_30C = value;
+                    break;
+
+                case 0x318:
+                    field_318 = value;
+                    break;
+                case 0x31A:
+                    field_31A = value;
+                    break;
+                case 0x31C:
+                    field_31C = value;
+                    break;
+                case 0x31E:
+                    field_31E = value;
+                    break;
+
+                case 0x332:
+                    field_332 = value;
                     break;
 
                 case 0x336:
@@ -395,6 +671,9 @@ namespace Classes
                     break;
                 case 0x342:
                     current_city = (byte)value;
+                    break;
+                case 0x344:
+                    field_344 = (byte)value;
                     break;
                 case 0x346:
                     field_346 = (byte)value;
@@ -464,6 +743,7 @@ namespace Classes
                     break;
 
                 default:
+                    Logger.Log("field_6A00_Set @{0}:{1:x} {2:X} = {3:X}", gbl.game_area, gbl.ecl_offset, loc, value);
                     DataIO.SetObjectUShort(this, origData, loc, value);
                     break;
             }
@@ -554,6 +834,8 @@ namespace Classes
 
                 case 0x244:
                     return field_244;
+                case 0x246:
+                    return field_246;
 
                 case 0x24E:
                     return field_24E;
@@ -575,9 +857,49 @@ namespace Classes
                     return field_25E;
                 case 0x260:
                     return field_260;
-
+                case 0x262:
+                    return field_262;
+                case 0x264:
+                    return field_264;
+                case 0x266:
+                    return field_266;
+                case 0x268:
+                    return field_268;
                 case 0x26A:
                     return field_26A;
+
+                case 0x26E:
+                    return field_26E;
+                case 0x270:
+                    return field_270;
+
+                case 0x276:
+                    return field_276;
+                case 0x278:
+                    return field_278;
+                case 0x27A:
+                    return field_27A;
+
+                case 0x27E:
+                    return field_27E;
+
+                case 0x280:
+                    return field_280;
+                case 0x282:
+                    return field_282;
+                case 0x284:
+                    return field_284;
+
+                case 0x288:
+                    return field_288;
+                case 0x28A:
+                    return field_28A;
+                case 0x28C:
+                    return field_28C;
+                case 0x28E:
+                    return field_28E;
+                case 0x290:
+                    return field_290;
 
                 case 0x296:
                     return field_296;
@@ -586,6 +908,20 @@ namespace Classes
 
                 case 0x29A:
                     return field_29A;
+                case 0x29C:
+                    return field_29C;
+                case 0x29E:
+                    return field_29E;
+                case 0x2A0:
+                    return field_2A0;
+                case 0x2A2:
+                    return field_2A2;
+                case 0x2A4:
+                    return field_2A4;
+                case 0x2A6:
+                    return field_2A6;
+                case 0x2A8:
+                    return field_2A8;
 
                 case 0x2B2:
                     return field_2B2;
@@ -594,10 +930,66 @@ namespace Classes
                 case 0x2B6:
                     return field_2B6;
 
+                case 0x2BC:
+                    return field_2BC;
+                case 0x2BE:
+                    return field_2BE;
                 case 0x2C0:
                     return field_2C0;
+                case 0x2C2:
+                    return field_2C2;
+                case 0x2C4:
+                    return field_2C4;
+                case 0x2C6:
+                    return field_2C6;
+                case 0x2C8:
+                    return field_2C8;
                 case 0x2CA:
                     return field_2CA;
+                case 0x2CC:
+                    return field_2CC;
+
+                case 0x2D0:
+                    return field_2D0;
+                case 0x2D2:
+                    return field_2D2;
+                case 0x2D4:
+                    return field_2D4;
+                case 0x2D6:
+                    return field_2D6;
+                case 0x2D8:
+                    return field_2D8;
+                case 0x2DA:
+                    return field_2DA;
+                case 0x2DC:
+                    return field_2DC;
+                case 0x2DE:
+                    return field_2DE;
+                case 0x2E0:
+                    return field_2E0;
+
+                case 0x302:
+                    return field_302;
+                case 0x304:
+                    return field_304;
+
+                case 0x308:
+                    return field_308;
+
+                case 0x30C:
+                    return field_30C;
+
+                case 0x318:
+                    return field_318;
+                case 0x31A:
+                    return field_31A;
+                case 0x31C:
+                    return field_31C;
+                case 0x31E:
+                    return field_31E;
+
+                case 0x332:
+                    return field_332;
 
                 case 0x336:
                     return field_336;
@@ -654,6 +1046,7 @@ namespace Classes
                     return field_596;
 
                 default:
+                    Logger.Log("field_6A00_Get @{0}:{1:X} {2:X}", gbl.game_area, gbl.ecl_offset, index);
                     return DataIO.GetObjectUShort(this, origData, loc);
             }
         }
