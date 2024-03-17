@@ -872,7 +872,7 @@ namespace engine
             string area_text = gbl.game_area.ToString();
 
             byte[] data;
-            short decode_size;
+            ushort decode_size;
             seg042.load_decode_dax(out data, out decode_size, monster_id, "MON" + area_text + "CHA.dax");
 
             if (decode_size == 0)

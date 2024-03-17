@@ -1087,7 +1087,7 @@ namespace engine
         internal static void CMD_Treasure() /* load_item */
         {
             byte[] data;
-            short dataSize;
+            ushort dataSize;
             ItemType item_type = 0;
 
             ovr008.vm_LoadCmdSets(8);
