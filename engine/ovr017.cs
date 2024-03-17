@@ -677,7 +677,7 @@ namespace engine
         internal static Player load_mob(int monster_id, bool exit)
         {
             byte[] data;
-            short decode_size;
+            ushort decode_size;
             seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}CHA.DAX", gbl.game_area));
 
             if (decode_size == 0)

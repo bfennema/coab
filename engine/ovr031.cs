@@ -690,7 +690,7 @@ namespace engine
         internal static void Load3DMap(int blockId)
         {
             byte[] data;
-            short bytesRead;
+            ushort bytesRead;
 
             seg042.load_decode_dax(out data, out bytesRead, blockId, "GEO" + gbl.game_area.ToString() + ".dax");
 

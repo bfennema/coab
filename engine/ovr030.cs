@@ -52,7 +52,7 @@ namespace engine
 
                     bool is_pic_or_final = (file_name == "PIC" || file_name == "FINAL");
 
-                    short uncompressed_size;
+                    ushort uncompressed_size;
                     byte[] uncompressed_data;
 
                     seg042.load_decode_dax(out uncompressed_data, out uncompressed_size, block_id, file_name + gbl.game_area.ToString() + ".dax");
