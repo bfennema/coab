@@ -343,9 +343,9 @@ namespace engine
 		{
 			sbyte[] stat_bonus = new sbyte[5];
 
-            player.activeItems.Reset();
+			player.activeItems.Reset();
 
-			bool var_8 = false;
+			bool bag_of_holding = player.items.Find(i => i.type == ItemType.PotionOfGiantStr && i.namenum3 == 73 && i.readied) != null;
 
 			player.weaponsHandsUsed = 0;
 
@@ -454,7 +454,7 @@ namespace engine
 				stat_bonus[3] = 0;
 			}
 
-			if (var_8 == true)
+			if (bag_of_holding == true)
 			{
 				if (player.weight < 5000)
 				{
