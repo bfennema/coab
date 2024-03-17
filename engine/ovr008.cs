@@ -136,7 +136,7 @@ namespace engine
         internal static void load_ecl_dax(byte block_id)
         {
             byte[] block_mem;
-            short block_size = 0;
+            ushort block_size = 0;
 
             gbl.ecl_ptr.Clear();
 
