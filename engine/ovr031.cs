@@ -652,7 +652,7 @@ namespace engine
                 string area_text = gbl.game_area.ToString();
                 byte[] data;
 
-                short decode_size;
+                ushort decode_size;
                 seg042.load_decode_dax(out data, out decode_size, block_id, "WALLDEF" + area_text + ".dax");
 
                 if (decode_size == 0 ||
@@ -703,7 +703,7 @@ namespace engine
         internal static void Load3DMap(int blockId)
         {
             byte[] data;
-            short bytesRead;
+            ushort bytesRead;
 
             seg042.load_decode_dax(out data, out bytesRead, blockId, "GEO" + gbl.game_area.ToString() + ".dax");
 
