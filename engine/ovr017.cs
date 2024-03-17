@@ -729,13 +729,15 @@ namespace engine
         }
 
 
-        internal static void load_npc(int monster_id) // sub_4A57D
+        internal static void load_npc(int monster_id, byte morale) // sub_4A57D
         {
             if (gbl.area2_ptr.party_size <= 7)
             {
                 Player player = load_mob(monster_id);
 
                 player.mod_id = (byte)monster_id;
+
+                player.control_morale = (byte)((morale >> 1) + Control.NPC_Base);
 
                 AssignPlayerIconId(player);
 
