@@ -24,7 +24,7 @@ namespace engine
         internal static void Load8x8Tiles() // load_8x8d1_201
         {
             byte[] block_ptr;
-            short block_size;
+            ushort block_size;
 
             seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8d1.dax");
 

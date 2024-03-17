@@ -6,7 +6,7 @@ namespace engine
     {
         internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string fileName) // load_dax
         {
-            short pic_size;
+            ushort pic_size;
             byte[] pic_data;
             seg042.load_decode_dax(out pic_data, out pic_size, block_id, fileName + ".dax");
 
