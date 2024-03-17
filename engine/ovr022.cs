@@ -423,9 +423,20 @@ namespace engine
             {
                 bonus = 1;
             }
-            else if (roll >= 15 && roll <= 20)
+            else if (roll >= 15 && roll <= 19)
             {
                 bonus = 2;
+            }
+            else if (roll == 20)
+            {
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+                    bonus = 3;
+                }
+                else
+                {
+                    bonus = 2;
+                }
             }
 
             return bonus;
@@ -455,6 +466,8 @@ namespace engine
                 type == ItemType.RingOfProt)
             {
                 item.plus = randomBonus();
+                item.plus_save = 0;
+                item.count = 0;
 
                 if (item.type == ItemType.Javelin)
                 {
@@ -516,21 +529,23 @@ namespace engine
                     {
                         item.namenum1 = 222; // AC 4
                     }
+                    else if (item.plus == 8)
+                    {
+                        item.namenum1 = 220; // AC 2
+                    }
                 }
                 else if (item.type == ItemType.RingOfProt)
                 {
                     item.namenum3 = 66; // Ring
                     item.namenum2 = 224; // of Prot.
                     item.namenum1 = item.plus + 161;
+                    item.plus_save = (byte)item.plus;
                 }
                 else
                 {
                     item.namenum3 = (int)item.type;
                     item.namenum2 = item.plus + 161;
                 }
-
-                item.plus_save = 0;
-                item.count = 0;
 
                 switch (item.type)
                 {
