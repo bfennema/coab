@@ -831,8 +831,20 @@ namespace engine
                     break;
 
                 case 3: // Gauntlets of Ogre Power
-                    gbl.applyItemAffect = true;
-                    ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
+                    if (add_item)
+                    {
+                        int encodedStrength = 0;
+                        if (ovr024.TryEncodeStrength(out encodedStrength, 100, 18, player) == true)
+                        {
+                            ovr025.DisplayPlayerStatusString(true, 10, "is stronger", player);
+                            ovr024.add_affect(true, encodedStrength, 0, item.affect_2, player);
+                            ovr024.CalcStatBonuses(Stat.STR, player);
+                        }
+                    }
+                    else
+                    {
+                        ovr024.remove_affect(null, item.affect_2, player);
+                    }
                     break;
 
                 case 4:
