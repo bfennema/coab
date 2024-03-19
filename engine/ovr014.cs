@@ -801,7 +801,7 @@ namespace engine
                 {
                     if (target.actions.AttacksReceived > 1 &&
                         getTargetDirection(target, attacker) == target.actions.direction &&
-                        target.actions.directionChanges > 4)
+                        target.actions.directionChanges >= 4)
                     {
                         BehindAttack = true;
                     }

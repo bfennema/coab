@@ -832,7 +832,7 @@ namespace engine
 			}
 		}
 
-
+		static string[] directions = { "N", "NE", "E", "SE", "S", "SW", "W", "NW" };
 		internal static void displayPlayerName(bool pural, int y_offset, int x_offset, Player player) /*sub_678A2*/
 		{
 			int color;
@@ -850,7 +850,15 @@ namespace engine
 				color = 0x0B;
 			}
 
-			string name = player.name + ((pural) ? "'s" : "");
+			string name;
+			if (player.actions != null)
+			{
+				name = player.name + ((pural) ? "'s" : "") + " <" + directions[player.actions.direction] + ">";
+			}
+			else
+			{
+				name = player.name + ((pural) ? "'s" : "");
+			}
 
 			seg041.displayString(name, 0, color, y_offset, x_offset);
 		}
