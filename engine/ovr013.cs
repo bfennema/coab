@@ -779,6 +779,54 @@ namespace engine
 		}
 
 
+		internal static void AffectMummyHealing(Effect arg_0, object param, Player player)
+		{
+			if (gbl.cureSpell == false)
+			{
+				if (ovr024.heal_player(1, 1, player) == true)
+				{
+					ovr025.DescribeHealing(player);
+				}
+				addAffect(10 * 24 * 60, 0xFF, Affects.mummy_disease_healing, player);
+			}
+		}
+
+
+		internal static void AffectMummyRot(Effect arg_0, object param, Player player)
+		{
+			Affect affect = (Affect)param;
+			if (gbl.cureSpell == false)
+			{
+				int duration = affect.affect_data >> 4;
+
+				ovr025.DisplayPlayerStatusString(true, 10, "ROTS...", player);
+				player.stats2.Cha.cur -= 2;
+				ovr024.CalcStatBonuses(Stat.CHA, player);
+				duration--;
+				if (duration == 0)
+				{
+					ovr024.KillPlayer("DIES ROTS AWAY", Status.dead, player);
+				}
+				else
+				{
+					addAffect(30 * 24 * 60, (duration << 4) | 0xF, Affects.mummy_disease_rot, player);
+				}
+			}
+		}
+
+
+		internal static void MummyRotAttack(Effect arg_0, object param, Player player)
+		{
+			if (arg_0 == Effect.Add)
+			{
+				int duration = ovr024.roll_dice(6, 1);
+				ovr024.add_affect(true, (duration << 4) | 0xF, 30 * 24 * 60, Affects.mummy_disease_rot, player.actions.target);
+				ovr024.add_affect(true, 0xFF, 10 * 24 * 60, Affects.mummy_disease_healing, player.actions.target);
+				ovr025.DisplayPlayerStatusString(false, 10, "is diseased", player.actions.target);
+			}
+		}
+
+
 		internal static void HotFireShield(Effect arg_0, object param, Player player) // sub_3B212
 		{
 			if ((gbl.damage_flags & DamageType.Cold) != 0)
@@ -1109,6 +1157,40 @@ namespace engine
 			gbl.damage /= 2;
 		}
 
+		internal static void MummyFear(Effect add_remove, object param, Player player) /* sub_3C932 */
+		{
+			var opp = player.OppositeTeam();
+
+			var sortedCombatants = ovr032.Rebuild_SortedCombatantList(player, 6, p => p.combat_team == opp);
+
+			foreach (Player tmpPlayer in gbl.TeamList)
+			{
+				if (tmpPlayer.combat_team == opp)
+				{
+					int save_bonus = 0;
+					if (tmpPlayer.race == Race.human)
+					{
+						save_bonus += 2;
+					}
+
+					if (ovr024.RollSavingThrow(save_bonus, SaveVerseType.Spell, tmpPlayer) == false)
+					{
+						ushort time = ovr024.roll_dice(4, 1);
+						ovr024.add_affect(false, 12, time, Affects.paralyze, tmpPlayer);
+						ovr025.DisplayPlayerStatusString(true, 10, "is paralyzed with fear", tmpPlayer);
+					}
+					else
+					{
+						ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", tmpPlayer);
+
+					}
+				}
+				else
+				{
+					ovr024.remove_affect(null, Affects.mummy_fear, tmpPlayer);
+				}
+			}
+		}
 
 		internal static void AffectResistFireAndCold(Effect arg_0, object param, Player player) // sub_3B990
 		{
@@ -1525,6 +1607,15 @@ namespace engine
 			if (item != null && item.type == ItemType.HolyWater)
 			{
 				gbl.damage = ovr024.roll_dice_save(6, 1) + 1;
+			}
+		}
+
+
+		internal static void AffectVulnFire(Effect arg_0, object param, Player player) // sub_3C2F9
+		{
+			if ((gbl.damage_flags & DamageType.Fire) != 0)
+			{
+				gbl.damage += gbl.dice_count;
 			}
 		}
 
@@ -2009,6 +2100,11 @@ namespace engine
 			affect_table.Add(Affects.protection_from_fire, ovr013.AffectProtectFire);
 			affect_table.Add(Affects.resist_lightning, ovr013.AffectResistLightning);
 			affect_table.Add(Affects.protection_from_lightning, ovr013.AffectProtectLightning);
+			affect_table.Add(Affects.mummy_fear, ovr013.MummyFear);
+			affect_table.Add(Affects.mummy_disease_healing, ovr013.AffectMummyHealing);
+			affect_table.Add(Affects.mummy_disease_rot, ovr013.AffectMummyRot);
+			affect_table.Add(Affects.mummy_rot_attack, ovr013.MummyRotAttack);
+			affect_table.Add(Affects.vuln_fire, ovr013.AffectVulnFire);
 		}
 
 		internal static void CallAffectTable(Effect add_remove, object parameter, Player player, Affects affect) /* sub_630C7 */

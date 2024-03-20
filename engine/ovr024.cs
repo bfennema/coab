@@ -153,6 +153,7 @@ namespace engine
                     calc_affect_effect(Affects.fireAttack_2d10, player);
                     calc_affect_effect(Affects.ankheg_melee_acid_attack, player);
                     calc_affect_effect(Affects.dispel_evil_banish, player);
+                    calc_affect_effect(Affects.mummy_rot_attack, player);
                     calc_affect_effect(Affects.engulf, player);
                     calc_affect_effect(Affects.owlbear_hug_check, player);
                     calc_affect_effect(Affects.dracolich_paralysis, player);
@@ -189,6 +190,7 @@ namespace engine
                     calc_affect_effect(Affects.protect_non_magic_weapons, player);
                     calc_affect_effect(Affects.resist_blunt_pierce, player);
                     calc_affect_effect(Affects.vuln_holy_water, player);
+                    calc_affect_effect(Affects.vuln_fire, player);
                     calc_affect_effect(Affects.resist_normal_weapons, player);
                     calc_affect_effect(Affects.half_damage, player);
                     calc_affect_effect(Affects.resist_fire_and_cold, player);
@@ -240,6 +242,7 @@ namespace engine
                     calc_affect_effect(Affects.displace, player);
                     calc_affect_effect(Affects.camouflage, player);
                     calc_affect_effect(Affects.item_invisibility, player);
+                    calc_affect_effect(Affects.mummy_fear, player);
                     break;
 
                 case CheckType.MagicResistance:

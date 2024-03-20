@@ -550,6 +550,7 @@ namespace engine
             EffectNameMap.Add(Affects.prot_drag_breath, "protected from dragon breath");
             EffectNameMap.Add(Affects.berserk, "berserk");
             EffectNameMap.Add(Affects.displace, "Displaced");
+            EffectNameMap.Add(Affects.mummy_disease_rot, "Dreaded mummy disease");
 
         }
 
