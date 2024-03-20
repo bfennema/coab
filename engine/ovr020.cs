@@ -1640,8 +1640,8 @@ namespace engine
             Affects.cause_disease_1,
             Affects.weaken,
             Affects.cause_disease_2,
-            (Affects)0x32,
-            (Affects)0x39,
+            Affects.mummy_disease_healing,
+            Affects.mummy_disease_rot,
         };
 
         internal static void PaladinCureDisease(Player player) /* sub_577EC */

@@ -365,9 +365,12 @@ namespace engine
 
                 foreach (Player player in gbl.TeamList)
                 {
-                    if (ovr024.heal_player(0, 1, player) == true)
+                    if (gbl.game != Game.PoolOfRadiance || player.HasAffect(Affects.mummy_disease_healing) == false)
                     {
-                        update_ui = true;
+                        if (ovr024.heal_player(0, 1, player) == true)
+                        {
+                            update_ui = true;
+                        }
                     }
                 }
 

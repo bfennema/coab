@@ -70,7 +70,7 @@ namespace engine
             {
                 foreach (Affect affect in player.affects)
                 {
-                    Logger.Debug("who: {0}  sp#: {1} - {2}", player.name, (int)affect.type, affect.type);
+                    Logger.Debug("who: {0}  sp#: {1} - {2}  duration: {3}  data: {4:X}  table: {5}", player.name, (int)affect.type, affect.type, affect.minutes, affect.affect_data, affect.callAffectTable);
                 }
             }
         }

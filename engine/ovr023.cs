@@ -1718,11 +1718,10 @@ namespace engine
 				ovr024.remove_affect(null, Affects.helpless, gbl.spellTargets[0]);
 			}
 
-			// This is presumably mummy rot from pool of radiance
-			if (ovr024.cure_affect((Affects)0x32, gbl.spellTargets[0]) == true)
+			if (ovr024.cure_affect(Affects.mummy_disease_healing, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
-				ovr024.remove_affect(null, (Affects)0x39, gbl.spellTargets[0]);
+				ovr024.remove_affect(null, Affects.mummy_disease_rot, gbl.spellTargets[0]);
 			}
 
 			gbl.cureSpell = false;
