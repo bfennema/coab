@@ -2,6 +2,7 @@ using Classes;
 using System.Collections.Generic;
 using System;
 using Classes.Combat;
+using System.Linq;
 
 namespace engine
 {
@@ -2262,6 +2263,70 @@ namespace engine
             /* MU */        { 0, 2501, 5001, 10001, 22501, 40001, 60001,  90001, 135001, 250001,  375001, 750001, 1125001, 1500001, 1875001, -1, -1, -1, -1 },
             /* Thief */     { 0, 1251, 2501,  5001, 10001, 20001, 42501,  70001, 110001, 160001,  220001, 440001, 660001, 8800001, 1100001, 1320001, 1540001, 1760001, -1 },
             /* Monk */      { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }};
+
+
+        internal static void EnergyDrain(Player player, int number)
+        {
+            SkillType[] top = new SkillType[(int)SkillType.Monk+1];
+            int[] exp = new int[(int)SkillType.Monk+1];
+
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                top[(int)skill] = skill;
+                exp[(int)skill] = 0;
+            }
+
+            Array.Sort(top, (a, b) => {
+                int la = player.ClassLevel[(int)a];
+                int lb = player.ClassLevel[(int)b];
+                int delta = la.CompareTo(lb);
+                if (delta == 0 && la > 0 && lb > 0)
+                {
+                    delta = exp_table[(int)a,la-1].CompareTo(exp_table[(int)b,lb-1]);
+                }
+                return -delta;
+            });
+
+            for (int i=0, j=0; i<number; i++,j++)
+            {
+                SkillType skill = top[j];
+                if (player.ClassLevel[(int)skill] == 0)
+                {
+                    j = 0;
+                    skill = top[j];
+                }
+                if (player.ClassLevel[(int)skill] > 1)
+                {
+                    player.lost_lvls++;
+                    int con_adj = get_con_hp_adj(player);
+                    player.ClassLevel[(int)skill]--;
+                    short rolled_decrease = roll_hp(classMasks[(int)skill], player);
+
+                    int max_hp_decrease = rolled_decrease / player.SkillCount();
+                    if (max_hp_decrease == 0)
+                    {
+                        max_hp_decrease = 1;
+                    }
+                    player.lost_hp += (byte)max_hp_decrease;
+                    player.hit_point_rolled -= (byte)max_hp_decrease;
+                    int total_hp_decrease = max_hp_decrease + con_adj;
+                    player.hit_point_current -= (byte)total_hp_decrease;
+                    player.hit_point_max -= (byte)total_hp_decrease;
+
+                    exp[j] = exp_table[(int)skill, player.ClassLevel[(int)skill]-1] +
+                        ((exp_table[(int)skill, player.ClassLevel[(int)skill]] - exp_table[(int)skill, player.ClassLevel[(int)skill]-1]) / 2);
+                }
+                else
+                {
+                    player.ClassLevel[(int)skill] = 1;
+                    exp[j] = 1;
+                }
+            }
+            if (exp.Max() < player.exp)
+            {
+                player.exp = exp.Max();
+            }
+        }
 
         internal static void train_player()
         {

@@ -158,6 +158,8 @@ namespace engine
                     calc_affect_effect(Affects.owlbear_hug_check, player);
                     calc_affect_effect(Affects.dracolich_paralysis, player);
                     calc_affect_effect(Affects.dracolich_cold_damage, player);
+                    calc_affect_effect(Affects.energy_drain_1, player);
+                    calc_affect_effect(Affects.energy_drain_2, player);
                     break;
 
                 case CheckType.PostHit2_Damage:
@@ -314,6 +316,7 @@ namespace engine
 
                 case CheckType.Type_14:
                     calc_affect_effect(Affects.petrifying_gaze, player);
+                    calc_affect_effect(Affects.charming_gaze, player);
                     calc_affect_effect(Affects.breath_elec, player);
                     calc_affect_effect(Affects.ankheg_ranged_acid_attack, player);
                     calc_affect_effect(Affects.spit_acid, player);

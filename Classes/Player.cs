@@ -582,6 +582,19 @@ namespace Classes
         //    set { ClassLevelsOld[7] = value; }
         //}
 
+        public int SkillCount()
+        {
+            int skill_count = 0;
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                if (ClassLevel[(int)skill] > 0)
+                {
+                    skill_count++;
+                }
+            }
+            return skill_count;
+        }
+
         public int SkillLevel(params SkillType[] skills)
         {
             int level = 0;

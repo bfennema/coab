@@ -1236,6 +1236,25 @@ namespace engine
 			}
 		}
 
+		internal static void AffectEnergyDrain(Effect arg_0, object param, Player player)
+		{
+			Affect affect = (Affect)param;
+
+			if (affect != null)
+			{
+				if (affect.type == Affects.energy_drain_2)
+				{
+					ovr018.EnergyDrain(gbl.spell_target, 2);
+					ovr025.MagicAttackDisplay("is drained 2 levels", true, gbl.spell_target);
+				}
+				else
+				{
+					ovr018.EnergyDrain(gbl.spell_target, 1);
+					ovr025.MagicAttackDisplay("is drained 1 level", true, gbl.spell_target);
+				}
+			}
+		}
+
 
 		internal static void AffectDisplace(Effect arg_0, object param, Player player) /*sub_3BA55*/
 		{
@@ -2105,6 +2124,9 @@ namespace engine
 			affect_table.Add(Affects.mummy_disease_rot, ovr013.AffectMummyRot);
 			affect_table.Add(Affects.mummy_rot_attack, ovr013.MummyRotAttack);
 			affect_table.Add(Affects.vuln_fire, ovr013.AffectVulnFire);
+			affect_table.Add(Affects.charming_gaze, ovr023.AffectCharmingGaze);
+			affect_table.Add(Affects.energy_drain_1, ovr013.AffectEnergyDrain);
+			affect_table.Add(Affects.energy_drain_2, ovr013.AffectEnergyDrain);
 		}
 
 		internal static void CallAffectTable(Effect add_remove, object parameter, Player player, Affects affect) /* sub_630C7 */
