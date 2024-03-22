@@ -167,10 +167,13 @@ namespace Classes
         mummy_rot_attack = 0x9f,
         vuln_fire = 0xa0,
         affect_a1 = 0xa1,
-        barkskin = 0xa2,
-        protection_from_fire = 0xa3,
-        resist_lightning = 0xa4,
-        protection_from_lightning = 0xa5,
+        charming_gaze = 0xa2,
+        energy_drain_1 = 0xa3,
+        energy_drain_2 = 0xa4,
+        barkskin = 0xa5,
+        protection_from_fire = 0xa6,
+        resist_lightning = 0xa7,
+        protection_from_lightning = 0xa8,
     }
 
     /// <summary>

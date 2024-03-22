@@ -2951,6 +2951,34 @@ namespace engine
 		}
 
 
+		internal static void AffectCharmingGaze(Effect arg_0, object param, Player player) /* spell_stone */
+		{
+			player.actions.target = null;
+
+			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.wand_of_magic_missiles);
+
+			if (player.actions.target != null)
+			{
+				gbl.spell_target = player.actions.target;
+
+				ovr025.DisplayPlayerStatusString(false, 10, "gazes...", player);
+				ovr025.load_missile_icons(0x12);
+
+				ovr025.draw_missile_attack(0x2d, 4, ovr033.PlayerMapPos(gbl.spell_target), ovr033.PlayerMapPos(player));
+
+				if (ovr024.RollSavingThrow(2, SaveVerseType.Spell, gbl.spell_target) == false)
+				{
+					ovr024.add_affect(true, 0x8c, 0, Affects.charm_person, gbl.spell_target);
+					ovr025.DisplayPlayerStatusString(true, 10, "is charmed", gbl.spell_target);
+				}
+				else
+				{
+					ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", gbl.spell_target);
+				}
+			}
+		}
+
+
 		internal static void DragonBreathElec(Effect arg_0, object param, Player player) // cast_breath
 		{
 			Affect affect = (Affect)param;
@@ -2964,7 +2992,7 @@ namespace engine
 
 				ovr025.DisplayPlayerStatusString(true, 10, "Breathes!", player);
 
-                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.lightning_bolt);
+				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.lightning_bolt);
 
 				gbl.targetPos.x = var_2.x + Math.Sign(gbl.targetPos.x - var_2.x);
 				gbl.targetPos.y = var_2.y + Math.Sign(gbl.targetPos.y - var_2.y);

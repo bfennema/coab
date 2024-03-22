@@ -229,9 +229,9 @@ namespace Classes
             //mapping.Add(PoolRadAffects.dragon_fear_aura, Affects.dragon_fear_aura);
             mapping.Add(PoolRadAffects.mummy_fear, Affects.mummy_fear);
             mapping.Add(PoolRadAffects.petrifying_gaze, Affects.petrifying_gaze);
-            //mapping.Add(PoolRadAffects.charming_gaze, Affects.charming_gaze);
-            //mapping.Add(PoolRadAffects.energy_drain_1, Affects.energy_drain_1);
-            //mapping.Add(PoolRadAffects.energy_drain_2, Affects.energy_drain_2);
+            mapping.Add(PoolRadAffects.charming_gaze, Affects.charming_gaze);
+            mapping.Add(PoolRadAffects.energy_drain_1, Affects.energy_drain_1);
+            mapping.Add(PoolRadAffects.energy_drain_2, Affects.energy_drain_2);
             mapping.Add(PoolRadAffects.mummy_rot_attack, Affects.mummy_rot_attack);
             mapping.Add(PoolRadAffects.breath_elec, Affects.breath_elec);
             mapping.Add(PoolRadAffects.displace, Affects.displace);
