@@ -59,33 +59,33 @@ namespace Classes
             }
         }
 
-        public void EnforceRaceSexLimits(int race, int sex)
+        public void EnforceRaceSexLimits(Race race, int sex)
         {
             int delta = full - cur;
             if( raceSexMinMax != null )
             {
-                cur = Math.Min(raceSexMinMax[race, 1, sex], cur);
-                cur = Math.Max(raceSexMinMax[race, 0, sex], cur);
+                cur = Math.Min(raceSexMinMax[(int)race, 1, sex], cur);
+                cur = Math.Max(raceSexMinMax[(int)race, 0, sex], cur);
             }
             full = cur + delta;
         }
 
-        public void EnforceClassLimits(int _class)
+        public void EnforceClassLimits(ClassId _class)
         {
             int delta = full - cur;
             if (classMin != null)
             {
-                cur = Math.Max(classMin[_class], cur);
+                cur = Math.Max(classMin[(int)_class], cur);
             }
             full = cur + delta;
         }
 
-        public void AgeEffects(int race, int age)
+        public void AgeEffects(Race race, int age)
         {
             int delta = full - cur;
             for (int i = 0; i < 5; i++)
             {
-                if (Limits.RaceAgeBrackets[race, i] < age)
+                if (Limits.RaceAgeBrackets[(int)race, i] < age)
                 {
                     cur += ageEffects[i];
                 }
@@ -143,6 +143,28 @@ namespace Classes
             Con.Read(data, offset + 0x08);
             Cha.Read(data, offset + 0x0a);
             Str00.Read(data, offset + 0x0c);
+        }
+
+        public void Save(byte[] data)
+        {
+            Str.Write(data, 0x00);
+            Int.Write(data, 0x02);
+            Wis.Write(data, 0x04);
+            Dex.Write(data, 0x06);
+            Con.Write(data, 0x08);
+            Cha.Write(data, 0x0a);
+            Str00.Write(data, 0x0c);
+        }
+
+        public void Load(byte[] data)
+        {
+            Str.Read(data, 0x00);
+            Int.Read(data, 0x02);
+            Wis.Read(data, 0x04);
+            Dex.Read(data, 0x06);
+            Con.Read(data, 0x08);
+            Cha.Read(data, 0x0a);
+            Str00.Read(data, 0x0c);
         }
 
         public void Assign(PlayerStats ps)
@@ -226,6 +248,14 @@ namespace Classes
             for (int i = 0; i < 100; i++)
             {
                 spellBook[i + 1] = data[offset + i] != 0;
+            }
+        }
+
+        public void Save(byte[] data, int length)
+        {
+            for (int i = 0; i < length; i++)
+            {
+                data[i] = (byte)(spellBook[i + 1] ? 1 : 0);
             }
         }
 
@@ -786,30 +816,8 @@ namespace Classes
 
         public Player()
         {
-            Init();
-        }
-
-        public Player(byte[] data, int offset)
-        {
-            Init();
-
-            DataIO.ReadObject(this, data, offset);
-
-            spellList.Load(data, offset + 0x1e);
-
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    spellCastCount[i, j] = data[0x12d + j + (i * i)];
-                }
-            }
-        }
-
-        private void Init()
-        {
             spellCastCount = new byte[3, 5];
-            //stats = new StatValue[6];
+
             stats2 = new PlayerStats();
 
             spellBook = new SpellBook();
@@ -833,25 +841,6 @@ namespace Classes
             return p;
         }
 
-
-        public byte[] ToByteArray()
-        {
-            byte[] data = new byte[StructSize];
-
-            DataIO.WriteObject(this, data);
-
-            spellList.Save(data, 0x1e);
-
-            for (int i = 0; i < 3; i++)
-            {
-                for (int j = 0; j < 5; j++)
-                {
-                    data[0x12d + j + (i * i)] = spellCastCount[i, j];
-                }
-            }
-
-            return data;
-        }
 
         public override string ToString()
         {

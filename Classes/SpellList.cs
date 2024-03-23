@@ -108,9 +108,9 @@ namespace Classes
             spells.RemoveAll(sp => sp.Learning == true);
         }
 
-        public void Load(byte[] data, int offset)
+        public void Load(byte[] data, int offset, int size = SpellListSize)
         {
-            for (int i = 0; i < SpellListSize; i++)
+            for (int i = 0; i < size; i++)
             {
                 if (data[offset + i] > 0)
                 {
