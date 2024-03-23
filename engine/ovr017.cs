@@ -177,7 +177,7 @@ namespace engine
 
             seg051.Rewrite(file);
 
-            seg051.BlockWrite(Player.StructSize, player.ToByteArray(), file);
+            seg051.BlockWrite(Player.StructSize, new CursePlayer(player).Save(), file);
             seg051.Close(file);
 
             seg042.delete_file(filePath + ".swg");
@@ -201,7 +201,7 @@ namespace engine
 
                 foreach (Affect affect in player.affects)
                 {
-                    seg051.BlockWrite(Affect.StructSize, affect.ToByteArray(), file);
+                    seg051.BlockWrite(Affect.StructSize, new CurseAffect(affect).Save(), file);
                 }
 
                 seg051.Close(file);
@@ -228,156 +228,6 @@ namespace engine
 
             }
             return false;
-        }
-
-
-        internal static Player ConvertPoolRadPlayer(PoolRadPlayer bp_var_1C0)
-        {
-            /* nested function, arg_0 is BP */
-            Player player = new Player();
-
-            player.race = (Race)bp_var_1C0.race;
-            player.sex = bp_var_1C0.sex;
-
-            player.name = bp_var_1C0.name;
-
-            int race = (int)player.race;
-            int sex = player.sex;
-
-            player.stats2.Str.Load(bp_var_1C0.stat_str);
-            player.stats2.Str.EnforceRaceSexLimits(race, sex);
-
-            player.stats2.Int.Load(bp_var_1C0.stat_int);
-            player.stats2.Int.EnforceRaceSexLimits(race, sex);
-
-            player.stats2.Wis.Load(bp_var_1C0.stat_wis);
-            player.stats2.Wis.EnforceRaceSexLimits(race, sex);
-
-            player.stats2.Dex.Load(bp_var_1C0.stat_dex);
-            player.stats2.Dex.EnforceRaceSexLimits(race, sex);
-
-            player.stats2.Con.Load(bp_var_1C0.stat_con);
-            player.stats2.Con.EnforceRaceSexLimits(race, sex);
-
-            player.stats2.Cha.Load(bp_var_1C0.stat_cha);
-            player.stats2.Cha.EnforceRaceSexLimits(race, sex);
-
-            player.stats2.Str00.Load(bp_var_1C0.stat_str00);
-            player.stats2.Str00.EnforceRaceSexLimits(race, sex);
-
-            player.thac0 = bp_var_1C0.thac0;
-            player._class = (ClassId)bp_var_1C0._class;
-            player.age = bp_var_1C0.age;
-            player.hit_point_max = bp_var_1C0.hp_max;
-
-            player.spellBook.Load(bp_var_1C0.field_33, 0x38);
-            player.spellBook.UnlearnSpell(Spells.animate_dead);
-
-            player.attackLevel = bp_var_1C0.field_6B;
-            player.icon_dimensions = bp_var_1C0.icon_dimensions;
-
-            System.Array.Copy(bp_var_1C0.saveVerse, player.saveVerse, 5);
-
-            player.base_movement = bp_var_1C0.field_72;
-            player.HitDice = bp_var_1C0.field_73;
-            player.multiclassLevel = player.HitDice;
-            player.lost_lvls = bp_var_1C0.field_74;
-            player.lost_hp = bp_var_1C0.field_75;
-            player.level_undead = bp_var_1C0.field_76;
-
-            System.Array.Copy(bp_var_1C0.field_77, player.thief_skills, 8);
-
-            player.field_F6 = bp_var_1C0.field_83;
-            player.control_morale = bp_var_1C0.field_84;
-            player.npcTreasureShareCount = bp_var_1C0.field_85;
-            player.field_F9 = bp_var_1C0.field_86;
-            player.field_FA = bp_var_1C0.field_87;
-
-            player.Money.SetCoins(Money.Platinum, 300);
-
-            System.Array.Copy(bp_var_1C0.field_96, player.ClassLevel, 8);
-
-            player.monsterType = (MonsterType)bp_var_1C0.field_9F;
-            player.alignment = bp_var_1C0.field_A0;
-
-            player.attacksCount = bp_var_1C0.field_A1;
-            player.baseHalfMoves = bp_var_1C0.field_A2;
-            player.attack1_DiceCountBase = bp_var_1C0.field_A3;
-            player.attack2_DiceCountBase = bp_var_1C0.field_A4;
-            player.attack1_DiceSizeBase = bp_var_1C0.field_A5;
-            player.attack2_DiceSizeBase = bp_var_1C0.field_A6;
-            player.attack1_DamageBonusBase = bp_var_1C0.field_A7;
-            player.attack2_DamageBonusBase = bp_var_1C0.field_A8;
-
-            player.base_ac = bp_var_1C0.field_A9;
-            player.field_125 = bp_var_1C0.field_AA;
-            player.mod_id = bp_var_1C0.field_AB;
-
-            player.exp = bp_var_1C0.field_AC;
-            player.classFlags = bp_var_1C0.field_B0;
-            player.hit_point_rolled = bp_var_1C0.field_B1;
-
-            for (int var_2 = 1; var_2 <= 3; var_2++)
-            {
-                player.spellCastCount[0, var_2 - 1] = bp_var_1C0.field_B2[var_2 - 1];
-                player.spellCastCount[2, var_2 - 1] = bp_var_1C0.field_B5[var_2 - 1];
-            }
-
-            player.field_13C = bp_var_1C0.field_B8;
-
-            player.field_13E = bp_var_1C0.field_BA;
-            player.field_13F = bp_var_1C0.field_BB;
-
-            player.field_140 = bp_var_1C0.field_BC;
-            player.head_icon = bp_var_1C0.field_BD;
-            player.weapon_icon = bp_var_1C0.field_BE;
-            player.icon_size = bp_var_1C0.field_C0;
-
-            System.Array.Copy(bp_var_1C0.field_C1, player.icon_colours, 6);
-
-
-            //player.field_14c = bp_var_1C0.field_C7; // Item count
-
-            //mov	di, [bp+arg_0] // copy item pointers...
-            //les	di, ss:[di-0x1C0]
-            //add	di, 0x0CC
-            //push	es
-            //push	di
-            //les	di, int ptr [bp+player.offset]
-            //add	di, 0x151
-            //push	es
-            //push	di
-            //mov	ax, 0x34
-            //push	ax
-            //call	Move(Any &,Any &,Word)
-
-            player.weaponsHandsUsed = bp_var_1C0.field_100;
-            player.field_186 = (sbyte)bp_var_1C0.field_101;
-            player.weight = bp_var_1C0.field_102;
-
-            player.health_status = (Status)bp_var_1C0.field_10C;
-            player.in_combat = bp_var_1C0.field_10D != 0;
-            player.combat_team = (CombatTeam)bp_var_1C0.field_10E;
-            player.hitBonus = bp_var_1C0.field_110;
-
-            player.ac = bp_var_1C0.field_111;
-            player.ac_behind = bp_var_1C0.field_112;
-
-            player.attack1_AttacksLeft = bp_var_1C0.field_113;
-            player.attack2_AttacksLeft = bp_var_1C0.field_114;
-
-            player.attack1_DiceCount = bp_var_1C0.field_115;
-            player.attack2_DiceCount = bp_var_1C0.field_116;
-
-            player.attack1_DiceSize = bp_var_1C0.field_117;
-            player.attack2_DiceSize = bp_var_1C0.field_118;
-
-            player.attack1_DamageBonus = (sbyte)bp_var_1C0.field_119;
-            player.attack2_DamageBonus = bp_var_1C0.field_11A;
-            player.hit_point_current = bp_var_1C0.field_11B;
-            player.movement = (byte)bp_var_1C0.field_11C;
-
-            return player;
         }
 
 
@@ -483,8 +333,9 @@ namespace engine
     ClassId.unknown};
 
 
-        internal static void import_char01(ref Player player, string arg_8)
+        internal static Player import_char01(string arg_8)
         {
+            Player player = null;
             Classes.File file;
 
             seg042.find_and_open_file(out file, false, Path.Combine(Config.GetSavePath(), arg_8));
@@ -498,8 +349,7 @@ namespace engine
                 seg051.BlockRead(Player.StructSize, data, file);
                 seg051.Close(file);
 
-                player = new Player(data, 0);
-
+                player = new CursePlayer(data, 0).Load();
             }
             else if (gbl.import_from == ImportSource.Pool)
             {
@@ -507,9 +357,7 @@ namespace engine
                 seg051.BlockRead(PoolRadPlayer.StructSize, data, file);
                 seg051.Close(file);
 
-                PoolRadPlayer poolRadPlayer = new PoolRadPlayer(data);
-
-                player = ConvertPoolRadPlayer(poolRadPlayer);
+                player = new PoolRadPlayer(data).Load();
             }
             else if (gbl.import_from == ImportSource.Hillsfar)
             {
@@ -565,9 +413,7 @@ namespace engine
                 {
                     if (seg051.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
                     {
-                        Affect tmp_affect = new Affect(data, 0);
-
-                        player.affects.Add(new Affect(data, 0));
+                        new CurseAffect(data, 0).Load(player);
                     }
                     else
                     {
@@ -610,6 +456,8 @@ namespace engine
             seg043.clear_keyboard();
             ovr025.reclac_player_values(player);
             ovr026.ReclacClassBonuses(player);
+
+            return player;
         }
 
 
@@ -635,7 +483,7 @@ namespace engine
                 seg051.BlockRead(Player.StructSize, data, file);
                 seg051.Close(file);
 
-                player = new Player(data, 0);
+                player = new CursePlayer(data, 0).Load();
 
                 Player PreviousSelectedPlayer = gbl.SelectedPlayer;
                 gbl.SelectedPlayer = player;
@@ -693,9 +541,7 @@ namespace engine
                     seg051.BlockRead(PoolRadPlayer.StructSize, data, file);
                     seg051.Close(file);
 
-                    PoolRadPlayer poolRadPlayer = new PoolRadPlayer(data);
-
-                    player = ConvertPoolRadPlayer(poolRadPlayer);
+                    player = new PoolRadPlayer(data).Load();
 
                     Player PreviousSelectedPlayer = gbl.SelectedPlayer;
                     gbl.SelectedPlayer = player;
@@ -842,7 +688,7 @@ namespace engine
                 }
             }
 
-            Player player = new Player(data, 0);
+            Player player = new CursePlayer(data, 0).Load();
 
             seg042.load_decode_dax(out data, out decode_size, monster_id, "MON" + area_text + "SPC.dax");
 
@@ -852,8 +698,7 @@ namespace engine
 
                 do
                 {
-                    Affect affect = new Affect(data, offset);
-                    player.affects.Add(affect);
+                    new CurseAffect(data, offset).Load(player);
 
                     offset += 9;
                 } while (offset < decode_size);
@@ -1040,9 +885,7 @@ namespace engine
 
                 if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".sav")) == true)
                 {
-                    Player player = new Player();
-
-                    import_char01(ref player, var_1F6 + ".sav");
+                    Player player = import_char01(var_1F6 + ".sav");
                     AssignPlayerIconId(player);
                 }
             }

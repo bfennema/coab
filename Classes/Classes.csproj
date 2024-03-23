@@ -128,12 +128,15 @@
     <Compile Include="AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="BiLookup.cs" />
     <Compile Include="Cheats.cs" />
     <Compile Include="ClassStatsMin.cs" />
     <Compile Include="Combat.cs" />
     <Compile Include="Combat\CombatantMap.cs" />
     <Compile Include="Combat\CombatIcon.cs" />
     <Compile Include="Combat\CombatPlayerIndex.cs" />
+    <Compile Include="CurseAffect.cs" />
+    <Compile Include="CursePlayer.cs" />
     <Compile Include="DataIO.cs" />
     <Compile Include="DaxFiles\DaxArray.cs" />
     <Compile Include="DaxFiles\DaxBlock.cs">
