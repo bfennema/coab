@@ -1181,7 +1181,7 @@ namespace engine
 		}
 
 
-		internal static void sub_3BE06(Effect arg_0, object param, Player player)
+		internal static void AffectDelayDeath(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 			affect.callAffectTable = false;
@@ -1265,7 +1265,7 @@ namespace engine
 			if (heal_amount > 0 &&
 				ovr024.combat_heal(heal_amount, player) == true)
 			{
-				ovr024.add_affect(true, 0xff, (ushort)(ovr024.roll_dice(4, 1) + 1), Affects.affect_5F, player);
+				ovr024.add_affect(true, 0xff, (ushort)(ovr024.roll_dice(4, 1) + 1), Affects.delay_death, player);
 				arg_2.callAffectTable = false;
 				ovr024.remove_affect(arg_2, Affects.fight_unconscious, player);
 			}
@@ -1878,7 +1878,7 @@ namespace engine
 			affect_table.Add(Affects.affect_5c, ovr013.empty);
 			affect_table.Add(Affects.half_fire, ovr013.half_fire_damage);
 			affect_table.Add(Affects.resist_blunt_pierce, ovr013.AffectResistBluntPierce);
-			affect_table.Add(Affects.affect_5F, ovr013.sub_3BE06);
+			affect_table.Add(Affects.delay_death, ovr013.AffectDelayDeath);
 			affect_table.Add(Affects.owlbear_hug_check, ovr014.AffectOwlbearHugAttackCheck);
 			affect_table.Add(Affects.con_saving_bonus, ovr013.con_saving_bonus);
 			affect_table.Add(Affects.regen_3_hp, ovr013.AffectRegen3Hp);
