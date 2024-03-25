@@ -99,7 +99,7 @@ namespace Classes
         affect_5c = 0x5c,
         half_fire = 0x5d,
         resist_blunt_pierce = 0x5e,
-        affect_5F = 0x5f,
+        delay_death = 0x5f,
         owlbear_hug_check = 0x60,
         con_saving_bonus = 0x61,
         regen_3_hp = 0x62,

@@ -689,7 +689,7 @@ namespace engine
 								  Affects.sleep,
 								  Affects.clear_movement,
 								  Affects.regenerate,
-								  Affects.affect_5F,
+								  Affects.delay_death,
 								  Affects.regen_3_hp,
 								  Affects.entangle,
 								  Affects.affect_89,
