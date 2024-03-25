@@ -2540,13 +2540,13 @@ namespace engine
 				if (input_key == 'H')
 				{
 					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.hot_fire_shield, gbl.SelectedPlayer);
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.protect_elec, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.fire_shield_damage, gbl.SelectedPlayer);
 					var_3 = true;
 				}
 				else if (input_key == 'C')
 				{
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.cold_fire_shield, gbl.SelectedPlayer);
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.protect_elec, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.cold_fire_shield, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.fire_shield_damage, gbl.SelectedPlayer);
 					var_3 = true;
 				}
 				else
