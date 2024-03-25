@@ -690,14 +690,14 @@ namespace engine
 								  Affects.affect_5F,
 								  Affects.regen_3_hp,
 								  Affects.entangle,
-								  Affects.affect_89,
+								  Affects.confuse_berserk,
 								  Affects.affect_8b,
 								  Affects.owlbear_hug_round_attack
 							  };
 
             System.Array.ForEach(table, affect => remove_affect(null, affect, player));
 
-            if (player.HasAffect(Affects.berserk) == true && player.control_morale == Control.PC_Berzerk)
+            if (player.HasAffect(Affects.berserk) == true && player.control_morale == Control.PC_Berserk)
             {
                 player.combat_team = CombatTeam.Ours;
             }

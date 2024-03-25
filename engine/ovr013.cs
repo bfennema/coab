@@ -174,7 +174,7 @@ namespace engine
 			{
 				player.combat_team = (CombatTeam)((affect.affect_data & 0x40) >> 6);
 
-				if (player.control_morale == Control.PC_Berzerk)
+				if (player.control_morale == Control.PC_Berserk)
 				{
 					player.control_morale = Control.PC_Base;
 				}
@@ -190,7 +190,7 @@ namespace engine
 
 					if (player.control_morale < Control.NPC_Base)
 					{
-						player.control_morale = Control.PC_Berzerk;
+						player.control_morale = Control.PC_Berserk;
 					}
 
 					player.actions.target = null;
@@ -430,7 +430,7 @@ namespace engine
 			player.attackLevel = (byte)player.SkillLevel(SkillType.Fighter, SkillType.Paladin, SkillType.Ranger);
 			player.base_movement = 0x0C;
 
-			if (player.control_morale == Control.PC_Berzerk)
+			if (player.control_morale == Control.PC_Berserk)
 			{
 				player.control_morale = Control.PC_Base;
 			}
@@ -469,7 +469,7 @@ namespace engine
 
 				if (player.control_morale < Control.NPC_Base)
 				{
-					player.control_morale = Control.PC_Berzerk;
+					player.control_morale = Control.PC_Berserk;
 				}
 
 				player.actions.target = null;
@@ -484,8 +484,8 @@ namespace engine
 			}
 			else if (var_1 >= 61 && var_1 <= 80)
 			{
-				ovr024.ApplyAttackSpellAffect("goes berserk", false, DamageOnSave.Zero, true, (byte)player.combat_team, 1, Affects.affect_89, player);
-				ovr013.CallAffectTable(Effect.Add, null, player, Affects.affect_89);
+				ovr024.ApplyAttackSpellAffect("goes berserk", false, DamageOnSave.Zero, true, (byte)player.combat_team, 1, Affects.confuse_berserk, player);
+				ovr013.CallAffectTable(Effect.Add, null, player, Affects.confuse_berserk);
 			}
 			else if (var_1 >= 81 && var_1 <= 100)
 			{
@@ -980,13 +980,13 @@ namespace engine
 				player.quick_fight = QuickFight.True;
 
 				if (player.control_morale < Control.NPC_Base ||
-					player.control_morale == Control.PC_Berzerk)
+					player.control_morale == Control.PC_Berserk)
 				{
-					player.control_morale = Control.PC_Berzerk;
+					player.control_morale = Control.PC_Berserk;
 				}
 				else
 				{
-					player.control_morale = Control.NPC_Berzerk;
+					player.control_morale = Control.NPC_Berserk;
 				}
 
 				if (gbl.game_state == GameState.Combat)
@@ -1000,12 +1000,12 @@ namespace engine
 					player.actions.can_cast = false;
 					player.combat_team = player.actions.target.OppositeTeam();
 
-					ovr025.DisplayPlayerStatusString(true, 10, "goes berzerk", player);
+					ovr025.DisplayPlayerStatusString(true, 10, "goes berserk", player);
 				}
 			}
 			else
 			{
-				if (player.control_morale == Control.PC_Berzerk)
+				if (player.control_morale == Control.PC_Berserk)
 				{
 					player.control_morale = Control.PC_Base;
 				}
@@ -1670,7 +1670,7 @@ namespace engine
 		}
 
 
-		internal static void sub_3C7E0(Effect arg_0, object param, Player player) // sub_3C7E0
+		internal static void AffectConfuseBerserk(Effect arg_0, object param, Player player) // sub_3C7E0
 		{
 			Affect affect = (Affect)param;
 
@@ -1679,13 +1679,13 @@ namespace engine
 				player.quick_fight = QuickFight.True;
 
 				if (player.control_morale < Control.NPC_Base ||
-					player.control_morale == Control.PC_Berzerk)
+					player.control_morale == Control.PC_Berserk)
 				{
-					player.control_morale = Control.PC_Berzerk;
+					player.control_morale = Control.PC_Berserk;
 				}
 				else
 				{
-					player.control_morale = Control.NPC_Berzerk;
+					player.control_morale = Control.NPC_Berserk;
 				}
 
 				player.actions.target = null;
@@ -1697,7 +1697,7 @@ namespace engine
 			}
 			else
 			{
-				if (player.control_morale == Control.PC_Berzerk)
+				if (player.control_morale == Control.PC_Berserk)
 				{
 					player.control_morale = 0;
 				}
@@ -1726,7 +1726,7 @@ namespace engine
 		{
 			if (add_remove == Effect.Remove)
 			{
-				if (player.control_morale == Control.PC_Berzerk)
+				if (player.control_morale == Control.PC_Berserk)
 				{
 					player.control_morale = Control.PC_Base;
 					player.quick_fight = QuickFight.False;
@@ -1920,7 +1920,7 @@ namespace engine
 			affect_table.Add(Affects.ranger_vs_giant, ovr013.AffectRangerVsGiant);
 			affect_table.Add(Affects.protect_elec, ovr013.AffectProtElec);
 			affect_table.Add(Affects.entangle, ovr013.AffectEntangle);
-			affect_table.Add(Affects.affect_89, ovr013.sub_3C7E0);
+			affect_table.Add(Affects.confuse_berserk, ovr013.AffectConfuseBerserk);
 			affect_table.Add(Affects.add_invisibility, ovr013.AffectAddInvisibility);
 			affect_table.Add(Affects.affect_8b, ovr014.sub_425C6);
 			affect_table.Add(Affects.paladinDailyHealCast, ovr013.empty);

@@ -1551,11 +1551,11 @@ namespace engine
 
 						if (player.control_morale >= Control.NPC_Base)
 						{
-							player.control_morale = Control.NPC_Berzerk;
+							player.control_morale = Control.NPC_Berserk;
 						}
 						else
 						{
-							player.control_morale = Control.PC_Berzerk;
+							player.control_morale = Control.PC_Berserk;
 						}
 
 						player.monsterType = MonsterType.animated_dead;
@@ -2500,7 +2500,7 @@ namespace engine
 
 					if (target.control_morale < Control.NPC_Base)
 					{
-						target.control_morale = Control.PC_Berzerk;
+						target.control_morale = Control.PC_Berserk;
 					}
 
 					target.actions.target = null;

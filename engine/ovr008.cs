@@ -1333,7 +1333,7 @@ namespace engine
                 DuelMaster.quick_fight = QuickFight.True;
                 DuelMaster.combat_team = CombatTeam.Enemy;
 
-                DuelMaster.control_morale = Control.NPC_Berzerk;
+                DuelMaster.control_morale = Control.NPC_Berserk;
                 DuelMaster.icon_id = gbl.monster_icon_id;
 
                 DuelMaster.affects = new List<Affect>();

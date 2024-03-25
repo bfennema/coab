@@ -159,7 +159,7 @@ namespace engine
 											Affects.clear_movement,
 											Affects.affect_in_cloud_kill,
 											Affects.entangle,
-											Affects.affect_89,
+											Affects.confuse_berserk,
 											Affects.affect_8b,
 											Affects.fear,
 											Affects.owlbear_hug_round_attack,

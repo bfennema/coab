@@ -140,7 +140,7 @@ namespace engine
             foreach (Player player in gbl.TeamList)
             {
                 if (player.control_morale == Control.PC_Base ||
-                    player.control_morale == Control.PC_Berzerk)
+                    player.control_morale == Control.PC_Berserk)
                 {
                     gbl.pooled_money += player.Money;
                     for (int coin = 0; coin < 7; coin++)
@@ -160,7 +160,7 @@ namespace engine
             foreach (Player player in gbl.TeamList)
             {
                 if (player.control_morale == Control.PC_Base ||
-                    player.control_morale == Control.PC_Berzerk)
+                    player.control_morale == Control.PC_Berserk)
                 {
                     count++;
                 }
