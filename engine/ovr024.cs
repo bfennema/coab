@@ -194,7 +194,7 @@ namespace engine
                     calc_affect_effect(Affects.resist_fire_and_cold, player);
                     calc_affect_effect(Affects.resist_piercing, player);
                     calc_affect_effect(Affects.vuln_blessed_quarrel, player);
-                    calc_affect_effect(Affects.affect_8f, player);
+                    calc_affect_effect(Affects.fire_shield_damage, player);
                     break;
 
                 case CheckType.PreDamage:

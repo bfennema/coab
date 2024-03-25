@@ -1737,7 +1737,7 @@ namespace engine
 		}
 
 
-		internal static void sub_3C975(Effect arg_0, object arg_2, Player target)
+		internal static void AffectFireShieldDamage(Effect arg_0, object arg_2, Player target)
 		{
 			if (ovr025.getTargetRange(target, gbl.SelectedPlayer) < 2)
 			{
@@ -1747,7 +1747,7 @@ namespace engine
 				gbl.damage *= 2;
 				gbl.damage_flags = DamageType.Magic;
 
-				ovr025.DisplayPlayerStatusString(true, 10, "resists dispel evil", gbl.SelectedPlayer);
+				ovr025.DisplayPlayerStatusString(true, 10, "gets zapped", gbl.SelectedPlayer);
 
 				ovr024.damage_person(false, 0, gbl.damage, gbl.SelectedPlayer);
 				gbl.damage = bkup_damage;
@@ -1926,7 +1926,7 @@ namespace engine
 			affect_table.Add(Affects.paladinDailyHealCast, ovr013.empty);
 			affect_table.Add(Affects.paladinDailyCureRefresh, ovr013.PaladinCastCureRefresh);
 			affect_table.Add(Affects.fear, ovr013.AffectFear);
-			affect_table.Add(Affects.affect_8f, ovr013.sub_3C975);
+			affect_table.Add(Affects.fire_shield_damage, ovr013.AffectFireShieldDamage);
 			affect_table.Add(Affects.owlbear_hug_round_attack, ovr014.AffectOwlbearHugRoundAttack);
 			affect_table.Add(Affects.dispel_evil_banish, ovr013.AffectDispelEvilBanish);
 			affect_table.Add(Affects.strength_spell, ovr013.empty);

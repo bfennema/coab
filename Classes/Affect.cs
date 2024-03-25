@@ -149,7 +149,7 @@ namespace Classes
         paladinDailyHealCast = 0x8c,
         paladinDailyCureRefresh = 0x8d,
         fear = 0x8e,
-        affect_8f = 0x8f,
+        fire_shield_damage = 0x8f,
         owlbear_hug_round_attack = 0x90,
         dispel_evil_banish = 0x91,
         strength_spell = 0x92,
