@@ -996,7 +996,7 @@ namespace engine
                     if (rangedWeapon.count == 0)
                     {
                         if (ovr025.is_weapon_ranged_melee(attacker) == true &&
-                            rangedWeapon.affect_3 != Affects.affect_89)
+                            rangedWeapon.affect_3 != Affects.confuse_berserk)
                         {
                             Item new_item = rangedWeapon.ShallowClone();
                             new_item.readied = false;

@@ -143,7 +143,7 @@ namespace Classes
         girdle_of_dwarves = 0x86,
         protect_elec = 0x87,
         entangle = 0x88,
-        affect_89 = 0x89,
+        confuse_berserk = 0x89,
         add_invisibility = 0x8a,
         affect_8b = 0x8b,
         paladinDailyHealCast = 0x8c,
