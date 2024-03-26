@@ -202,19 +202,12 @@ namespace Classes.PoolRad
             player.name = name;
 
             player.stats2.Str.Load(stat_str);
-            player.stats2.Str.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Int.Load(stat_int);
-            player.stats2.Int.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Wis.Load(stat_wis);
-            player.stats2.Wis.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Dex.Load(stat_dex);
-            player.stats2.Dex.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Con.Load(stat_con);
-            player.stats2.Con.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Cha.Load(stat_cha);
-            player.stats2.Cha.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Str00.Load(stat_str00);
-            player.stats2.Str00.EnforceRaceSexLimits(player.race, sex);
 
             player.spellList.Load(field_17, 0, 21);
 

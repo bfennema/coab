@@ -203,7 +203,7 @@ namespace engine
 
                 foreach (Affect affect in player.affects)
                 {
-                    gbl.file.BlockWrite(Affect.StructSize, new Classes.Curse.Affect(affect).Save(), file);
+                    gbl.file.BlockWrite(Affect.StructSize, new Classes.Curse.Affect(affect, player).Save(), file);
                 }
 
                 gbl.file.Close(file);
@@ -326,9 +326,6 @@ namespace engine
         }
 
 
-        static Set asc_49280 = new Set(18, 26, 47, 48, 97, 107, 124);
-
-
         static ClassId[] HillsFarClassMap = {
     ClassId.unknown,    ClassId.thief,      ClassId.fighter,    ClassId.mc_f_t, ClassId.magic_user,
     ClassId.mc_mu_t,    ClassId.mc_f_mu,    ClassId.mc_f_mu_t,  ClassId.cleric, ClassId.mc_c_t,
@@ -440,11 +437,7 @@ namespace engine
                     {
                         if (gbl.file.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
                         {
-                            if (asc_49280.MemberOf(data[0]) == true)
-                            {
-                                Affect tmpAffect = new Affect(data, 0);
-                                player.affects.Add(tmpAffect);
-                            }
+                            new Classes.PoolRad.Affect(data, 0).Load(player);
                         }
                         else
                         {
@@ -455,6 +448,16 @@ namespace engine
                     gbl.file.Close(file);
 
                 }
+
+                ovr024.CalcStatBonuses(Stat.STR, player);
+                ovr024.CalcStatBonuses(Stat.CHA, player);
+                player.stats2.Str.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Int.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Wis.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Dex.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Con.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Cha.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Str00.EnforceRaceSexLimits(player.race, player.sex);
             }
 
             seg043.clear_keyboard();
