@@ -355,6 +355,9 @@ namespace engine
                 seg051.Close(file);
 
                 player = new PoolRadPlayer(data).Load();
+                player.spellBook.UnlearnSpell(Spells.animate_dead);
+                player.Money.ClearAll();
+                player.Money.SetCoins(Money.Platinum, 300);
             }
             else if (gbl.import_from == ImportSource.Hillsfar)
             {
@@ -545,6 +548,9 @@ namespace engine
                     seg051.Close(file);
 
                     player = new PoolRadPlayer(data).Load();
+                    player.spellBook.UnlearnSpell(Spells.animate_dead);
+                    player.Money.ClearAll();
+                    player.Money.SetCoins(Money.Platinum, 300);
 
                     Player PreviousSelectedPlayer = gbl.SelectedPlayer;
                     gbl.SelectedPlayer = player;
