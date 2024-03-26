@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Classes
 {
     public enum CurseAffects
@@ -338,11 +336,11 @@ namespace Classes
             callAffectTable = (data[offset + 0x4] != 0);
         }
 
-        public CurseAffect(Affect affect)
+        public CurseAffect(Affect affect, Player player)
         {
             if (mapping == null) { InitMapping(); }
 
-            type = mapping[affect.type].First();
+            type = mapping[affect.type][0];
             minutes = affect.minutes;
             affect_data = affect.affect_data;
             callAffectTable = affect.callAffectTable;
@@ -352,7 +350,7 @@ namespace Classes
         {
             if (mapping == null) { InitMapping(); }
 
-            Affect affect = new Affect(mapping[type].First(), minutes, affect_data, callAffectTable);
+            Affect affect = new Affect(mapping[type][0], minutes, affect_data, callAffectTable);
 
             player.affects.Add(affect);
         }

@@ -119,14 +119,14 @@ namespace Classes
             }
         }
 
-        public void Save(byte[] data, int offset)
+        public void Save(byte[] data, int offset, int size = SpellListSize)
         {
-            for (int i = 0; i < SpellListSize; i++)
+            for (int i = 0; i < size; i++)
             {
                 data[offset + i] = 0;
             }
 
-            int idx = SpellListSize - 1;
+            int idx = size - 1;
             foreach (var sp in spells)
             {
                 if (sp.Learning == false)

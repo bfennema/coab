@@ -1,11 +1,12 @@
-using System.Collections.Generic;
-
 namespace Classes
 {
     public enum PoolRadAffects
     {
+        enlarge = 0xc,
+        friends = 0xe,
         gnome_vs_goblin_kobold = 0x12,
         dwarf_vs_orc = 0x1a,
+        strength = 0x26,
         dwarf_and_gnome_vs_giants = 0x2f,
         gnome_vs_gnoll = 0x30,
         con_saving_bonus = 0x61,
@@ -53,16 +54,63 @@ namespace Classes
             callAffectTable = (data[offset + 0x4] != 0);
         }
 
+        public PoolRadAffect(Affect affect, Player player)
+        {
+            if (mapping == null) { InitMapping(); }
+
+            type = mapping[affect.type][0];
+            minutes = affect.minutes;
+            if (type == PoolRadAffects.enlarge)
+            {
+                if (player.stats2.Str.cur == 18)
+                {
+                    affect_data = (byte)(player.stats2.Str00.cur + 1);
+                }
+                else
+                {
+                    affect_data = (byte)(player.stats2.Str.cur + 100);
+                }
+            }
+            else if (type == PoolRadAffects.friends)
+            {
+                affect_data = (byte)player.stats2.Cha.cur;
+            }
+            affect_data = affect.affect_data;
+            callAffectTable = affect.callAffectTable;
+
+        }
+
         public void Load(Player player)
         {
             if (mapping == null) { InitMapping(); }
 
-            IList<Affects> new_type = mapping[type];
-
-            if (new_type.Count == 1)
+            if (mapping[type].Count == 1)
             {
-                Affect affect = new Affect(new_type[0], minutes, affect_data, callAffectTable);
+                Affect affect = new Affect(mapping[type][0], minutes, affect_data, callAffectTable);
                 player.affects.Add(affect);
+            }
+            else if (type == PoolRadAffects.friends)
+            {
+                player.stats2.Cha.cur = affect_data;
+            }
+            else if (type == PoolRadAffects.strength || type == PoolRadAffects.enlarge)
+            {
+                int str_00 = 0;
+                int str = (int)(affect_data & 0x7F);
+
+                if (str <= 101)
+                {
+                    str_00 = str - 1;
+                    str = 18;
+                }
+                else
+                {
+                    str -= 100;
+                    str_00 = 0;
+                }
+
+                player.stats2.Str.cur = str;
+                player.stats2.Str00.cur = str_00;
             }
         }
 
@@ -75,7 +123,7 @@ namespace Classes
         [DataOffset(0x04, DataType.Bool)]
         public bool callAffectTable;
 
-        public byte[] ToByteArray()
+        public byte[] Save()
         {
             byte[] data = new byte[StructSize];
 
