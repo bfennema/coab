@@ -873,7 +873,7 @@ namespace engine
 
                     if (stat_index == Stat.STR)
                     {
-                        if (var_12 == 3 && (int)item.affect_2 == 0) // Gauntlets of Ogre Power
+                        if (var_12 == 3 && ((int)item.affect_2 == 0 || (PoolRadAffects)item.affect_2 == PoolRadAffects.strength)) // Gauntlets of Ogre Power
                         {
                             stat_b = 18;
                             str_00_b = 100;
