@@ -340,7 +340,6 @@ namespace Classes
             player.hit_point_max = hp_max;
 
             player.spellBook.Load(field_33, 56);
-            player.spellBook.UnlearnSpell(Spells.animate_dead);
 
             player.attackLevel = field_6B;
             player.icon_dimensions = icon_dimensions;
@@ -362,7 +361,13 @@ namespace Classes
             player.field_F9 = field_86;
             player.field_FA = field_87;
 
-            player.Money.SetCoins(Money.Platinum, 300);
+            player.Money.SetCoins(Money.Copper, field_88);
+            player.Money.SetCoins(Money.Silver, field_8A);
+            player.Money.SetCoins(Money.Electrum, field_8C);
+            player.Money.SetCoins(Money.Gold, field_8E);
+            player.Money.SetCoins(Money.Platinum, field_90);
+            player.Money.SetCoins(Money.Gems, field_92);
+            player.Money.SetCoins(Money.Jewelry, field_94);
 
             System.Array.Copy(field_96, player.ClassLevel, 8);
 
