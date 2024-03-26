@@ -220,7 +220,7 @@ namespace Classes.Curse
 
             player.stats2.Save(stats);
 
-            player.spellList.Save(memorizedSpells, 0);
+            player.spellList.Save(memorizedSpells, 0, memorizedSpells.Length);
             spell_to_learn_count = player.spell_to_learn_count;
             thac0 = player.thac0;
 

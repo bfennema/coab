@@ -191,7 +191,7 @@ namespace Classes.Curse
             callAffectTable = (data[offset + 0x4] != 0);
         }
 
-        public Affect(Classes.Affect affect)
+        public Affect(Classes.Affect affect, Classes.Player player)
         {
             type = mapping[affect.type][0];
             minutes = affect.minutes;
