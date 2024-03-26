@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
-
 namespace Classes
 {
     public class PoolRadPlayer
@@ -203,15 +199,15 @@ namespace Classes
 
             name = player.name;
 
-            stat_str = (byte)player.stats2.Str.cur;
-            stat_int = (byte)player.stats2.Int.cur;
-            stat_wis = (byte)player.stats2.Wis.cur;
-            stat_dex = (byte)player.stats2.Dex.cur;
-            stat_con = (byte)player.stats2.Con.cur;
-            stat_cha = (byte)player.stats2.Cha.cur;
-            stat_str00 = (byte)player.stats2.Str00.cur;
+            stat_str = (byte)player.stats2.Str.full;
+            stat_int = (byte)player.stats2.Int.full;
+            stat_wis = (byte)player.stats2.Wis.full;
+            stat_dex = (byte)player.stats2.Dex.full;
+            stat_con = (byte)player.stats2.Con.full;
+            stat_cha = (byte)player.stats2.Cha.full;
+            stat_str00 = (byte)player.stats2.Str00.full;
 
-            player.spellList.Save(field_17, 21);
+            player.spellList.Save(field_17, 0, field_17.Length);
 
             thac0 = player.thac0;
             _class = (byte)player._class;
@@ -329,19 +325,12 @@ namespace Classes
             player.name = name;
 
             player.stats2.Str.Load(stat_str);
-            player.stats2.Str.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Int.Load(stat_int);
-            player.stats2.Int.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Wis.Load(stat_wis);
-            player.stats2.Wis.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Dex.Load(stat_dex);
-            player.stats2.Dex.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Con.Load(stat_con);
-            player.stats2.Con.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Cha.Load(stat_cha);
-            player.stats2.Cha.EnforceRaceSexLimits(player.race, sex);
             player.stats2.Str00.Load(stat_str00);
-            player.stats2.Str00.EnforceRaceSexLimits(player.race, sex);
 
             player.spellList.Load(field_17, 0, 21);
 
@@ -465,7 +454,7 @@ namespace Classes
             return player;
         }
 
-        byte[] Save(Player player)
+        public byte[] Save()
         {
             byte[] data = new byte[StructSize];
 

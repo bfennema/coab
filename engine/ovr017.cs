@@ -201,7 +201,7 @@ namespace engine
 
                 foreach (Affect affect in player.affects)
                 {
-                    seg051.BlockWrite(Affect.StructSize, new CurseAffect(affect).Save(), file);
+                    seg051.BlockWrite(Affect.StructSize, new CurseAffect(affect, player).Save(), file);
                 }
 
                 seg051.Close(file);
@@ -444,6 +444,16 @@ namespace engine
                     seg051.Close(file);
 
                 }
+
+                ovr024.CalcStatBonuses(Stat.STR, player);
+                ovr024.CalcStatBonuses(Stat.CHA, player);
+                player.stats2.Str.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Int.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Wis.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Dex.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Con.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Cha.EnforceRaceSexLimits(player.race, player.sex);
+                player.stats2.Str00.EnforceRaceSexLimits(player.race, player.sex);
             }
 
             seg043.clear_keyboard();
