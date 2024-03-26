@@ -323,9 +323,6 @@ namespace engine
         }
 
 
-        static Set asc_49280 = new Set(18, 26, 47, 48, 97, 107, 124);
-
-
         static ClassId[] HillsFarClassMap = {
     ClassId.unknown,    ClassId.thief,      ClassId.fighter,    ClassId.mc_f_t, ClassId.magic_user,
     ClassId.mc_mu_t,    ClassId.mc_f_mu,    ClassId.mc_f_mu_t,  ClassId.cleric, ClassId.mc_c_t,
@@ -436,11 +433,7 @@ namespace engine
                     {
                         if (seg051.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
                         {
-                            if (asc_49280.MemberOf(data[0]) == true)
-                            {
-                                Affect tmpAffect = new Affect(data, 0);
-                                player.affects.Add(tmpAffect);
-                            }
+                            new PoolRadAffect(data, 0).Load(player);
                         }
                         else
                         {

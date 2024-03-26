@@ -171,6 +171,7 @@
     <Compile Include="Player.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="PoolRadAffect.cs" />
     <Compile Include="PoolRadPlayer.cs" />
     <Compile Include="RestTime.cs" />
     <Compile Include="Set.cs">
