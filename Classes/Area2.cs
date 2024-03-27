@@ -11,13 +11,21 @@ namespace Classes
 
         public Area2()
         {
+            constructorInit();
         }
 
         public Area2(byte[] data, int offset)
         {
+            constructorInit();
+
             DataIO.ReadObject(this, data, offset);
 
             System.Array.Copy(data, offset, origData, 0, Area2Size);
+        }
+
+        private void constructorInit()
+        {
+            origData = new byte[Area2Size];
         }
 
         public void Clear()
@@ -27,7 +35,7 @@ namespace Classes
             DataIO.ReadObject(this, origData, 0);
         }
 
-        protected byte[] origData = new byte[Area2Size];
+        protected byte[] origData;
 
         [DataOffset(0x170, DataType.Word)]
         public ushort field_170; // 0x170
@@ -150,9 +158,9 @@ namespace Classes
 
         public byte[] ToByteArray()
         {
-            byte[] data = new byte[0x800];
-            DataIO.WriteObject(this, data);
-            return data;
+            DataIO.WriteObject(this, origData);
+
+            return (byte[])origData.Clone();
         }
 
         public ushort field_800_Get(int index)
