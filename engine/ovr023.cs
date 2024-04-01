@@ -2,6 +2,7 @@ using Classes;
 using System;
 using System.Collections.Generic;
 using Classes.Combat;
+using static Classes.Item;
 
 namespace engine
 {
@@ -2932,7 +2933,7 @@ namespace engine
 
 				if (player.HasAffect(Affects.reflectable_gaze) == true)
 				{
-					Item item = gbl.spell_target.items.Find(i => i.readied && (i.namenum1 == 0x76 || i.namenum2 == 0x76 || i.namenum3 == 0x76));
+					Item item = gbl.spell_target.items.Find(i => i.readied && (i.namenum[0] == ItemNames.Mirror || i.namenum[1] == ItemNames.Mirror || i.namenum[2] == ItemNames.Mirror));
 
 					if (item != null)
 					{
@@ -3235,8 +3236,8 @@ namespace engine
 			if (affect_index != 0)
 			{
 				item.setAffect(affect_index, 0);
-				item.namenum2 -= 1;
-				if (item.namenum2 < 0xd2)
+				item.namenum[1] -= 1;
+				if (item.namenum[2] < ItemNames.With_1_Spell)
 				{
 					ovr025.lose_item(item, player);
 				}
