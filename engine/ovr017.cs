@@ -187,7 +187,7 @@ namespace engine
                 file = await gbl.file.Create(Config.SavePath, string.Format("{0}.SWG", file_text));
                 gbl.file.Rewrite(file);
 
-                player.items.ForEach(item => gbl.file.BlockWrite(Item.StructSize, item.ToByteArray(), file));
+                player.items.ForEach(item => gbl.file.BlockWrite(Classes.Curse.Item.StructSize, new Classes.Curse.Item(item).Save(), file));
 
                 gbl.file.Close(file);
             }
@@ -203,7 +203,7 @@ namespace engine
 
                 foreach (Affect affect in player.affects)
                 {
-                    gbl.file.BlockWrite(Affect.StructSize, new Classes.Curse.Affect(affect, player).Save(), file);
+                    gbl.file.BlockWrite(Classes.Curse.Affect.StructSize, new Classes.Curse.Affect(affect, player).Save(), file);
                 }
 
                 gbl.file.Close(file);
@@ -392,7 +392,7 @@ namespace engine
                 {
                     if (gbl.file.BlockRead(Item.StructSize, data, file) == Item.StructSize)
                     {
-                        player.items.Add(new Item(data, 0));
+                        player.items.Add(new Classes.Curse.Item(data, 0).Load());
                     }
                     else
                     {
@@ -501,7 +501,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.helpless, (Affects)hf_player.field_1D,
                         (short)(hf_player.field_1D * 200), 0, 0,
-                        false, 0, false, 0, 0, 0x57, 0xa7, 0xa8, ItemType.GemsJewelry, true);
+                        false, 0, false, 0, 0, Classes.Item.Names.Chime, Classes.Item.Names.of, Classes.Item.Names.Vulnerability, ItemType.GemsJewelry, true);
 
                     player.items.Add(newItem);
                 }
@@ -510,7 +510,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.poison_plus_4, (Affects)hf_player.field_23,
                         (short)(hf_player.field_23 * 0x15E), 0, 1,
-                        false, 0, false, 0, 1, 0x45, 0xa7, 0xce, ItemType.WandB, true);
+                        false, 0, false, 0, 1, Classes.Item.Names.Wand, Classes.Item.Names.of, Classes.Item.Names.Magic_Missiles, ItemType.WandB, true);
 
                     player.items.Add(newItem);
                 }
@@ -519,7 +519,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.helpless, (Affects)hf_player.field_86,
                         (short)(hf_player.field_86 * 0xc8), 0, 0,
-                        false, 0, false, 0, 0, 0x42, 0xa7, 0xa8, ItemType.Ring, true);
+                        false, 0, false, 0, 0, Classes.Item.Names.Ring, Classes.Item.Names.of, Classes.Item.Names.Vulnerability, ItemType.Ring, true);
 
                     player.items.Add(newItem);
                 }
@@ -528,7 +528,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.highConRegen, (Affects)hf_player.field_87,
                         (short)(hf_player.field_87 * 0x190), 0, (short)(hf_player.field_87 * 10),
-                        false, 0, false, 0, 0, 0x40, 0xa7, 0xb9, ItemType.GemsJewelry, true);
+                        false, 0, false, 0, 0, Classes.Item.Names.Potion, Classes.Item.Names.of, Classes.Item.Names.Healing, ItemType.GemsJewelry, true);
 
                     player.items.Add(newItem);
                 }
@@ -715,7 +715,7 @@ namespace engine
             {
                 for (int offset = 0; offset < decode_size; offset += Item.StructSize)
                 {
-                    player.items.Add(new Item(data, offset));
+                    player.items.Add(new Classes.Curse.Item(data, offset).Load());
                 }
             }
 
@@ -773,7 +773,7 @@ namespace engine
             }
         }
 
-        static Set save_game_keys = new Set(65, 66, 67, 68, 69, 70, 71, 72, 73, 74); // asc_4A761
+        static Set save_game_keys = new Set('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // asc_4A761
 
 
         internal static async void loadGameMenu() // loadGame
@@ -966,8 +966,6 @@ namespace engine
             if (inputKey != '\0')
             {
                 gbl.import_from = ImportSource.Curse;
-
-                short var_1FC;
 
                 do
                 {

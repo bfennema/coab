@@ -1092,7 +1092,7 @@ namespace engine
 
                 for (int offset = 0; offset < dataSize; offset += Item.StructSize)
                 {
-                    gbl.items_pointer.Add(new Item(data, offset));
+                    gbl.items_pointer.Add(new Classes.Curse.Item(data, offset).Load());
                 }
 
                 data = null;
