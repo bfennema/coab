@@ -1,5 +1,7 @@
 using Classes;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace engine
 {
@@ -595,9 +597,16 @@ namespace engine
         }
 
 
-        internal static byte roll_dice(int dice_size, int dice_count, int min_roll = 1)
+        internal static byte roll_dice(int dice_size, int dice_count, int min_roll = 1, int keep_dice = 0)
         {
-            int roll_total = 0;
+            int[] rolls = new int[dice_count];
+
+            if (keep_dice == 0)
+            {
+                keep_dice = dice_count;
+            }
+
+            int[] keep_rolls = new int[keep_dice];
 
             for (int i = 0; i < dice_count; i++)
             {
@@ -614,10 +623,14 @@ namespace engine
                     if (roll_current < min_roll)
                         roll_current = min_roll;
                 }
-                roll_total += roll_current;
+                rolls[i] = roll_current;
             }
 
-            byte byte_total = (byte)roll_total;
+            Array.Sort(rolls);
+            Array.Reverse(rolls);
+            Array.Copy(rolls, keep_rolls, keep_dice);
+
+            byte byte_total = (byte)keep_rolls.Sum();
 
             return byte_total;
         }

@@ -225,7 +225,7 @@ namespace engine
                             if (menuFlags[allow_load] == true)
                             {
                                 ovr017.loadGameMenu();
-                                if (gbl.game == Game.PoolOfRadiance)
+                                if (gbl.game == Game.PoolOfRadiance && gbl.game_state != GameState.StartGameMenu)
                                 {
                                     if (gbl.game == Game.PoolOfRadiance && gbl.area_ptr.field_3FA == 1)
                                     {
@@ -355,6 +355,75 @@ namespace engine
             {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46, 48, 48, 48, 50, 50, 50},
         };
 
+        internal static byte[,] dice_table =
+        {
+            {7, 4, 9, 5, 8, 6 }, /* cleric */
+            {7, 4, 8, 5, 6, 9 }, /* druid */
+            {9, 3, 5, 7, 8, 6 }, /* fighter */
+            {7, 5, 8, 3, 6, 9 }, /* paladin */
+            {7, 6, 8, 5, 9, 4 }, /* ranger */
+            {4, 9, 7, 8, 6, 5 }, /* magic-user */
+            {6, 5, 3, 9, 7, 4 }, /* thief */
+            {7, 5, 9, 8, 6, 4 }, /* monk */
+        };
+
+        internal static void assignStats(Player player, byte[] rolls)
+        {
+            byte[] dice = new byte[6];
+            List<byte>[] order = new List<byte>[9 * 3];
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                if (player.ClassLevel[(int)skill] > 0)
+                {
+                    for (int i = 0; i<6; i++)
+                    {
+                        dice[i] += dice_table[(int)skill, i];
+                    }
+                }
+            }
+            for (int i = 0; i < 6; i++)
+            {
+                if (order[dice[i]] == null)
+                {
+                    order[dice[i]] = new List<byte>();
+                }
+                order[dice[i]].Add((byte)(i + 1));
+            }
+            for (int i = order.Length-1, k = 0; i>=0; i--)
+            {
+                if (order[i] != null)
+                {
+                    for (int j = 0; j < order[i].Count; j++)
+                    {
+                        if (order[i][j] == (byte)(Stat.STR + 1))
+                        {
+                            player.stats2.Str.Load(rolls[k]);
+                        }
+                        else if (order[i][j] == (byte)(Stat.INT + 1))
+                        {
+                            player.stats2.Int.Load(rolls[k]);
+                        }
+                        else if (order[i][j] == (byte)(Stat.WIS + 1))
+                        {
+                            player.stats2.Wis.Load(rolls[k]);
+                        }
+                        else if (order[i][j] == (byte)(Stat.DEX + 1))
+                        {
+                            player.stats2.Dex.Load(rolls[k]);
+                        }
+                        else if (order[i][j] == (byte)(Stat.CON + 1))
+                        {
+                            player.stats2.Con.Load(rolls[k]);
+                        }
+                        else if (order[i][j] == (byte)(Stat.CHA + 1))
+                        {
+                            player.stats2.Cha.Load(rolls[k]);
+                        }
+                        k++;
+                    }
+                }
+            }
+        }
 
 
         internal static void createPlayer()
@@ -660,6 +729,38 @@ namespace engine
 
             var_C.Clear();
 
+            index = 1;
+            showExit = true;
+            menuRedraw = true;
+
+            do
+            {
+                var_C.Add(new MenuItem("Pick Stat Roll Method", true));
+                var_C.Add(new MenuItem("  Method I   - 4d6, top 3"));
+                var_C.Add(new MenuItem("  Method II  - 3d6 12 times, keep 6"));
+                var_C.Add(new MenuItem("  Method III - 3d6 6 times/stat"));
+                var_C.Add(new MenuItem("  Method IV  - 12 characters"));
+                if (player.race == Race.human)
+                {
+                    var_C.Add(new MenuItem("  Method V   - #d6, based on class"));
+                }
+
+                input_key = ovr027.sl_select_item(out selected, ref index, ref menuRedraw, showExit, var_C,
+                    22, 38, 2, 1, gbl.defaultMenuColors, "Select", string.Empty);
+
+                if (input_key == '\0')
+                {
+                    var_C.Clear();
+
+                    player = null;
+                    return;
+                }
+            } while (input_key != 'S');
+
+            var stat_roll_method = index;
+
+            var_C.Clear();
+
             if (player._class <= ClassId.monk)
             {
                 SubStruct_1A35E v5 = gbl.race_ages[(int)player.race][player._class];
@@ -713,14 +814,103 @@ namespace engine
                 player.stats2.Con.Load(0);
                 player.stats2.Cha.Load(0);
 
-                for (int i = 0; i < 6; i++)
+                if (stat_roll_method == 1)
                 {
-                    player.stats2.Str.Load(Math.Max(player.stats2.Str.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Int.Load(Math.Max(player.stats2.Int.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Wis.Load(Math.Max(player.stats2.Wis.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Dex.Load(Math.Max(player.stats2.Dex.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Con.Load(Math.Max(player.stats2.Con.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Cha.Load(Math.Max(player.stats2.Cha.cur, ovr024.roll_dice(6, 3)+1));
+                    byte[] rolls = new byte[6];
+                    for (int i=0; i<6; i++)
+                    {
+                        rolls[i] = ovr024.roll_dice(6, 4, keep_dice: 3);
+                    }
+                    Array.Sort(rolls);
+                    Array.Reverse(rolls);
+                    assignStats(player, rolls);
+                }
+                else if (stat_roll_method == 2)
+                {
+                    byte[] all_rolls = new byte[12];
+                    byte[] rolls = new byte[6];
+                    for (int i = 0; i < 12; i++)
+                    {
+                        all_rolls[i] = ovr024.roll_dice(6, 3);
+                    }
+                    Array.Sort(all_rolls);
+                    Array.Reverse(all_rolls);
+                    Array.Copy(all_rolls, rolls, 6);
+                    assignStats(player, rolls);
+                }
+                else if (stat_roll_method == 3)
+                {
+                    for (int i = 0; i < 6; i++)
+                    {
+                        player.stats2.Str.Load(Math.Max(player.stats2.Str.cur, ovr024.roll_dice(6, 3)));
+                        player.stats2.Int.Load(Math.Max(player.stats2.Int.cur, ovr024.roll_dice(6, 3)));
+                        player.stats2.Wis.Load(Math.Max(player.stats2.Wis.cur, ovr024.roll_dice(6, 3)));
+                        player.stats2.Dex.Load(Math.Max(player.stats2.Dex.cur, ovr024.roll_dice(6, 3)));
+                        player.stats2.Con.Load(Math.Max(player.stats2.Con.cur, ovr024.roll_dice(6, 3)));
+                        player.stats2.Cha.Load(Math.Max(player.stats2.Cha.cur, ovr024.roll_dice(6, 3)));
+                    }
+                }
+                else if (stat_roll_method == 4)
+                {
+                    int last_sum = 0;
+                    for (int i = 0; i < 12; i++)
+                    {
+                        int[] rolls = new int[6];
+                        for (int j = 0; j < 6; j++)
+                        {
+                            rolls[j] = ovr024.roll_dice(6, 3);
+                        }
+                        if (rolls.Sum() > last_sum)
+                        {
+                            last_sum = rolls.Sum();
+                            player.stats2.Str.Load(rolls[0]);
+                            player.stats2.Int.Load(rolls[1]);
+                            player.stats2.Wis.Load(rolls[2]);
+                            player.stats2.Dex.Load(rolls[3]);
+                            player.stats2.Con.Load(rolls[4]);
+                            player.stats2.Cha.Load(rolls[5]);
+                        }
+                    }
+                }
+                else if (stat_roll_method == 5)
+                {
+                    SkillType skill;
+                    for (skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+                    {
+                        if (player.ClassLevel[(byte)skill] > 0)
+                        {
+                            break;
+                        }
+                    }
+                    player.stats2.Str.Load(ovr024.roll_dice(6, dice_table[(byte)skill, 0], 1, 3));
+                    player.stats2.Int.Load(ovr024.roll_dice(6, dice_table[(byte)skill, 1], 1, 3));
+                    player.stats2.Wis.Load(ovr024.roll_dice(6, dice_table[(byte)skill, 2], 1, 3));
+                    player.stats2.Dex.Load(ovr024.roll_dice(6, dice_table[(byte)skill, 3], 1, 3));
+                    player.stats2.Con.Load(ovr024.roll_dice(6, dice_table[(byte)skill, 4], 1, 3));
+                    player.stats2.Cha.Load(ovr024.roll_dice(6, dice_table[(byte)skill, 5], 1, 3));
+                }
+
+                if (player.race == Race.dwarf)
+                {
+                    player.stats2.Con.Inc();
+                    player.stats2.Cha.Dec();
+                }
+                else if (player.race == Race.elf)
+                {
+                    player.stats2.Dex.Inc();
+                    player.stats2.Con.Dec();
+                }
+                else if (player.race == Race.halfling)
+                {
+                    player.stats2.Str.Dec();
+                    player.stats2.Dex.Dec();
+                }
+                else if (player.race == Race.half_orc)
+                {
+                    player.stats2.Str.Inc();
+                    player.stats2.Con.Inc();
+                    player.stats2.Cha.Dec();
+                    player.stats2.Cha.Dec();
                 }
 
                 Race race = player.race;
@@ -904,7 +1094,7 @@ namespace engine
                 }
 
                 player.hit_point_current = player.hit_point_max;
-                player.hit_point_rolled = (byte)(player.hit_point_max / class_count);
+                player.hit_point_rolled = (byte)(player.hit_point_rolled / class_count);
                 byte trainingClassMaskBackup = gbl.area2_ptr.training_class_mask;
 
                 ovr017.SilentTrainPlayer();
@@ -2576,28 +2766,31 @@ namespace engine
 
                 short rolled_increase = roll_hp(actualTrainingClassesMask, gbl.SelectedPlayer);
 
-                int max_hp_increase = rolled_increase / class_count;
-
-                if (max_hp_increase == 0)
+                if (rolled_increase > 0)
                 {
-                    max_hp_increase = 1;
+                    int max_hp_increase = rolled_increase / class_count;
+
+                    if (max_hp_increase == 0)
+                    {
+                        max_hp_increase = 1;
+                    }
+
+                    player.hit_point_rolled += (byte)max_hp_increase;
+
+                    int con_hp_adj = get_con_hp_adj(gbl.SelectedPlayer);
+
+                    max_hp_increase = (rolled_increase + con_hp_adj) / class_count;
+
+                    if (max_hp_increase < 1)
+                    {
+                        max_hp_increase = 1;
+                    }
+
+                    int hp_lost = player.hit_point_max - player.hit_point_current;
+
+                    player.hit_point_max += (byte)max_hp_increase;
+                    player.hit_point_current = (byte)(player.hit_point_max - hp_lost);
                 }
-
-                player.hit_point_rolled += (byte)max_hp_increase;
-
-                int con_hp_adj = get_con_hp_adj(gbl.SelectedPlayer);
-
-                max_hp_increase = (rolled_increase + con_hp_adj) / class_count;
-
-                if (max_hp_increase < 1)
-                {
-                    max_hp_increase = 1;
-                }
-
-                int hp_lost = player.hit_point_max - player.hit_point_current;
-
-                player.hit_point_max += (byte)max_hp_increase;
-                player.hit_point_current = (byte)(player.hit_point_max - hp_lost);
             }
         }
     }
