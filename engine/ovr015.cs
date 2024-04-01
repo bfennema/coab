@@ -349,7 +349,7 @@ namespace engine
 
             gbl.area2_ptr.field_592 = 0;
 
-            if (gbl.game_state == GameState.DungeonMap)
+            if (gbl.game_state == GameState.DungeonMap && (gbl.game != Game.PoolOfRadiance || gbl.last_game_state != GameState.WildernessMap))
             {
                 bool stop_loop = false;
 
