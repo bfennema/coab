@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Logging;
 using System.IO;
 using System;
+using static Classes.Item;
 
 namespace engine
 {
@@ -151,7 +152,14 @@ namespace engine
 
             if (arg_0 == "")
             {
-                ext_text = ".GUY";
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+                    ext_text = ".CHA";
+                }
+                else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+                {
+                    ext_text = ".GUY";
+                }
                 file_text = seg042.clean_string(player.name);
             }
             else
@@ -204,7 +212,7 @@ namespace engine
                     file.Assign(filePath + ".ITM");
                     seg051.Rewrite(file);
 
-                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, item.ToByteArray(), file));
+                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new PoolRadItem(item).Save(), file));
 
                     seg051.Close(file);
                 }
@@ -218,7 +226,7 @@ namespace engine
                     file.Assign(filePath + ".SWG");
                     seg051.Rewrite(file);
 
-                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, item.ToByteArray(), file));
+                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new CurseItem(item).Save(), file));
 
                     seg051.Close(file);
                 }
@@ -235,7 +243,20 @@ namespace engine
 
                     foreach (Affect affect in player.affects)
                     {
-                        seg051.BlockWrite(Affect.StructSize, new PoolRadAffect(affect, player).Save(), file);
+                        PoolRadAffect new_affect;
+                        try
+                        {
+                            new_affect = new PoolRadAffect(affect, player);
+                        }
+                        catch (System.ArgumentException)
+                        {
+                            new_affect = null;
+                        }
+
+                        if (new_affect != null)
+                        {
+                            seg051.BlockWrite(Affect.StructSize, new_affect.Save(), file);
+                        }
                     }
 
                     seg051.Close(file);
@@ -457,7 +478,14 @@ namespace engine
                 {
                     if (seg051.BlockRead(Item.StructSize, data, file) == Item.StructSize)
                     {
-                        player.items.Add(new Item(data, 0));
+                        if (gbl.game == Game.PoolOfRadiance)
+                        {
+                            player.items.Add(new PoolRadItem(data, 0).Load());
+                        }
+                        else if (gbl.game == Game.CurseOfTheAzureBonds)
+                        {
+                            player.items.Add(new CurseItem(data, 0).Load());
+                        }
                     }
                     else
                     {
@@ -565,7 +593,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.helpless, (Affects)hf_player.field_1D,
                         (short)(hf_player.field_1D * 200), 0, 0,
-                        false, 0, false, 0, 0, 0x57, 0xa7, 0xa8, ItemType.GemsJewelry, true);
+                        false, 0, false, 0, 0, ItemNames.Chime, ItemNames.of, ItemNames.Vulnerability, ItemType.GemsJewelry, true);
 
                     player.items.Add(newItem);
                 }
@@ -574,7 +602,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.poison_plus_4, (Affects)hf_player.field_23,
                         (short)(hf_player.field_23 * 0x15E), 0, 1,
-                        false, 0, false, 0, 1, 0x45, 0xa7, 0xce, ItemType.WandB, true);
+                        false, 0, false, 0, 1, ItemNames.Wand, ItemNames.of, ItemNames.Magic_Missiles, ItemType.WandB, true);
 
                     player.items.Add(newItem);
                 }
@@ -583,7 +611,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.helpless, (Affects)hf_player.field_86,
                         (short)(hf_player.field_86 * 0xc8), 0, 0,
-                        false, 0, false, 0, 0, 0x42, 0xa7, 0xa8, ItemType.Ring, true);
+                        false, 0, false, 0, 0, ItemNames.Ring, ItemNames.of, ItemNames.Vulnerability, ItemType.Ring, true);
 
                     player.items.Add(newItem);
                 }
@@ -592,7 +620,7 @@ namespace engine
                 {
                     Item newItem = new Item(Affects.none, Affects.highConRegen, (Affects)hf_player.field_87,
                         (short)(hf_player.field_87 * 0x190), 0, (short)(hf_player.field_87 * 10),
-                        false, 0, false, 0, 0, 0x40, 0xa7, 0xb9, ItemType.GemsJewelry, true);
+                        false, 0, false, 0, 0, ItemNames.Potion, ItemNames.of, ItemNames.Healing, ItemType.GemsJewelry, true);
 
                     player.items.Add(newItem);
                 }
@@ -792,7 +820,14 @@ namespace engine
             {
                 for (int offset = 0; offset < decode_size; offset += Item.StructSize)
                 {
-                    player.items.Add(new Item(data, offset));
+                    if (gbl.game == Game.PoolOfRadiance)
+                    {
+                        player.items.Add(new PoolRadItem(data, offset).Load());
+                    }
+                    else if (gbl.game == Game.CurseOfTheAzureBonds)
+                    {
+                        player.items.Add(new CurseItem(data, offset).Load());
+                    }
                 }
             }
 
@@ -872,7 +907,7 @@ namespace engine
             }
         }
 
-        static Set save_game_keys = new Set(65, 66, 67, 68, 69, 70, 71, 72, 73, 74); // asc_4A761
+        static Set save_game_keys = new Set('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // asc_4A761
 
 
         internal static void loadGameMenu() // loadGame
@@ -964,9 +999,17 @@ namespace engine
 
             seg051.BlockRead(1, data, file);
             gbl.last_game_state = (GameState)data[0];
+            if (gbl.game == Game.PoolOfRadiance && gbl.last_game_state == GameState.Shop)
+            {
+                gbl.last_game_state = GameState.DungeonMap;
+            }
 
             seg051.BlockRead(1, data, file);
             gbl.game_state = (GameState)data[0];
+            if (gbl.game == Game.PoolOfRadiance && gbl.game_state == GameState.Shop)
+            {
+                gbl.game_state = GameState.DungeonMap;
+            }
 
             if (gbl.game == Game.CurseOfTheAzureBonds)
             {
@@ -1062,7 +1105,7 @@ namespace engine
             }
         }
 
-        static Set unk_4AEA0 = new Set(0, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74); 
+        static Set save_slots = new Set(0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // unk_4AEA0
         static Set unk_4AEEF = new Set(0, 2, 18); 
 
 
@@ -1076,27 +1119,24 @@ namespace engine
             {
                 inputKey = ovr027.displayInput((gbl.game_state == GameState.Camping), 0, gbl.defaultMenuColors, "A B C D E F G H I J", "Save Which Game: ");
 
-            } while (unk_4AEA0.MemberOf(inputKey) == false);
+            } while (save_slots.MemberOf(inputKey) == false);
 
             if (inputKey != '\0')
             {
                 gbl.import_from = ImportSource.Curse;
 
-                short var_1FC;
-
                 do
                 {
                     save_file.Assign(Path.Combine(Config.GetSavePath(), "SAVGAM" + inputKey + ".DAT"));
                     seg051.Rewrite(save_file);
-                    var_1FC = gbl.FIND_result;
 
-                    if (unk_4AEEF.MemberOf(var_1FC) == false)
+                    if (unk_4AEEF.MemberOf(gbl.FIND_result) == false)
                     {
-                        seg041.DisplayAndPause("Unexpected error during save: " + var_1FC.ToString(), 14);
+                        seg041.DisplayAndPause("Unexpected error during save: " + gbl.FIND_result.ToString(), 14);
                         seg051.Close(save_file);
                         return;
                     }
-                } while (unk_4AEEF.MemberOf(var_1FC) == false);
+                } while (unk_4AEEF.MemberOf(gbl.FIND_result) == false);
 
                 ovr027.ClearPromptArea();
                 seg041.displayString("Saving...Please Wait", 0, 10, 0x18, 0);
@@ -1123,8 +1163,16 @@ namespace engine
                 seg051.BlockWrite(5, data, save_file);
 
                 data[0] = (byte)gbl.last_game_state;
+                if (gbl.game == Game.PoolOfRadiance && gbl.last_game_state == GameState.DungeonMap)
+                {
+                    data[0] = (byte)GameState.Shop;
+                }
                 seg051.BlockWrite(1, data, save_file);
                 data[0] = (byte)gbl.game_state;
+                if (gbl.game == Game.PoolOfRadiance && gbl.game_state == GameState.DungeonMap)
+                {
+                    data[0] = (byte)GameState.Shop;
+                }
                 seg051.BlockWrite(1, data, save_file);
 
                 if (gbl.game == Game.CurseOfTheAzureBonds)

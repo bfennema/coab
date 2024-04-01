@@ -2,6 +2,7 @@ using Classes;
 using System;
 using System.Collections.Generic;
 using Classes.Combat;
+using static Classes.Item;
 
 namespace engine
 {
@@ -349,7 +350,7 @@ namespace engine
 
 			player.activeItems.Reset();
 
-			bool bag_of_holding = player.items.Find(i => i.type == ItemType.PotionOfGiantStr && i.namenum3 == 73 && i.readied) != null;
+			bool bag_of_holding = player.items.Find(i => i.type == ItemType.PotionOfGiantStr && i.namenum[2] == ItemNames.Bag && i.readied) != null;
 
 			player.weaponsHandsUsed = 0;
 

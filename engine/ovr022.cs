@@ -1,5 +1,6 @@
 using Classes;
 using System.Collections.Generic;
+using static Classes.Item;
 
 namespace engine
 {
@@ -443,13 +444,13 @@ namespace engine
         }
 
         static short[,] /*seg600:082E unk_16B3E */	preconfiguredItems = {
-            {185, 187,  64,  1,   800,  3, 99,   0}, // potion extra healing
-            {239, 167,  64,  1,  1100,  1, 59,   0}, // potion of giant strength
-            {185, 167,  64,  1,   400,  1,  3,   0}, // potion of healing
-            {173, 167,  64,  1,   450,  1, 48,   0}, // potion of speed (unused)
-            {206, 167,  69,  1, 11000, 30, 15,   0}, // wand of magic missile
-            {226, 167, 100, 10, 15000,  0, 38, 131}, // gauntlets of ogre power (unused)
-            {157, 167,  21, 20,  3000,  1, 51,   0}, // javelin of lightning
+            {(short)ItemNames.Healing,        (short)ItemNames.Extra, (short)ItemNames.Potion,         1,   800,  3, 99,   0}, // potion extra healing
+            {(short)ItemNames.Giant_Strength, (short)ItemNames.of,    (short)ItemNames.Potion,         1,  1100,  1, 59,   0}, // potion of giant strength
+            {(short)ItemNames.Healing,        (short)ItemNames.of,    (short)ItemNames.Potion,         1,   400,  1,  3,   0}, // potion of healing
+            {(short)ItemNames.Speed,          (short)ItemNames.of,    (short)ItemNames.Potion,         1,   450,  1, 48,   0}, // potion of speed (unused)
+            {(short)ItemNames.Magic_Missiles, (short)ItemNames.of,    (short)ItemNames.Wand,           1, 11000, 30, 15,   0}, // wand of magic missile
+            {(short)ItemNames.Ogre_Power,     (short)ItemNames.of,    (short)ItemNames.Gauntlets,     10, 15000,  0, 38, 131}, // gauntlets of ogre power (unused)
+            {(short)ItemNames.Javelin,        (short)ItemNames.of,    (short)ItemNames.WEAPONJavelin, 20,  3000,  1, 51,   0}, // javelin of lightning
         };
 
         internal static Item create_item(ItemType item_type) /* sub_5A007 */
@@ -478,73 +479,73 @@ namespace engine
                     }
                     else
                     {
-                        item.namenum3 = (int)item.type;
-                        item.namenum2 = item.plus + 161;
+                        item.namenum[2] = (ItemNames)item.type;
+                        item.namenum[1] = (ItemNames)(item.plus + 161);
                     }
                 }
                 else if (item.type == ItemType.Quarrel)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = item.plus + 161;
+                    item.namenum[2] = (ItemNames)item.type;
+                    item.namenum[1] = GetItemNamesPlus(item.plus);
                 }
                 else if (item.type == ItemType.LeatherArmor ||
                          item.type == ItemType.PaddedArmor)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = 49; // Armor
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = (ItemNames)item.type;
+                    item.namenum[1] = ItemNames.ARMORArmor;
+                    item.namenum[0] = GetItemNamesPlus(item.plus);
                     item.hidden_names_flag = 4;
                 }
                 else if (item.type == ItemType.StuddedLeather)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = 50; // Leather
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = (ItemNames)item.type;
+                    item.namenum[1] = ItemNames.ARMORLeather;
+                    item.namenum[0] = GetItemNamesPlus(item.plus);
                     item.hidden_names_flag = 4;
                 }
                 else if (item.type >= ItemType.RingMail &&
                          item.type <= ItemType.PlateMail)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = 48; // Mail
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = (ItemNames)item.type;
+                    item.namenum[1] = ItemNames.ARMORMail;
+                    item.namenum[0] = GetItemNamesPlus(item.plus);
                     item.hidden_names_flag = 4;
                 }
                 else if (item.type == ItemType.Arrow)
                 {
-                    item.namenum3 = 61; // Arrow
-                    item.namenum2 = item.plus + 161;
+                    item.namenum[2] = ItemNames.WEAPONArrow;
+                    item.namenum[1] = GetItemNamesPlus(item.plus);
                 }
                 else if (item.type == ItemType.Bracers)
                 {
-                    item.namenum3 = 79; // Bracers
-                    item.namenum2 = 167; // of
+                    item.namenum[2] = ItemNames.Bracers;
+                    item.namenum[1] = ItemNames.of;
                     item.plus = (item.plus << 1) + 2;
 
                     if (item.plus == 4)
                     {
-                        item.namenum1 = 221; // AC 6
+                        item.namenum[0] = ItemNames.AC_6;
                     }
                     else if (item.plus == 6)
                     {
-                        item.namenum1 = 222; // AC 4
+                        item.namenum[0] = ItemNames.AC_4;
                     }
                     else if (item.plus == 8)
                     {
-                        item.namenum1 = 220; // AC 2
+                        item.namenum[0] = ItemNames.AC_2;
                     }
                 }
                 else if (item.type == ItemType.RingOfProt)
                 {
-                    item.namenum3 = 66; // Ring
-                    item.namenum2 = 224; // of Prot.
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = ItemNames.Ring;
+                    item.namenum[1] = ItemNames.Of_ProtDOT;
+                    item.namenum[0] = GetItemNamesPlus(item.plus);
                     item.plus_save = (byte)item.plus;
                 }
                 else
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = item.plus + 161;
+                    item.namenum[2] = (ItemNames)item.type;
+                    item.namenum[1] = GetItemNamesPlus(item.plus);
                 }
 
                 switch (item.type)
@@ -720,15 +721,15 @@ namespace engine
 
                 if (item.type == ItemType.MUScroll)
                 {
-                    item.namenum3 = 0xD1;
+                    item.namenum[2] = ItemNames.MU_Scroll;
                 }
                 else
                 {
-                    item.namenum3 = 0xD0;
+                    item.namenum[2] = ItemNames.Clrc_Scroll;
                 }
 
-                item.namenum2 = spellsCount + 0xd1;
-                item.namenum1 = 0;
+                item.namenum[1] = GetItemNamesSpellCount(spellsCount);
+                item.namenum[0] = 0;
                 item.plus = 1;
                 item.weight = 0x19;
                 item.count = 0;
@@ -822,9 +823,9 @@ namespace engine
 
             if (preconfig > -1)
             {
-                item.namenum1 = preconfiguredItems[preconfig, 0];
-                item.namenum2 = preconfiguredItems[preconfig, 1];
-                item.namenum3 = preconfiguredItems[preconfig, 2];
+                item.namenum[0] = (ItemNames)preconfiguredItems[preconfig, 0];
+                item.namenum[1] = (ItemNames)preconfiguredItems[preconfig, 1];
+                item.namenum[2] = (ItemNames)preconfiguredItems[preconfig, 2];
 
                 item.plus = 1;
                 item.plus_save = 1;
@@ -982,7 +983,7 @@ namespace engine
 
                             if (input_key == 'K' && must_sell == false)
                             {
-                                Item gem_item = new Item(value, 0, 1, false, 0, false, 0, 0, 0x65, 0, 0, ItemType.GemsJewelry, true);
+                                Item gem_item = new Item(value, 0, 1, false, 0, false, 0, 0, ItemNames.Gem, 0, 0, ItemType.GemsJewelry, true);
 
                                 gbl.SelectedPlayer.items.Add(gem_item);
                             }
@@ -1054,7 +1055,7 @@ namespace engine
 
                             if (input_key == 'K' && must_sell == false)
                             {
-                                Item jewel_item = new Item(value, 0, 1, false, 0, false, 0, 0, 0xd6, 0, 0, ItemType.GemsJewelry, true);
+                                Item jewel_item = new Item(value, 0, 1, false, 0, false, 0, 0, ItemNames.Jewelry, 0, 0, ItemType.GemsJewelry, true);
 
                                 gbl.SelectedPlayer.items.Add(jewel_item);
                             }

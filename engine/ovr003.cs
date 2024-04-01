@@ -1111,7 +1111,14 @@ namespace engine
 
                 for (int offset = 0; offset < dataSize; offset += Item.StructSize)
                 {
-                    gbl.items_pointer.Add(new Item(data, offset));
+                    if (gbl.game == Game.PoolOfRadiance)
+                    {
+                        gbl.items_pointer.Add(new PoolRadItem(data, offset).Load());
+                    }
+                    else if (gbl.game == Game.CurseOfTheAzureBonds)
+                    {
+                        gbl.items_pointer.Add(new CurseItem(data, offset).Load());
+                    }
                 }
 
                 data = null;

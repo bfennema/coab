@@ -485,13 +485,13 @@ namespace engine
             seg041.displayString(arg_0.type.ToString(), 0, 10, 1, 0x14);
 
             seg041.displayString("namenum(1):   ", 0, 10, 2, 1);
-            seg041.displayString(arg_0.namenum1.ToString(), 0, 10, 2, 0x14);
+            seg041.displayString(arg_0.namenum[0].ToString(), 0, 10, 2, 0x14);
 
             seg041.displayString("namenum(2):   ", 0, 10, 3, 1);
-            seg041.displayString(arg_0.namenum2.ToString(), 0, 10, 3, 0x14);
+            seg041.displayString(arg_0.namenum[1].ToString(), 0, 10, 3, 0x14);
 
             seg041.displayString("namenum(3):   ", 0, 10, 4, 1);
-            seg041.displayString(arg_0.namenum3.ToString(), 0, 10, 4, 0x14);
+            seg041.displayString(arg_0.namenum[2].ToString(), 0, 10, 4, 0x14);
 
             seg041.displayString("plus:         ", 0, 10, 5, 1);
             seg041.displayString(arg_0.plus.ToString(), 0, 10, 5, 0x14);
@@ -1097,9 +1097,9 @@ namespace engine
                 {
                     return (i != item &&
                     i.count > 0 &&
-                    i.namenum1 == item.namenum1 &&
-                    i.namenum2 == item.namenum2 &&
-                    i.namenum3 == item.namenum3 &&
+                    i.namenum[0] == item.namenum[0] &&
+                    i.namenum[1] == item.namenum[1] &&
+                    i.namenum[2] == item.namenum[2] &&
                     i.type == item.type &&
                     i.plus == item.plus &&
                     i.plus_save == item.plus_save &&

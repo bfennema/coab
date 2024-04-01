@@ -136,6 +136,7 @@
     <Compile Include="Combat\CombatIcon.cs" />
     <Compile Include="Combat\CombatPlayerIndex.cs" />
     <Compile Include="CurseAffect.cs" />
+    <Compile Include="CurseItem.cs" />
     <Compile Include="CursePlayer.cs" />
     <Compile Include="DataIO.cs" />
     <Compile Include="DaxFiles\DaxArray.cs" />
@@ -172,6 +173,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PoolRadAffect.cs" />
+    <Compile Include="PoolRadItem.cs" />
     <Compile Include="PoolRadPlayer.cs" />
     <Compile Include="RestTime.cs" />
     <Compile Include="Set.cs">
