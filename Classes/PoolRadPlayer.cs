@@ -348,7 +348,7 @@ namespace Classes
 
             player.base_movement = field_72;
             player.HitDice = field_73;
-            player.multiclassLevel = player.HitDice;
+            player.multiclassLevel = 0;
             player.lost_lvls = field_74;
             player.lost_hp = field_75;
             player.level_undead = field_76;
