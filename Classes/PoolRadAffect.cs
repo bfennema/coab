@@ -295,26 +295,32 @@ namespace Classes
         {
             if (mapping == null) { InitMapping(); }
 
-            type = mapping[affect.type][0];
-            minutes = affect.minutes;
-            if (type == PoolRadAffects.enlarge)
+            if (mapping[affect.type].Count > 0)
             {
-                if (player.stats2.Str.cur == 18)
+                type = mapping[affect.type][0];
+                minutes = affect.minutes;
+                if (type == PoolRadAffects.enlarge)
                 {
-                    affect_data = (byte)(player.stats2.Str00.cur + 1);
+                    if (player.stats2.Str.cur == 18)
+                    {
+                        affect_data = (byte)(player.stats2.Str00.cur + 1);
+                    }
+                    else
+                    {
+                        affect_data = (byte)(player.stats2.Str.cur + 100);
+                    }
                 }
-                else
+                else if (type == PoolRadAffects.friends)
                 {
-                    affect_data = (byte)(player.stats2.Str.cur + 100);
+                    affect_data = (byte)player.stats2.Cha.cur;
                 }
+                affect_data = affect.affect_data;
+                callAffectTable = affect.callAffectTable;
             }
-            else if (type == PoolRadAffects.friends)
+            else
             {
-                affect_data = (byte)player.stats2.Cha.cur;
+                throw new System.ArgumentException("No affect mapping found");
             }
-            affect_data = affect.affect_data;
-            callAffectTable = affect.callAffectTable;
-
         }
 
         public void Load(Player player)
