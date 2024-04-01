@@ -102,7 +102,7 @@ namespace Main
                 return 0x2e;
             }
 
-            return 0x0020;
+            return 0x0000;
         }
     }
 }
