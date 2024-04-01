@@ -17,7 +17,14 @@ namespace engine
 
                 int val = ItemsValue(item);
 
-                list.Insert(0, new MenuItem(string.Format("{0,-21}{1,9}", item.name.Trim(), val), item));
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+                    list.Insert(0, new MenuItem(string.Format("{0,-26}{1,5}", item.name.Trim(), val), item));
+                }
+                else
+                {
+                    list.Insert(0, new MenuItem(string.Format("{0,-21}{1,9}", item.name.Trim(), val), item));
+                }
             }
 
             gbl.menuSelectedWord = 0;
