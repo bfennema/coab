@@ -871,7 +871,7 @@ namespace engine
 
                 if (item != null &&
                     item.count == 0 &&
-                    item.type == ItemType.DartOfHornetsNest)
+                    item.type == Item.Type.DartOfHornetsNest)
                 {
                     attacker.attack1_AttacksLeft = 0;
                     attacker.attack2_AttacksLeft = 0;
@@ -969,8 +969,8 @@ namespace engine
             }
 
             if (attacker.activeItems.primaryWeapon != null && 
-                (attacker.activeItems.primaryWeapon.type == ItemType.Sling ||
-                attacker.activeItems.primaryWeapon.type == ItemType.StaffSling))
+                (attacker.activeItems.primaryWeapon.type == Item.Type.Sling ||
+                attacker.activeItems.primaryWeapon.type == Item.Type.StaffSling))
             {
                 DrawRangedAttack(attacker.activeItems.primaryWeapon, target, attacker);
             }
@@ -1461,12 +1461,12 @@ namespace engine
                 Item weapon = attacker.activeItems.primaryWeapon;
 
                 if (weapon == null ||
-                    weapon.type == ItemType.DrowLongSword ||
-                    weapon.type == ItemType.Club ||
-                    weapon.type == ItemType.Dagger ||
-                    weapon.type == ItemType.BroadSword ||
-                    weapon.type == ItemType.LongSword ||
-                    weapon.type == ItemType.ShortSword)
+                    weapon.type == Item.Type.DrowLongSword ||
+                    weapon.type == Item.Type.Club ||
+                    weapon.type == Item.Type.Dagger ||
+                    weapon.type == Item.Type.BroadSword ||
+                    weapon.type == Item.Type.LongSword ||
+                    weapon.type == Item.Type.ShortSword)
                 {
                     if (target.actions.AttacksReceived > 1 &&
                         (target.icon_dimensions & 0x7F) <= 1 &&
@@ -1623,13 +1623,13 @@ namespace engine
 
             switch (item.type)
             {
-                case ItemType.Dart:
-                case ItemType.Javelin:
-                case ItemType.DartOfHornetsNest:
-                case ItemType.Quarrel:
-                case ItemType.Spear:
-                case ItemType.Arrow:
-                case ItemType.Dagger:
+                case Item.Type.Dart:
+                case Item.Type.Javelin:
+                case Item.Type.DartOfHornetsNest:
+                case Item.Type.Quarrel:
+                case Item.Type.Spear:
+                case Item.Type.Arrow:
+                case Item.Type.Dagger:
                     if ((dir & 1) == 1)
                     {
                         if (dir == 3 || dir == 5)
@@ -1655,26 +1655,26 @@ namespace engine
                     seg044.PlaySound(Sound.sound_c);
                     break;
 
-                case ItemType.HandAxe:
-                case ItemType.Club:
-                case ItemType.Hammer:
+                case Item.Type.HandAxe:
+                case Item.Type.Club:
+                case Item.Type.Hammer:
                     ovr025.load_missile_icons(iconId + 3);
                     frame_count = 4;
                     delay = 50;
                     seg044.PlaySound(Sound.sound_9);
                     break;
 
-                case ItemType.HolyWater:
-                case ItemType.FlaskOfOil:
+                case Item.Type.HolyWater:
+                case Item.Type.FlaskOfOil:
                     ovr025.load_missile_icons(iconId + 4);
                     frame_count = 4;
                     delay = 50;
                     seg044.PlaySound(Sound.sound_6);
                     break;
 
-                case ItemType.StaffSling:
-                case ItemType.Sling:
-                case ItemType.Spine:
+                case Item.Type.StaffSling:
+                case Item.Type.Sling:
+                case Item.Type.Spine:
                     ovr025.load_missile_dax(false, 0, Icon.Normal, iconId + 8);
                     ovr025.load_missile_dax(false, 1, Icon.Attack, iconId + 8);
                     frame_count = 2;

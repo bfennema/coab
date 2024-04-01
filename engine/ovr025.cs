@@ -13,7 +13,7 @@ namespace engine
 
 			if (item != null)
 			{
-				ItemType item_type = item.type;
+				Item.Type item_type = item.type;
 
 				player.hitBonus = player.thac0;
 
@@ -47,12 +47,12 @@ namespace engine
 				player.attack1_DamageBonus += (sbyte)bonus;
 
 				if (player.race == Race.elf &&
-					(item.type == ItemType.CompositeLongBow ||
-					 item.type == ItemType.CompositeShortBow ||
-					 item.type == ItemType.LongBow ||
-					 item.type == ItemType.ShortBow ||
-					 item.type == ItemType.ShortSword ||
-					 item.type == ItemType.LongSword))
+					(item.type == Item.Type.CompositeLongBow ||
+					 item.type == Item.Type.CompositeShortBow ||
+					 item.type == Item.Type.LongBow ||
+					 item.type == Item.Type.ShortBow ||
+					 item.type == Item.Type.ShortSword ||
+					 item.type == Item.Type.LongSword))
 				{
 					bonus++;
 				}
@@ -393,12 +393,12 @@ namespace engine
 						}
 					}
 
-					if (item.type == ItemType.Arrow)
+					if (item.type == Item.Type.Arrow)
 					{
                         player.activeItems.arrows = item;
 					}
 
-					if (item.type == ItemType.Quarrel)
+					if (item.type == Item.Type.Quarrel)
 					{
                         player.activeItems.quarrels = item;
 					}

@@ -831,7 +831,7 @@ namespace engine
                 rating += itemData.bonusNormal * 2;
             }
 
-            if (item.type == ItemType.HolyWater &&
+            if (item.type == Item.Type.HolyWater &&
                 player.actions.target != null &&
                 player.actions.target.level_undead > 0)
             {
@@ -895,7 +895,7 @@ namespace engine
 
             foreach (Item item in player.items)
             {
-                ItemType item_type = item.type;
+                Item.Type item_type = item.type;
 
                 if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.Weapon &&
                     (gbl.ItemDataTable[item_type].classFlags & player.classFlags) != 0)

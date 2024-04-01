@@ -303,7 +303,7 @@ namespace engine
 
 		internal static void affect_spiritual_hammer(Effect add_remove, object param, Player player) /* sub_3A583 */
 		{
-			Item item = player.items.Find(i => i.type == ItemType.Hammer && i.namenum3 == 0xf3);
+			Item item = player.items.Find(i => i.type == Item.Type.Hammer && i.namenum[2] == Classes.Item.Names.Spiritual);
 			bool item_found = item != null;
 
 			if (add_remove == Effect.Remove && item != null)
@@ -315,7 +315,7 @@ namespace engine
 				item_found == false &&
 				player.items.Count < Player.MaxItems)
 			{
-				item = new Item(0x80 | 0x09, Affects.spiritual_hammer, 0, 0, 0, 0, false, 0, false, 0, 1, 243, 20, 0, ItemType.Hammer, true);
+				item = new Item(0x80 | 0x09, Affects.spiritual_hammer, 0, 0, 0, 0, false, 0, false, 0, 1, Classes.Item.Names.Spiritual, Classes.Item.Names.WEAPONHammer, 0, Item.Type.Hammer, true);
 
 				player.items.Add(item);
 				if (gbl.SelectedPlayer.activeItems[ItemSlot.Weapon] != null)
@@ -1479,7 +1479,7 @@ namespace engine
 		{
             Item item = gbl.SelectedPlayer.activeItems.primaryWeapon;
 
-			if (item != null && item.type == ItemType.HolyWater)
+			if (item != null && item.type == Item.Type.HolyWater)
 			{
 				gbl.damage = ovr024.roll_dice_save(6, 1) + 1;
 			}
@@ -1513,7 +1513,7 @@ namespace engine
 
 			if (field_151 != null)
 			{
-				if (field_151.type == ItemType.HillGiantBoulder || field_151.type == ItemType.CloudGiantBoulder)
+				if (field_151.type == Item.Type.HillGiantBoulder || field_151.type == Item.Type.CloudGiantBoulder)
 				{
 					AvoidMissleAttack(50, player);
 				}
@@ -1612,8 +1612,8 @@ namespace engine
 
 			if (ovr025.GetCurrentAttackItem(out item, gbl.SelectedPlayer) == true &&
 				item != null &&
-				item.type == ItemType.Quarrel &&
-				item.namenum3 == 0x87)
+				item.type == Item.Type.Quarrel &&
+				item.namenum[2] == Item.Names.Blessed)
 			{
 				player.health_status = Status.gone;
 				player.in_combat = false;

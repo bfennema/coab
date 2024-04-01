@@ -432,16 +432,16 @@ namespace engine
         }
 
         static short[,] /*seg600:082E unk_16B3E */	preconfiguredItems = {
-            {185, 187,  64,  1,   800,  3, 99,   0}, // potion extra healing
-            {239, 167,  64,  1,  1100,  1, 59,   0}, // potion of giant strength
-            {185, 167,  64,  1,   400,  1,  3,   0}, // potion of healing
-            {173, 167,  64,  1,   450,  1, 48,   0}, // potion of speed (unused)
-            {206, 167,  69,  1, 11000, 30, 15,   0}, // wand of magic missile
-            {226, 167, 100, 10, 15000,  0, 38, 131}, // gauntlets of ogre power (unused)
-            {157, 167,  21, 20,  3000,  1, 51,   0}, // javelin of lightning
+            {(short)Item.Names.Healing,        (short)Item.Names.Extra, (short)Item.Names.Potion,         1,   800,  3, 99,   0}, // potion extra healing
+            {(short)Item.Names.Giant_Strength, (short)Item.Names.of,    (short)Item.Names.Potion,         1,  1100,  1, 59,   0}, // potion of giant strength
+            {(short)Item.Names.Healing,        (short)Item.Names.of,    (short)Item.Names.Potion,         1,   400,  1,  3,   0}, // potion of healing
+            {(short)Item.Names.Speed,          (short)Item.Names.of,    (short)Item.Names.Potion,         1,   450,  1, 48,   0}, // potion of speed (unused)
+            {(short)Item.Names.Magic_Missiles, (short)Item.Names.of,    (short)Item.Names.Wand,           1, 11000, 30, 15,   0}, // wand of magic missile
+            {(short)Item.Names.Ogre_Power,     (short)Item.Names.of,    (short)Item.Names.Gauntlets,     10, 15000,  0, 38, 131}, // gauntlets of ogre power (unused)
+            {(short)Item.Names.Javelin,        (short)Item.Names.of,    (short)Item.Names.WEAPONJavelin, 20,  3000,  1, 51,   0}, // javelin of lightning
         };
 
-        internal static Item create_item(ItemType item_type) /* sub_5A007 */
+        internal static Item create_item(Item.Type item_type) /* sub_5A007 */
         {
             int preconfig = -1;
 
@@ -449,14 +449,14 @@ namespace engine
 
             var type = item.type;
 
-            if ((type >= ItemType.BattleAxe && type <= ItemType.Shield) ||
-                type == ItemType.Arrow ||
-                type == ItemType.Bracers ||
-                type == ItemType.RingOfProt)
+            if ((type >= Item.Type.BattleAxe && type <= Item.Type.Shield) ||
+                type == Item.Type.Arrow ||
+                type == Item.Type.Bracers ||
+                type == Item.Type.RingOfProt)
             {
                 item.plus = randomBonus();
 
-                if (item.type == ItemType.Javelin)
+                if (item.type == Item.Type.Javelin)
                 {
                     int roll = ovr024.roll_dice(5, 1);
                     if (roll == 5)
@@ -465,68 +465,73 @@ namespace engine
                     }
                     else
                     {
-                        item.namenum3 = (int)item.type;
-                        item.namenum2 = item.plus + 161;
+                        item.namenum[2] = (Item.Names)item.type;
+                        item.namenum[1] = (Item.Names)(item.plus + 161);
                     }
                 }
-                else if (item.type == ItemType.Quarrel)
+                else if (item.type == Item.Type.Quarrel)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = item.plus + 161;
+                    item.namenum[2] = (Item.Names)item.type;
+                    item.namenum[1] = Item.GetNamesPlus(item.plus);
                 }
-                else if (item.type == ItemType.LeatherArmor ||
-                         item.type == ItemType.PaddedArmor)
+                else if (item.type == Item.Type.LeatherArmor ||
+                         item.type == Item.Type.PaddedArmor)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = 49; // Armor
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = (Item.Names)item.type;
+                    item.namenum[1] = Item.Names.ARMORArmor;
+                    item.namenum[0] = Item.GetNamesPlus(item.plus);
                     item.hidden_names_flag = 4;
                 }
-                else if (item.type == ItemType.StuddedLeather)
+                else if (item.type == Item.Type.StuddedLeather)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = 50; // Leather
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = (Item.Names)item.type;
+                    item.namenum[1] = Item.Names.ARMORLeather;
+                    item.namenum[0] = Item.GetNamesPlus(item.plus);
                     item.hidden_names_flag = 4;
                 }
-                else if (item.type >= ItemType.RingMail &&
-                         item.type <= ItemType.PlateMail)
+                else if (item.type >= Item.Type.RingMail &&
+                         item.type <= Item.Type.PlateMail)
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = 48; // Mail
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = (Item.Names)item.type;
+                    item.namenum[1] = Item.Names.ARMORMail;
+                    item.namenum[0] = Item.GetNamesPlus(item.plus);
                     item.hidden_names_flag = 4;
                 }
-                else if (item.type == ItemType.Arrow)
+                else if (item.type == Item.Type.Arrow)
                 {
-                    item.namenum3 = 61; // Arrow
-                    item.namenum2 = item.plus + 161;
+                    item.namenum[2] = Item.Names.WEAPONArrow;
+                    item.namenum[1] = Item.GetNamesPlus(item.plus);
                 }
-                else if (item.type == ItemType.Bracers)
+                else if (item.type == Item.Type.Bracers)
                 {
-                    item.namenum3 = 79; // Bracers
-                    item.namenum2 = 167; // of
+                    item.namenum[2] = Item.Names.Bracers;
+                    item.namenum[1] = Item.Names.of;
                     item.plus = (item.plus << 1) + 2;
 
                     if (item.plus == 4)
                     {
-                        item.namenum1 = 221; // AC 6
+                        item.namenum[0] = Item.Names.AC_6;
                     }
                     else if (item.plus == 6)
                     {
-                        item.namenum1 = 222; // AC 4
+                        item.namenum[0] = Item.Names.AC_4;
+                    }
+                    else if (item.plus == 8)
+                    {
+                        item.namenum[0] = Item.Names.AC_2;
                     }
                 }
-                else if (item.type == ItemType.RingOfProt)
+                else if (item.type == Item.Type.RingOfProt)
                 {
-                    item.namenum3 = 66; // Ring
-                    item.namenum2 = 224; // of Prot.
-                    item.namenum1 = item.plus + 161;
+                    item.namenum[2] = Item.Names.Ring;
+                    item.namenum[1] = Item.Names.of_ProtDOT;
+                    item.namenum[0] = Item.GetNamesPlus(item.plus);
+                    item.plus_save = (byte)item.plus;
                 }
                 else
                 {
-                    item.namenum3 = (int)item.type;
-                    item.namenum2 = item.plus + 161;
+                    item.namenum[2] = (Item.Names)item.type;
+                    item.namenum[1] = Item.GetNamesPlus(item.plus);
                 }
 
                 item.plus_save = 0;
@@ -534,129 +539,129 @@ namespace engine
 
                 switch (item.type)
                 {
-                    case ItemType.BattleAxe:
-                    case ItemType.MilitaryFork:
-                    case ItemType.Glaive:
-                    case ItemType.BroadSword:
+                    case Item.Type.BattleAxe:
+                    case Item.Type.MilitaryFork:
+                    case Item.Type.Glaive:
+                    case Item.Type.BroadSword:
                         item.weight = 75;
                         break;
 
-                    case ItemType.HandAxe:
-                    case ItemType.Hammer:
-                    case ItemType.Ranseur:
-                    case ItemType.Spear:
-                    case ItemType.Spetum:
-                    case ItemType.QuarterStaff:
-                    case ItemType.Trident:
-                    case ItemType.CompositeShortBow:
-                    case ItemType.ShortBow:
-                    case ItemType.LightCrossbow:
-                    case ItemType.Shield:
+                    case Item.Type.HandAxe:
+                    case Item.Type.Hammer:
+                    case Item.Type.Ranseur:
+                    case Item.Type.Spear:
+                    case Item.Type.Spetum:
+                    case Item.Type.QuarterStaff:
+                    case Item.Type.Trident:
+                    case Item.Type.CompositeShortBow:
+                    case Item.Type.ShortBow:
+                    case Item.Type.LightCrossbow:
+                    case Item.Type.Shield:
                         item.weight = 50;
                         break;
 
-                    case ItemType.Bardiche:
-                    case ItemType.MorningStar:
-                    case ItemType.Voulge:
+                    case Item.Type.Bardiche:
+                    case Item.Type.MorningStar:
+                    case Item.Type.Voulge:
                         item.weight = 125;
                         break;
 
-                    case ItemType.BecDeCorbin:
-                    case ItemType.GlaiveGuisarme:
-                    case ItemType.Mace:
-                    case ItemType.BastardSword:
-                    case ItemType.LongBow:
-                    case ItemType.HeavyCrossbow:
-                    case ItemType.PaddedArmor:
+                    case Item.Type.BecDeCorbin:
+                    case Item.Type.GlaiveGuisarme:
+                    case Item.Type.Mace:
+                    case Item.Type.BastardSword:
+                    case Item.Type.LongBow:
+                    case Item.Type.FineBow:
+                    case Item.Type.PaddedArmor:
                         item.weight = 100;
                         break;
 
-                    case ItemType.BillGuisarme:
-                    case ItemType.Flail:
-                    case ItemType.GuisarmeVoulge:
-                    case ItemType.LucernHammer:
-                    case ItemType.LeatherArmor:
+                    case Item.Type.BillGuisarme:
+                    case Item.Type.Flail:
+                    case Item.Type.GuisarmeVoulge:
+                    case Item.Type.LucernHammer:
+                    case Item.Type.LeatherArmor:
                         item.weight = 150;
                         break;
 
-                    case ItemType.BoStick:
+                    case Item.Type.BoStick:
                         item.weight = 15;
                         break;
 
-                    case ItemType.Club:
+                    case Item.Type.Club:
                         item.weight = 30;
                         break;
 
-                    case ItemType.Dagger:
-                    case ItemType.Bracers:
+                    case Item.Type.Dagger:
+                    case Item.Type.Bracers:
                         item.weight = 10;
                         break;
 
-                    case ItemType.Dart:
+                    case Item.Type.Dart:
                         item.weight = 25;
                         item.count = 5;
                         break;
 
-                    case ItemType.Fauchard:
-                    case ItemType.MilitaryPick:
-                    case ItemType.LongSword:
+                    case Item.Type.Fauchard:
+                    case Item.Type.MilitaryPick:
+                    case Item.Type.LongSword:
                         item.weight = 60;
                         break;
 
-                    case ItemType.FauchardFork:
-                    case ItemType.Guisarme:
-                    case ItemType.Partisan:
-                    case ItemType.AwlPike:
-                    case ItemType.CompositeLongBow:
+                    case Item.Type.FauchardFork:
+                    case Item.Type.Guisarme:
+                    case Item.Type.Partisan:
+                    case Item.Type.AwlPike:
+                    case Item.Type.CompositeLongBow:
                     // case ItemType.Sling: - this exists twice. other seems correct (weight 80 for a sling seems off)
                         item.weight = 80;
                         break;
 
-                    case ItemType.Halberd:
+                    case Item.Type.Halberd:
                         item.weight = 175;
                         break;
 
-                    case ItemType.Javelin:
+                    case Item.Type.Javelin:
                         item.weight = 20;
                         break;
 
-                    case ItemType.JoStick:
-                    case ItemType.Scimitar:
+                    case Item.Type.JoStick:
+                    case Item.Type.Scimitar:
                         item.weight = 40;
                         break;
 
-                    case ItemType.ShortSword:
+                    case Item.Type.ShortSword:
                         item.weight = 35;
                         break;
 
-                    case ItemType.TwoHandedSword:
-                    case ItemType.RingMail:
+                    case Item.Type.TwoHandedSword:
+                    case Item.Type.RingMail:
                         item.weight = 250;
                         break;
 
-                    case ItemType.StuddedLeather:
+                    case Item.Type.StuddedLeather:
                         item.weight = 200;
                         break;
 
-                    case ItemType.ScaleMail:
-                    case ItemType.SplintMail:
+                    case Item.Type.ScaleMail:
+                    case Item.Type.SplintMail:
                         item.weight = 400;
                         break;
 
-                    case ItemType.ChainMail:
+                    case Item.Type.ChainMail:
                         item.weight = 300;
                         break;
 
-                    case ItemType.BandedMail:
+                    case Item.Type.BandedMail:
                         item.weight = 350;
                         break;
 
-                    case ItemType.PlateMail:
+                    case Item.Type.PlateMail:
                         item.weight = 450;
                         break;
 
-                    case ItemType.Sling:
-                    case ItemType.RingOfProt:
+                    case Item.Type.Sling:
+                    case Item.Type.RingOfProt:
                         item.weight = 1;
                         break;
 
@@ -666,31 +671,31 @@ namespace engine
                         break;
                 }
 
-                if (item.type == ItemType.Shield)
+                if (item.type == Item.Type.Shield)
                 {
                     item._value = (short)(item.plus * 2500);
                 }
-                else if (item.type == ItemType.Arrow || item.type == ItemType.Quarrel)
+                else if (item.type == Item.Type.Arrow || item.type == Item.Type.Quarrel)
                 {
                     item._value = (short)(item.plus * 150);
                 }
-                else if (item.type == ItemType.RingMail || item.type == ItemType.ScaleMail)
+                else if (item.type == Item.Type.RingMail || item.type == Item.Type.ScaleMail)
                 {
                     item._value = (short)(item.plus * 3000);
                 }
-                else if (item.type == ItemType.ChainMail || item.type == ItemType.SplintMail)
+                else if (item.type == Item.Type.ChainMail || item.type == Item.Type.SplintMail)
                 {
                     item._value = (short)(item.plus * 3500);
                 }
-                else if (item.type == ItemType.BandedMail)
+                else if (item.type == Item.Type.BandedMail)
                 {
                     item._value = (short)(item.plus * 4000);
                 }
-                else if (item.type == ItemType.PlateMail)
+                else if (item.type == Item.Type.PlateMail)
                 {
                     item._value = (short)(item.plus * 5000);
                 }
-                else if (item.type == ItemType.Bracers)
+                else if (item.type == Item.Type.Bracers)
                 {
                     item._value = (short)(item.plus * 3000);
                 }
@@ -699,21 +704,21 @@ namespace engine
                     item._value = (short)(item.plus * 2000);
                 }
             }
-            else if (type == ItemType.MUScroll || type == ItemType.ClrcScroll)
+            else if (type == Item.Type.MUScroll || type == Item.Type.ClrcScroll)
             {
                 byte spellsCount = ovr024.roll_dice(3, 1);
 
-                if (item.type == ItemType.MUScroll)
+                if (item.type == Item.Type.MUScroll)
                 {
-                    item.namenum3 = 0xD1;
+                    item.namenum[2] = Item.Names.MU_Scroll;
                 }
                 else
                 {
-                    item.namenum3 = 0xD0;
+                    item.namenum[2] = Item.Names.Clrc_Scroll;
                 }
 
-                item.namenum2 = spellsCount + 0xd1;
-                item.namenum1 = 0;
+                item.namenum[1] = Item.GetNamesSpellCount(spellsCount);
+                item.namenum[0] = 0;
                 item.plus = 1;
                 item.weight = 0x19;
                 item.count = 0;
@@ -724,7 +729,7 @@ namespace engine
                     int roll = ovr024.roll_dice(5, 1);
                     Spells spell;
 
-                    if (item.type == ItemType.MUScroll)
+                    if (item.type == Item.Type.MUScroll)
                     {
                         switch (roll)
                         {
@@ -779,19 +784,19 @@ namespace engine
                     item._value += (short)(roll * 300);
                 }
             }
-            else if (type == ItemType.Gauntlets || type == ItemType.CloakOfProt) // Gauntlets and CloakOfProt unused
+            else if (type == Item.Type.Gauntlets || type == Item.Type.Cloak) // Gauntlets and CloakOfProt unused
             {
                 preconfig = 5;
             }
-            else if (type == ItemType.WandA || type == ItemType.WandB) // WandA unused
+            else if (type == Item.Type.WandA || type == Item.Type.WandB) // WandA unused
             {
                 preconfig = 4;
             }
-            else if (type == ItemType.PotionOfGiantStr || type == ItemType.Cloak) // Cloak unused
+            else if (type == Item.Type.PotionOfGiantStr || type == Item.Type.Cloak) // Cloak unused
             {
                 preconfig = 1;
             }
-            else if (type == ItemType.Potion)
+            else if (type == Item.Type.Potion)
             {
                 int roll = ovr024.roll_dice(8, 1);
 
@@ -807,9 +812,9 @@ namespace engine
 
             if (preconfig > -1)
             {
-                item.namenum1 = preconfiguredItems[preconfig, 0];
-                item.namenum2 = preconfiguredItems[preconfig, 1];
-                item.namenum3 = preconfiguredItems[preconfig, 2];
+                item.namenum[0] = (Item.Names)preconfiguredItems[preconfig, 0];
+                item.namenum[1] = (Item.Names)preconfiguredItems[preconfig, 1];
+                item.namenum[2] = (Item.Names)preconfiguredItems[preconfig, 2];
 
                 item.plus = 1;
                 item.plus_save = 1;
@@ -967,7 +972,7 @@ namespace engine
 
                             if (input_key == 'K' && must_sell == false)
                             {
-                                Item gem_item = new Item(value, 0, 1, false, 0, false, 0, 0, 0x65, 0, 0, ItemType.GemsJewelry, true);
+                                Item gem_item = new Item(value, 0, 1, false, 0, false, 0, 0, Item.Names.Gem, 0, 0, Item.Type.GemsJewelry, true);
 
                                 gbl.SelectedPlayer.items.Add(gem_item);
                             }
@@ -1039,7 +1044,7 @@ namespace engine
 
                             if (input_key == 'K' && must_sell == false)
                             {
-                                Item jewel_item = new Item(value, 0, 1, false, 0, false, 0, 0, 0xd6, 0, 0, ItemType.GemsJewelry, true);
+                                Item jewel_item = new Item(value, 0, 1, false, 0, false, 0, 0, Item.Names.Jewelry, 0, 0, Item.Type.GemsJewelry, true);
 
                                 gbl.SelectedPlayer.items.Add(jewel_item);
                             }

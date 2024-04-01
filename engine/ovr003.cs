@@ -1069,7 +1069,7 @@ namespace engine
         {
             byte[] data;
             short dataSize;
-            ItemType item_type = 0;
+            Item.Type item_type = 0;
 
             ovr008.vm_LoadCmdSets(8);
 
@@ -1092,7 +1092,7 @@ namespace engine
 
                 for (int offset = 0; offset < dataSize; offset += Item.StructSize)
                 {
-                    gbl.items_pointer.Add(new Item(data, offset));
+                    gbl.items_pointer.Add(new Classes.Curse.Item(data, offset).Load());
                 }
 
                 data = null;
@@ -1107,16 +1107,16 @@ namespace engine
                     {
                         int roll2 = ovr024.roll_dice(100, 1);
 
-                        if ((roll2 >= (int)ItemType.BattleAxe && roll2 <= (int)ItemType.Sling) ||
-                            (roll2 >= (int)ItemType.LeatherArmor && roll2 <= (int)ItemType.Shield))
+                        if ((roll2 >= (int)Item.Type.BattleAxe && roll2 <= (int)Item.Type.Sling) ||
+                            (roll2 >= (int)Item.Type.LeatherArmor && roll2 <= (int)Item.Type.Shield))
                         {
-                            if (roll2 == (int)ItemType.HeavyCrossbow)
+                            if (roll2 == (int)Item.Type.FineBow)
                             {
-                                item_type = ItemType.Shield;
+                                item_type = Item.Type.Shield;
                             }
                             else
                             {
-                                item_type = (ItemType)roll2;
+                                item_type = (Item.Type)roll2;
                             }
                         }
                         else if (roll2 >= 60 && roll2 <= 90)
@@ -1125,49 +1125,49 @@ namespace engine
 
                             if (roll3 >= 1 && roll3 <= 4)
                             {
-                                item_type = ItemType.LongSword;
+                                item_type = Item.Type.LongSword;
                             }
                             else if (roll3 >= 5 && roll3 <= 7)
                             {
-                                item_type = ItemType.BroadSword;
+                                item_type = Item.Type.BroadSword;
                             }
                             else if (roll3 == 8)
                             {
-                                item_type = ItemType.BastardSword;
+                                item_type = Item.Type.BastardSword;
                             }
                             else if (roll3 == 9)
                             {
-                                item_type = ItemType.ShortSword;
+                                item_type = Item.Type.ShortSword;
                             }
                             else if (roll3 == 10)
                             {
-                                item_type = ItemType.TwoHandedSword;
+                                item_type = Item.Type.TwoHandedSword;
                             }
                         }
                         else if (roll2 >= 91 && roll2 <= 94)
                         {
-                            item_type = ItemType.Arrow;
+                            item_type = Item.Type.Arrow;
                         }
                         else if (roll2 >= 95 && roll2 <= 97)
                         {
-                            item_type = ItemType.RingOfProt;
+                            item_type = Item.Type.RingOfProt;
                         }
                         else if (roll2 >= 98 && roll2 <= 100)
                         {
-                            item_type = ItemType.Bracers;
+                            item_type = Item.Type.Bracers;
                         }
                         else // roll == 48 || roll == 49
                         {
-                            item_type = ItemType.Shield;
+                            item_type = Item.Type.Shield;
                         }
                     }
                     else if (roll1 >= 61 && roll1 <= 85)
                     {
-                        item_type = ItemType.MUScroll;
+                        item_type = Item.Type.MUScroll;
                     }
                     else if (roll1 >= 86 && roll1 <= 92)
                     {
-                        item_type = ItemType.ClrcScroll;
+                        item_type = Item.Type.ClrcScroll;
                     }
                     else if (roll1 >= 91 && roll1 <= 98) // actually 93-98
                     {
@@ -1175,20 +1175,20 @@ namespace engine
 
                         if (roll2 >= 1 && roll2 <= 9)
                         {
-                            item_type = ItemType.Potion;
+                            item_type = Item.Type.Potion;
                         }
                         else if (roll2 == 10)
                         {
-                            item_type = ItemType.PotionOfGiantStr;
+                            item_type = Item.Type.PotionOfGiantStr;
                         }
                         else if (roll2 >= 11 && roll2 <= 15)
                         {
-                            item_type = ItemType.WandB;
+                            item_type = Item.Type.WandB;
                         }
                     }
                     else if (roll1 == 99 || roll1 == 100)
                     {
-                        item_type = ItemType.Shield;
+                        item_type = Item.Type.Shield;
                     }
 
                     gbl.items_pointer.Add(ovr022.create_item(item_type));
@@ -1561,7 +1561,7 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(1);
 
-            ItemType item_type = (ItemType)ovr008.vm_GetCmdValue(1);
+            Item.Type item_type = (Item.Type)ovr008.vm_GetCmdValue(1);
 
             for (int i = 0; i < 6; i++)
             {
@@ -2042,7 +2042,7 @@ namespace engine
         internal static void CMD_DestroyItems() // sub_292F9
         {
             ovr008.vm_LoadCmdSets(1);
-            ItemType item_type = (ItemType)ovr008.vm_GetCmdValue(1);
+            Item.Type item_type = (Item.Type)ovr008.vm_GetCmdValue(1);
 
             VmLog.WriteLine("CMD_DestroyItems: type: {0}", item_type);
 
