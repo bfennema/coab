@@ -495,16 +495,16 @@ namespace engine
                 case Race.dwarf:
                     player.icon_size = 1;
                     ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_and_gnome_vs_giants, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc_goblin, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
                     break;
 
                 case Race.gnome:
                     player.icon_size = 1;
                     ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
                     ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_goblin_kobold, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_and_gnome_vs_giants, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_gnoll, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.gnoll_bugbear_vs_gnome, player);
                     break;
 
                 case Race.elf:
@@ -989,9 +989,9 @@ namespace engine
 
                 for (int i = 0; i < 5; i++)
                 {
-                    player.spellCastCount[0, i] = 0;
-                    player.spellCastCount[1, i] = 0;
-                    player.spellCastCount[2, i] = 0;
+                    player.spellCastCount[0][i] = 0;
+                    player.spellCastCount[1][i] = 0;
+                    player.spellCastCount[2][i] = 0;
                 }
                 for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
                 {
@@ -999,15 +999,15 @@ namespace engine
                     {
                         if (skill == SkillType.Cleric)
                         {
-                            player.spellCastCount[0, 0] = 1;
+                            player.spellCastCount[0][0] = 1;
                         }
                         else if (skill == SkillType.Druid)
                         {
-                            player.spellCastCount[1, 0] = 2;
+                            player.spellCastCount[1][0] = 2;
                         }
                         else if (skill == SkillType.MagicUser)
                         {
-                            player.spellCastCount[2, 0] = 1;
+                            player.spellCastCount[2][0] = 1;
                         }
 
                         int gold_roll = ovr024.roll_dice(gold_size[(byte)skill], gold_count[(byte)skill]);
@@ -1390,9 +1390,9 @@ namespace engine
                                         player.stats2.Wis.EnforceRaceSexLimits(race, sex);
                                         player.stats2.Wis.EnforceClassLimits(player._class);
 
-                                        if (player.spellCastCount[0, 0] > 0)
+                                        if (player.spellCastCount[0][0] > 0)
                                         {
-                                            player.spellCastCount[0, 0] = 1;
+                                            player.spellCastCount[0][0] = 1;
                                         }
                                         break;
 
@@ -1483,9 +1483,9 @@ namespace engine
                                     case Stat.WIS:
                                         player.stats2.Wis.EnforceRaceSexLimits(race, sex);
 
-                                        if (player.spellCastCount[0, 0] > 0)
+                                        if (player.spellCastCount[0][0] > 0)
                                         {
-                                            player.spellCastCount[0, 0] = 1;
+                                            player.spellCastCount[0][0] = 1;
                                         }
                                         break;
 

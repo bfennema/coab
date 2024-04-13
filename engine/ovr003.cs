@@ -1901,6 +1901,7 @@ namespace engine
                             gbl.displayPlayerSprite = false;
 
                             gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
+                            seg041.GameDelay();
                         }
                     }
                     break;
@@ -2330,6 +2331,7 @@ namespace engine
                             break;
                     }
 
+                    ovr025.display_map_position_time();
                     ovr025.PartySummary(gbl.SelectedPlayer);
                 }
             }

@@ -22,7 +22,7 @@ namespace Classes
 
     public class MoneySet : IDataIO
     {
-        int[] money = new int[7];
+        public int[] money = new int[7];
 
         // overload operator +
         public static MoneySet operator +(MoneySet a, MoneySet b)

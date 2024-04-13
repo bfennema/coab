@@ -1,4 +1,5 @@
 using Classes;
+using System.Runtime.CompilerServices;
 using static Classes.Item;
 
 namespace engine
@@ -88,7 +89,7 @@ namespace engine
 
 		internal static void DispelEvil(Effect arg_0, object param, Player player)
 		{
-			if ((gbl.SelectedPlayer.field_14B & 1) != 0)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.EvilSummon))
 			{
 				gbl.attack_roll -= 7;
 			}
@@ -104,15 +105,15 @@ namespace engine
 			{
 				gbl.spell_target = player.actions.target;
 
-				if (gbl.spell_target.monsterType == MonsterType.troll)
+				if (gbl.spell_target.flags.HasFlag(Flags.Regenerate))
 				{
 					bonus = 1;
 				}
-				else if (gbl.spell_target.monsterType == MonsterType.cold || gbl.spell_target.monsterType == MonsterType.avian)
+				else if (gbl.spell_target.flags.HasFlag(Flags.Cold) || gbl.spell_target.flags.HasFlag(Flags.Avian))
 				{
 					bonus = 2;
 				}
-				else if (gbl.spell_target.monsterType == MonsterType.animated_dead)
+				else if (gbl.spell_target.flags.HasFlag(Flags.Undead))
 				{
 					bonus = 3;
 				}
@@ -159,7 +160,7 @@ namespace engine
 
 		internal static void affect_resist_cold(Effect arg_0, object param, Player player) /* sub_3A28E */
 		{
-			if ((gbl.damage_flags & DamageType.Cold) != 0)
+			if ((gbl.damage_flags.HasFlag(DamageType.Cold)))
 			{
 				gbl.damage /= 2;
 				gbl.savingThrowRoll += 3;
@@ -256,7 +257,7 @@ namespace engine
 		{
 			if (player.actions != null &&
 				player.actions.target != null &&
-				(player.actions.target.field_14B & 2) != 0)
+				(player.actions.target.flags & Flags.GnomeBonus) != 0)
 			{
 				gbl.spell_target = player.actions.target;
 				gbl.attack_roll++;
@@ -304,14 +305,14 @@ namespace engine
 		{
 			Affect affect = (Affect)param;
 			if (add_remove == Effect.Add &&
-				(gbl.damage_flags & DamageType.Electricity) != 0)
+				gbl.damage_flags.HasFlag(DamageType.Electricity))
 			{
 				gbl.damage /= 2;
-                if (affect.affect_data > 1)
-                    gbl.savingThrowRoll += affect.affect_data;
-                else
-                    gbl.savingThrowRoll += 3;
-            }
+				if (affect.affect_data > 1)
+					gbl.savingThrowRoll += affect.affect_data;
+				else
+					gbl.savingThrowRoll += 3;
+			}
 		}
 
 
@@ -319,7 +320,7 @@ namespace engine
 		{
 			Affect affect = (Affect)param;
 			if (add_remove == Effect.Add &&
-				(gbl.damage_flags & DamageType.Electricity) != 0)
+				gbl.damage_flags.HasFlag(DamageType.Electricity))
 			{
 				if (affect.affect_data > gbl.damage)
 				{
@@ -406,11 +407,11 @@ namespace engine
 		}
 
 
-		internal static void AffectDwarfVsOrc(Effect arg_0, object param, Player player) // sub_3A7E8
+		internal static void AffectDwarfVsOrcGoblin(Effect arg_0, object param, Player player) // sub_3A7E8
 		{
 			gbl.spell_target = player.actions.target;
 
-			if ((gbl.spell_target.field_14B & 4) != 0)
+			if (gbl.spell_target.flags.HasFlag(Flags.DwarfBonus))
 			{
 				gbl.attack_roll++;
 			}
@@ -491,14 +492,14 @@ namespace engine
 			player.level_undead = 0;
 
 			player.attackLevel = (byte)player.SkillLevel(SkillType.Fighter, SkillType.Paladin, SkillType.Ranger);
-			player.base_movement = 0x0C;
+			player.base_movement = 12;
 
 			if (player.control_morale == Control.PC_Berserk)
 			{
 				player.control_morale = Control.PC_Base;
 			}
 
-			player.monsterType = 0;
+			player.flags |= Flags.Undead;
 		}
 
 
@@ -736,25 +737,20 @@ namespace engine
 		}
 
 
-		internal static void AffectDwarfGnomeVsGiants(Effect arg_0, object param, Player player)
+		internal static void GiantVsDwarfGnome(Effect arg_0, object param, Player player)
 		{
 			gbl.spell_target = player.actions.target;
 
-			if (gbl.SelectedPlayer.monsterType == MonsterType.giant ||
-				gbl.SelectedPlayer.monsterType == MonsterType.troll)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.DwarfPenalty))
 			{
-				if ((gbl.SelectedPlayer.icon_dimensions & 0x7F) == 2)
-				{
-					gbl.attack_roll -= 4;
-				}
+				gbl.attack_roll -= 4;
 			}
 		}
 
 
-		internal static void AffectGnomeVsGnoll(Effect arg_0, object param, Player player)
+		internal static void GnollBugbearVsGnome(Effect arg_0, object param, Player player)
 		{
-			if (gbl.SelectedPlayer.monsterType == MonsterType.humanoid &&
-				(gbl.SelectedPlayer.icon_dimensions & 0x7F) == 2)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.GnomePenalty))
 			{
 				gbl.attack_roll -= 4;
 			}
@@ -1008,7 +1004,7 @@ namespace engine
 
 		internal static void AffectInvisToAnimals(Effect arg_0, object param, Player player) // sub_3B636
 		{
-			if (gbl.SelectedPlayer.monsterType == MonsterType.animal)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.Animal))
 			{
 				if (gbl.SelectedPlayer.HasAffect(Affects.detect_invisibility) == false &&
 					player.HasAffect(Affects.faerie_fire) == false)
@@ -1059,7 +1055,7 @@ namespace engine
 			{
 				gbl.spell_target = player.actions.target;
 
-				if (gbl.spell_target.monsterType == MonsterType.dragon)
+				if (gbl.spell_target.flags.HasFlag(Flags.Dragon))
 				{
 					gbl.damage = (ovr024.roll_dice(12, 1) * 3) + 4 + ovr025.strengthDamBonus(player);
 					gbl.attack_roll += 2;
@@ -1075,7 +1071,7 @@ namespace engine
 				gbl.spell_target = player.actions.target;
 
 				if (gbl.spell_target != null &&
-					gbl.spell_target.monsterType == MonsterType.fire)
+					gbl.spell_target.flags.HasFlag(Flags.Fire))
 				{
 					gbl.attack_roll += 3;
 					gbl.damage += 3;
@@ -1822,7 +1818,7 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if ((gbl.spell_target.field_14B & 8) != 0) // giant
+			if (gbl.spell_target.flags.HasFlag(Flags.RangerBonus))
 			{
 				gbl.damage += player.ranger_lvl;
 			}
@@ -1934,7 +1930,7 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if ((gbl.spell_target.field_14B & 1) != 0 &&
+			if ((gbl.spell_target.flags & Flags.EvilSummon) != 0 &&
 				ovr024.RollSavingThrow(0, SaveVerseType.Spell, gbl.spell_target) == false)
 			{
 				ovr024.KillPlayer("is dispelled", Status.gone, gbl.spell_target);
@@ -1994,7 +1990,7 @@ namespace engine
 			affect_table.Add(Affects.spiritual_hammer, ovr013.affect_spiritual_hammer);
 			affect_table.Add(Affects.detect_invisibility, ovr013.empty);
 			affect_table.Add(Affects.invisibility, ovr013.sub_3A6C6);
-			affect_table.Add(Affects.dwarf_vs_orc, ovr013.AffectDwarfVsOrc);
+			affect_table.Add(Affects.dwarf_vs_orc_goblin, ovr013.AffectDwarfVsOrcGoblin);
 			affect_table.Add(Affects.fumbling, ovr013.sub_3A071);
 			affect_table.Add(Affects.mirror_image, ovr013.MirrorImage);
 			affect_table.Add(Affects.ray_of_enfeeblement, ovr013.three_quarters_damage);
@@ -2015,8 +2011,8 @@ namespace engine
 			affect_table.Add(Affects.cause_disease_2, ovr013.sub_3B0C2);
 			affect_table.Add(Affects.prot_from_evil_10_radius, ovr013.affect_protect_evil);
 			affect_table.Add(Affects.prot_from_good_10_radius, ovr013.affect_protect_good);
-			affect_table.Add(Affects.dwarf_and_gnome_vs_giants, ovr013.AffectDwarfGnomeVsGiants);
-			affect_table.Add(Affects.gnome_vs_gnoll, ovr013.AffectGnomeVsGnoll);
+			affect_table.Add(Affects.giant_vs_dwarf_gnome, ovr013.GiantVsDwarfGnome);
+			affect_table.Add(Affects.gnoll_bugbear_vs_gnome, ovr013.GnollBugbearVsGnome);
 			affect_table.Add(Affects.prayer, ovr013.AffectPrayer);
 			affect_table.Add(Affects.hot_fire_shield, ovr013.HotFireShield);
 			affect_table.Add(Affects.snake_charm, ovr013.sub_3A071);

@@ -482,7 +482,7 @@ namespace engine
 						{
 							//skip this spell
 						}
-						else if (gbl.SelectedPlayer.spellCastCount[(int)sp_class, sp_lvl - 1] > 0 &&
+						else if (gbl.SelectedPlayer.spellCastCount[(int)sp_class][sp_lvl - 1] > 0 &&
 							can_learn_spell((int)spell, gbl.SelectedPlayer) == true &&
 							gbl.SelectedPlayer.spellBook.KnowsSpell(spell) == false)
 						{
@@ -714,7 +714,7 @@ namespace engine
 
 					if (ovr027.yes_no(gbl.defaultMenuColors, "Lose it? ") == 'Y')
 					{
-						caster.spellList.ClearSpell(spell_id);
+						caster.spellList.ClearSpell((Spells)spell_id);
 					}
 				}
 				else
@@ -793,7 +793,7 @@ namespace engine
 
 					if (gbl.spell_from_item == false)
 					{
-						caster.spellList.ClearSpell(spell_id);
+						caster.spellList.ClearSpell((Spells)spell_id);
 					}
 
 					gbl.spell_id = spell_id;
@@ -816,7 +816,7 @@ namespace engine
 						ovr025.string_print01("Spell Aborted");
 						if (gbl.spell_from_item == false)
 						{
-							caster.spellList.ClearSpell(spell_id);
+							caster.spellList.ClearSpell((Spells)spell_id);
 						}
 
 						stillCast = false;
@@ -986,13 +986,13 @@ namespace engine
 				DamageOnSave can_save_flag;
 
 				if ((gbl.spell_id == (byte)Spells.hold_person_CL || gbl.spell_id == (byte)Spells.hold_person_MU) &&
-					(target.monsterType > MonsterType.humanoid || target.icon_dimensions > 1))
+					!target.flags.HasFlag(Flags.HeldCharmed))
 				{
 					saved = true;
 					can_save_flag = DamageOnSave.Zero;
 				}
-				else if ((gbl.spell_id == (byte)Spells.hold_animal && target.monsterType != MonsterType.animal) ||
-					(gbl.spell_id == (byte)Spells.hold_plant && target.monsterType != MonsterType.plant))
+				else if ((gbl.spell_id == (byte)Spells.hold_animal && !target.flags.HasFlag(Flags.Animal)) ||
+					(gbl.spell_id == (byte)Spells.hold_plant && !target.flags.HasFlag(Flags.Plant)))
 				{
 					saved = true;
 					can_save_flag = DamageOnSave.Zero;
@@ -1076,8 +1076,7 @@ namespace engine
 		{
 			Player target = gbl.spellTargets[0];
 
-			if (target.monsterType > MonsterType.humanoid ||
-				target.icon_dimensions > 1)
+			if (!target.flags.HasFlag(Flags.HeldCharmed))
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
 			}
@@ -1098,8 +1097,7 @@ namespace engine
 		{
 			Player target = gbl.spellTargets[0];
 
-			if ((target.monsterType > MonsterType.humanoid && target.monsterType < MonsterType.animal) ||
-				target.icon_dimensions > 1)
+			if (!target.flags.HasFlag(Flags.HeldCharmed) && !target.flags.HasFlag(Flags.Mammal))
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
 			}
@@ -1417,7 +1415,7 @@ namespace engine
 
 			gbl.spellTargets = gbl.TeamList.FindAll(target =>
 				{
-					if (target.monsterType == MonsterType.snake &&
+					if (target.flags.HasFlag(Flags.Snake) &&
 					   totalSpellPower >= target.hit_point_current)
 					{
 						totalSpellPower -= target.hit_point_current;
@@ -1640,7 +1638,7 @@ namespace engine
 			foreach (Player player in gbl.TeamList)
 			{
 				if (player.health_status == Status.dead &&
-					player.monsterType == 0)
+					player.race != Race.monster)
 				{
 					if (ovr033.sub_7515A(true, ovr033.PlayerMapPos(player), player) == true)
 					{
@@ -1663,7 +1661,7 @@ namespace engine
 							player.control_morale = Control.PC_Berserk;
 						}
 
-						player.monsterType = MonsterType.animated_dead;
+						player.flags |= Flags.Undead;
 
 						if (gbl.game_state == GameState.Combat)
 						{
@@ -2900,7 +2898,7 @@ namespace engine
 
 			foreach (var target in gbl.spellTargets)
 			{
-				bool change_damage = target.monsterType != MonsterType.plant;
+				bool change_damage = !target.flags.HasFlag(Flags.Plant);
 
 				ovr024.damage_person(change_damage, gbl.spellCastingTable[(int)Spells.wand_of_defoliation].damageOnSave, ovr024.roll_dice_save(6, 6), target);
 			}

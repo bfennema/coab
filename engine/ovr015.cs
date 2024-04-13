@@ -254,7 +254,7 @@ namespace engine
 
         static bool TeamMemberHasSpell(Spells spellId)
         {
-            return gbl.TeamList.Exists(p => p.spellList.HasSpell((int)spellId));
+            return gbl.TeamList.Exists(p => p.spellList.HasSpell(spellId));
         }
 
 
@@ -262,9 +262,9 @@ namespace engine
         {
             foreach (Player player in gbl.TeamList)
             {
-                if (player.spellList.HasSpell((int)Spells.knock))
+                if (player.spellList.HasSpell(Spells.knock))
                 {
-                    player.spellList.ClearSpell((int)Spells.knock);
+                    player.spellList.ClearSpell(Spells.knock);
                     return true;
                 }
             }

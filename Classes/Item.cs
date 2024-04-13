@@ -192,6 +192,7 @@ namespace Classes
 
         public enum ItemNames
         {
+            empty = 0,
             WEAPONBattle_Axe = ItemType.BattleAxe,
             WEAPONHand_Axe = ItemType.HandAxe,
             WEAPONBardiche = ItemType.Bardiche,

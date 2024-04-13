@@ -272,7 +272,7 @@ namespace engine
                     calc_affect_effect(Affects.prayer, player);
                     calc_affect_effect(Affects.weap_flame_tongue, player);
                     calc_affect_effect(Affects.gnome_vs_goblin_kobold, player);
-                    calc_affect_effect(Affects.dwarf_vs_orc, player);
+                    calc_affect_effect(Affects.dwarf_vs_orc_goblin, player);
                     calc_affect_effect(Affects.weap_dragon_slayer, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
                     break;
@@ -343,8 +343,8 @@ namespace engine
                     calc_affect_effect(Affects.invisibility, player);
                     calc_affect_effect(Affects.invisible, player);
                     calc_affect_effect(Affects.blink, player);
-                    calc_affect_effect(Affects.dwarf_and_gnome_vs_giants, player);
-                    calc_affect_effect(Affects.gnome_vs_gnoll, player);
+                    calc_affect_effect(Affects.giant_vs_dwarf_gnome, player);
+                    calc_affect_effect(Affects.gnoll_bugbear_vs_gnome, player);
                     calc_affect_effect(Affects.displace, player);
                     calc_affect_effect(Affects.dispel_evil, player);
                     break;
@@ -1316,7 +1316,7 @@ namespace engine
             {
                 ovr025.DisplayPlayerStatusString(true, 12, "lost a spell", player);
 
-                player.spellList.ClearSpell(player.actions.spell_id);
+                player.spellList.ClearSpell((Spells)player.actions.spell_id);
                 player.actions.spell_id = 0;
             }
         }

@@ -4,6 +4,7 @@ using Logging;
 using System.IO;
 using System;
 using static Classes.Item;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace engine
 {
@@ -193,6 +194,8 @@ namespace engine
 
             seg051.Rewrite(file);
 
+            List<PoolRadAffect> poolrad_affects = new List<PoolRadAffect>();
+
             if (gbl.game == Game.PoolOfRadiance)
             {
                 seg051.BlockWrite(PoolRadPlayer.StructSize, new PoolRadPlayer(player).Save(), file);
@@ -212,7 +215,7 @@ namespace engine
                     file.Assign(filePath + ".ITM");
                     seg051.Rewrite(file);
 
-                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new PoolRadItem(item).Save(), file));
+                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new PoolRadItem(item).Save(player, poolrad_affects), file));
 
                     seg051.Close(file);
                 }
@@ -259,6 +262,11 @@ namespace engine
                         }
                     }
 
+                    foreach (PoolRadAffect affect in poolrad_affects)
+                    {
+                        seg051.BlockWrite(Affect.StructSize, affect.Save(), file);
+                    }
+
                     seg051.Close(file);
                 }
             }
@@ -279,6 +287,13 @@ namespace engine
                     seg051.Close(file);
                 }
             }
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(player.GetType());
+            string fileString = Path.Combine(Config.GetSavePath(), file_text) + ".XML";
+            System.IO.FileStream stream;
+            stream = System.IO.File.Open(fileString, System.IO.FileMode.OpenOrCreate);
+            stream.SetLength(0);
+            x.Serialize(stream, player);
+            stream.Close();
         }
 
         internal static bool PlayerFileExists(string fileExt, string player_name) // sub_483AE
@@ -703,16 +718,16 @@ namespace engine
                         case Race.dwarf:
                             player.icon_size = 1;
                             ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.dwarf_and_gnome_vs_giants, player);
+                            ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc_goblin, player);
+                            ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
                             break;
 
                         case Race.gnome:
                             player.icon_size = 1;
                             ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
                             ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_goblin_kobold, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.dwarf_and_gnome_vs_giants, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_gnoll, player);
+                            ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
+                            ovr024.add_affect(false, 0xff, 0, Affects.gnoll_bugbear_vs_gnome, player);
                             break;
 
                         case Race.elf:
@@ -1036,13 +1051,25 @@ namespace engine
             gbl.game_speed_var = gbl.area_ptr.game_speed;
             gbl.area2_ptr.party_size = 0;
 
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(typeof(Player));
+
             for (int index = 0; index < number_of_players; index++)
             {
                 string var_1F6 = seg042.clean_string(var_148[index]);
 
-                if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".sav")) == true)
+                if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".XML")) == true)
                 {
-                    Player player = import_char01(var_1F6 + ".sav");
+                    string fileString = Path.Combine(Config.GetSavePath(), var_1F6) + ".XML";
+                    System.IO.FileStream stream;
+                    stream = System.IO.File.Open(fileString, System.IO.FileMode.Open);
+                    Player player = (Player)x.Deserialize(stream);
+                    stream.Close();
+                    player.stats2.ReInit();
+                    AssignPlayerIconId(player);
+                }
+                else if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".SAV")) == true)
+                {
+                    Player player = import_char01(var_1F6 + ".SAV");
                     AssignPlayerIconId(player);
                 }
             }

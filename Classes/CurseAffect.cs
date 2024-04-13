@@ -28,7 +28,7 @@ namespace Classes
         spiritual_hammer = 0x17,
         detect_invisibility = 0x18,
         invisibility = 0x19,
-        dwarf_vs_orc = 0x1a,
+        dwarf_vs_orc_goblin = 0x1a,
         fumbling = 0x1b,
         mirror_image = 0x1c,
         ray_of_enfeeblement = 0x1d,
@@ -50,7 +50,7 @@ namespace Classes
         prot_from_evil_10_radius = 0x2d,
         prot_from_good_10_radius = 0x2e,
         dwarf_and_gnome_vs_giants = 0x2f,
-        gnome_vs_gnoll = 0x30,
+        gnoll_bugbear_vs_gnome = 0x30,
         prayer = 0x31,
         hot_fire_shield = 0x32,
         snake_charm = 0x33,
@@ -195,7 +195,7 @@ namespace Classes
             mapping.Add(CurseAffects.spiritual_hammer, Affects.spiritual_hammer);
             mapping.Add(CurseAffects.detect_invisibility, Affects.detect_invisibility);
             mapping.Add(CurseAffects.invisibility, Affects.invisibility);
-            mapping.Add(CurseAffects.dwarf_vs_orc, Affects.dwarf_vs_orc);
+            mapping.Add(CurseAffects.dwarf_vs_orc_goblin, Affects.dwarf_vs_orc_goblin);
             mapping.Add(CurseAffects.fumbling, Affects.fumbling);
             mapping.Add(CurseAffects.mirror_image, Affects.mirror_image);
             mapping.Add(CurseAffects.ray_of_enfeeblement, Affects.ray_of_enfeeblement);
@@ -216,8 +216,8 @@ namespace Classes
             mapping.Add(CurseAffects.cause_disease_2, Affects.cause_disease_2);
             mapping.Add(CurseAffects.prot_from_evil_10_radius, Affects.prot_from_evil_10_radius);
             mapping.Add(CurseAffects.prot_from_good_10_radius, Affects.prot_from_good_10_radius);
-            mapping.Add(CurseAffects.dwarf_and_gnome_vs_giants, Affects.dwarf_and_gnome_vs_giants);
-            mapping.Add(CurseAffects.gnome_vs_gnoll, Affects.gnome_vs_gnoll);
+            mapping.Add(CurseAffects.dwarf_and_gnome_vs_giants, Affects.giant_vs_dwarf_gnome);
+            mapping.Add(CurseAffects.gnoll_bugbear_vs_gnome, Affects.gnoll_bugbear_vs_gnome);
             mapping.Add(CurseAffects.prayer, Affects.prayer);
             mapping.Add(CurseAffects.hot_fire_shield, Affects.hot_fire_shield);
             mapping.Add(CurseAffects.snake_charm, Affects.snake_charm);

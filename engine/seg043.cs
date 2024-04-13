@@ -249,9 +249,10 @@ namespace engine
             DebugWriter dw = new DebugWriter(filename);
 
             dw.WriteLine("GnomeVsManSizedGiant");
-            DumpMonstersFilteredSub(dw, p => (p.field_14B & 2) != 0);
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.GnomeBonus) != 0);
             dw.WriteLine("");
 
+            /*
             dw.WriteLine("monsterType == humanoid");
             DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.humanoid));
             dw.WriteLine("");
@@ -295,6 +296,7 @@ namespace engine
             dw.WriteLine("monsterType == animal");
             DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.animal));
             dw.WriteLine("");
+            */
 
 
             dw.Close();

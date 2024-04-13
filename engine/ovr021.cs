@@ -395,11 +395,11 @@ namespace engine
 
         static int rest_memorize(ref bool findNext, Player player)
         {
-            foreach (int id in player.spellList.LearningList())
+            foreach (Spells id in player.spellList.LearningList())
             {
                 if (findNext == true)
                 {
-                    return gbl.spellCastingTable[id].spellLevel;
+                    return gbl.spellCastingTable[(int)id].spellLevel;
                 }
                 else
                 {
@@ -407,7 +407,7 @@ namespace engine
 
                     display_resting_time(0);
 
-                    ovr023.DisplayCaseSpellText(id, "has memorized", player);
+                    ovr023.DisplayCaseSpellText((int)id, "has memorized", player);
                     findNext = true;
                 }
             }

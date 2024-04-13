@@ -1,5 +1,6 @@
 ﻿using Classes;
 using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices.WindowsRuntime;
 using static Classes.Item;
 
@@ -319,8 +320,16 @@ namespace Classes
             count = (byte)item.count;
             _value = item._value;
             affect_1 = (byte)item.affect_1;
-            affect_2 = (byte)item.affect_2;
-            affect_3 = (byte)item.affect_3;
+            if (item.type == ItemType.Gauntlets && item.affect_3 == (Affects)131)
+            {
+                affect_2 = (byte)38;
+                affect_3 = (byte)131;
+            }
+            else
+            {
+                affect_2 = (byte)item.affect_2;
+                affect_3 = (byte)item.affect_3;
+            }
         }
 
         public Item Load()
@@ -345,18 +354,9 @@ namespace Classes
                 affect_3 = (Affects)affect_3
             };
 
-            if (item.type == ItemType.Gauntlets)
+            if (item.type == ItemType.Gauntlets && item.affect_2 == (Affects)38 && item.affect_3 == (Affects)131)
             {
-                if (affect_2 > 0 && affect_3 >= 128)
-                {
-                    item.affect_2 = 0;
-                    item.affect_3 = (Affects)affect_3;
-                }
-                else
-                {
-                    item.affect_2 = (Affects)affect_2;
-                    item.affect_3 = (Affects)affect_3;
-                }
+                item.affect_2 = 0;
             }
 
             ItemLibrary.Add(item);
@@ -364,9 +364,24 @@ namespace Classes
             return item;
         }
 
-        public byte[] Save()
+        public byte[] Save(Player player, List<PoolRadAffect> affects)
         {
             byte[] data = new byte[StructSize];
+
+            if (readied > 0 && type == (byte)ItemType.Gauntlets && affect_2 == 38 && affect_3 == 131)
+            {
+                byte affect_data;
+                if (player.stats2.Str.cur == 18)
+                {
+                    affect_data = (byte)(player.stats2.Str00.cur + 1);
+                }
+                else
+                {
+                    affect_data = (byte)(player.stats2.Str.cur + 100);
+                }
+                PoolRadAffect affect = new PoolRadAffect(PoolRadAffects.strength, 0, affect_data, true);
+                affects.Add(affect);
+            }
 
             DataIO.WriteObject(this, data);
 

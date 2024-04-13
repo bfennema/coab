@@ -90,7 +90,7 @@ namespace engine
         {
             foreach (Player player in gbl.TeamList)
             {
-                cancel_memorize(player);
+                //cancel_memorize(player);
                 cancel_scribes(player);
             }
         }
@@ -109,7 +109,7 @@ namespace engine
                 }
             }
 
-            return gbl.SelectedPlayer.spellCastCount[(int)spellClass, spellLevel - 1] - alreadyLearning;
+            return gbl.SelectedPlayer.spellCastCount[(int)spellClass][spellLevel - 1] - alreadyLearning;
         }
 
 
@@ -218,7 +218,7 @@ namespace engine
                 {
                     var_60[(int)spellClass, spellLevel] = HowManySpellsPlayerCanLearn(spellClass, spellLevel + 1).ToString();
 
-                    if (gbl.SelectedPlayer.spellCastCount[(int)spellClass, spellLevel] == 0)
+                    if (gbl.SelectedPlayer.spellCastCount[(int)spellClass][spellLevel] == 0)
                     {
                         var_60[(int)spellClass, spellLevel] = " ";
                     }
@@ -348,7 +348,7 @@ namespace engine
                         }
                         else if (HowManySpellsPlayerCanLearn(gbl.spellCastingTable[spellId].spellClass, gbl.spellCastingTable[spellId].spellLevel) > 0)
                         {
-                            gbl.SelectedPlayer.spellList.AddLearn(spellId);
+                            gbl.SelectedPlayer.spellList.AddLearn((Spells)spellId);
                         }
                     }
                 }
@@ -450,7 +450,7 @@ namespace engine
                                 int spell_level = gbl.spellCastingTable[var_4].spellLevel;
                                 int spell_class = (int)gbl.spellCastingTable[var_4].spellClass;
 
-                                if (gbl.SelectedPlayer.spellCastCount[spell_class, spell_level - 1] > 0)
+                                if (gbl.SelectedPlayer.spellCastCount[spell_class][spell_level - 1] > 0)
                                 {
                                     foreach (Item var_C in gbl.SelectedPlayer.items)
                                     {
@@ -957,16 +957,16 @@ namespace engine
 
                 if (player.health_status == Status.okey)
                 {
-                    numCureLight += player.spellCastCount[0, 0];
-                    var_A = player.spellCastCount[0, 0] * 15;
-                    numCureLight += player.spellCastCount[1, 1];
-                    var_B = player.spellCastCount[1, 1] * 30;
+                    numCureLight += player.spellCastCount[0][0];
+                    var_A = player.spellCastCount[0][0] * 15;
+                    numCureLight += player.spellCastCount[1][1];
+                    var_B = player.spellCastCount[1][1] * 30;
 
-                    numCureSerious += player.spellCastCount[0, 3] + player.spellCastCount[1, 3];
-                    var_C = (player.spellCastCount[0, 3] + player.spellCastCount[1,3]) * 60;
+                    numCureSerious += player.spellCastCount[0][3] + player.spellCastCount[1][3];
+                    var_C = (player.spellCastCount[0][3] + player.spellCastCount[1][3]) * 60;
 
-                    numCureCritical += player.spellCastCount[0, 4];
-                    var_E = player.spellCastCount[0, 4] * 75;
+                    numCureCritical += player.spellCastCount[0][4];
+                    var_E = player.spellCastCount[0][4] * 75;
                 }
 
                 if (var_A > 0)

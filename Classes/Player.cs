@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security.Cryptography.X509Certificates;
+using System.Xml.Serialization;
 
 
 namespace Classes
@@ -25,9 +28,16 @@ namespace Classes
             max = _max;
         }
 
+        public StatValue(StatValue old, int[,,] _raceSexMinMax, int[] _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
+            : this(_raceSexMinMax, _classMin, _ageEffects, _cur_offset, _full_offset, _min, _max)
+        {
+            cur = old.cur;
+            full = old.full;
+        }
+
         public int cur;
         public int full;
-        readonly int cur_offset ;
+        readonly int cur_offset;
         readonly int full_offset;
 
         public void Load(int val)
@@ -122,6 +132,16 @@ namespace Classes
         public StatValue Wis = new StatValue(Limits.WisRaceSexMinMax, Limits.WisClassMin, Limits.WisAgeEffect);
         public StatValue Cha = new StatValue(Limits.ChaRaceSexMinMax, Limits.ChaClassMin, Limits.ChaAgeEffect);
 
+        public void ReInit()
+        {
+            Str = new StatValue(Str, Limits.StrRaceSexMinMax, Limits.StrClassMin, Limits.StrAgeEffect);
+            Str00 = new StatValue(Str00, Limits.Str00RaceSexMinMax, Limits.Str00ClassMin, Limits.Str00AgeEffect, 1, 0, 0, 100);
+            Con = new StatValue(Con, Limits.ConRaceSexMinMax, Limits.ConClassMin, Limits.ConAgeEffect);
+            Dex = new StatValue(Dex, Limits.DexRaceSexMinMax, Limits.DexClassMin, Limits.DexAgeEffect);
+            Int = new StatValue(Int, Limits.IntRaceSexMinMax, Limits.IntClassMin, Limits.IntAgeEffect);
+            Wis = new StatValue(Wis, Limits.WisRaceSexMinMax, Limits.WisClassMin, Limits.WisAgeEffect);
+            Cha = new StatValue(Cha, Limits.ChaRaceSexMinMax, Limits.ChaClassMin, Limits.ChaAgeEffect);
+    }
 
         void IDataIO.Write(byte[] data, int offset)
         {
@@ -231,14 +251,14 @@ namespace Classes
 
     public class SpellBook : IDataIO
     {
-        public bool[] spellBook = new bool[(byte)Enum.GetValues(typeof(Spells)).Cast<Spells>().Max()+1];
+        public List<Spells> spellBook = new List<Spells>();
         void IDataIO.Write(byte[] data, int offset)
         {
             foreach (SpellEntry spell in gbl.spellCastingTable)
             {
                 if (spell != null && spell.spellIdx <= (byte)Spells.bestow_curse_MU)
                 {
-                    data[offset + spell.spellIdx - 1] = (byte)(spellBook[spell.spellIdx] == true ? 1 : 0);
+                    data[offset + spell.spellIdx - 1] = (byte)(spellBook.Contains((Spells)spell.spellIdx) ? 1 : 0);
                 }
             }
         }
@@ -247,7 +267,13 @@ namespace Classes
         {
             for (int i = 0; i < 100; i++)
             {
-                spellBook[i + 1] = data[offset + i] != 0;
+                if (data[offset + i] != 0)
+                {
+                    if (!spellBook.Contains((Spells)(i+1)))
+                    {
+                        spellBook.Add((Spells)(i + 1));
+                    }
+                }
             }
         }
 
@@ -255,7 +281,7 @@ namespace Classes
         {
             for (int i = 0; i < length; i++)
             {
-                data[i] = (byte)(spellBook[i + 1] ? 1 : 0);
+                data[i] = (byte)(spellBook.Contains((Spells)(i + 1)) ? 1 : 0);
             }
         }
 
@@ -263,23 +289,29 @@ namespace Classes
         {
             for (int i = 0; i < length; i++)
             {
-                spellBook[i + 1] = data[i] != 0;
+                if (data[i] != 0)
+                {
+                    spellBook.Add((Spells)(i + 1));
+                }
             }
         }
 
         public bool KnowsSpell(Spells spell)
         {
-            return spellBook[(int)spell];
+            return spellBook.Contains(spell);
         }
 
         public void LearnSpell(Spells spell)
         {
-            spellBook[(int)spell] = true;
+            if (!spellBook.Contains(spell))
+            {
+                spellBook.Add(spell);
+            }
         }
 
         public void UnlearnSpell(Spells spell)
         {
-            spellBook[(int)spell] = false;
+            spellBook.Remove(spell);
         }
     }
 
@@ -426,151 +458,136 @@ namespace Classes
     /// </summary>
     public class Player
     {
-        [DataOffset(0x00, DataType.PString, 15)]
         public string name;
 
-        //[DataOffset(0x10, DataType.Cust1Array, 6)]
-        //public StatValue[] stats;
-
-        [DataOffset(0x10, DataType.CustSaveLoad, 0x12)]
         public PlayerStats stats2;
 
         public SpellList spellList; // ox1e was spell_list
 
-        [DataOffset(0x72, DataType.Byte)]
         public byte spell_to_learn_count; // 0x72;
-        [DataOffset(0x73, DataType.SByte)]
         public sbyte thac0; // 0x73; field_73
 
-        [DataOffset(0x74, DataType.IByte)]
         public Race race; // 0x74;
 
-        [DataOffset(0x75, DataType.IByte)]
         public ClassId _class; // 0x75;
-        [DataOffset(0x76, DataType.SWord)]
         public short age; // 0x76;
 
-        [DataOffset(0x78, DataType.Byte)]
         public byte hit_point_max; // 0x78;
 
-        [DataOffset(0x79, DataType.CustSaveLoad, 100)]
         public SpellBook spellBook; // 0x79 - 0xDC
 
-        [DataOffset(0xdd, DataType.Byte)]
         public byte attackLevel; // 0xdd; field_DD
-        [DataOffset(0xde, DataType.Byte)]
         public byte icon_dimensions; // 0xde;
-        [DataOffset(0xdf, DataType.ByteArray, 5)]
         public byte[] saveVerse = new byte[5]; // 0xdf; field_DF 
 
-        [DataOffset(0xe4, DataType.Byte)]
         public byte base_movement; // 0xe4;
-        [DataOffset(0xe5, DataType.Byte)]
         public byte HitDice; // 0xe5; HitDice?
-        [DataOffset(0xe6, DataType.Byte)]
         public byte multiclassLevel; // 0xe6;
-        [DataOffset(0xe7, DataType.Byte)]
         public byte lost_lvls; // 0xe7;
-        [DataOffset(0xe8, DataType.Byte)]
         public byte lost_hp; // 0xe8;
-        [DataOffset(0xe9, DataType.Byte)]
         public byte level_undead; // 0xe9;
-        [DataOffset(0xeA, DataType.ByteArray, 8)]
         public byte[] thief_skills = new byte[8]; // 0xeA; [] was 1 offset @ 0xe9, pick_pockets, open_locks, find_remove_traps, move_silently, hide_in_shadows, hear_noise, climb_walls, read_languages
         public List<Affect> affects; // f2 - affect_ptr
 
-        [DataOffset(0xf6, DataType.Byte)]
         public byte field_F6; // 0xf6; field_F6
-        [DataOffset(0xf7, DataType.Byte)]
         public byte control_morale; // 0xf7; field_F7
-        [DataOffset(0xf8, DataType.Byte)]
         public byte npcTreasureShareCount; // 0xf8;
-        [DataOffset(0xf9, DataType.Byte)]
         public byte field_F9; // 0xf9
-        [DataOffset(0xfa, DataType.Byte)]
         public byte field_FA; // 0xfa;
 
-        [DataOffset(0xfb, DataType.ShortArray, 7)]
         public MoneySet Money;
 
-        [DataOffset(0x109, DataType.ByteArray, 8)]
         public byte[] ClassLevel = new byte[8]; /* Skill_A_lvl */
 
+        [XmlIgnore]
         public byte cleric_lvl // 0x109;
         {
             get { return ClassLevel[0]; }
             set { ClassLevel[0] = value; }
         }
+        [XmlIgnore]
         public byte druid_lvl // 0x10a;
         {
             get { return ClassLevel[1]; }
             set { ClassLevel[1] = value; }
         }
+        [XmlIgnore]
         public byte fighter_lvl // 0x10b;
         {
             get { return ClassLevel[2]; }
             set { ClassLevel[2] = value; }
         }
+        [XmlIgnore]
         public byte paladin_lvl // 0x10c;
         {
             get { return ClassLevel[3]; }
             set { ClassLevel[3] = value; }
         }
+        [XmlIgnore]
         public byte ranger_lvl // 0x10d;
         {
             get { return ClassLevel[4]; }
             set { ClassLevel[4] = value; }
         }
+        [XmlIgnore]
         public byte magic_user_lvl // 0x10e;
         {
             get { return ClassLevel[5]; }
             set { ClassLevel[5] = value; }
         }
+        [XmlIgnore]
         public byte thief_lvl // 0x10f;
         {
             get { return ClassLevel[6]; }
             set { ClassLevel[6] = value; }
         }
+        [XmlIgnore]
         public byte monk_lvl // 0x110;
         {
             get { return ClassLevel[7]; }
             set { ClassLevel[7] = value; }
         }
 
-        [DataOffset(0x111, DataType.ByteArray, 8)]
         public byte[] ClassLevelsOld = new byte[8];
 
 
+        [XmlIgnore]
         public byte cleric_old_lvl // 0x111;
         {
             get { return ClassLevelsOld[0]; }
             set { ClassLevelsOld[0] = value; }
         }
+        [XmlIgnore]
         public byte druid_old_lvl // 0x112;
         {
             get { return ClassLevelsOld[1]; }
             set { ClassLevelsOld[1] = value; }
         }
+        [XmlIgnore]
         public byte fighter_old_lvl // 0x113;
         {
             get { return ClassLevelsOld[2]; }
             set { ClassLevelsOld[2] = value; }
         }
+        [XmlIgnore]
         public byte paladin_old_lvl // 0x114;
         {
             get { return ClassLevelsOld[3]; }
             set { ClassLevelsOld[3] = value; }
         }
+        [XmlIgnore]
         public byte ranger_old_lvl // 0x115;
         {
             get { return ClassLevelsOld[4]; }
             set { ClassLevelsOld[4] = value; }
         }
+        [XmlIgnore]
         public byte magic_user_old_lvl // 0x116;
         {
             get { return ClassLevelsOld[5]; }
             set { ClassLevelsOld[5] = value; }
         }
+        [XmlIgnore]
         public byte thief_old_lvl // 0x117;
         {
             get { return ClassLevelsOld[6]; }
@@ -614,67 +631,40 @@ namespace Classes
             return System.Math.Max(SkillLevel(SkillType.Cleric), SkillLevel(SkillType.Paladin) - 2);
         }
 
-        [DataOffset(0x119, DataType.Byte)]
         public byte sex; // 0x119;
-        [DataOffset(0x11a, DataType.IByte)]
-        public MonsterType monsterType; // 0x11a;
-        [DataOffset(0x11b, DataType.Byte)]
         public byte alignment; // 0x11b;
         /// <summary>
         /// half-attacks count
         /// </summary>
-        [DataOffset(0x11c, DataType.Byte)]
         public byte attacksCount; // 0x11c;
-        [DataOffset(0x11d, DataType.Byte)]
         public byte baseHalfMoves; // 0x11d;
-        [DataOffset(0x11e, DataType.Byte)]
         public byte attack1_DiceCountBase; // 0x11e;
-        [DataOffset(0x11f, DataType.Byte)]
         public byte attack2_DiceCountBase; // 0x11f;
-        [DataOffset(0x120, DataType.Byte)]
         public byte attack1_DiceSizeBase; // 0x120;
-        [DataOffset(0x121, DataType.Byte)]
         public byte attack2_DiceSizeBase; // 0x121;
-        [DataOffset(0x122, DataType.Byte)]
         public byte attack1_DamageBonusBase; // 0x122;
-        [DataOffset(0x123, DataType.Byte)]
         public byte attack2_DamageBonusBase; // 0x123;
-        [DataOffset(0x124, DataType.Byte)]
         public byte base_ac; // 0x124;
-        [DataOffset(0x125, DataType.Byte)]
         public byte field_125; // 0x125;
-        [DataOffset(0x126, DataType.Byte)]
         public byte mod_id; // 0x126; field_126
-        [DataOffset(0x127, DataType.Int)]
         public int exp; // 0x127
-        [DataOffset(0x12b, DataType.Byte)]
         public byte classFlags; // 0x12b;
-        [DataOffset(0x12c, DataType.Byte)]
         public byte hit_point_rolled; // 0x12c;
 
-        //[DataOffset(0x12d, DataType.ByteArray,15)]
-        public byte[,] spellCastCount = new byte[3, 5]; // 0x12d - field_12D
+        //[XmlIgnore]
+        //public byte[,] spellCastCount = new byte[3, 5]; // 0x12d - field_12D
+        public byte[][] spellCastCount = new byte[3][];
 
-        [DataOffset(0x13c, DataType.SWord)]
         public short field_13C; // 0x13c
-        [DataOffset(0x13e, DataType.Byte)]
         public byte field_13E; // 0x13e;
-        [DataOffset(0x13f, DataType.Byte)]
         public byte field_13F; // 0x13f;
-        [DataOffset(0x140, DataType.Byte)]
         public byte field_140; // 0x140;
-        [DataOffset(0x141, DataType.Byte)]
         public byte head_icon; // 0x141;
-        [DataOffset(0x142, DataType.Byte)]
         public byte weapon_icon; // 0x142;
-        [DataOffset(0x143, DataType.Byte)]
         public byte icon_id; // 0x143;
-        [DataOffset(0x144, DataType.Byte)]
         public byte icon_size; // 0x144; field_144  1 small 2 normal
-        [DataOffset(0x145, DataType.ByteArray, 6)]
         public byte[] icon_colours = new byte[6]; // 0x145 = field_144[1] // byte[6]
-        [DataOffset(0x14b, DataType.Byte)]
-        public byte field_14B; // 0x14b;
+        public Flags flags; // 0x14b;
 
         //[DataOffset(0x14c, DataType.Byte)]
         //public byte field_14C; // 0x14c; // items.Count
@@ -687,37 +677,23 @@ namespace Classes
         public ActiveItems activeItems = new ActiveItems();
 
 
-        [DataOffset(0x185, DataType.Byte)]
         public byte weaponsHandsUsed; // 0x185;
-        [DataOffset(0x186, DataType.SByte)]
         public sbyte field_186; // 0x186;
-        [DataOffset(0x187, DataType.SWord)]
         public short weight; // 0x187
 
         public Action actions; // 0x18d
-        [DataOffset(0x191, DataType.Byte)]
         public byte paladinCuresLeft; // 0x191 field_191
-        [DataOffset(0x192, DataType.Byte)]
         public byte field_192; // 0x192
-        [DataOffset(0x193, DataType.Byte)]
         public byte field_193; // 0x193
-        [DataOffset(0x194, DataType.Byte)]
         public byte field_194; // 0x194
-        [DataOffset(0x195, DataType.IByte)]
         public Status health_status; // 0x195
-        [DataOffset(0x196, DataType.Bool)]
         public bool in_combat; // 0x196
-        [DataOffset(0x197, DataType.IByte)]
         public CombatTeam combat_team; // 0x197 0 - our team, 1 - enemy
-        [DataOffset(0x198, DataType.IByte)]
         public QuickFight quick_fight; // 0x198
-        [DataOffset(0x199, DataType.IByte)]
         public int hitBonus; // 0x199 field_199
-        [DataOffset(0x19a, DataType.Byte)]
         public byte ac; // 0x19a
         public int DisplayAc { get { return 60 - ac; } }
 
-        [DataOffset(0x19b, DataType.Byte)]
         public byte ac_behind; // 0x19b field_19B
 
         public byte AttacksLeft(int index)
@@ -763,9 +739,7 @@ namespace Classes
             }
         }
 
-        [DataOffset(0x19c, DataType.Byte)]
         public byte attack1_AttacksLeft; // 0x19c - field_19C
-        [DataOffset(0x19d, DataType.Byte)]
         public byte attack2_AttacksLeft; // 0x19d - field_19D
 
         public byte attackDiceCount(int index)
@@ -780,9 +754,7 @@ namespace Classes
                     throw new System.NotImplementedException();
             }
         }
-        [DataOffset(0x19E, DataType.Byte)]
         public byte attack1_DiceCount; // 0x19e field_19E
-        [DataOffset(0x19F, DataType.Byte)]
         public byte attack2_DiceCount; // 0x19f
 
         public byte attackDiceSize(int index)
@@ -797,9 +769,7 @@ namespace Classes
                     throw new System.NotImplementedException();
             }
         }
-        [DataOffset(0x1A0, DataType.Byte)]
         public byte attack1_DiceSize; // 0x1a0 field_1A0
-        [DataOffset(0x1A1, DataType.Byte)]
         public byte attack2_DiceSize; // 0x1a1
 
         public byte attackDamageBonus(int index)
@@ -814,22 +784,22 @@ namespace Classes
                     throw new System.NotImplementedException();
             }
         }
-        [DataOffset(0x1a2, DataType.SByte)]
         public sbyte attack1_DamageBonus; // 0x1a2
-        [DataOffset(0x1a3, DataType.Byte)]
         public byte attack2_DamageBonus; // 0x1a3
 
-        [DataOffset(0x1a4, DataType.Byte)]
         public byte hit_point_current; // 0x1a4
 
-        [DataOffsetAttribute(0x1A5, DataType.Byte)]
         public byte movement; // 0x1a5 initiative
 
         public const int StructSize = 0x1A6;
 
         public Player()
         {
-            spellCastCount = new byte[3, 5];
+            spellCastCount = new byte[3][];
+            for (int i=0; i<3; i++)
+            {
+                spellCastCount[i] = new byte[5];
+            }
 
             stats2 = new PlayerStats();
 

@@ -27,7 +27,7 @@ namespace Classes
         spiritual_hammer = 0x17,
         detect_invisibility = 0x18,
         invisibility = 0x19,
-        dwarf_vs_orc = 0x1a,
+        dwarf_vs_orc_goblin = 0x1a,
         feather_fall = 0x1b,
         mirror_image = 0x1c,
         ray_of_enfeeblement = 0x1d,
@@ -48,8 +48,8 @@ namespace Classes
         cause_disease_2 = 0x2c,
         prot_from_evil_10_radius = 0x2d,
         prot_from_good_10_radius = 0x2e,
-        dwarf_and_gnome_vs_giants = 0x2f,
-        gnome_vs_gnoll = 0x30,
+        giant_vs_dwarf_gnome = 0x2f,
+        gnoll_bugbear_vs_gnome = 0x30,
         prayer = 0x31,
         mummy_disease_healing = 0x32,
         snake_charm = 0x33,
@@ -149,10 +149,10 @@ namespace Classes
             mapping.Add(PoolRadAffects.bless, Affects.bless);
             mapping.Add(PoolRadAffects.cursed, Affects.cursed);
             //mapping.Add(PoolRadAffects.sword_vs_undead, Affects.sword_vs_undead);
-            //mapping.Add(PoolRadAffects.studying_manual_bodily_health, Affects.studying_manual_bodily_health);
+            mapping.Add(PoolRadAffects.studying_manual_bodily_health, Affects.studying_manual_bodily_health);
             mapping.Add(PoolRadAffects.detect_magic, Affects.detect_magic);
             mapping.Add(PoolRadAffects.weap_flame_tongue, Affects.weap_flame_tongue);
-            //mapping.Add(PoolRadAffects.training_manual_bodily_health, Affects.training_manual_bodily_health);
+            mapping.Add(PoolRadAffects.training_manual_bodily_health, Affects.training_manual_bodily_health);
             mapping.Add(PoolRadAffects.protection_from_evil, Affects.protection_from_evil);
             mapping.Add(PoolRadAffects.protection_from_good, Affects.protection_from_good);
             mapping.Add(PoolRadAffects.resist_cold, Affects.resist_cold);
@@ -171,7 +171,7 @@ namespace Classes
             mapping.Add(PoolRadAffects.spiritual_hammer, Affects.spiritual_hammer);
             mapping.Add(PoolRadAffects.detect_invisibility, Affects.detect_invisibility);
             mapping.Add(PoolRadAffects.invisibility, Affects.invisibility);
-            mapping.Add(PoolRadAffects.dwarf_vs_orc, Affects.dwarf_vs_orc);
+            mapping.Add(PoolRadAffects.dwarf_vs_orc_goblin, Affects.dwarf_vs_orc_goblin);
             //mapping.Add(PoolRadAffects.feather_fall, Affects.feather_fall);
             mapping.Add(PoolRadAffects.mirror_image, Affects.mirror_image);
             mapping.Add(PoolRadAffects.ray_of_enfeeblement, Affects.ray_of_enfeeblement);
@@ -192,8 +192,8 @@ namespace Classes
             mapping.Add(PoolRadAffects.cause_disease_2, Affects.cause_disease_2);
             mapping.Add(PoolRadAffects.prot_from_evil_10_radius, Affects.prot_from_evil_10_radius);
             mapping.Add(PoolRadAffects.prot_from_good_10_radius, Affects.prot_from_good_10_radius);
-            mapping.Add(PoolRadAffects.dwarf_and_gnome_vs_giants, Affects.dwarf_and_gnome_vs_giants);
-            mapping.Add(PoolRadAffects.gnome_vs_gnoll, Affects.gnome_vs_gnoll);
+            mapping.Add(PoolRadAffects.giant_vs_dwarf_gnome, Affects.giant_vs_dwarf_gnome);
+            mapping.Add(PoolRadAffects.gnoll_bugbear_vs_gnome, Affects.gnoll_bugbear_vs_gnome);
             mapping.Add(PoolRadAffects.prayer, Affects.prayer);
             mapping.Add(PoolRadAffects.mummy_disease_healing, Affects.mummy_disease_healing);
             mapping.Add(PoolRadAffects.snake_charm, Affects.snake_charm);
@@ -349,9 +349,9 @@ namespace Classes
             else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 if (type == PoolRadAffects.gnome_vs_goblin_kobold ||
-                    type == PoolRadAffects.dwarf_vs_orc ||
-                    type == PoolRadAffects.dwarf_and_gnome_vs_giants ||
-                    type == PoolRadAffects.gnome_vs_gnoll ||
+                    type == PoolRadAffects.dwarf_vs_orc_goblin ||
+                    type == PoolRadAffects.giant_vs_dwarf_gnome ||
+                    type == PoolRadAffects.gnoll_bugbear_vs_gnome ||
                     type == PoolRadAffects.con_saving_bonus ||
                     type == PoolRadAffects.elf_resist_sleep ||
                     type == PoolRadAffects.halfelf_resistance)

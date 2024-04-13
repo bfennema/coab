@@ -2,6 +2,19 @@ namespace Classes
 {
     public class PoolRadPlayer
     {
+        public enum MonsterType
+        {
+            humanoid = 1,
+            giant = 2,
+            dragon = 3,
+            animated_dead = 4,
+            genie = 7,
+            troll = 10,
+            reptile = 11,
+            snake = 14,
+            animal = 15,
+        }
+
         [DataOffset(0x00, DataType.PString, 15)]
         public string name; // 0x0 - 0x0F
         [DataOffset(0x10, DataType.Byte)]
@@ -80,8 +93,8 @@ namespace Classes
         public byte[] field_96 = new byte[8]; // 0x96 Array 8 0x96 - 0x9D
         [DataOffset(0x9E, DataType.Byte)]
         public byte sex; // 0x9E
-        [DataOffset(0x9F, DataType.Byte)]
-        public byte field_9F; // 0x9F
+        [DataOffset(0x9F, DataType.IByte)]
+        public MonsterType monsterType; // 0x9F;
         [DataOffset(0xA0, DataType.Byte)]
         public byte field_A0; // 0xA0
 
@@ -186,7 +199,6 @@ namespace Classes
 
         public const int StructSize = 0x011D;
 
-
         public PoolRadPlayer(byte[] data)
         {
             DataIO.ReadObject(this, data, 0);
@@ -245,11 +257,6 @@ namespace Classes
 
             System.Array.Copy(player.ClassLevel, field_96, 8);
 
-            field_9F = (byte)player.monsterType;
-            if (player.monsterType == MonsterType.animal)
-            {
-                field_9F = (byte)MonsterType.animal;
-            }
             field_A0 = player.alignment;
 
             field_A1 = player.attacksCount;
@@ -271,8 +278,8 @@ namespace Classes
 
             for (int var_2 = 1; var_2 <= 3; var_2++)
             {
-                field_B2[var_2 - 1] = player.spellCastCount[0, var_2 - 1];
-                field_B5[var_2 - 1] = player.spellCastCount[2, var_2 - 1];
+                field_B2[var_2 - 1] = player.spellCastCount[0][var_2 - 1];
+                field_B5[var_2 - 1] = player.spellCastCount[2][var_2 - 1];
             }
 
             field_B8 = player.field_13C;
@@ -286,6 +293,8 @@ namespace Classes
             field_C0 = player.icon_size;
 
             System.Array.Copy(player.icon_colours, field_C1, 6);
+
+            monsterType = 0;
 
             field_100 = player.weaponsHandsUsed;
             field_101 = (byte)player.field_186;
@@ -371,11 +380,19 @@ namespace Classes
 
             System.Array.Copy(field_96, player.ClassLevel, 8);
 
-            player.monsterType = (MonsterType)field_9F;
-            if (player.monsterType == MonsterType.animal_old)
+            if (player.paladin_lvl > 0)
             {
-                player.monsterType = MonsterType.animal;
+                player.paladinCuresLeft = (byte)(((player.paladin_lvl - 1) / 5) + 1);
+                Affect affect = new Affect(Affects.protection_from_evil, 0, (byte)0xFF, false);
+                player.affects.Add(affect);
             }
+
+            if (player.ranger_lvl > 0)
+            {
+                Affect affect = new Affect(Affects.ranger_vs_giant, 0, (byte)0xFF, false);
+                player.affects.Add(affect);
+            }
+
             player.alignment = field_A0;
 
             player.attacksCount = field_A1;
@@ -397,8 +414,8 @@ namespace Classes
 
             for (int var_2 = 1; var_2 <= 3; var_2++)
             {
-                player.spellCastCount[0, var_2 - 1] = field_B2[var_2 - 1];
-                player.spellCastCount[2, var_2 - 1] = field_B5[var_2 - 1];
+                player.spellCastCount[0][var_2 - 1] = field_B2[var_2 - 1];
+                player.spellCastCount[2][var_2 - 1] = field_B5[var_2 - 1];
             }
 
             player.field_13C = field_B8;
@@ -413,6 +430,82 @@ namespace Classes
 
             System.Array.Copy(field_C1, player.icon_colours, 6);
 
+            if (monsterType == 0)
+            {
+                if (name.Contains("HOBGOBLIN"))
+                {
+                    player.flags |= Flags.DwarfBonus | Flags.RangerBonus;
+                }
+                if (icon_dimensions == 1)
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+            }
+            else if (monsterType == MonsterType.humanoid)
+            {
+                player.flags |= Flags.RangerBonus;
+
+                if (name.Contains("BUGBEAR"))
+                {
+                    player.flags |= Flags.GnomePenalty;
+                }
+                else if (name.Contains("ORC"))
+                {
+                    player.flags |= Flags.DwarfBonus;
+                }
+                else if (name.Contains("GOBLIN"))
+                {
+                    player.flags |= Flags.DwarfBonus | Flags.GnomeBonus;
+                }
+                else if (name.Contains("KOBOLD"))
+                {
+                    player.flags |= Flags.GnomeBonus | Flags.Reptile;
+                }
+                if (name.Contains("GNOLL") || icon_dimensions == 1)
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+            }
+            else if (monsterType == MonsterType.giant)
+            {
+                player.flags |= Flags.DwarfPenalty | Flags.GnomePenalty | Flags.RangerBonus | Flags.Giant;
+            }
+            else if (monsterType == MonsterType.dragon)
+            {
+                player.flags |= Flags.Dragon;
+            }
+            else if (monsterType == MonsterType.animated_dead)
+            {
+                player.flags |= Flags.Undead;
+            }
+            else if (monsterType == MonsterType.genie)
+            {
+                player.flags |= Flags.EvilSummon;
+            }
+            else if (monsterType == MonsterType.troll)
+            {
+                player.flags |= Flags.DwarfPenalty | Flags.GnomePenalty | Flags.RangerBonus | Flags.Regenerate;
+            }
+            else if (monsterType == MonsterType.reptile)
+            {
+                player.flags |= Flags.Reptile;
+                if (name.Contains("MAN"))
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+                else
+                {
+                    player.flags |= Flags.Animal;
+                }
+            }
+            else if (monsterType == MonsterType.snake)
+            {
+                player.flags |= Flags.Snake | Flags.Animal;
+            }
+            else if (monsterType == MonsterType.animal)
+            {
+                player.flags |= Flags.Animal | Flags.Mammal;
+            }
 
             //player.field_14c = bp_var_1C0.field_C7; // Item count
 

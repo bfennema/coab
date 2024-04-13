@@ -30,7 +30,7 @@ namespace Classes
         spiritual_hammer = 0x17,
         detect_invisibility = 0x18,
         invisibility = 0x19,
-        dwarf_vs_orc = 0x1a,
+        dwarf_vs_orc_goblin = 0x1a,
         fumbling = 0x1b,
         mirror_image = 0x1c,
         ray_of_enfeeblement = 0x1d,
@@ -51,8 +51,8 @@ namespace Classes
         cause_disease_2 = 0x2c,
         prot_from_evil_10_radius = 0x2d,
         prot_from_good_10_radius = 0x2e,
-        dwarf_and_gnome_vs_giants = 0x2f,
-        gnome_vs_gnoll = 0x30,
+        giant_vs_dwarf_gnome = 0x2f,
+        gnoll_bugbear_vs_gnome = 0x30,
         prayer = 0x31,
         hot_fire_shield = 0x32,
         snake_charm = 0x33,
@@ -174,6 +174,8 @@ namespace Classes
         protection_from_fire = 0xa6,
         resist_lightning = 0xa7,
         protection_from_lightning = 0xa8,
+        studying_manual_bodily_health = 0xa9,
+        training_manual_bodily_health = 0xaa,
     }
 
     /// <summary>
@@ -182,6 +184,14 @@ namespace Classes
     public class Affect
     {
         public const int StructSize = 9;
+
+        public Affect()
+        {
+            type = Affects.none;
+            minutes = 0;
+            affect_data = 0;
+            callAffectTable = false;
+        }
 
         public Affect(Affects _type, ushort _minutes, byte _affect_data, bool _call_spell_jump_list)
         {

@@ -1,3 +1,5 @@
+using System;
+
 namespace Classes
 {
     /// <summary>
@@ -5,11 +7,40 @@ namespace Classes
     /// </summary>
     public class CursePlayer
     {
-        [DataOffset(0x00, DataType.PString, 15)]
-        public string name; // 0x00 - 0x0E;
+        enum MonsterType
+        {
+            humanoid = 1,
+            giant = 2,
+            dragon = 3,
+            animated_dead = 4,
+            genie = 7,
+            fire = 8,
+            cold = 9,
+            troll = 10,
+            reptile = 11,
+            avian = 12,
+            squid = 13,
+            snake = 14,
+            giant_bug = 16,
+            magic_beast = 17,
+            plant = 18,
+            animal = 19,
+        }
 
-        [DataOffset(0x10, DataType.ByteArray, 14)]
-        public byte[] stats = new byte[14]; // 0x10 - 0x1D;
+        [Flags]
+        enum CurseFlags
+        {
+            EvilSummon = 0x01,
+            DwarfPenalty = 0x02,
+            GnomePenalty = 0x04,
+            RangerBonus = 0x08,
+        }
+
+        [DataOffset(0x00, DataType.PString, 15)]
+        string name; // 0x00 - 0x0E;
+
+        [DataOffset(0x10, DataType.CustSaveLoad, 14)]
+        public PlayerStats stats; // 0x10 - 0x1D;
 
         [DataOffset(0x1E, DataType.ByteArray, 84)]
         public byte[] memorizedSpells = new byte[84]; // 0x1E - 0x71;
@@ -30,31 +61,20 @@ namespace Classes
         [DataOffset(0x78, DataType.Byte)]
         public byte hit_point_max; // 0x78;
 
-        [DataOffset(0x79, DataType.ByteArray, 100)]
-        public byte[] knownSpells = new byte[100]; // 0x79 - 0xDC;
+        [DataOffset(0x79, DataType.CustSaveLoad, 100)]
+        public SpellBook spellBook; // 0x79 - 0xDC
 
-        [DataOffset(0xDD, DataType.Byte)]
         public byte attackLevel; // 0xDD;
-        [DataOffset(0xDE, DataType.Byte)]
         public byte icon_dimensions; // 0xDE;
-        [DataOffset(0xDF, DataType.ByteArray, 5)]
         public byte[] saveVerse = new byte[5]; // 0xDF - 0xE3;
 
-        [DataOffset(0xE4, DataType.Byte)]
         public byte base_movement; // 0xE4;
-        [DataOffset(0xE5, DataType.Byte)]
         public byte HitDice; // 0xE5;
-        [DataOffset(0xE6, DataType.Byte)]
         public byte multiclassLevel; // 0xE6;
-        [DataOffset(0xE7, DataType.Byte)]
         public byte lost_lvls; // 0xE7;
-        [DataOffset(0xE8, DataType.Byte)]
         public byte lost_hp; // 0xE8;
-        [DataOffset(0xE9, DataType.Byte)]
         public byte level_undead; // 0xE9;
-        [DataOffset(0xEA, DataType.ByteArray, 8)]
         public byte[] thief_skills = new byte[8]; // 0xEA - 0xF1; [] was 1 offset @ 0xe9, pick_pockets, open_locks, find_remove_traps, move_silently, hide_in_shadows, hear_noise, climb_walls, read_languages
-        [DataOffset(0xF2, DataType.ByteArray, 5)]
         public byte[] affects = new byte[5]; // 0xF2 - 0xF5;
 
         [DataOffset(0xF6, DataType.Byte)]
@@ -79,8 +99,8 @@ namespace Classes
 
         [DataOffset(0x119, DataType.Byte)]
         public byte sex; // 0x119;
-        [DataOffset(0x11A, DataType.Byte)]
-        public byte monsterType; // 0x11A;
+        [DataOffset(0x11A, DataType.IByte)]
+        MonsterType monsterType; // 0x11A;
         [DataOffset(0x11B, DataType.Byte)]
         public byte alignment; // 0x11B;
         /// <summary>
@@ -136,8 +156,8 @@ namespace Classes
         public byte icon_size; // 0x144; field_144  1 small 2 normal
         [DataOffset(0x145, DataType.ByteArray, 6)]
         public byte[] icon_colours = new byte[6]; // 0x145 = field_144[1] // byte[6]
-        [DataOffset(0x14B, DataType.Byte)]
-        public byte field_14B; // 0x14B;
+        [DataOffset(0x14B, DataType.IByte)]
+        CurseFlags flags_1; // 0x14B;
 
         //[DataOffset(0x14C, DataType.Byte)]
         //public byte number_of_items;
@@ -218,7 +238,7 @@ namespace Classes
         {
             name = player.name;
 
-            player.stats2.Save(stats);
+            stats = player.stats2;
 
             player.spellList.Save(memorizedSpells, 0, memorizedSpells.Length);
             spell_to_learn_count = player.spell_to_learn_count;
@@ -231,7 +251,7 @@ namespace Classes
 
             hit_point_max = player.hit_point_max;
 
-            player.spellBook.Save(knownSpells, knownSpells.Length);
+            spellBook = player.spellBook;
 
             attackLevel = player.attackLevel;
             icon_dimensions = player.icon_dimensions;
@@ -263,7 +283,7 @@ namespace Classes
             System.Array.Copy(player.ClassLevelsOld, ClassLevelsOld, 8);
 
             sex = player.sex;
-            monsterType = (byte)player.monsterType;
+            monsterType = 0;
             alignment = player.alignment;
 
             attacksCount = player.attacksCount;
@@ -285,7 +305,7 @@ namespace Classes
             {
                 for (int spell_level = 0; spell_level < 5; spell_level++)
                 {
-                    spellCastCount[spell_class * 5 + spell_level] = player.spellCastCount[spell_class, spell_level];
+                    spellCastCount[spell_class * 5 + spell_level] = player.spellCastCount[spell_class][spell_level];
                 }
             }
 
@@ -297,8 +317,24 @@ namespace Classes
             weapon_icon = player.weapon_icon;
             icon_id = player.icon_id;
             icon_size = player.icon_size;
+            flags_1 = 0x00;
             System.Array.Copy(player.icon_colours, icon_colours, 6);
-            field_14B = player.field_14B;
+            if (player.flags.HasFlag(Flags.EvilSummon))
+            {
+                flags_1 |= CurseFlags.EvilSummon;
+            }
+            if (player.flags.HasFlag(Flags.DwarfPenalty))
+            {
+                flags_1 |= CurseFlags.DwarfPenalty;
+            }
+            if (player.flags.HasFlag(Flags.GnomePenalty))
+            {
+                flags_1 |= CurseFlags.GnomePenalty;
+            }
+            if (player.flags.HasFlag(Flags.RangerBonus))
+            {
+                flags_1 |= CurseFlags.RangerBonus;
+            }
 
             weaponsHandsUsed = player.weaponsHandsUsed;
             field_186 = player.field_186;
@@ -340,7 +376,7 @@ namespace Classes
 
             player.name = name;
 
-            player.stats2.Load(stats);
+            player.stats2 = stats;
 
             player.spellList.Load(memorizedSpells, 0, memorizedSpells.Length);
             player.spell_to_learn_count = spell_to_learn_count;
@@ -353,7 +389,7 @@ namespace Classes
 
             player.hit_point_max = hit_point_max;
 
-            player.spellBook.Load(knownSpells, knownSpells.Length);
+            player.spellBook = spellBook;
 
             player.attackLevel = attackLevel;
             player.icon_dimensions = icon_dimensions;
@@ -385,7 +421,6 @@ namespace Classes
             System.Array.Copy(ClassLevelsOld, player.ClassLevelsOld, 8);
 
             player.sex = sex;
-            player.monsterType = (MonsterType)monsterType;
             player.alignment = alignment;
 
             player.attacksCount = attacksCount;
@@ -407,7 +442,7 @@ namespace Classes
             {
                 for (int spell_level = 0; spell_level < 5; spell_level++)
                 {
-                    player.spellCastCount[spell_class, spell_level] = spellCastCount[spell_class * 5 + spell_level];
+                    player.spellCastCount[spell_class][spell_level] = spellCastCount[spell_class * 5 + spell_level];
                 }
             }
 
@@ -420,7 +455,102 @@ namespace Classes
             player.icon_id = icon_id;
             player.icon_size = icon_size;
             System.Array.Copy(icon_colours, player.icon_colours, 6);
-            player.field_14B = field_14B;
+            player.flags = 0;
+            if ((flags_1 & CurseFlags.EvilSummon) == CurseFlags.EvilSummon)
+            {
+                player.flags |= Flags.EvilSummon;
+            }
+            if ((flags_1 & CurseFlags.DwarfPenalty) == CurseFlags.DwarfPenalty)
+            {
+                player.flags |= Flags.DwarfPenalty;
+            }
+            if ((flags_1 & CurseFlags.GnomePenalty) == CurseFlags.GnomePenalty)
+            {
+                player.flags |= Flags.GnomePenalty;
+            }
+            if ((flags_1 & CurseFlags.RangerBonus) == CurseFlags.RangerBonus)
+            {
+                player.flags |= Flags.RangerBonus;
+            }
+
+            if (monsterType == 0)
+            {
+                if (name.Contains("HOBGOBLIN"))
+                {
+                    player.flags |= Flags.DwarfBonus;
+                }
+                if (icon_dimensions == 1)
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+            }
+            else if (monsterType == MonsterType.humanoid)
+            {
+                if (name.Contains("ORC"))
+                {
+                    player.flags |= Flags.DwarfBonus;
+                }
+                else if (name.Contains("GOBLIN"))
+                {
+                    player.flags |= Flags.DwarfBonus | Flags.GnomeBonus;
+                }
+                else if (name.Contains("KOBOLD"))
+                {
+                    player.flags |= Flags.GnomeBonus | Flags.Reptile;
+                }
+                if (name.Contains("GNOLL") || icon_dimensions == 1)
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+            }
+            else if (monsterType == MonsterType.giant)
+            {
+                player.flags |= Flags.Giant;
+            }
+            else if (monsterType == MonsterType.dragon)
+            {
+                player.flags |= Flags.Dragon;
+            }
+            else if (monsterType == MonsterType.animated_dead)
+            {
+                player.flags |= Flags.Undead;
+            }
+            else if (monsterType == MonsterType.fire)
+            {
+                player.flags |= Flags.Fire;
+            }
+            else if (monsterType == MonsterType.cold)
+            {
+                player.flags |= Flags.Cold;
+            }
+            else if (monsterType == MonsterType.troll)
+            {
+                player.flags |= Flags.DwarfPenalty | Flags.GnomePenalty | Flags.RangerBonus | Flags.Regenerate;
+            }
+            else if (monsterType == MonsterType.reptile)
+            {
+                player.flags |= Flags.Reptile;
+                if (name.Contains("MAN"))
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+                else
+                {
+                    player.flags |= Flags.Animal;
+                }
+            }
+            else if (monsterType == MonsterType.avian)
+            {
+                player.flags |= Flags.Avian | Flags.Animal;
+            }
+            else if (monsterType == MonsterType.snake)
+            {
+                player.flags |= Flags.Snake | Flags.Animal;
+            }
+            else if (monsterType == MonsterType.animal)
+            {
+                player.flags |= Flags.Animal | Flags.Mammal;
+            }
 
             player.weaponsHandsUsed = weaponsHandsUsed;
             player.field_186 = field_186;

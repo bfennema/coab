@@ -773,30 +773,30 @@ namespace engine
                 case 1: // ring of wizardy
                     if (add_item == true)
                     {
-                        player.spellCastCount[2, 0] *= 2;
-                        player.spellCastCount[2, 1] *= 2;
-                        player.spellCastCount[2, 2] *= 2;
+                        player.spellCastCount[2][0] *= 2;
+                        player.spellCastCount[2][1] *= 2;
+                        player.spellCastCount[2][2] *= 2;
                     }
                     else
                     {
                         int muSkillLevel = player.SkillLevel(SkillType.MagicUser);
 
-                        player.spellCastCount[2, 0] = 0;
-                        player.spellCastCount[2, 1] = 0;
-                        player.spellCastCount[2, 2] = 0;
-                        player.spellCastCount[2, 3] = 0;
-                        player.spellCastCount[2, 4] = 0;
+                        player.spellCastCount[2][0] = 0;
+                        player.spellCastCount[2][1] = 0;
+                        player.spellCastCount[2][2] = 0;
+                        player.spellCastCount[2][3] = 0;
+                        player.spellCastCount[2][4] = 0;
 
-                        player.spellCastCount[2, 0] = 1;
+                        player.spellCastCount[2][0] = 1;
 
                         for (int sp_lvl = 0; sp_lvl < (muSkillLevel - 1); sp_lvl++)
                         {
                             /* unk_1A7C6 = seg600:44B6 */
-                            player.spellCastCount[2, 0] += MU_spell_lvl_learn[sp_lvl, 0];
-                            player.spellCastCount[2, 1] += MU_spell_lvl_learn[sp_lvl, 1];
-                            player.spellCastCount[2, 2] += MU_spell_lvl_learn[sp_lvl, 2];
-                            player.spellCastCount[2, 3] += MU_spell_lvl_learn[sp_lvl, 3];
-                            player.spellCastCount[2, 4] += MU_spell_lvl_learn[sp_lvl, 4];
+                            player.spellCastCount[2][0] += MU_spell_lvl_learn[sp_lvl, 0];
+                            player.spellCastCount[2][1] += MU_spell_lvl_learn[sp_lvl, 1];
+                            player.spellCastCount[2][2] += MU_spell_lvl_learn[sp_lvl, 2];
+                            player.spellCastCount[2][3] += MU_spell_lvl_learn[sp_lvl, 3];
+                            player.spellCastCount[2][4] += MU_spell_lvl_learn[sp_lvl, 4];
                         }
 
                         byte[] spCounts = new byte[5];
@@ -811,7 +811,7 @@ namespace engine
                                 int spLvl = gbl.spellCastingTable[id].spellLevel - 1;
                                 spCounts[spLvl] += 1;
 
-                                if (spCounts[spLvl] > player.spellCastCount[2, spLvl])
+                                if (spCounts[spLvl] > player.spellCastCount[2][spLvl])
                                 {
                                     removeList.Add(id);
                                 }
@@ -820,7 +820,7 @@ namespace engine
 
                         foreach (var id in removeList)
                         {
-                            player.spellList.ClearSpell(id);
+                            player.spellList.ClearSpell((Spells)id);
                         }
                     }
                     break;
