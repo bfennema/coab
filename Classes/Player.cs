@@ -658,7 +658,7 @@ namespace Classes
         public byte hit_point_rolled; // 0x12c;
 
         //[DataOffset(0x12d, DataType.ByteArray,15)]
-        public byte[,] spellCastCount = new byte[3, 5]; // 0x12d - field_12D
+        public byte[][] spellCastCount = new byte[3][]; // 0x12d - field_12D
 
         [DataOffset(0x13c, DataType.SWord)]
         public short field_13C; // 0x13c
@@ -833,7 +833,11 @@ namespace Classes
 
         public Player()
         {
-            spellCastCount = new byte[3, 5];
+            spellCastCount = new byte[3][];
+            for (int i=0; i<3; i++)
+            {
+                spellCastCount[i] = new byte[5];
+            }
 
             stats2 = new PlayerStats();
 
