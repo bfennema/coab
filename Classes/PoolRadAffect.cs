@@ -149,10 +149,10 @@ namespace Classes
             mapping.Add(PoolRadAffects.bless, Affects.bless);
             mapping.Add(PoolRadAffects.cursed, Affects.cursed);
             //mapping.Add(PoolRadAffects.sword_vs_undead, Affects.sword_vs_undead);
-            //mapping.Add(PoolRadAffects.studying_manual_bodily_health, Affects.studying_manual_bodily_health);
+            mapping.Add(PoolRadAffects.studying_manual_bodily_health, Affects.studying_manual_bodily_health);
             mapping.Add(PoolRadAffects.detect_magic, Affects.detect_magic);
             mapping.Add(PoolRadAffects.weap_flame_tongue, Affects.weap_flame_tongue);
-            //mapping.Add(PoolRadAffects.training_manual_bodily_health, Affects.training_manual_bodily_health);
+            mapping.Add(PoolRadAffects.training_manual_bodily_health, Affects.training_manual_bodily_health);
             mapping.Add(PoolRadAffects.protection_from_evil, Affects.protection_from_evil);
             mapping.Add(PoolRadAffects.protection_from_good, Affects.protection_from_good);
             mapping.Add(PoolRadAffects.resist_cold, Affects.resist_cold);

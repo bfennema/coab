@@ -174,6 +174,8 @@ namespace Classes
         protection_from_fire = 0xa6,
         resist_lightning = 0xa7,
         protection_from_lightning = 0xa8,
+        studying_manual_bodily_health = 0xa9,
+        training_manual_bodily_health = 0xaa,
     }
 
     /// <summary>
