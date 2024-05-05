@@ -538,7 +538,6 @@ namespace Classes
         }
 
         public byte sex; // 0x119;
-        public MonsterType monsterType; // 0x11a;
         public byte alignment; // 0x11b;
         /// <summary>
         /// half-attacks count
@@ -569,7 +568,7 @@ namespace Classes
         public byte icon_id; // 0x143;
         public byte icon_size; // 0x144; field_144  1 small 2 normal
         public byte[] icon_colours = new byte[6]; // 0x145 = field_144[1] // byte[6]
-        public byte field_14B; // 0x14b;
+        public Flags flags; // 0x14b;
 
         //public byte field_14C; // 0x14c; // items.Count
         public const int MaxItems = 16;

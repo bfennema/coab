@@ -2,6 +2,19 @@ namespace Classes.PoolRad
 {
     public class Player
     {
+        public enum MonsterType
+        {
+            humanoid = 1,
+            giant = 2,
+            dragon = 3,
+            animated_dead = 4,
+            genie = 7,
+            troll = 10,
+            reptile = 11,
+            snake = 14,
+            animal = 15,
+        }
+
         [DataOffset(0x00, DataType.PString, 15)]
         public string name; // 0x0 - 0x0F
         [DataOffset(0x10, DataType.ByteArray, 7)]
@@ -68,8 +81,8 @@ namespace Classes.PoolRad
         public byte[] ClassLevel = new byte[8]; // 0x96 Array 8 0x96 - 0x9D
         [DataOffset(0x9E, DataType.Byte)]
         public byte sex; // 0x9E
-        [DataOffset(0x9F, DataType.Byte)]
-        public byte monsterType; // 0x9F
+        [DataOffset(0x9F, DataType.IByte)]
+        public MonsterType monsterType; // 0x9F;
         [DataOffset(0xA0, DataType.Byte)]
         public byte alignment; // 0xA0
 
@@ -224,11 +237,83 @@ namespace Classes.PoolRad
 
             System.Array.Copy(ClassLevel, player.ClassLevel, 8);
 
-            player.monsterType = (MonsterType)monsterType;
-            if (player.monsterType == MonsterType.animal_old)
+            if (monsterType == 0)
             {
-                player.monsterType = MonsterType.animal;
+                if (name.Contains("HOBGOBLIN"))
+                {
+                    player.flags |= Flags.DwarfBonus | Flags.RangerBonus;
+                }
+                if (icon_dimensions == 1)
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
             }
+            else if (monsterType == MonsterType.humanoid)
+            {
+                player.flags |= Flags.RangerBonus;
+
+                if (name.Contains("BUGBEAR"))
+                {
+                    player.flags |= Flags.GnomePenalty;
+                }
+                else if (name.Contains("ORC"))
+                {
+                    player.flags |= Flags.DwarfBonus;
+                }
+                else if (name.Contains("GOBLIN"))
+                {
+                    player.flags |= Flags.DwarfBonus | Flags.GnomeBonus;
+                }
+                else if (name.Contains("KOBOLD"))
+                {
+                    player.flags |= Flags.GnomeBonus | Flags.Reptile;
+                }
+                if (name.Contains("GNOLL") || icon_dimensions == 1)
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+            }
+            else if (monsterType == MonsterType.giant)
+            {
+                player.flags |= Flags.DwarfPenalty | Flags.GnomePenalty | Flags.RangerBonus | Flags.Giant;
+            }
+            else if (monsterType == MonsterType.dragon)
+            {
+                player.flags |= Flags.Dragon;
+            }
+            else if (monsterType == MonsterType.animated_dead)
+            {
+                player.flags |= Flags.Undead;
+            }
+            else if (monsterType == MonsterType.genie)
+            {
+                player.flags |= Flags.EvilSummon;
+            }
+            else if (monsterType == MonsterType.troll)
+            {
+                player.flags |= Flags.DwarfPenalty | Flags.GnomePenalty | Flags.RangerBonus | Flags.Regenerate;
+            }
+            else if (monsterType == MonsterType.reptile)
+            {
+                player.flags |= Flags.Reptile;
+                if (name.Contains("MAN"))
+                {
+                    player.flags |= Flags.HeldCharmed;
+                }
+                else
+                {
+                    player.flags |= Flags.Animal;
+                }
+            }
+            else if (monsterType == MonsterType.snake)
+            {
+                player.flags |= Flags.Snake | Flags.Animal;
+            }
+            else if (monsterType == MonsterType.animal)
+            {
+                player.flags |= Flags.Animal | Flags.Mammal;
+            }
+
             player.alignment = alignment;
 
             player.attacksCount = attacksCount;

@@ -249,51 +249,51 @@ namespace engine
             DebugWriter dw = new DebugWriter(filename);
 
             dw.WriteLine("GnomeVsManSizedGiant");
-            DumpMonstersFilteredSub(dw, p => (p.field_14B & 2) != 0);
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.GnomeBonus) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == humanoid");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.humanoid));
+            dw.WriteLine("RangerBonus");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.RangerBonus) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == giant");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.giant));
+            dw.WriteLine("Giant");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Giant) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == dragon");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.dragon));
+            dw.WriteLine("Dragon");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Dragon) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == animated_dead");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.animated_dead));
+            dw.WriteLine("Undead");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Undead) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == cold");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.cold));
+            dw.WriteLine("Cold");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Cold) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == fire");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.fire));
+            dw.WriteLine("Fire");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Fire) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == troll");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.troll));
+            dw.WriteLine("Regenrate");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Regenerate) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == avian");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.avian));
+            dw.WriteLine("Aviant");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Avian) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == snake");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.snake));
+            dw.WriteLine("Snake");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Snake) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == plant");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.plant));
+            dw.WriteLine("Plant");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Plant) != 0);
             dw.WriteLine("");
 
-            dw.WriteLine("monsterType == animal");
-            DumpMonstersFilteredSub(dw, p => (p.monsterType == MonsterType.animal));
+            dw.WriteLine("Animal");
+            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Animal) != 0);
             dw.WriteLine("");
 
 
