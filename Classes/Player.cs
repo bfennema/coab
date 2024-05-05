@@ -678,8 +678,7 @@ namespace Classes
         public byte icon_size; // 0x144; field_144  1 small 2 normal
         [DataOffset(0x145, DataType.ByteArray, 6)]
         public byte[] icon_colours = new byte[6]; // 0x145 = field_144[1] // byte[6]
-        [DataOffset(0x14b, DataType.Byte)]
-        public byte field_14B; // 0x14b;
+        public Flags flags; // 0x14b;
 
         //[DataOffset(0x14c, DataType.Byte)]
         //public byte field_14C; // 0x14c; // items.Count

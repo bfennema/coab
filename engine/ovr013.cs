@@ -88,7 +88,7 @@ namespace engine
 
 		internal static void DispelEvil(Effect arg_0, object param, Player player)
 		{
-			if ((gbl.SelectedPlayer.field_14B & 1) != 0)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.EvilSummon))
 			{
 				gbl.attack_roll -= 7;
 			}
@@ -104,15 +104,15 @@ namespace engine
 			{
 				gbl.spell_target = player.actions.target;
 
-				if (gbl.spell_target.monsterType == MonsterType.troll)
+				if (gbl.spell_target.flags.HasFlag(Flags.Regenerate))
 				{
 					bonus = 1;
 				}
-				else if (gbl.spell_target.monsterType == MonsterType.cold || gbl.spell_target.monsterType == MonsterType.avian)
+				else if (gbl.spell_target.flags.HasFlag(Flags.Cold) || gbl.spell_target.flags.HasFlag(Flags.Avian))
 				{
 					bonus = 2;
 				}
-				else if (gbl.spell_target.monsterType == MonsterType.animated_dead)
+				else if (gbl.spell_target.flags.HasFlag(Flags.Undead))
 				{
 					bonus = 3;
 				}
@@ -159,7 +159,7 @@ namespace engine
 
 		internal static void affect_resist_cold(Effect arg_0, object param, Player player) /* sub_3A28E */
 		{
-			if ((gbl.damage_flags & DamageType.Cold) != 0)
+			if ((gbl.damage_flags.HasFlag(DamageType.Cold)))
 			{
 				gbl.damage /= 2;
 				gbl.savingThrowRoll += 3;
@@ -256,7 +256,7 @@ namespace engine
 		{
 			if (player.actions != null &&
 				player.actions.target != null &&
-				(player.actions.target.field_14B & 2) != 0)
+				(player.actions.target.flags & Flags.GnomeBonus) != 0)
 			{
 				gbl.spell_target = player.actions.target;
 				gbl.attack_roll++;
@@ -304,7 +304,7 @@ namespace engine
 		{
 			Affect affect = (Affect)param;
 			if (add_remove == Effect.Add &&
-				(gbl.damage_flags & DamageType.Electricity) != 0)
+				gbl.damage_flags.HasFlag(DamageType.Electricity))
 			{
 				gbl.damage /= 2;
 				if (affect.affect_data > 1)
@@ -319,7 +319,7 @@ namespace engine
 		{
 			Affect affect = (Affect)param;
 			if (add_remove == Effect.Add &&
-				(gbl.damage_flags & DamageType.Electricity) != 0)
+				gbl.damage_flags.HasFlag(DamageType.Electricity))
 			{
 				if (affect.affect_data > gbl.damage)
 				{
@@ -410,7 +410,7 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if ((gbl.spell_target.field_14B & 4) != 0)
+			if (gbl.spell_target.flags.HasFlag(Flags.DwarfBonus))
 			{
 				gbl.attack_roll++;
 			}
@@ -498,7 +498,7 @@ namespace engine
 				player.control_morale = Control.PC_Base;
 			}
 
-			player.monsterType = 0;
+			player.flags |= Flags.Undead;
 		}
 
 
@@ -740,21 +740,16 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if (gbl.SelectedPlayer.monsterType == MonsterType.giant ||
-				gbl.SelectedPlayer.monsterType == MonsterType.troll)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.DwarfPenalty))
 			{
-				if ((gbl.SelectedPlayer.icon_dimensions & 0x7F) == 2)
-				{
-					gbl.attack_roll -= 4;
-				}
+				gbl.attack_roll -= 4;
 			}
 		}
 
 
 		internal static void AffectGnollBugbearVsGnome(Effect arg_0, object param, Player player)
 		{
-			if (gbl.SelectedPlayer.monsterType == MonsterType.humanoid &&
-				(gbl.SelectedPlayer.icon_dimensions & 0x7F) == 2)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.GnomePenalty))
 			{
 				gbl.attack_roll -= 4;
 			}
@@ -1008,7 +1003,7 @@ namespace engine
 
 		internal static void AffectInvisToAnimals(Effect arg_0, object param, Player player) // sub_3B636
 		{
-			if (gbl.SelectedPlayer.monsterType == MonsterType.animal)
+			if (gbl.SelectedPlayer.flags.HasFlag(Flags.Animal))
 			{
 				if (gbl.SelectedPlayer.HasAffect(Affects.detect_invisibility) == false &&
 					player.HasAffect(Affects.faerie_fire) == false)
@@ -1059,7 +1054,7 @@ namespace engine
 			{
 				gbl.spell_target = player.actions.target;
 
-				if (gbl.spell_target.monsterType == MonsterType.dragon)
+				if (gbl.spell_target.flags.HasFlag(Flags.Dragon))
 				{
 					gbl.damage = (ovr024.roll_dice(12, 1) * 3) + 4 + ovr025.strengthDamBonus(player);
 					gbl.attack_roll += 2;
@@ -1094,7 +1089,7 @@ namespace engine
 				gbl.spell_target = player.actions.target;
 
 				if (gbl.spell_target != null &&
-					gbl.spell_target.monsterType == MonsterType.fire)
+					gbl.spell_target.flags.HasFlag(Flags.Fire))
 				{
 					gbl.attack_roll += 3;
 					gbl.damage += 3;
@@ -1842,7 +1837,7 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if ((gbl.spell_target.field_14B & 8) != 0) // giant
+			if (gbl.spell_target.flags.HasFlag(Flags.RangerBonus))
 			{
 				gbl.damage += player.ranger_lvl;
 			}
@@ -1954,7 +1949,7 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if ((gbl.spell_target.field_14B & 1) != 0 &&
+			if ((gbl.spell_target.flags & Flags.EvilSummon) != 0 &&
 				ovr024.RollSavingThrow(0, SaveVerseType.Spell, gbl.spell_target) == false)
 			{
 				ovr024.KillPlayer("is dispelled", Status.gone, gbl.spell_target);
