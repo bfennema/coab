@@ -391,16 +391,16 @@ namespace engine
                 case Race.dwarf:
                     player.icon_size = 1;
                     ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_and_gnome_vs_giants, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc_goblin, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
                     break;
 
                 case Race.gnome:
                     player.icon_size = 1;
                     ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
                     ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_goblin_kobold, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.dwarf_and_gnome_vs_giants, player);
-                    ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_gnoll, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
+                    ovr024.add_affect(false, 0xff, 0, Affects.gnoll_bugbear_vs_gnome, player);
                     break;
 
                 case Race.elf:

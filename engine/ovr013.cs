@@ -343,7 +343,7 @@ namespace engine
 		}
 
 
-		internal static void AffectDwarfVsOrc(Effect arg_0, object param, Player player) // sub_3A7E8
+		internal static void AffectDwarfVsOrcGoblin(Effect arg_0, object param, Player player) // sub_3A7E8
 		{
 			gbl.spell_target = player.actions.target;
 
@@ -673,7 +673,7 @@ namespace engine
 		}
 
 
-		internal static void AffectDwarfGnomeVsGiants(Effect arg_0, object param, Player player)
+		internal static void AffectGiantVsDwarfGnome(Effect arg_0, object param, Player player)
 		{
 			gbl.spell_target = player.actions.target;
 
@@ -688,7 +688,7 @@ namespace engine
 		}
 
 
-		internal static void AffectGnomeVsGnoll(Effect arg_0, object param, Player player)
+		internal static void AffectGnollBugbearVsGnome(Effect arg_0, object param, Player player)
 		{
 			if (gbl.SelectedPlayer.monsterType == MonsterType.humanoid &&
 				(gbl.SelectedPlayer.icon_dimensions & 0x7F) == 2)
@@ -1829,7 +1829,7 @@ namespace engine
 			affect_table.Add(Affects.spiritual_hammer, ovr013.affect_spiritual_hammer);
 			affect_table.Add(Affects.detect_invisibility, ovr013.empty);
 			affect_table.Add(Affects.invisibility, ovr013.sub_3A6C6);
-			affect_table.Add(Affects.dwarf_vs_orc, ovr013.AffectDwarfVsOrc);
+			affect_table.Add(Affects.dwarf_vs_orc_goblin, ovr013.AffectDwarfVsOrcGoblin);
 			affect_table.Add(Affects.fumbling, ovr013.sub_3A071);
 			affect_table.Add(Affects.mirror_image, ovr013.MirrorImage);
 			affect_table.Add(Affects.ray_of_enfeeblement, ovr013.three_quarters_damage);
@@ -1850,8 +1850,8 @@ namespace engine
 			affect_table.Add(Affects.cause_disease_2, ovr013.sub_3B0C2);
 			affect_table.Add(Affects.prot_from_evil_10_radius, ovr013.affect_protect_evil);
 			affect_table.Add(Affects.prot_from_good_10_radius, ovr013.affect_protect_good);
-			affect_table.Add(Affects.dwarf_and_gnome_vs_giants, ovr013.AffectDwarfGnomeVsGiants);
-			affect_table.Add(Affects.gnome_vs_gnoll, ovr013.AffectGnomeVsGnoll);
+			affect_table.Add(Affects.giant_vs_dwarf_gnome, ovr013.AffectGiantVsDwarfGnome);
+			affect_table.Add(Affects.gnoll_bugbear_vs_gnome, ovr013.AffectGnollBugbearVsGnome);
 			affect_table.Add(Affects.prayer, ovr013.AffectPrayer);
 			affect_table.Add(Affects.hot_fire_shield, ovr013.HotFireShield);
 			affect_table.Add(Affects.snake_charm, ovr013.sub_3A071);
