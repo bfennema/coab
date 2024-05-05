@@ -56,9 +56,9 @@ namespace engine
         {
             for (int i = 0; i < 5; i++)
             {
-                player.spellCastCount[0, i] = 0;
-                player.spellCastCount[1, i] = 0;
-                player.spellCastCount[2, i] = 0;
+                player.spellCastCount[0][i] = 0;
+                player.spellCastCount[1][i] = 0;
+                player.spellCastCount[2][i] = 0;
             }
 
             for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
@@ -70,13 +70,13 @@ namespace engine
                     switch (skill)
                     {
                         case SkillType.Cleric:
-                            player.spellCastCount[0, 0] += 1;
+                            player.spellCastCount[0][0] += 1;
 
                             for (int PlayerLvl = 0; PlayerLvl <= (skillLevel - 2); PlayerLvl++)
                             {
                                 for (int sp_lvl = 0; sp_lvl < 5; sp_lvl++)
                                 {
-                                    player.spellCastCount[0, sp_lvl] += ClericSpellLevels[PlayerLvl, sp_lvl];
+                                    player.spellCastCount[0][sp_lvl] += ClericSpellLevels[PlayerLvl, sp_lvl];
                                 }
                             }
 
@@ -90,7 +90,7 @@ namespace engine
                                 int sp_lvl = (se.spellLevel - 1) % 5;
 
                                 if (se.spellClass == SpellClass.Cleric &&
-                                    player.spellCastCount[sp_class, sp_lvl] > 0 &&
+                                    player.spellCastCount[sp_class][sp_lvl] > 0 &&
                                     spell != Spells.animate_dead)
                                 {
                                     player.spellBook.LearnSpell(spell);
@@ -105,7 +105,7 @@ namespace engine
                                 {
                                     for (int spellLvl = 0; spellLvl < 5; spellLvl++)
                                     {
-                                        player.spellCastCount[0, spellLvl] += PaladinSpellLevels[addLvl, spellLvl];
+                                        player.spellCastCount[0][spellLvl] += PaladinSpellLevels[addLvl, spellLvl];
                                     }
                                 }
 
@@ -116,7 +116,7 @@ namespace engine
                                     int sp_lvl = (se.spellLevel - 1) % 5;
 
                                     if (se.spellClass == SpellClass.Cleric &&
-                                        player.spellCastCount[sp_class, sp_lvl] > 0)
+                                        player.spellCastCount[sp_class][sp_lvl] > 0)
                                     {
                                         player.spellBook.LearnSpell(spell);
                                     }
@@ -131,12 +131,12 @@ namespace engine
                                 {
                                     for (int sp_lvl = 0; sp_lvl < 3; sp_lvl++)
                                     {
-                                        player.spellCastCount[1, sp_lvl] += unk_1A758[var_3, sp_lvl];
+                                        player.spellCastCount[1][sp_lvl] += unk_1A758[var_3, sp_lvl];
                                     }
 
                                     for (int sp_lvl = 3; sp_lvl < 5; sp_lvl++)
                                     {
-                                        player.spellCastCount[2, sp_lvl - 3] += unk_1A758[var_3, sp_lvl];
+                                        player.spellCastCount[2][sp_lvl - 3] += unk_1A758[var_3, sp_lvl];
                                     }
                                 }
 
@@ -152,16 +152,16 @@ namespace engine
                             break;
 
                         case SkillType.MagicUser:
-                            player.spellCastCount[2, 0] += 1;
+                            player.spellCastCount[2][0] += 1;
 
                             for (int lvl = 0; lvl <= (skillLevel - 2); lvl++)
                             {
                                 /* unk_1A7C6 = seg600:44B6 */
-                                player.spellCastCount[2, 0] += ovr020.MU_spell_lvl_learn[lvl, 0];
-                                player.spellCastCount[2, 1] += ovr020.MU_spell_lvl_learn[lvl, 1];
-                                player.spellCastCount[2, 2] += ovr020.MU_spell_lvl_learn[lvl, 2];
-                                player.spellCastCount[2, 3] += ovr020.MU_spell_lvl_learn[lvl, 3];
-                                player.spellCastCount[2, 4] += ovr020.MU_spell_lvl_learn[lvl, 4];
+                                player.spellCastCount[2][0] += ovr020.MU_spell_lvl_learn[lvl, 0];
+                                player.spellCastCount[2][1] += ovr020.MU_spell_lvl_learn[lvl, 1];
+                                player.spellCastCount[2][2] += ovr020.MU_spell_lvl_learn[lvl, 2];
+                                player.spellCastCount[2][3] += ovr020.MU_spell_lvl_learn[lvl, 3];
+                                player.spellCastCount[2][4] += ovr020.MU_spell_lvl_learn[lvl, 4];
                             }
                             break;
                     }
@@ -174,7 +174,7 @@ namespace engine
                 {
                     for (int sp_lvl = 0; sp_lvl < 3; sp_lvl++)
                     {
-                        player.spellCastCount[2, sp_lvl] *= 2;
+                        player.spellCastCount[2][sp_lvl] *= 2;
                     }
                 }
             }
@@ -274,48 +274,48 @@ namespace engine
                 {
                     for (int sp_lvl = 1; sp_lvl < 5; sp_lvl++)
                     {
-                        player.spellCastCount[0, sp_lvl] = 0;
+                        player.spellCastCount[0][sp_lvl] = 0;
                     }
 
-                    player.spellCastCount[0, 0] = 1;
+                    player.spellCastCount[0][0] = 1;
 
                     for (int playerLvl = 0; playerLvl <= (clericLvl - 2); playerLvl++)
                     {
                         for (int spellLvl = 0; spellLvl < 5; spellLvl++)
                         {
-                            player.spellCastCount[0, spellLvl] += ClericSpellLevels[playerLvl, spellLvl];
+                            player.spellCastCount[0][spellLvl] += ClericSpellLevels[playerLvl, spellLvl];
                         }
                     }
                 }
 
-                if (player.stats.Wis.full > 12 && player.spellCastCount[0, 0] > 0)
+                if (player.stats.Wis.full > 12 && player.spellCastCount[0][0] > 0)
                 {
-                    player.spellCastCount[0, 0] += 1;
+                    player.spellCastCount[0][0] += 1;
                 }
 
-                if (player.stats.Wis.full > 13 && player.spellCastCount[0, 0] > 0)
+                if (player.stats.Wis.full > 13 && player.spellCastCount[0][0] > 0)
                 {
-                    player.spellCastCount[0, 0] += 1;
+                    player.spellCastCount[0][0] += 1;
                 }
 
-                if (player.stats.Wis.full > 14 && player.spellCastCount[0, 1] > 0)
+                if (player.stats.Wis.full > 14 && player.spellCastCount[0][1] > 0)
                 {
-                    player.spellCastCount[0, 1] += 1;
+                    player.spellCastCount[0][1] += 1;
                 }
 
-                if (player.stats.Wis.full > 15 && player.spellCastCount[0, 1] > 0)
+                if (player.stats.Wis.full > 15 && player.spellCastCount[0][1] > 0)
                 {
-                    player.spellCastCount[0, 1] += 1;
+                    player.spellCastCount[0][1] += 1;
                 }
 
-                if (player.stats.Wis.full > 16 && player.spellCastCount[0, 2] > 0)
+                if (player.stats.Wis.full > 16 && player.spellCastCount[0][2] > 0)
                 {
-                    player.spellCastCount[0, 2] += 1;
+                    player.spellCastCount[0][2] += 1;
                 }
 
-                if (player.stats.Wis.full > 17 && player.spellCastCount[0, 3] > 0)
+                if (player.stats.Wis.full > 17 && player.spellCastCount[0][3] > 0)
                 {
-                    player.spellCastCount[0, 3] += 1;
+                    player.spellCastCount[0][3] += 1;
                 }
             }
         }
@@ -669,18 +669,18 @@ namespace engine
 
             for (int i = 0; i < 5; i++)
             {
-                player.spellCastCount[0, i] = 0;
-                player.spellCastCount[1, i] = 0;
-                player.spellCastCount[2, i] = 0;
+                player.spellCastCount[0][i] = 0;
+                player.spellCastCount[1][i] = 0;
+                player.spellCastCount[2][i] = 0;
             }
 
             if (newClass == SkillType.Cleric)
             {
-                player.spellCastCount[0, 0] = 1;
+                player.spellCastCount[0][0] = 1;
             }
             else if (newClass == SkillType.MagicUser)
             {
-                player.spellCastCount[2, 0] = 1;
+                player.spellCastCount[2][0] = 1;
                 player.spellBook.LearnSpell(Spells.detect_magic_MU);
                 player.spellBook.LearnSpell(Spells.read_magic);
                 player.spellBook.LearnSpell(Spells.sleep);

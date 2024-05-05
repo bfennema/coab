@@ -264,8 +264,8 @@ namespace Classes.PoolRad
 
             for (int var_2 = 1; var_2 <= 3; var_2++)
             {
-                field_B2[var_2 - 1] = player.spellCastCount[0, var_2 - 1];
-                field_B5[var_2 - 1] = player.spellCastCount[2, var_2 - 1];
+                field_B2[var_2 - 1] = player.spellCastCount[0][var_2 - 1];
+                field_B5[var_2 - 1] = player.spellCastCount[2][var_2 - 1];
             }
 
             field_B8 = player.field_13C;
@@ -460,8 +460,8 @@ namespace Classes.PoolRad
 
             for (int var_2 = 1; var_2 <= 3; var_2++)
             {
-                player.spellCastCount[0, var_2 - 1] = field_B2[var_2 - 1];
-                player.spellCastCount[2, var_2 - 1] = field_B5[var_2 - 1];
+                player.spellCastCount[0][var_2 - 1] = field_B2[var_2 - 1];
+                player.spellCastCount[2][var_2 - 1] = field_B5[var_2 - 1];
             }
 
             player.field_13C = field_B8;

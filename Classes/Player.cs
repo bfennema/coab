@@ -621,7 +621,7 @@ namespace Classes
         public byte classFlags; // 0x12b;
         public byte hit_point_rolled; // 0x12c;
 
-        public byte[,] spellCastCount = new byte[3, 5]; // 0x12d - field_12D
+        public byte[][] spellCastCount = new byte[3][]; // 0x12d - field_12D
 
         public short field_13C; // 0x13c
         public byte field_13E; // 0x13e;
@@ -762,7 +762,18 @@ namespace Classes
 
         public Player()
         {
-            spellCastCount = new byte[3, 5];
+            spellCastCount = new byte[3][];
+            for (int i=0; i<3; i++)
+            {
+                if (i == 0 || i == 1)
+                {
+                    spellCastCount[i] = new byte[7];
+                }
+                else
+                {
+                    spellCastCount[i] = new byte[9];
+                }
+            }
 
             stats = new PlayerStats();
 

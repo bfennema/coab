@@ -316,7 +316,7 @@ namespace Classes.Curse
             {
                 for (int spell_level = 0; spell_level < 5; spell_level++)
                 {
-                    spellCastCount[spell_class * 5 + spell_level] = player.spellCastCount[spell_class, spell_level];
+                    spellCastCount[spell_class * 5 + spell_level] = player.spellCastCount[spell_class][spell_level];
                 }
             }
 
@@ -453,7 +453,7 @@ namespace Classes.Curse
             {
                 for (int spell_level = 0; spell_level < 5; spell_level++)
                 {
-                    player.spellCastCount[spell_class, spell_level] = spellCastCount[spell_class * 5 + spell_level];
+                    player.spellCastCount[spell_class][spell_level] = spellCastCount[spell_class * 5 + spell_level];
                 }
             }
 

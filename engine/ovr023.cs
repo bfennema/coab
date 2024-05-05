@@ -463,7 +463,7 @@ namespace engine
 						{
 							//skip this spell
 						}
-						else if (gbl.SelectedPlayer.spellCastCount[(int)sp_class, sp_lvl - 1] > 0 &&
+						else if (gbl.SelectedPlayer.spellCastCount[(int)sp_class][sp_lvl - 1] > 0 &&
 							can_learn_spell((int)spell, gbl.SelectedPlayer) == true &&
 							gbl.SelectedPlayer.spellBook.KnowsSpell(spell) == false)
 						{

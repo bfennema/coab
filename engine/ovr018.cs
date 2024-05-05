@@ -773,9 +773,9 @@ namespace engine
 
                 for (int i = 0; i < 5; i++)
                 {
-                    player.spellCastCount[0, i] = 0;
-                    player.spellCastCount[1, i] = 0;
-                    player.spellCastCount[2, i] = 0;
+                    player.spellCastCount[0][i] = 0;
+                    player.spellCastCount[1][i] = 0;
+                    player.spellCastCount[2][i] = 0;
                 }
                 for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
                 {
@@ -783,11 +783,11 @@ namespace engine
                     {
                         if (skill == SkillType.Cleric)
                         {
-                            player.spellCastCount[0, 0] = 1;
+                            player.spellCastCount[0][0] = 1;
                         }
                         else if (skill == SkillType.MagicUser)
                         {
-                            player.spellCastCount[2, 0] = 1;
+                            player.spellCastCount[2][0] = 1;
                         }
 
                         int gold_roll = ovr024.roll_dice(gold_size[(byte)skill], gold_count[(byte)skill]);
@@ -1143,9 +1143,9 @@ namespace engine
                                         player.stats.Wis.EnforceRaceSexLimits(race, sex);
                                         player.stats.Wis.EnforceClassLimits(player._class);
 
-                                        if (player.spellCastCount[0, 0] > 0)
+                                        if (player.spellCastCount[0][0] > 0)
                                         {
-                                            player.spellCastCount[0, 0] = 1;
+                                            player.spellCastCount[0][0] = 1;
                                         }
                                         break;
 
@@ -1236,9 +1236,9 @@ namespace engine
                                     case Stat.WIS:
                                         player.stats.Wis.EnforceRaceSexLimits(race, sex);
 
-                                        if (player.spellCastCount[0, 0] > 0)
+                                        if (player.spellCastCount[0][0] > 0)
                                         {
-                                            player.spellCastCount[0, 0] = 1;
+                                            player.spellCastCount[0][0] = 1;
                                         }
                                         break;
 
