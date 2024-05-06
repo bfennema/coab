@@ -6,11 +6,13 @@ namespace Classes
 {
     public class SpellItem
     {
-        public int Id;
+        public Spells Id;
         public bool Learning;
 
-        public SpellItem(int id) { Id = id; Learning = false; }
-        public SpellItem(int id, bool learning) { Id = id; Learning = learning; }
+        public SpellItem() { Id = 0; Learning = false; }
+        public SpellItem(Spells id) { Id = id; Learning = false; }
+        public SpellItem(Spells id, bool learning) { Id = id; Learning = learning; }
+        public SpellItem(byte id, bool learning) { Id = (Spells)id; Learning = learning; }
         public SpellItem ShallowClone()
         {
             SpellItem s = (SpellItem)this.MemberwiseClone();
@@ -25,7 +27,7 @@ namespace Classes
     {
         public const int SpellListSize = 84;
 
-        List<SpellItem> spells = new List<SpellItem>();
+        public List<SpellItem> spells = new List<SpellItem>();
 
         public SpellList() { }
 
@@ -39,13 +41,13 @@ namespace Classes
             spells.Clear();
         }
 
-        public void ClearSpell(int spellId)
+        public void ClearSpell(Spells spellId)
         {
             SpellItem found = null;
 
             foreach (var sp in spells)
             {
-                if (sp.Id == spellId)
+                if (sp.Id == spellId && sp.Learning == false)
                 {
                     found = sp;
                     break;
@@ -55,7 +57,12 @@ namespace Classes
             spells.Remove(found);
         }
 
-        public IEnumerable<int> IdList()
+        public void ClearSpell(int spellId)
+        {
+            ClearSpell((Spells)spellId);
+        }
+
+        public IEnumerable<Spells> IdList()
         {
             foreach (var sp in spells)
             {
@@ -63,7 +70,7 @@ namespace Classes
             }
         }
 
-        public IEnumerable<int> LearntList()
+        public IEnumerable<Spells> LearntList()
         {
             foreach (var sp in spells)
             {
@@ -74,7 +81,7 @@ namespace Classes
             }
         }
 
-        public IEnumerable<int> LearningList()
+        public IEnumerable<Spells> LearningList()
         {
             foreach (var sp in spells)
             {
@@ -85,7 +92,12 @@ namespace Classes
             }
         }
 
-        public void AddLearn(int id)
+        public void AddLearn(Spells id)
+        {
+            spells.Add(new SpellItem(id, true));
+        }
+
+        public void AddLearn(byte id)
         {
             spells.Add(new SpellItem(id, true));
         }
@@ -94,11 +106,11 @@ namespace Classes
         {
             if (gbl.game != Game.CurseOfTheAzureBonds || (id & 0x7F) != (int)Spells.animate_dead)
             {
-                spells.Add(new SpellItem(id & 0x7F, id > 0x7f));
+                spells.Add(new SpellItem((Spells)(id & 0x7F), id > 0x7f));
             }
         }
 
-        public void MarkLearnt(int id)
+        public void MarkLearnt(Spells id)
         {
             var spell = spells.Find(sp => sp.Id == id && sp.Learning == true);
 
@@ -113,7 +125,7 @@ namespace Classes
             return spells.Count > 0;
         }
 
-        public bool HasSpell(int id)
+        public bool HasSpell(Spells id)
         {
             return spells.Exists(sp => sp.Id == id);
         }

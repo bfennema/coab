@@ -714,7 +714,7 @@ namespace engine
 
 					if (ovr027.yes_no(gbl.defaultMenuColors, "Lose it? ") == 'Y')
 					{
-						caster.spellList.ClearSpell(spell_id);
+						caster.spellList.ClearSpell((Spells)spell_id);
 					}
 				}
 				else
@@ -793,7 +793,7 @@ namespace engine
 
 					if (gbl.spell_from_item == false)
 					{
-						caster.spellList.ClearSpell(spell_id);
+						caster.spellList.ClearSpell((Spells)spell_id);
 					}
 
 					gbl.spell_id = spell_id;
@@ -816,7 +816,7 @@ namespace engine
 						ovr025.string_print01("Spell Aborted");
 						if (gbl.spell_from_item == false)
 						{
-							caster.spellList.ClearSpell(spell_id);
+							caster.spellList.ClearSpell((Spells)spell_id);
 						}
 
 						stillCast = false;

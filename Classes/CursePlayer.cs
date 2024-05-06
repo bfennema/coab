@@ -59,8 +59,8 @@ namespace Classes
         [DataOffset(0x78, DataType.Byte)]
         public byte hit_point_max; // 0x78;
 
-        [DataOffset(0x79, DataType.ByteArray, 100)]
-        public byte[] knownSpells = new byte[100]; // 0x79 - 0xDC;
+        [DataOffset(0x79, DataType.CustSaveLoad, 100)]
+        public SpellBook spellBook; // 0x79 - 0xDC
 
         [DataOffset(0xDD, DataType.Byte)]
         public byte attackLevel; // 0xDD;
@@ -260,7 +260,7 @@ namespace Classes
 
             hit_point_max = player.hit_point_max;
 
-            player.spellBook.Save(knownSpells, knownSpells.Length);
+            spellBook = player.spellBook;
 
             attackLevel = player.attackLevel;
             icon_dimensions = player.icon_dimensions;
@@ -398,7 +398,7 @@ namespace Classes
 
             player.hit_point_max = hit_point_max;
 
-            player.spellBook.Load(knownSpells, knownSpells.Length);
+            player.spellBook = spellBook;
 
             player.attackLevel = attackLevel;
             player.icon_dimensions = icon_dimensions;
