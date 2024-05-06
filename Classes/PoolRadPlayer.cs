@@ -199,7 +199,6 @@ namespace Classes
 
         public const int StructSize = 0x011D;
 
-
         public PoolRadPlayer(byte[] data)
         {
             DataIO.ReadObject(this, data, 0);
@@ -380,6 +379,19 @@ namespace Classes
             player.Money.SetCoins(Money.Jewelry, field_94);
 
             System.Array.Copy(field_96, player.ClassLevel, 8);
+
+            if (player.paladin_lvl > 0)
+            {
+                player.paladinCuresLeft = (byte)(((player.paladin_lvl - 1) / 5) + 1);
+                Affect affect = new Affect(Affects.protection_from_evil, 0, (byte)0xFF, false);
+                player.affects.Add(affect);
+            }
+
+            if (player.ranger_lvl > 0)
+            {
+                Affect affect = new Affect(Affects.ranger_vs_giant, 0, (byte)0xFF, false);
+                player.affects.Add(affect);
+            }
 
             player.alignment = field_A0;
 
