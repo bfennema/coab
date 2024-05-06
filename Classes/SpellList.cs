@@ -53,8 +53,7 @@ namespace Classes
                     break;
                 }
             }
-
-            spells.Remove(found);
+            found.Learning = true;
         }
 
         public void ClearSpell(int spellId)

@@ -90,7 +90,6 @@ namespace engine
         {
             foreach (Player player in gbl.TeamList)
             {
-                cancel_memorize(player);
                 cancel_scribes(player);
             }
         }
