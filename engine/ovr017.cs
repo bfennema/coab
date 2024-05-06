@@ -193,6 +193,8 @@ namespace engine
 
             seg051.Rewrite(file);
 
+            List<PoolRadAffect> poolrad_affects = new List<PoolRadAffect>();
+
             if (gbl.game == Game.PoolOfRadiance)
             {
                 seg051.BlockWrite(PoolRadPlayer.StructSize, new PoolRadPlayer(player).Save(), file);
@@ -212,7 +214,7 @@ namespace engine
                     file.Assign(filePath + ".ITM");
                     seg051.Rewrite(file);
 
-                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new PoolRadItem(item).Save(), file));
+                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new PoolRadItem(item).Save(player, poolrad_affects), file));
 
                     seg051.Close(file);
                 }
@@ -257,6 +259,11 @@ namespace engine
                         {
                             seg051.BlockWrite(Affect.StructSize, new_affect.Save(), file);
                         }
+                    }
+
+                    foreach (PoolRadAffect affect in poolrad_affects)
+                    {
+                        seg051.BlockWrite(Affect.StructSize, affect.Save(), file);
                     }
 
                     seg051.Close(file);
