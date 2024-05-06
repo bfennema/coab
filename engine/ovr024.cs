@@ -1288,7 +1288,7 @@ namespace engine
             {
                 ovr025.DisplayPlayerStatusString(true, 12, "lost a spell", player);
 
-                player.spellList.ClearSpell(player.actions.spell_id);
+                player.spellList.ClearSpell((Spells)player.actions.spell_id);
                 player.actions.spell_id = 0;
             }
         }

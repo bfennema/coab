@@ -236,14 +236,14 @@ namespace Classes
 
     public class SpellBook : IDataIO
     {
-        public bool[] spellBook = new bool[(byte)Enum.GetValues(typeof(Spells)).Cast<Spells>().Max()+1];
+        public List<Spells> spellBook = new List<Spells>();
         void IDataIO.Write(byte[] data, int offset)
         {
             foreach (SpellEntry spell in gbl.spellCastingTable)
             {
-                if (spell != null && spell.spellIdx <= (byte)Spells.bestow_curse_MU)
+                if (spell != null && spell.spell <= Spells.bestow_curse_MU)
                 {
-                    data[offset + spell.spellIdx - 1] = (byte)(spellBook[spell.spellIdx] == true ? 1 : 0);
+                    data[offset + (int)spell.spell - 1] = (byte)(spellBook.Contains(spell.spell) ? 1 : 0);
                 }
             }
         }
@@ -252,7 +252,13 @@ namespace Classes
         {
             for (int i = 0; i < 100; i++)
             {
-                spellBook[i + 1] = data[offset + i] != 0;
+                if (data[offset + i] != 0)
+                {
+                    if (!spellBook.Contains((Spells)(i+1)))
+                    {
+                        spellBook.Add((Spells)(i + 1));
+                    }
+                }
             }
         }
 
@@ -260,7 +266,7 @@ namespace Classes
         {
             for (int i = 0; i < length; i++)
             {
-                data[i] = (byte)(spellBook[i + 1] ? 1 : 0);
+                data[i] = (byte)(spellBook.Contains((Spells)(i + 1)) ? 1 : 0);
             }
         }
 
@@ -268,23 +274,29 @@ namespace Classes
         {
             for (int i = 0; i < length; i++)
             {
-                spellBook[i + 1] = data[i] != 0;
+                if (data[i] != 0)
+                {
+                    spellBook.Add((Spells)(i + 1));
+                }
             }
         }
 
         public bool KnowsSpell(Spells spell)
         {
-            return spellBook[(int)spell];
+            return spellBook.Contains(spell);
         }
 
         public void LearnSpell(Spells spell)
         {
-            spellBook[(int)spell] = true;
+            if (!spellBook.Contains(spell))
+            {
+                spellBook.Add(spell);
+            }
         }
 
         public void UnlearnSpell(Spells spell)
         {
-            spellBook[(int)spell] = false;
+            spellBook.Remove(spell);
         }
     }
 

@@ -177,14 +177,14 @@ namespace Classes
             priority = _priority;
             targetsEnemy = _targetsEnemy;
             maxRange = _max_range;
-            spellIdx = (int)_spell;
+            spell = _spell;
         }
 
 
         /// <summary>
         /// 0 - Cleric, 1 - Druid, 2 - Magic-User
         /// </summary>
-        public int spellIdx;
+        public Spells spell;
 
         public SpellClass spellClass; //seg600:37DC asc_19AEC    // field_0
         public int spellLevel; //seg600:37DD unk_19AED    // field_1
