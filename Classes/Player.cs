@@ -122,6 +122,11 @@ namespace Classes
         public StatValue Wis = new StatValue(Limits.WisRaceSexMinMax, Limits.WisClassMin, Limits.WisAgeEffect);
         public StatValue Cha = new StatValue(Limits.ChaRaceSexMinMax, Limits.ChaClassMin, Limits.ChaAgeEffect);
 
+        public PlayerStats() { }
+        public PlayerStats(PlayerStats playerStats)
+        {
+            Assign(playerStats);
+        }
 
         void IDataIO.Write(byte[] data, int offset)
         {
@@ -828,8 +833,8 @@ namespace Classes
         public Player ShallowClone()
         {
             Player p = (Player)this.MemberwiseClone();
-            p.stats2.Assign(this.stats2);
-            p.spellBook = this.spellBook;
+            p.stats2 = new PlayerStats(this.stats2);
+            p.spellList = new SpellList(this.spellList);
             return p;
         }
 

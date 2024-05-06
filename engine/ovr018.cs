@@ -1002,8 +1002,7 @@ namespace engine
 
             ovr020.playerDisplayFull(gbl.SelectedPlayer, true);
 
-            PlayerStats stats_bkup = new PlayerStats();
-            stats_bkup.Assign(gbl.SelectedPlayer.stats2);
+            PlayerStats stats_bkup = new PlayerStats(gbl.SelectedPlayer.stats2);
 
             byte orig_hp_max = gbl.SelectedPlayer.hit_point_max;
 

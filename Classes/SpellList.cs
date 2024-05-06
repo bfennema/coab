@@ -11,6 +11,11 @@ namespace Classes
 
         public SpellItem(int id) { Id = id; Learning = false; }
         public SpellItem(int id, bool learning) { Id = id; Learning = learning; }
+        public SpellItem ShallowClone()
+        {
+            SpellItem s = (SpellItem)this.MemberwiseClone();
+            return s;
+        }
     }
 
 
@@ -21,6 +26,13 @@ namespace Classes
         public const int SpellListSize = 84;
 
         List<SpellItem> spells = new List<SpellItem>();
+
+        public SpellList() { }
+
+        public SpellList(SpellList spellList)
+        {
+            spellList.spells.ForEach(spell => spells.Add(spell.ShallowClone()));
+        }
 
         public void Clear()
         {
