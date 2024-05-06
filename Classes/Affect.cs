@@ -185,6 +185,14 @@ namespace Classes
     {
         public const int StructSize = 9;
 
+        public Affect()
+        {
+            type = Affects.none;
+            minutes = 0;
+            affect_data = 0;
+            callAffectTable = false;
+        }
+
         public Affect(Affects _type, ushort _minutes, byte _affect_data, bool _call_spell_jump_list)
         {
             type = _type;

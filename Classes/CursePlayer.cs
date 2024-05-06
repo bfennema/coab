@@ -35,10 +35,10 @@ namespace Classes
         }
 
         [DataOffset(0x00, DataType.PString, 15)]
-        public string name; // 0x00 - 0x0E;
+        string name; // 0x00 - 0x0E;
 
-        [DataOffset(0x10, DataType.ByteArray, 14)]
-        public byte[] stats = new byte[14]; // 0x10 - 0x1D;
+        [DataOffset(0x10, DataType.CustSaveLoad, 14)]
+        public PlayerStats stats; // 0x10 - 0x1D;
 
         [DataOffset(0x1E, DataType.ByteArray, 84)]
         public byte[] memorizedSpells = new byte[84]; // 0x1E - 0x71;
@@ -247,7 +247,7 @@ namespace Classes
         {
             name = player.name;
 
-            player.stats2.Save(stats);
+            stats = player.stats2;
 
             player.spellList.Save(memorizedSpells, 0, memorizedSpells.Length);
             spell_to_learn_count = player.spell_to_learn_count;
@@ -385,7 +385,7 @@ namespace Classes
 
             player.name = name;
 
-            player.stats2.Load(stats);
+            player.stats2 = stats;
 
             player.spellList.Load(memorizedSpells, 0, memorizedSpells.Length);
             player.spell_to_learn_count = spell_to_learn_count;

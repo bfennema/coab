@@ -286,6 +286,13 @@ namespace engine
                     seg051.Close(file);
                 }
             }
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(player.GetType());
+            string fileString = Path.Combine(Config.GetSavePath(), file_text) + ".XML";
+            System.IO.FileStream stream;
+            stream = System.IO.File.Open(fileString, System.IO.FileMode.OpenOrCreate);
+            stream.SetLength(0);
+            x.Serialize(stream, player);
+            stream.Close();
         }
 
         internal static bool PlayerFileExists(string fileExt, string player_name) // sub_483AE
@@ -1043,13 +1050,25 @@ namespace engine
             gbl.game_speed_var = gbl.area_ptr.game_speed;
             gbl.area2_ptr.party_size = 0;
 
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(typeof(Player));
+
             for (int index = 0; index < number_of_players; index++)
             {
                 string var_1F6 = seg042.clean_string(var_148[index]);
 
-                if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".sav")) == true)
+                if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".XML")) == true)
                 {
-                    Player player = import_char01(var_1F6 + ".sav");
+                    string fileString = Path.Combine(Config.GetSavePath(), var_1F6) + ".XML";
+                    System.IO.FileStream stream;
+                    stream = System.IO.File.Open(fileString, System.IO.FileMode.Open);
+                    Player player = (Player)x.Deserialize(stream);
+                    stream.Close();
+                    player.stats2.ReInit();
+                    AssignPlayerIconId(player);
+                }
+                else if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".SAV")) == true)
+                {
+                    Player player = import_char01(var_1F6 + ".SAV");
                     AssignPlayerIconId(player);
                 }
             }
