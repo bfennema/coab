@@ -20,9 +20,6 @@ namespace Classes
         }
     }
 
-
-
-
     public class SpellList
     {
         public const int SpellListSize = 84;
@@ -102,6 +99,11 @@ namespace Classes
             spells.Add(new SpellItem(id, true));
         }
 
+        public void AddLearnt(Spells id, bool learning)
+        {
+            spells.Add(new SpellItem(id, learning));
+        }
+
         public void AddLearnt(int id)
         {
             spells.Add(new SpellItem((Spells)(id & 0x7F), id > 0x7f));
@@ -130,35 +132,6 @@ namespace Classes
         public void CancelLearning()
         {
             spells.RemoveAll(sp => sp.Learning == true);
-        }
-
-        public void Load(byte[] data, int offset, int size = SpellListSize)
-        {
-            for (int i = 0; i < size; i++)
-            {
-                if (data[offset + i] > 0)
-                {
-                    AddLearnt(data[offset + i]);
-                }
-            }
-        }
-
-        public void Save(byte[] data, int offset, int size = SpellListSize)
-        {
-            for (int i = 0; i < size; i++)
-            {
-                data[offset + i] = 0;
-            }
-
-            int idx = size - 1;
-            foreach (var sp in spells)
-            {
-                if (sp.Learning == false)
-                {
-                    data[offset + idx] = (byte)sp.Id;
-                    idx -= 1;
-                }
-            }
         }
     }
 }

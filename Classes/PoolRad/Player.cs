@@ -209,15 +209,14 @@ namespace Classes.PoolRad
             player.stats2.Cha.Load(stat_cha);
             player.stats2.Str00.Load(stat_str00);
 
-            player.spellList.Load(field_17, 0, 21);
+            Spell.Load(player.spellList, field_17, field_17.Length);
 
             player.thac0 = thac0;
             player._class = (ClassId)_class;
             player.age = age;
             player.hit_point_max = hp_max;
 
-            player.spellBook.Load(field_33, 56);
-            player.spellBook.UnlearnSpell(Spells.animate_dead);
+            Spell.Load(player.spellBook, field_33, field_33.Length);
 
             player.attackLevel = field_6B;
             player.icon_dimensions = icon_dimensions;
