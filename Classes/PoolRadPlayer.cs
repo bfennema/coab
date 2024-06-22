@@ -2,7 +2,7 @@ namespace Classes
 {
     public class PoolRadPlayer
     {
-        public enum MonsterType
+        enum MonsterType
         {
             humanoid = 1,
             giant = 2,
@@ -94,7 +94,7 @@ namespace Classes
         [DataOffset(0x9E, DataType.Byte)]
         public byte sex; // 0x9E
         [DataOffset(0x9F, DataType.IByte)]
-        public MonsterType monsterType; // 0x9F;
+        MonsterType monsterType; // 0x9F;
         [DataOffset(0xA0, DataType.Byte)]
         public byte field_A0; // 0xA0
 
@@ -219,14 +219,14 @@ namespace Classes
             stat_cha = (byte)player.stats2.Cha.full;
             stat_str00 = (byte)player.stats2.Str00.full;
 
-            player.spellList.Save(field_17, 0, field_17.Length);
+            PoolRadSpells.Save(player.spellList, field_17, field_17.Length);
 
             thac0 = player.thac0;
             _class = (byte)player._class;
             age = player.age;
             hp_max = player.hit_point_max;
 
-            player.spellBook.Save(field_33, 56);
+            PoolRadSpells.Save(player.spellBook, field_33, field_33.Length);
 
             field_6B = player.attackLevel;
             icon_dimensions = player.icon_dimensions;
@@ -341,14 +341,14 @@ namespace Classes
             player.stats2.Cha.Load(stat_cha);
             player.stats2.Str00.Load(stat_str00);
 
-            player.spellList.Load(field_17, 0, 21);
+            PoolRadSpells.Load(player.spellList, field_17, field_17.Length);
 
             player.thac0 = thac0;
             player._class = (ClassId)_class;
             player.age = age;
             player.hit_point_max = hp_max;
 
-            player.spellBook.Load(field_33, 56);
+            PoolRadSpells.Load(player.spellBook, field_33, field_33.Length);
 
             player.attackLevel = field_6B;
             player.icon_dimensions = icon_dimensions;

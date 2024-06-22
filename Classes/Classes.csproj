@@ -138,6 +138,7 @@
     <Compile Include="CurseAffect.cs" />
     <Compile Include="CurseItem.cs" />
     <Compile Include="CursePlayer.cs" />
+    <Compile Include="CurseSpells.cs" />
     <Compile Include="DataIO.cs" />
     <Compile Include="DaxFiles\DaxArray.cs" />
     <Compile Include="DaxFiles\DaxBlock.cs">
@@ -175,6 +176,7 @@
     <Compile Include="PoolRadAffect.cs" />
     <Compile Include="PoolRadItem.cs" />
     <Compile Include="PoolRadPlayer.cs" />
+    <Compile Include="PoolRadSpells.cs" />
     <Compile Include="RestTime.cs" />
     <Compile Include="Set.cs">
       <SubType>Code</SubType>

@@ -59,8 +59,8 @@ namespace Classes
         [DataOffset(0x78, DataType.Byte)]
         public byte hit_point_max; // 0x78;
 
-        [DataOffset(0x79, DataType.CustSaveLoad, 100)]
-        public SpellBook spellBook; // 0x79 - 0xDC
+        [DataOffset(0x79, DataType.ByteArray, 100)]
+        public byte[] spellBook = new byte[100]; // 0x79 - 0xDC
 
         [DataOffset(0xDD, DataType.Byte)]
         public byte attackLevel; // 0xDD;
@@ -249,7 +249,7 @@ namespace Classes
 
             stats = player.stats2;
 
-            player.spellList.Save(memorizedSpells, 0, memorizedSpells.Length);
+            CurseSpells.Save(player.spellList, memorizedSpells, memorizedSpells.Length);
             spell_to_learn_count = player.spell_to_learn_count;
             thac0 = player.thac0;
 
@@ -260,7 +260,7 @@ namespace Classes
 
             hit_point_max = player.hit_point_max;
 
-            spellBook = player.spellBook;
+            CurseSpells.Save(player.spellBook, spellBook, spellBook.Length);
 
             attackLevel = player.attackLevel;
             icon_dimensions = player.icon_dimensions;
@@ -387,7 +387,7 @@ namespace Classes
 
             player.stats2 = stats;
 
-            player.spellList.Load(memorizedSpells, 0, memorizedSpells.Length);
+            CurseSpells.Load(player.spellList, memorizedSpells, memorizedSpells.Length);
             player.spell_to_learn_count = spell_to_learn_count;
             player.thac0 = thac0;
 
@@ -398,7 +398,7 @@ namespace Classes
 
             player.hit_point_max = hit_point_max;
 
-            player.spellBook = spellBook;
+            CurseSpells.Load(player.spellBook, spellBook, spellBook.Length);
 
             player.attackLevel = attackLevel;
             player.icon_dimensions = icon_dimensions;

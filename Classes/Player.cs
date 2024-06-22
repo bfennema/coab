@@ -252,50 +252,27 @@ namespace Classes
         }
     }
 
-    public class SpellBook : IDataIO
+    public class SpellBook
     {
         public List<Spells> spellBook = new List<Spells>();
-        void IDataIO.Write(byte[] data, int offset)
+
+        public SpellBook() { }
+
+        public SpellBook(SpellBook spellBook)
         {
-            foreach (SpellEntry spell in gbl.spellCastingTable)
-            {
-                if (spell != null && spell.spell <= Spells.bestow_curse_MU)
-                {
-                    data[offset + (int)spell.spell - 1] = (byte)(spellBook.Contains(spell.spell) ? 1 : 0);
-                }
-            }
+            spellBook.spellBook.ForEach(spell => spellBook.LearnSpell(spell));
         }
 
-        void IDataIO.Read(byte[] data, int offset)
+        public void Clear()
         {
-            for (int i = 0; i < 100; i++)
-            {
-                if (data[offset + i] != 0)
-                {
-                    if (!spellBook.Contains((Spells)(i+1)))
-                    {
-                        spellBook.Add((Spells)(i + 1));
-                    }
-                }
-            }
+            spellBook.Clear();
         }
 
-        public void Save(byte[] data, int length)
+        public IEnumerable<Spells> LearntList()
         {
-            for (int i = 0; i < length; i++)
+            foreach (var sp in spellBook)
             {
-                data[i] = (byte)(spellBook.Contains((Spells)(i + 1)) ? 1 : 0);
-            }
-        }
-
-        public void Load(byte[] data, int length)
-        {
-            for (int i = 0; i < length; i++)
-            {
-                if (data[i] != 0)
-                {
-                    spellBook.Add((Spells)(i + 1));
-                }
+                yield return sp;
             }
         }
 
