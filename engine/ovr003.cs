@@ -2331,6 +2331,7 @@ namespace engine
                             break;
                     }
 
+                    //ovr025.display_map_position_time();
                     ovr025.PartySummary(gbl.SelectedPlayer);
                 }
             }
