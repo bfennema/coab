@@ -491,7 +491,7 @@ namespace engine
 			player.level_undead = 0;
 
 			player.attackLevel = (byte)player.SkillLevel(SkillType.Fighter, SkillType.Paladin, SkillType.Ranger);
-			player.base_movement = 0x0C;
+			player.base_movement = 12;
 
 			if (player.control_morale == Control.PC_Berserk)
 			{
