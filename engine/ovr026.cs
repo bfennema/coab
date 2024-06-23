@@ -6,45 +6,55 @@ namespace engine
     class ovr026
     {
         static byte[,] /*seg600:42BC*/ ClericSpellLevels = { // unk_1A5CC
-			{1, 0, 0, 0, 0}, // 2
-			{0, 1, 0, 0, 0}, // 3
-			{1, 1, 0, 0, 0}, // 4
-			{0, 1, 1, 0, 0}, // 5
-			{0, 0, 1, 0, 0}, // 6
-			{0, 0, 0, 1, 0}, // 7
-			{0, 0, 1, 1, 0}, // 8
-			{1, 1, 0, 0, 1}, // 9  seg600:42EE
-			{0, 0, 0, 1, 1}, // 10 seg600:42F3
-			{1, 0, 1, 0, 0}, // 11 seg600:42F8
-			{1, 1, 1, 0, 0}, // 12 seg600:42FD
-			{0, 1, 1, 1, 0}, // 13
-			{0, 0, 0, 1, 1}, // 14
-			{1, 1, 1, 0, 1}, // 15
+			{1, 0, 0, 0, 0, 0, 0}, // 2
+			{0, 1, 0, 0, 0, 0, 0}, // 3
+			{1, 1, 0, 0, 0, 0, 0}, // 4
+			{0, 1, 1, 0, 0, 0, 0}, // 5
+			{0, 0, 1, 0, 0, 0, 0}, // 6
+			{0, 0, 0, 1, 0, 0, 0}, // 7
+			{0, 0, 1, 1, 0, 0, 0}, // 8
+			{1, 1, 0, 0, 1, 0, 0}, // 9  seg600:42EE
+			{0, 0, 0, 1, 1, 0, 0}, // 10 seg600:42F3
+			{1, 0, 1, 0, 0, 1, 0}, // 11 seg600:42F8
+			{1, 1, 1, 0, 0, 1, 0}, // 12 seg600:42FD
+			{0, 1, 1, 1, 0, 0, 0}, // 13
+			{0, 0, 0, 1, 1, 0, 0}, // 14
+			{1, 1, 1, 0, 1, 0, 0}, // 15
+			{0, 0, 0, 1, 1, 1, 1}, // 16
+			{1, 1, 1, 0, 0, 0, 0}, // 17
+			{0, 0, 0, 1, 1, 1, 0}, // 18
+			{1, 1, 1, 0, 0, 0, 1}, // 19
+			{0, 0, 0, 1, 1, 1, 0}, // 20
 		};
 
         static byte[,] DruidSpellLevels = {
-			{0, 1, 0, 0, 0}, // 2
-			{1, 1, 1, 0, 0}, // 3
-			{1, 0, 1, 0, 0}, // 4
-			{0, 1, 0, 0, 0}, // 5
-			{0, 0, 0, 1, 0}, // 6
-			{0, 1, 1, 0, 0}, // 7
-			{0, 0, 0, 1, 0}, // 8
-			{1, 0, 0, 0, 1}, // 9
-			{0, 0, 0, 1, 1}, // 10
-			{0, 1, 0, 0, 0}, // 11
-			{0, 0, 1, 1, 1}, // 12
-			{1, 0, 1, 1, 1}, // 13
-			{0, 1, 1, 1, 1}, // 14
+			{0, 1, 0, 0, 0, 0, 0}, // 2
+			{1, 1, 1, 0, 0, 0, 0}, // 3
+			{1, 0, 1, 0, 0, 0, 0}, // 4
+			{0, 1, 0, 0, 0, 0, 0}, // 5
+			{0, 0, 0, 1, 0, 0, 0}, // 6
+			{0, 1, 1, 0, 0, 0, 0}, // 7
+			{0, 0, 0, 1, 0, 0, 0}, // 8
+			{1, 0, 0, 0, 1, 0, 0}, // 9
+			{0, 0, 0, 1, 1, 0, 0}, // 10
+			{0, 1, 0, 0, 0, 1, 0}, // 11
+			{0, 0, 1, 1, 1, 1, 1}, // 12
+			{1, 0, 1, 1, 1, 1, 1}, // 13
+			{0, 1, 1, 1, 1, 1, 1}, // 14
 		};
 
         static byte[,] /*seg600:43E5*/ PaladinSpellLevels = { // unk_1A6F5
-			{1, 0, 0, 0, 0}, // 10
-			{0, 1, 0, 0, 0}, // 11
-			{0, 1, 0, 0, 0}, // 12
-			{0, 0, 1, 0, 0}, // 13
-			{1, 0, 0, 0, 0}, // 14
-			{0, 0, 0, 1, 0}, // 15
+			{1, 0, 0, 0}, // 10
+			{0, 1, 0, 0}, // 11
+			{0, 1, 0, 0}, // 12
+			{0, 0, 1, 0}, // 13
+			{1, 0, 0, 0}, // 14
+			{0, 0, 0, 1}, // 15
+			{0, 1, 0, 0}, // 16
+			{0, 0, 1, 0}, // 17
+			{0, 0, 1, 0}, // 18
+			{0, 0, 0, 1}, // 19
+			{0, 0, 0, 1}, // 20
 		};
 
         static byte[,] /*seg600:4448*/ RangerSpellLevels = { //unk_1A758
@@ -55,18 +65,22 @@ namespace engine
 			{0, 0, 0, 0, 1}, // 13
 			{0, 1, 0, 0, 0}, // 14
 			{0, 0, 0, 0, 1}, // 15
+			{0, 0, 1, 0, 0}, // 16
+			{0, 0, 1, 0, 0}, // 17
 		};
 
 
 
         internal static void sub_6A00F(Player player) // sub_6A00F
         {
-            for (int i = 0; i < 5; i++)
+            for (int i = 0; i < 7; i++)
             {
                 player.spellCastCount[0][i] = 0;
                 player.spellCastCount[1][i] = 0;
                 player.spellCastCount[2][i] = 0;
             }
+            player.spellCastCount[2][7] = 0;
+            player.spellCastCount[2][8] = 0;
 
             for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
             {
@@ -79,9 +93,9 @@ namespace engine
                         case SkillType.Cleric:
                             player.spellCastCount[0][0] += 1;
 
-                            for (int TblIndex = 0; TblIndex <= (skillLevel - 2); TblIndex++)
+                            for (int TblIndex = 0; TblIndex <= System.Math.Min((skillLevel - 2), ClericSpellLevels.Length - 1); TblIndex++)
                             {
-                                for (int sp_lvl = 0; sp_lvl < 5; sp_lvl++)
+                                for (int sp_lvl = 0; sp_lvl < 7; sp_lvl++)
                                 {
                                     player.spellCastCount[0][sp_lvl] += ClericSpellLevels[TblIndex, sp_lvl];
                                 }
@@ -93,11 +107,10 @@ namespace engine
                             {
                                 SpellEntry se = gbl.spellCastingTable[(int)spell];
 
-                                int sp_class = (se.spellLevel - 1) / 5;
-                                int sp_lvl = (se.spellLevel - 1) % 5;
+                                int sp_lvl = se.spellLevel - 1;
 
                                 if (se.spellClass == SpellClass.Cleric &&
-                                    player.spellCastCount[sp_class][sp_lvl] > 0 &&
+                                    player.spellCastCount[0][sp_lvl] > 0 &&
                                     spell != Spells.animate_dead)
                                 {
                                     player.spellBook.LearnSpell(spell);
@@ -108,9 +121,9 @@ namespace engine
                         case SkillType.Druid:
                             player.spellCastCount[1][0] += 2;
 
-                            for (int TblIndex = 0; TblIndex <= (skillLevel - 2); TblIndex++)
+                            for (int TblIndex = 0; TblIndex <= System.Math.Min((skillLevel - 2), DruidSpellLevels.Length - 1); TblIndex++)
                             {
-                                for (int sp_lvl = 0; sp_lvl < 5; sp_lvl++)
+                                for (int sp_lvl = 0; sp_lvl < 7; sp_lvl++)
                                 {
                                     player.spellCastCount[1][sp_lvl] += DruidSpellLevels[TblIndex, sp_lvl];
                                 }
@@ -122,7 +135,10 @@ namespace engine
                             {
                                 SpellEntry se = gbl.spellCastingTable[(int)spell];
 
-                                if (se.spellClass == SpellClass.Druid)
+                                int sp_lvl = se.spellLevel - 1;
+
+                                if (se.spellClass == SpellClass.Druid &&
+                                    player.spellCastCount[1][sp_lvl] > 0)
                                 {
                                     player.spellBook.LearnSpell(spell);
                                 }
@@ -134,9 +150,9 @@ namespace engine
                             {
                                 player.spellCastCount[0][0] += 1;
 
-                                for (int TblIndex = 0; TblIndex <= (skillLevel - 10); TblIndex++)
+                                for (int TblIndex = 0; TblIndex <= System.Math.Min((skillLevel - 10), PaladinSpellLevels.Length - 1); TblIndex++)
                                 {
-                                    for (int spellLvl = 0; spellLvl < 5; spellLvl++)
+                                    for (int spellLvl = 0; spellLvl < 4; spellLvl++)
                                     {
                                         player.spellCastCount[0][spellLvl] += PaladinSpellLevels[TblIndex, spellLvl];
                                     }
@@ -146,7 +162,10 @@ namespace engine
                                 {
                                     SpellEntry se = gbl.spellCastingTable[(int)spell];
 
-                                    if (se.spellClass == SpellClass.Cleric)
+                                    int sp_lvl = se.spellLevel - 1;
+
+                                    if (se.spellClass == SpellClass.Cleric &&
+                                        player.spellCastCount[0][sp_lvl] > 0)
                                     {
                                         player.spellBook.LearnSpell(spell);
                                     }
@@ -159,7 +178,7 @@ namespace engine
                             {
                                 player.spellCastCount[1][0] += 1;
 
-                                for (int TblIndex = 0; TblIndex <= (skillLevel - 9); TblIndex++)
+                                for (int TblIndex = 0; TblIndex <= System.Math.Min((skillLevel - 9), RangerSpellLevels.Length - 1); TblIndex++)
                                 {
                                     for (int sp_lvl = 0; sp_lvl < 3; sp_lvl++)
                                     {
@@ -176,7 +195,10 @@ namespace engine
                                 {
                                     SpellEntry se = gbl.spellCastingTable[(int)spell];
 
-                                    if (se.spellClass == SpellClass.Druid)
+                                    int sp_lvl = se.spellLevel - 1;
+
+                                    if (se.spellClass == SpellClass.Druid &&
+                                        player.spellCastCount[1][sp_lvl] > 0)
                                     {
                                         player.spellBook.LearnSpell(spell);
                                     }
@@ -196,6 +218,10 @@ namespace engine
                                 player.spellCastCount[2][2] += ovr020.MU_spell_lvl_learn[lvl, 2];
                                 player.spellCastCount[2][3] += ovr020.MU_spell_lvl_learn[lvl, 3];
                                 player.spellCastCount[2][4] += ovr020.MU_spell_lvl_learn[lvl, 4];
+                                player.spellCastCount[2][5] += ovr020.MU_spell_lvl_learn[lvl, 5];
+                                player.spellCastCount[2][6] += ovr020.MU_spell_lvl_learn[lvl, 6];
+                                player.spellCastCount[2][7] += ovr020.MU_spell_lvl_learn[lvl, 7];
+                                player.spellCastCount[2][8] += ovr020.MU_spell_lvl_learn[lvl, 8];
                             }
                             break;
                     }
@@ -326,7 +352,7 @@ namespace engine
             {
                 if (ResetSpellLevels == true)
                 {
-                    for (int sp_lvl = 1; sp_lvl < 5; sp_lvl++)
+                    for (int sp_lvl = 1; sp_lvl < 7; sp_lvl++)
                     {
                         player.spellCastCount[index][sp_lvl] = 0;
                     }
@@ -335,7 +361,7 @@ namespace engine
 
                     for (int playerLvl = 0; playerLvl <= (level - 2); playerLvl++)
                     {
-                        for (int spellLvl = 0; spellLvl < 5; spellLvl++)
+                        for (int spellLvl = 0; spellLvl < 7; spellLvl++)
                         {
                             player.spellCastCount[index][spellLvl] += spellLevels[playerLvl, spellLvl];
                         }
@@ -429,6 +455,27 @@ namespace engine
                     if (player.spellCastCount[index][4] > 0)
                     {
                         player.spellCastCount[index][4] += 2;
+                    }
+                }
+
+                if (player.stats2.Wis.full > 23)
+                {
+                    if (player.spellCastCount[index][5] > 0)
+                    {
+                        player.spellCastCount[index][5] += 2;
+                    }
+                }
+
+                if (player.stats2.Wis.full > 24)
+                {
+                    if (player.spellCastCount[index][5] > 0)
+                    {
+                        player.spellCastCount[index][5] += 1;
+                    }
+
+                    if (player.spellCastCount[index][6] > 0)
+                    {
+                        player.spellCastCount[index][6] += 1;
                     }
                 }
             }

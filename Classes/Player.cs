@@ -777,7 +777,14 @@ namespace Classes
             spellCastCount = new byte[3][];
             for (int i=0; i<3; i++)
             {
-                spellCastCount[i] = new byte[5];
+                if (i == 0 || i == 1)
+                {
+                    spellCastCount[i] = new byte[7];
+                }
+                else
+                {
+                    spellCastCount[i] = new byte[9];
+                }
             }
 
             stats2 = new PlayerStats();

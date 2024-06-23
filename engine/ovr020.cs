@@ -741,20 +741,25 @@ namespace engine
 
         /*seg600:44B6 unk_1A7C6*/
         public readonly static byte[,] MU_spell_lvl_learn = { 
-            {1, 0, 0, 0, 0}, // 2
-            {0, 1, 0, 0, 0}, // 3
-            {1, 1, 0, 0, 0}, // 4
-            {1, 0, 1, 0, 0}, // 5
-            {0, 0, 1, 0, 0}, // 6
-            {0, 1, 0, 1, 0}, // 7
-            {0, 0, 1, 1, 0}, // 8
-            {0, 0, 0, 0, 1}, // 9
-            {0, 1, 0, 0, 1}, // 10
-            {0, 0, 1, 1, 1}, // 11
-            {0, 0, 0, 1, 1}, // 12
-            {1, 1, 1, 0, 0}, // 13
-            {0, 0, 0, 0, 0}, // 14
-            {0, 0, 0, 1, 1}, // 15
+            {1, 0, 0, 0, 0, 0, 0, 0, 0}, // 2
+            {0, 1, 0, 0, 0, 0, 0, 0, 0}, // 3
+            {1, 1, 0, 0, 0, 0, 0, 0, 0}, // 4
+            {1, 0, 1, 0, 0, 0, 0, 0, 0}, // 5
+            {0, 0, 1, 0, 0, 0, 0, 0, 0}, // 6
+            {0, 1, 0, 1, 0, 0, 0, 0, 0}, // 7
+            {0, 0, 1, 1, 0, 0, 0, 0, 0}, // 8
+            {0, 0, 0, 0, 1, 0, 0, 0, 0}, // 9
+            {0, 1, 0, 0, 1, 0, 0, 0, 0}, // 10
+            {0, 0, 1, 1, 1, 0, 0, 0, 0}, // 11
+            {0, 0, 0, 1, 1, 1, 0, 0, 0}, // 12
+            {1, 1, 1, 0, 0, 1, 0, 0, 0}, // 13
+            {0, 0, 0, 0, 0, 0, 1, 0, 0}, // 14
+            {0, 0, 0, 1, 1, 0, 0, 0, 0}, // 15
+            {0, 0, 0, 0, 0, 1, 1, 1, 0}, // 16
+            {0, 0, 0, 0, 0, 0, 1, 1, 0}, // 17
+            {0, 0, 0, 0, 0, 0, 0, 0, 1}, // 18
+            {0, 0, 0, 0, 0, 0, 0, 1, 0}, // 19
+            {0, 0, 0, 0, 0, 1, 0, 0, 1}, // 20
         };
 
         internal static void calc_items_effects(bool add_item, Item item) /*sub_55B04*/
@@ -781,13 +786,15 @@ namespace engine
                     {
                         int muSkillLevel = player.SkillLevel(SkillType.MagicUser);
 
-                        player.spellCastCount[2][0] = 0;
+                        player.spellCastCount[2][0] = 1;
                         player.spellCastCount[2][1] = 0;
                         player.spellCastCount[2][2] = 0;
                         player.spellCastCount[2][3] = 0;
                         player.spellCastCount[2][4] = 0;
-
-                        player.spellCastCount[2][0] = 1;
+                        player.spellCastCount[2][5] = 0;
+                        player.spellCastCount[2][6] = 0;
+                        player.spellCastCount[2][7] = 0;
+                        player.spellCastCount[2][8] = 0;
 
                         for (int sp_lvl = 0; sp_lvl < (muSkillLevel - 1); sp_lvl++)
                         {
@@ -797,6 +804,10 @@ namespace engine
                             player.spellCastCount[2][2] += MU_spell_lvl_learn[sp_lvl, 2];
                             player.spellCastCount[2][3] += MU_spell_lvl_learn[sp_lvl, 3];
                             player.spellCastCount[2][4] += MU_spell_lvl_learn[sp_lvl, 4];
+                            player.spellCastCount[2][5] += MU_spell_lvl_learn[sp_lvl, 5];
+                            player.spellCastCount[2][6] += MU_spell_lvl_learn[sp_lvl, 6];
+                            player.spellCastCount[2][7] += MU_spell_lvl_learn[sp_lvl, 7];
+                            player.spellCastCount[2][8] += MU_spell_lvl_learn[sp_lvl, 8];
                         }
 
                         byte[] spCounts = new byte[5];
