@@ -376,7 +376,7 @@ namespace Classes
                 {
                     affect_data = (byte)(player.stats2.Str.cur + 100);
                 }
-                PoolRadAffect affect = new PoolRadAffect(PoolRadAffects.strength, 0, affect_data, true);
+                PoolRadAffect affect = new PoolRadAffect(PoolRadAffect.Affects.strength, 0, affect_data, true);
                 affects.Add(affect);
             }
 
