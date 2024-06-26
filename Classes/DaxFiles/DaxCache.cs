@@ -23,6 +23,10 @@ namespace Classes.DaxFiles
                 {
                     return null;
                 }
+                catch (DirectoryNotFoundException)
+                {
+                    return null;
+                }
                 fileCache.Add(file_name, dfc);
             }
 
