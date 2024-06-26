@@ -8,7 +8,7 @@ namespace Classes
         public string name; // 0x0 - 0x2A
         [DataOffset(0x2E, DataType.Byte)]
         public byte type; // 0x2E
-        [DataOffset(0x2F, DataType.ByteArray)]
+        [DataOffset(0x2F, DataType.ByteArray, 3)]
         public byte[] namenum = new byte[3]; // 0x2F - 0x31
         [DataOffset(0x32, DataType.Byte)]
         public byte plus; // 0x32
