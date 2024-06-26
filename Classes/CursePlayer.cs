@@ -5,7 +5,7 @@ namespace Classes
     /// </summary>
     public class CursePlayer
     {
-        enum MonsterType
+        public enum MonsterType
         {
             humanoid = 1,
             giant = 2,
@@ -26,7 +26,7 @@ namespace Classes
         }
 
         [System.Flags]
-        enum CurseFlags
+        public enum CurseFlags
         {
             EvilSummon = 0x01,
             DwarfPenalty = 0x02,
@@ -35,10 +35,10 @@ namespace Classes
         }
 
         [DataOffset(0x00, DataType.PString, 15)]
-        string name; // 0x00 - 0x0E;
+        public string name; // 0x00 - 0x0E;
 
         [DataOffset(0x10, DataType.CustSaveLoad, 14)]
-        public PlayerStats stats; // 0x10 - 0x1D;
+        public PlayerStats stats = new PlayerStats(); // 0x10 - 0x1D;
 
         [DataOffset(0x1E, DataType.ByteArray, 84)]
         public byte[] memorizedSpells = new byte[84]; // 0x1E - 0x71;
@@ -109,7 +109,7 @@ namespace Classes
         [DataOffset(0x119, DataType.Byte)]
         public byte sex; // 0x119;
         [DataOffset(0x11A, DataType.IByte)]
-        MonsterType monsterType; // 0x11A;
+        public MonsterType monsterType; // 0x11A;
         [DataOffset(0x11B, DataType.Byte)]
         public byte alignment; // 0x11B;
         /// <summary>
@@ -166,7 +166,7 @@ namespace Classes
         [DataOffset(0x145, DataType.ByteArray, 6)]
         public byte[] icon_colours = new byte[6]; // 0x145 = field_144[1] // byte[6]
         [DataOffset(0x14B, DataType.IByte)]
-        CurseFlags flags_1; // 0x14B;
+        public CurseFlags flags_1; // 0x14B;
 
         //[DataOffset(0x14C, DataType.Byte)]
         //public byte number_of_items;
@@ -236,7 +236,6 @@ namespace Classes
         public byte movement; // 0x1A5;
 
         public const int StructSize = 0x1A6;
-
 
         public CursePlayer(byte[] data, int offset)
         {
