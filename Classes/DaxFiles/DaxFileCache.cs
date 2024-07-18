@@ -1,7 +1,6 @@
-﻿using System;
+﻿using Logging;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 
 namespace Classes.DaxFiles
 {
@@ -19,7 +18,7 @@ namespace Classes.DaxFiles
         private void LoadFile(string fileName)
         {
             int dataOffset = 0;
-            string filePath = Path.Combine(gbl.exe_path, fileName);
+            string filePath = Path.Combine(Config.GetDataPath(gbl.game), fileName);
 
             if (System.IO.File.Exists(filePath) == false)
             {

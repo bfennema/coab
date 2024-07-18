@@ -1,10 +1,7 @@
+using Logging;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.IO;
 using System.Drawing;
-using System.Text;
 using System.Windows.Forms;
 using Main.Properties;
 
@@ -19,6 +16,49 @@ namespace Main
 			InitializeComponent();
 
 			Classes.Display.UpdateCallback = UpdateDisplayCallback;
+
+			if (Settings.Default.PoolradData.Length > 0)
+			{
+				this.dataToolStripMenuItem1.Text += " - " + Settings.Default.PoolradData;
+			}
+			if (Settings.Default.PoolradSave.Length > 0)
+			{
+				this.saveToolStripMenuItem1.Text += " - " + Settings.Default.PoolradSave;
+			}
+			if (Settings.Default.CurseData.Length > 0)
+			{
+				this.dataToolStripMenuItem2.Text += " - " + Settings.Default.CurseData;
+			}
+			if (Settings.Default.CurseSave.Length > 0)
+			{
+				this.saveToolStripMenuItem2.Text += " - " + Settings.Default.CurseSave;
+			}
+			if (Settings.Default.SecretData.Length > 0)
+			{
+				this.dataToolStripMenuItem3.Text += " - " + Settings.Default.SecretData;
+			}
+			if (Settings.Default.SecretSave.Length > 0)
+			{
+				this.saveToolStripMenuItem3.Text += " - " + Settings.Default.SecretSave;
+			}
+			if ((Game)Settings.Default.Game == Game.PoolOfRadiance)
+			{
+				poolOfRadianceToolStripMenuItem.Checked = true;
+				curseOfTheAzureBondsToolStripMenuItem.Checked = false;
+				secretOfTheSilverBladesToolStripMenuItem.Checked = false;
+			}
+			else if ((Game)Settings.Default.Game == Game.CurseOfTheAzureBonds)
+			{
+				poolOfRadianceToolStripMenuItem.Checked = false;
+				curseOfTheAzureBondsToolStripMenuItem.Checked = true;
+				secretOfTheSilverBladesToolStripMenuItem.Checked = false;
+			}
+			else if ((Game)Settings.Default.Game == Game.SecretOfTheSilverBlades)
+			{
+				poolOfRadianceToolStripMenuItem.Checked = false;
+				curseOfTheAzureBondsToolStripMenuItem.Checked = false;
+				secretOfTheSilverBladesToolStripMenuItem.Checked = true;
+			}
 		}
 
 		object obj = new object();
@@ -31,7 +71,7 @@ namespace Main
 			}
 			else
 			{
-                displayArea.Image = (Image)Classes.Display.bm.Clone();
+				displayArea.Image = (Image)Classes.Display.bm.Clone();
 			}
 		}
 
@@ -113,9 +153,17 @@ namespace Main
 			Classes.Cheats.NoRaceClassRestrictions(Settings.Default.NoRaceClassLimits);
 			Classes.Cheats.SortTreasureSet(Settings.Default.SortTreasure);
 
+			Config.SetDataPath(Logging.Game.PoolOfRadiance, Settings.Default.PoolradData);
+			Config.SetSavePath(Logging.Game.PoolOfRadiance, Settings.Default.PoolradSave);
+			Config.SetDataPath(Logging.Game.CurseOfTheAzureBonds, Settings.Default.CurseData);
+			Config.SetSavePath(Logging.Game.CurseOfTheAzureBonds, Settings.Default.CurseSave);
+			Config.SetDataPath(Logging.Game.SecretOfTheSilverBlades, Settings.Default.SecretData);
+			Config.SetSavePath(Logging.Game.SecretOfTheSilverBlades, Settings.Default.SecretSave);
+			Config.SetGame(Settings.Default.Game);
+
 			engine.seg044.SetSound(Settings.Default.SoundOn);
-            engine.seg044.SetPicture(Settings.Default.PictureOn);
-            engine.seg044.SetAnimation(Settings.Default.AnimationOn);
+			engine.seg044.SetPicture(Settings.Default.PictureOn);
+			engine.seg044.SetAnimation(Settings.Default.AnimationOn);
 		}
 
 		private void playersAlwayMakeSavingThrowToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
@@ -277,5 +325,115 @@ namespace Main
 			Classes.Cheats.SortTreasureSet(flipped);
 		}
 
- 	}
+		private void DataToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = Settings.Default.PoolradData;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			Settings.Default.PoolradData = folderBrowserDialog1.SelectedPath;
+			Settings.Default.Save();
+			dataToolStripMenuItem1.Text = "Data - " + Settings.Default.PoolradData;
+
+			Logging.Config.SetSavePath(Logging.Game.PoolOfRadiance, Settings.Default.PoolradData);
+		}
+
+		private void SaveToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = Settings.Default.PoolradSave;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			Settings.Default.PoolradSave = folderBrowserDialog1.SelectedPath;
+			Settings.Default.Save();
+			saveToolStripMenuItem1.Text = "Save - " + Settings.Default.PoolradSave;
+
+			Logging.Config.SetSavePath(Logging.Game.PoolOfRadiance, Settings.Default.PoolradSave);
+		}
+
+		private void DataToolStripMenuItem2_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = Settings.Default.CurseData;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			Settings.Default.CurseData = folderBrowserDialog1.SelectedPath;
+			Settings.Default.Save();
+			dataToolStripMenuItem2.Text = "Data - " + Settings.Default.CurseData;
+
+			Logging.Config.SetSavePath(Logging.Game.CurseOfTheAzureBonds, Settings.Default.CurseData);
+		}
+
+		private void SaveToolStripMenuItem2_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = Settings.Default.CurseSave;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			Settings.Default.CurseSave = folderBrowserDialog1.SelectedPath;
+			Settings.Default.Save();
+			saveToolStripMenuItem2.Text = "Save - " + Settings.Default.CurseSave;
+
+			Logging.Config.SetSavePath(Logging.Game.CurseOfTheAzureBonds, Settings.Default.CurseSave);
+		}
+
+		private void DataToolStripMenuItem3_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = Settings.Default.SecretData;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			Settings.Default.SecretData = folderBrowserDialog1.SelectedPath;
+			Settings.Default.Save();
+			dataToolStripMenuItem3.Text = "Data - " + Settings.Default.SecretData;
+
+			Logging.Config.SetSavePath(Logging.Game.SecretOfTheSilverBlades, Settings.Default.SecretData);
+		}
+
+		private void SaveToolStripMenuItem3_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = Settings.Default.SecretSave;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			Settings.Default.SecretSave = folderBrowserDialog1.SelectedPath;
+			Settings.Default.Save();
+			saveToolStripMenuItem3.Text = "Save - " + Settings.Default.SecretSave;
+
+			Logging.Config.SetSavePath(Logging.Game.SecretOfTheSilverBlades, Settings.Default.SecretSave);
+		}
+
+		private void poolOfRadianceToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (poolOfRadianceToolStripMenuItem.Checked == false)
+			{
+				Settings.Default.Game = (int)Game.PoolOfRadiance;
+				Settings.Default.Save();
+				Config.SetGame(Settings.Default.Game);
+				poolOfRadianceToolStripMenuItem.Checked = true;
+				curseOfTheAzureBondsToolStripMenuItem.Checked = false;
+				secretOfTheSilverBladesToolStripMenuItem.Checked = false;
+			}
+		}
+
+		private void curseOfTheAzureBondsToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (curseOfTheAzureBondsToolStripMenuItem.Checked == false)
+			{
+				Settings.Default.Game = (int)Game.CurseOfTheAzureBonds;
+				Settings.Default.Save();
+				Config.SetGame(Settings.Default.Game);
+				poolOfRadianceToolStripMenuItem.Checked = false;
+				curseOfTheAzureBondsToolStripMenuItem.Checked = true;
+				secretOfTheSilverBladesToolStripMenuItem.Checked = false;
+			}
+		}
+
+		private void secretOfTheSilverBladesToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			if (secretOfTheSilverBladesToolStripMenuItem.Checked == false)
+			{
+				Settings.Default.Game = (int)Game.SecretOfTheSilverBlades;
+				Settings.Default.Save();
+				Config.SetGame(Settings.Default.Game);
+				poolOfRadianceToolStripMenuItem.Checked = false;
+				curseOfTheAzureBondsToolStripMenuItem.Checked = false;
+				secretOfTheSilverBladesToolStripMenuItem.Checked = true;
+			}
+		}
+    }
 }

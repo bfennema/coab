@@ -139,10 +139,4 @@ namespace Classes
         Cold                = 0x200000,
         Regenerate          = 0x400000,
     }
-
-    public enum Game
-    {
-        PoolOfRadiance,
-        CurseOfTheAzureBonds,
-    }
 }

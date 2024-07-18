@@ -41,7 +41,7 @@ namespace Classes
 
         public ItemDataTable(string fileName)
         {
-            string filePath = Path.Combine(gbl.exe_path, fileName);
+            string filePath = Path.Combine(Config.GetDataPath(gbl.game), fileName);
 
             if (System.IO.File.Exists(filePath) == false)
             {

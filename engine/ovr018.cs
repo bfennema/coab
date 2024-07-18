@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using Classes.Combat;
 using System.Linq;
+using Logging;
 
 namespace engine
 {

@@ -1,5 +1,6 @@
 using Classes;
 using Classes.Combat;
+using Logging;
 
 namespace engine
 {
@@ -42,6 +43,13 @@ namespace engine
             /* Memory Init - End */
 
             ovr003.SetupCommandTable();
+
+            gbl.game = Config.GetGame();
+            while (Config.GetDataPath(gbl.game).Length == 0)
+            {
+                seg041.GameDelay();
+                gbl.game = Config.GetGame();
+            }
 
             InitFirst();
 

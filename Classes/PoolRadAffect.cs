@@ -1,3 +1,5 @@
+using Logging;
+
 namespace Classes
 {
     /// <summary>
