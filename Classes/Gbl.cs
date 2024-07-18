@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Classes.Combat;
+using Logging;
 
 
 namespace Classes
@@ -21,7 +22,8 @@ namespace Classes
     {
         Curse = 0,
         Pool = 1,
-        Hillsfar = 2
+        Hillsfar = 2,
+        Secret = 3,
     }
 
     public enum GameState
@@ -533,6 +535,10 @@ namespace Classes
         public static List<Item> items_pointer;
 
         public static MoneySet pooled_money = new MoneySet();
+
+        public static List<Item> items_vault;
+
+        public static MoneySet vault_money = new MoneySet();
 
 
         /// <summary>

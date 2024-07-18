@@ -1,4 +1,5 @@
 using Classes;
+using Logging;
 
 namespace engine
 {
@@ -26,7 +27,14 @@ namespace engine
             byte[] block_ptr;
             ushort block_size;
 
-            seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8d1.dax");
+            if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8d1.dax");
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8d5.dax");
+            }
 
             if (block_size != 0)
             {

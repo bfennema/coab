@@ -37,6 +37,19 @@ namespace Classes
             return c;
         }
 
+        public MoneySet()
+        {
+            ClearAll();
+        }
+
+
+        public MoneySet(MoneySet a)
+        {
+            for (int coin = Money.Copper; coin <= Money.Jewelry; coin++)
+            {
+                money[coin] = a.money[coin];
+            }
+        }
 
         public void ClearAll()
         {

@@ -1,5 +1,4 @@
 using Logging;
-using System;
 
 namespace Classes
 {
@@ -306,6 +305,10 @@ namespace Classes
         [DataOffset(0x3E8, DataType.Word)]
         public ushort field_3E8;
 
+        [DataOffset(0x3F6, DataType.Word)]
+        public ushort field_3F6;
+        [DataOffset(0x3F8, DataType.Word)]
+        public ushort field_3F8;
         [DataOffset(0x3FA, DataType.Byte)]
         public byte field_3FA;
         [DataOffset(0x3FC, DataType.Word)]
@@ -734,7 +737,12 @@ namespace Classes
                     field_3E8 = value;
                     break;
 
-
+                case 0x3F6:
+                    field_3F6 = value;
+                    break;
+                case 0x3F8:
+                    field_3F8 = value;
+                    break;
                 case 0x3FA:
                     field_3FA = (byte)value;
                     break;
@@ -1047,10 +1055,16 @@ namespace Classes
                 case 0x3E8:
                     return field_3E8;
 
+                case 0x3F6:
+                    return field_3F6;
+                case 0x3F8:
+                    return field_3F8;
                 case 0x3FA:
                     return field_3FA;
                 case 0x3FC:
                     return field_3FC;
+                case 0x3FE:
+                    return (ushort)picture_fade;
 
                 case 0x596:
                     return field_596;
