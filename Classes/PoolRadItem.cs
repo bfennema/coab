@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using static Classes.CurseItem;
 using static Classes.Item;
 
 namespace Classes
@@ -36,11 +37,96 @@ namespace Classes
 
         public const int StructSize = 0x3F;
 
+        static BiLookup<PoolRadTypes, ItemType> type_map;
         static BiLookup<PoolRadNames, ItemNames> mapping;
 
         static void InitMapping()
         {
             if (mapping != null) { return; }
+
+            type_map = new BiLookup<PoolRadTypes, ItemType>();
+
+            type_map.Add(PoolRadTypes.Type_0, ItemType.Type_0);
+            type_map.Add(PoolRadTypes.BattleAxe, ItemType.BattleAxe);
+            type_map.Add(PoolRadTypes.HandAxe, ItemType.HandAxe);
+            type_map.Add(PoolRadTypes.Bardiche, ItemType.Bardiche);
+            type_map.Add(PoolRadTypes.BecDeCorbin, ItemType.BecDeCorbin);
+            type_map.Add(PoolRadTypes.BillGuisarme, ItemType.BillGuisarme);
+            type_map.Add(PoolRadTypes.BoStick, ItemType.BoStick);
+            type_map.Add(PoolRadTypes.Club, ItemType.Club);
+            type_map.Add(PoolRadTypes.Dagger, ItemType.Dagger);
+            type_map.Add(PoolRadTypes.Dart, ItemType.Dart);
+            type_map.Add(PoolRadTypes.Fauchard, ItemType.Fauchard);
+            type_map.Add(PoolRadTypes.FauchardFork, ItemType.FauchardFork);
+            type_map.Add(PoolRadTypes.Flail, ItemType.Flail);
+            type_map.Add(PoolRadTypes.MilitaryFork, ItemType.MilitaryFork);
+            type_map.Add(PoolRadTypes.Glaive, ItemType.Glaive);
+            type_map.Add(PoolRadTypes.GlaiveGuisarme, ItemType.GlaiveGuisarme);
+            type_map.Add(PoolRadTypes.Guisarme, ItemType.Guisarme);
+            type_map.Add(PoolRadTypes.GuisarmeVoulge, ItemType.GuisarmeVoulge);
+            type_map.Add(PoolRadTypes.Halberd, ItemType.Halberd);
+            type_map.Add(PoolRadTypes.LucernHammer, ItemType.LucernHammer);
+            type_map.Add(PoolRadTypes.Hammer, ItemType.Hammer);
+            type_map.Add(PoolRadTypes.Javelin, ItemType.Javelin);
+            type_map.Add(PoolRadTypes.JoStick, ItemType.JoStick);
+            type_map.Add(PoolRadTypes.Mace, ItemType.Mace);
+            type_map.Add(PoolRadTypes.MorningStar, ItemType.MorningStar);
+            type_map.Add(PoolRadTypes.Partisan, ItemType.Partisan);
+            type_map.Add(PoolRadTypes.MilitaryPick, ItemType.MilitaryPick);
+            type_map.Add(PoolRadTypes.AwlPike, ItemType.AwlPike);
+            type_map.Add(PoolRadTypes.Quarrel, ItemType.Quarrel);
+            type_map.Add(PoolRadTypes.Ranseur, ItemType.Ranseur);
+            type_map.Add(PoolRadTypes.Scimitar, ItemType.Scimitar);
+            type_map.Add(PoolRadTypes.Spear, ItemType.Spear);
+            type_map.Add(PoolRadTypes.Spetum, ItemType.Spetum);
+            type_map.Add(PoolRadTypes.QuarterStaff, ItemType.QuarterStaff);
+            type_map.Add(PoolRadTypes.BastardSword, ItemType.BastardSword);
+            type_map.Add(PoolRadTypes.BroadSword, ItemType.BroadSword);
+            type_map.Add(PoolRadTypes.LongSword, ItemType.LongSword);
+            type_map.Add(PoolRadTypes.ShortSword, ItemType.ShortSword);
+            type_map.Add(PoolRadTypes.TwoHandedSword, ItemType.TwoHandedSword);
+            type_map.Add(PoolRadTypes.Trident, ItemType.Trident);
+            type_map.Add(PoolRadTypes.Voulge, ItemType.Voulge);
+            type_map.Add(PoolRadTypes.CompositeLongBow, ItemType.CompositeLongBow);
+            type_map.Add(PoolRadTypes.CompositeShortBow, ItemType.CompositeShortBow);
+            type_map.Add(PoolRadTypes.LongBow, ItemType.LongBow);
+            type_map.Add(PoolRadTypes.ShortBow, ItemType.ShortBow);
+            type_map.Add(PoolRadTypes.HeavyCrossbow, ItemType.HeavyCrossbow);
+            type_map.Add(PoolRadTypes.LightCrossbow, ItemType.LightCrossbow);
+            type_map.Add(PoolRadTypes.Sling, ItemType.Sling);
+            type_map.Add(PoolRadTypes.LeatherArmor, ItemType.LeatherArmor);
+            type_map.Add(PoolRadTypes.PaddedArmor, ItemType.PaddedArmor);
+            type_map.Add(PoolRadTypes.StuddedLeather, ItemType.StuddedLeather);
+            type_map.Add(PoolRadTypes.RingMail, ItemType.RingMail);
+            type_map.Add(PoolRadTypes.ScaleMail, ItemType.ScaleMail);
+            type_map.Add(PoolRadTypes.ChainMail, ItemType.ChainMail);
+            type_map.Add(PoolRadTypes.SplintMail, ItemType.SplintMail);
+            type_map.Add(PoolRadTypes.BandedMail, ItemType.BandedMail);
+            type_map.Add(PoolRadTypes.PlateMail, ItemType.PlateMail);
+            type_map.Add(PoolRadTypes.Shield, ItemType.Shield);
+            type_map.Add(PoolRadTypes.MUScroll, ItemType.MUScroll);
+            type_map.Add(PoolRadTypes.ClrcScroll, ItemType.ClrcScroll);
+            type_map.Add(PoolRadTypes.Gauntlets, ItemType.Gauntlets);
+            type_map.Add(PoolRadTypes.Ring, ItemType.Ring);
+            type_map.Add(PoolRadTypes.GemsJewelry, ItemType.GemsJewelry);
+            type_map.Add(PoolRadTypes.Potion, ItemType.Potion);
+            type_map.Add(PoolRadTypes.Commodities, ItemType.Commodities);
+            type_map.Add(PoolRadTypes.Arrow, ItemType.Arrow);
+            type_map.Add(PoolRadTypes.HolySymbol, ItemType.HolySymbol);
+            type_map.Add(PoolRadTypes.Key, ItemType.Key);
+            type_map.Add(PoolRadTypes.CursedNecklace, ItemType.CursedNecklace);
+            type_map.Add(PoolRadTypes.Bracers, ItemType.Bracers);
+            type_map.Add(PoolRadTypes.WandA, ItemType.WandA);
+            type_map.Add(PoolRadTypes.WandB, ItemType.WandB);
+            type_map.Add(PoolRadTypes.EfreetiBottle, ItemType.EfreetiBottle);
+            type_map.Add(PoolRadTypes.PotionOfGiantStr, ItemType.PotionOfGiantStr);
+            type_map.Add(PoolRadTypes.HolyWater, ItemType.HolyWater);
+            type_map.Add(PoolRadTypes.FlaskOfOil, ItemType.FlaskOfOil);
+            type_map.Add(PoolRadTypes.HillGiantBoulder, ItemType.HillGiantBoulder);
+            type_map.Add(PoolRadTypes.RingOfFeatherFall, ItemType.RingOfFeatherFall);
+            type_map.Add(PoolRadTypes.Pass, ItemType.Pass);
+            type_map.Add(PoolRadTypes.Cloak, ItemType.Cloak);
+            type_map.Add(PoolRadTypes.RingOfProt, ItemType.RingOfProt);
 
             mapping = new BiLookup<PoolRadNames, ItemNames>();
 
@@ -336,7 +422,8 @@ namespace Classes
             Item item = new Item()
             {
                 name = name,
-                type = (ItemType)type,
+                type = type_map[(PoolRadTypes)type][0],
+                itemData = gbl.ItemDataTable[type],
                 namenum = new ItemNames[3] { mapping[(PoolRadNames)namenum[0]][0], mapping[(PoolRadNames)namenum[1]][0], mapping[(PoolRadNames)namenum[2]][0] },
                 plus = plus,
                 plus_save = plus_save,
@@ -383,6 +470,91 @@ namespace Classes
             DataIO.WriteObject(this, data);
 
             return data;
+        }
+
+        public enum PoolRadTypes
+        {
+            Type_0 = 0,
+            BattleAxe = 1,
+            HandAxe = 2,
+            Bardiche = 3,
+            BecDeCorbin = 4,
+            BillGuisarme = 5,
+            BoStick = 6,
+            Club = 7,
+            Dagger = 8,
+            Dart = 9,
+            Fauchard = 10,
+            FauchardFork = 11,
+            Flail = 12,
+            MilitaryFork = 13,
+            Glaive = 14,
+            GlaiveGuisarme = 15,
+            Guisarme = 16,
+            GuisarmeVoulge = 17,
+            Halberd = 18,
+            LucernHammer = 19,
+            Hammer = 20,
+            Javelin = 21,
+            JoStick = 22,
+            Mace = 23,
+            MorningStar = 24,
+            Partisan = 25,
+            MilitaryPick = 26,
+            AwlPike = 27,
+            Quarrel = 28,
+            Ranseur = 29,
+            Scimitar = 30,
+            Spear = 31,
+            Spetum = 32,
+            QuarterStaff = 33,
+            BastardSword = 34,
+            BroadSword = 35,
+            LongSword = 36,
+            ShortSword = 37,
+            TwoHandedSword = 38,
+            Trident = 39,
+            Voulge = 40,
+            CompositeLongBow = 41,
+            CompositeShortBow = 42,
+            LongBow = 43,
+            ShortBow = 44,
+            HeavyCrossbow = 45,
+            LightCrossbow = 46,
+            Sling = 47,
+            LeatherArmor = 50,
+            PaddedArmor = 51,
+            StuddedLeather = 52,
+            RingMail = 53,
+            ScaleMail = 54,
+            ChainMail = 55,
+            SplintMail = 56,
+            BandedMail = 57,
+            PlateMail = 58,
+            Shield = 59,
+            MUScroll = 61,
+            ClrcScroll = 62,
+            Gauntlets = 63, // Ogre Power
+            Ring = 69, // Fire Resistance
+            GemsJewelry = 70, // Manual of Bodily Health, Potion of Healing, Potion of Extra Healing, Dust of Disappearance, Potion of Speed, Potion of Giant Strength, Necklace of Missiles
+            Potion = 71, // Potion of Extra Healing, Holy Symbol, Mirror
+            Commodities = 72, // Tapestry, Sheet of Gold, Statuette, Chain of Bone, Rug, Brazier, Saddle
+            Arrow = 73,
+            HolySymbol = 74,
+            Key = 75,
+            CursedNecklace = 76,
+            Bracers = 77,
+            WandA = 78,
+            WandB = 79,
+            EfreetiBottle = 82,
+            PotionOfGiantStr = 84,
+            HolyWater = 85,
+            FlaskOfOil = 86,
+            HillGiantBoulder = 87,
+            RingOfFeatherFall = 90,
+            Pass = 91,
+            Cloak = 92, // Cloak of Displacement
+            RingOfProt = 93,
         }
 
         private enum PoolRadNames

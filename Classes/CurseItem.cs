@@ -35,11 +35,127 @@ namespace Classes
 
         public const int StructSize = 0x3F;
 
+        static BiLookup<CurseTypes, ItemType> type_map;
         static BiLookup<CurseNames, ItemNames> mapping;
 
         static void InitMapping()
         {
             if (mapping != null) { return; }
+
+            type_map = new BiLookup<CurseTypes, ItemType>();
+
+            type_map.Add(CurseTypes.Type_0, ItemType.Type_0);
+            type_map.Add(CurseTypes.BattleAxe, ItemType.BattleAxe);
+            type_map.Add(CurseTypes.HandAxe, ItemType.HandAxe);
+            type_map.Add(CurseTypes.Bardiche, ItemType.Bardiche);
+            type_map.Add(CurseTypes.BecDeCorbin, ItemType.BecDeCorbin);
+            type_map.Add(CurseTypes.BillGuisarme, ItemType.BillGuisarme);
+            type_map.Add(CurseTypes.BoStick, ItemType.BoStick);
+            type_map.Add(CurseTypes.Club, ItemType.Club);
+            type_map.Add(CurseTypes.Dagger, ItemType.Dagger);
+            type_map.Add(CurseTypes.Dart, ItemType.Dart);
+            type_map.Add(CurseTypes.Fauchard, ItemType.Fauchard);
+            type_map.Add(CurseTypes.FauchardFork, ItemType.FauchardFork);
+            type_map.Add(CurseTypes.Flail, ItemType.Flail);
+            type_map.Add(CurseTypes.MilitaryFork, ItemType.MilitaryFork);
+            type_map.Add(CurseTypes.Glaive, ItemType.Glaive);
+            type_map.Add(CurseTypes.GlaiveGuisarme, ItemType.GlaiveGuisarme);
+            type_map.Add(CurseTypes.Guisarme, ItemType.Guisarme);
+            type_map.Add(CurseTypes.GuisarmeVoulge, ItemType.GuisarmeVoulge);
+            type_map.Add(CurseTypes.Halberd, ItemType.Halberd);
+            type_map.Add(CurseTypes.LucernHammer, ItemType.LucernHammer);
+            type_map.Add(CurseTypes.Hammer, ItemType.Hammer);
+            type_map.Add(CurseTypes.Javelin, ItemType.Javelin);
+            type_map.Add(CurseTypes.JoStick, ItemType.JoStick);
+            type_map.Add(CurseTypes.Mace, ItemType.Mace);
+            type_map.Add(CurseTypes.MorningStar, ItemType.MorningStar);
+            type_map.Add(CurseTypes.Partisan, ItemType.Partisan);
+            type_map.Add(CurseTypes.MilitaryPick, ItemType.MilitaryPick);
+            type_map.Add(CurseTypes.AwlPike, ItemType.AwlPike);
+            type_map.Add(CurseTypes.Quarrel, ItemType.Quarrel);
+            type_map.Add(CurseTypes.Ranseur, ItemType.Ranseur);
+            type_map.Add(CurseTypes.Scimitar, ItemType.Scimitar);
+            type_map.Add(CurseTypes.Spear, ItemType.Spear);
+            type_map.Add(CurseTypes.Spetum, ItemType.Spetum);
+            type_map.Add(CurseTypes.QuarterStaff, ItemType.QuarterStaff);
+            type_map.Add(CurseTypes.BastardSword, ItemType.BastardSword);
+            type_map.Add(CurseTypes.BroadSword, ItemType.BroadSword);
+            type_map.Add(CurseTypes.LongSword, ItemType.LongSword);
+            type_map.Add(CurseTypes.ShortSword, ItemType.ShortSword);
+            type_map.Add(CurseTypes.TwoHandedSword, ItemType.TwoHandedSword);
+            type_map.Add(CurseTypes.Trident, ItemType.Trident);
+            type_map.Add(CurseTypes.Voulge, ItemType.Voulge);
+            type_map.Add(CurseTypes.CompositeLongBow, ItemType.CompositeLongBow);
+            type_map.Add(CurseTypes.CompositeShortBow, ItemType.CompositeShortBow);
+            type_map.Add(CurseTypes.LongBow, ItemType.LongBow);
+            type_map.Add(CurseTypes.ShortBow, ItemType.ShortBow);
+            type_map.Add(CurseTypes.HeavyCrossbow, ItemType.HeavyCrossbow);
+            type_map.Add(CurseTypes.LightCrossbow, ItemType.LightCrossbow);
+            type_map.Add(CurseTypes.Sling, ItemType.Sling);
+            type_map.Add(CurseTypes.Type_48, ItemType.Type_48);
+            type_map.Add(CurseTypes.Type_49, ItemType.Type_49);
+            type_map.Add(CurseTypes.LeatherArmor, ItemType.LeatherArmor);
+            type_map.Add(CurseTypes.PaddedArmor, ItemType.PaddedArmor);
+            type_map.Add(CurseTypes.StuddedLeather, ItemType.StuddedLeather);
+            type_map.Add(CurseTypes.RingMail, ItemType.RingMail);
+            type_map.Add(CurseTypes.ScaleMail, ItemType.ScaleMail);
+            type_map.Add(CurseTypes.ChainMail, ItemType.ChainMail);
+            type_map.Add(CurseTypes.SplintMail, ItemType.SplintMail);
+            type_map.Add(CurseTypes.BandedMail, ItemType.BandedMail);
+            type_map.Add(CurseTypes.PlateMail, ItemType.PlateMail);
+            type_map.Add(CurseTypes.Shield, ItemType.Shield);
+            type_map.Add(CurseTypes.ScrollOfProt, ItemType.ScrollOfProt);
+            type_map.Add(CurseTypes.MUScroll, ItemType.MUScroll);
+            type_map.Add(CurseTypes.ClrcScroll, ItemType.ClrcScroll);
+            type_map.Add(CurseTypes.Gauntlets, ItemType.Gauntlets);
+            type_map.Add(CurseTypes.Hat, ItemType.Hat);
+            type_map.Add(CurseTypes.Girdle, ItemType.Girdle);
+            type_map.Add(CurseTypes.Robe, ItemType.Robe);
+            type_map.Add(CurseTypes.CloakOfProt, ItemType.CloakOfProt);
+            type_map.Add(CurseTypes.Boots, ItemType.Boots);
+            type_map.Add(CurseTypes.Ring, ItemType.Ring);
+            type_map.Add(CurseTypes.GemsJewelry, ItemType.GemsJewelry);
+            type_map.Add(CurseTypes.Potion, ItemType.Potion);
+            type_map.Add(CurseTypes.Type_72, ItemType.Commodities);
+            type_map.Add(CurseTypes.Arrow, ItemType.Arrow);
+            type_map.Add(CurseTypes.Type_74, ItemType.HolySymbol);
+            type_map.Add(CurseTypes.Type_75, ItemType.Key);
+            type_map.Add(CurseTypes.Type_76, ItemType.CursedNecklace);
+            type_map.Add(CurseTypes.Bracers, ItemType.Bracers);
+            type_map.Add(CurseTypes.WandA, ItemType.WandA);
+            type_map.Add(CurseTypes.WandB, ItemType.WandB);
+            type_map.Add(CurseTypes.Type_80, ItemType.Type_80);
+            type_map.Add(CurseTypes.Type_81, ItemType.Type_81);
+            type_map.Add(CurseTypes.Type_82, ItemType.EfreetiBottle);
+            type_map.Add(CurseTypes.Type_83, ItemType.Type_83);
+            type_map.Add(CurseTypes.PotionOfGiantStr, ItemType.PotionOfGiantStr);
+            type_map.Add(CurseTypes.Type_85, ItemType.HolyWater);
+            type_map.Add(CurseTypes.FlaskOfOil, ItemType.FlaskOfOil);
+            type_map.Add(CurseTypes.Type_87, ItemType.HillGiantBoulder);
+            type_map.Add(CurseTypes.Type_88, ItemType.CloudGiantBoulder);
+            type_map.Add(CurseTypes.Type_89, ItemType.FireGiantBoulder);
+            type_map.Add(CurseTypes.Type_90, ItemType.RingOfFeatherFall);
+            type_map.Add(CurseTypes.Type_91, ItemType.Pass);
+            type_map.Add(CurseTypes.Cloak, ItemType.Cloak);
+            type_map.Add(CurseTypes.RingOfProt, ItemType.RingOfProt);
+            type_map.Add(CurseTypes.DrowMace, ItemType.DrowMace);
+            type_map.Add(CurseTypes.ElvenChain, ItemType.ElvenChain);
+            type_map.Add(CurseTypes.DrowChainMail, ItemType.DrowChainMail);
+            type_map.Add(CurseTypes.DrowLongSword, ItemType.DrowLongSword);
+            type_map.Add(CurseTypes.Type_98, ItemType.Spine);
+            type_map.Add(CurseTypes.RingOfWizardry, ItemType.RingOfWizardry);
+            type_map.Add(CurseTypes.DartOfHornetsNest, ItemType.DartOfHornetsNest);
+            type_map.Add(CurseTypes.StaffSling, ItemType.StaffSling);
+            type_map.Add(CurseTypes.Type_102, ItemType.Type_102);
+            type_map.Add(CurseTypes.Type_103, ItemType.Type_103);
+            type_map.Add(CurseTypes.Type_104, ItemType.Type_104);
+            type_map.Add(CurseTypes.Type_105, ItemType.Type_105);
+            type_map.Add(CurseTypes.Type_106, ItemType.Type_106);
+            type_map.Add(CurseTypes.Type_107, ItemType.Type_107);
+            type_map.Add(CurseTypes.Type_108, ItemType.Type_108);
+            type_map.Add(CurseTypes.Type_109, ItemType.Type_109);
+            type_map.Add(CurseTypes.Type_110, ItemType.Type_110);
+            type_map.Add(CurseTypes.Type_128, ItemType.Type_128);
 
             mapping = new BiLookup<CurseNames, ItemNames>();
 
@@ -306,7 +422,7 @@ namespace Classes
             if (mapping == null) { InitMapping(); }
 
             name = item.name;
-            type = (byte)item.type;
+            type = (byte)type_map[item.type][0];
             namenum[0] = (byte)mapping[item.namenum[0]][0];
             namenum[1] = (byte)mapping[item.namenum[1]][0];
             namenum[2] = (byte)mapping[item.namenum[2]][0];
@@ -330,7 +446,8 @@ namespace Classes
             Item item = new Item()
             {
                 name = name,
-                type = (ItemType)type,
+                type = type_map[(CurseTypes)type][0],
+                itemData = gbl.ItemDataTable[type],
                 namenum = new ItemNames[3] { mapping[(CurseNames)namenum[0]][0], mapping[(CurseNames)namenum[1]][0], mapping[(CurseNames)namenum[2]][0] },
                 plus = plus,
                 plus_save = plus_save,
@@ -357,6 +474,122 @@ namespace Classes
             DataIO.WriteObject(this, data);
 
             return data;
+        }
+
+        public enum CurseTypes
+        {
+            Type_0 = 0,
+            BattleAxe = 1,
+            HandAxe = 2,
+            Bardiche = 3,
+            BecDeCorbin = 4,
+            BillGuisarme = 5,
+            BoStick = 6,
+            Club = 7,
+            Dagger = 8,
+            Dart = 9,
+            Fauchard = 10,
+            FauchardFork = 11,
+            Flail = 12,
+            MilitaryFork = 13,
+            Glaive = 14,
+            GlaiveGuisarme = 15,
+            Guisarme = 16,
+            GuisarmeVoulge = 17,
+            Halberd = 18,
+            LucernHammer = 19,
+            Hammer = 20,
+            Javelin = 21,
+            JoStick = 22,
+            Mace = 23,
+            MorningStar = 24,
+            Partisan = 25,
+            MilitaryPick = 26,
+            AwlPike = 27,
+            Quarrel = 28,
+            Ranseur = 29,
+            Scimitar = 30,
+            Spear = 31,
+            Spetum = 32,
+            QuarterStaff = 33,
+            BastardSword = 34,
+            BroadSword = 35,
+            LongSword = 36,
+            ShortSword = 37,
+            TwoHandedSword = 38,
+            Trident = 39,
+            Voulge = 40,
+            CompositeLongBow = 41,
+            CompositeShortBow = 42,
+            LongBow = 43,
+            ShortBow = 44,
+            HeavyCrossbow = 45,
+            LightCrossbow = 46,
+            Sling = 47,
+            Type_48 = 48,
+            Type_49 = 49,
+            LeatherArmor = 50,
+            PaddedArmor = 51,
+            StuddedLeather = 52,
+            RingMail = 53,
+            ScaleMail = 54,
+            ChainMail = 55,
+            SplintMail = 56,
+            BandedMail = 57,
+            PlateMail = 58,
+            Shield = 59,
+            ScrollOfProt = 60,
+            MUScroll = 61,
+            ClrcScroll = 62,
+            Gauntlets = 63, // Gloves of Thievery, Gauntlets of Dexterity, Gauntlets of Fumbling
+            Hat = 64,
+            Girdle = 65,
+            Robe = 66,
+            CloakOfProt = 67,
+            Boots = 68,
+            Ring = 69,
+            GemsJewelry = 70, // Ioun Stone, Dust of Disappearance, Necklace of Missiles
+            Potion = 71, // Silver Mirror, Potion of Extra Healing, Potion of Speed, Potion of Invisibility
+            Type_72 = 72,
+            Arrow = 73,
+            Type_74 = 74,
+            Type_75 = 75,
+            Type_76 = 76,
+            Bracers = 77,
+            WandA = 78,
+            WandB = 79,
+            Type_80 = 80,
+            Type_81 = 81,
+            Type_82 = 82,
+            Type_83 = 83,
+            PotionOfGiantStr = 84,
+            Type_85 = 85,
+            FlaskOfOil = 86,
+            Type_87 = 87,
+            Type_88 = 88,
+            Type_89 = 89,
+            Type_90 = 90,
+            Type_91 = 91,
+            Cloak = 92,
+            RingOfProt = 93,
+            DrowMace = 94,
+            ElvenChain = 95,
+            DrowChainMail = 96,
+            DrowLongSword = 97,
+            Type_98 = 98,
+            RingOfWizardry = 99,
+            DartOfHornetsNest = 100,
+            StaffSling = 101,
+            Type_102 = 102,
+            Type_103 = 103,
+            Type_104 = 104,
+            Type_105 = 105,
+            Type_106 = 106,
+            Type_107 = 107,
+            Type_108 = 108,
+            Type_109 = 109,
+            Type_110 = 110,
+            Type_128 = 128,
         }
 
         private enum CurseNames
