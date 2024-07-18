@@ -450,6 +450,8 @@ namespace engine
             player.thac0 = 40;
             player.health_status = Status.okey;
             player.in_combat = true;
+            player.head_portrait = 1;
+            player.body_portrait = 1;
             player.icon_dimensions = 1;
             player.mod_id = (byte)seg051.Random(256);
             player.icon_id = 0x0A;
@@ -1171,6 +1173,11 @@ namespace engine
             {
                 player.name = seg041.getUserInputString(15, 0, 13, "Character name: ");
             } while (player.name.Length == 0);
+
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                portrait_builder();
+            }
 
             icon_builder();
 
@@ -1915,6 +1922,28 @@ namespace engine
         internal static void duplicateCombatIcon(bool recolour, byte destIndex, byte sourceIndex) /* sub_4FC5B */
         {
             gbl.combat_icons[destIndex].DuplicateIcon(recolour, gbl.combat_icons[sourceIndex], gbl.SelectedPlayer);
+        }
+
+        internal static void portrait_builder()
+        {
+            Player player = gbl.SelectedPlayer;
+            byte body_portrait = player.body_portrait;
+            byte head_portrait = player.head_portrait;
+            char input_key;
+            do
+            {
+                input_key = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Head Body Keep", string.Empty);
+                switch (input_key)
+                {
+                    case 'H':
+                        ovr020.playerNextHead(player);
+                        break;
+                    case 'B':
+                        ovr020.playerNextBody(player);
+                        break;
+                }
+                ovr020.playerDisplayPortrait(player);
+            } while (input_key != 'K');
         }
 
         static Set unk_4FE94 = new Set(0, 69);

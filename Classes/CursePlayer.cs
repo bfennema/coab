@@ -152,9 +152,9 @@ namespace Classes
         [DataOffset(0x13E, DataType.Byte)]
         public byte field_13E; // 0x13E;
         [DataOffset(0x13F, DataType.Byte)]
-        public byte field_13F; // 0x13F;
+        public byte head_portrait; // 0x13F;
         [DataOffset(0x140, DataType.Byte)]
-        public byte field_140; // 0x140;
+        public byte body_portrait; // 0x140;
         [DataOffset(0x141, DataType.Byte)]
         public byte head_icon; // 0x141;
         [DataOffset(0x142, DataType.Byte)]
@@ -319,8 +319,8 @@ namespace Classes
 
             field_13C = player.field_13C;
             field_13E = player.field_13E;
-            field_13F = player.field_13F;
-            field_140 = player.field_140;
+            head_portrait = player.head_portrait;
+            body_portrait = player.body_portrait;
             head_icon = player.head_icon;
             weapon_icon = player.weapon_icon;
             icon_id = player.icon_id;
@@ -456,8 +456,8 @@ namespace Classes
 
             player.field_13C = field_13C;
             player.field_13E = field_13E;
-            player.field_13F = field_13F;
-            player.field_140 = field_140;
+            player.head_portrait = head_portrait;
+            player.body_portrait = body_portrait;
             player.head_icon = head_icon;
             player.weapon_icon = weapon_icon;
             player.icon_id = icon_id;

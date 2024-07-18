@@ -773,8 +773,8 @@ namespace engine
                     player.thac0 = 40;
                     player.health_status = Status.okey;
                     player.in_combat = true;
-                    player.field_13F = 1;
-                    player.field_140 = 1;
+                    player.head_portrait = 1;
+                    player.body_portrait = 1;
                     player.icon_dimensions = 1;
 
                     player.mod_id = seg051.Random((byte)0xff);

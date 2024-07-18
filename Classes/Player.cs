@@ -636,8 +636,8 @@ namespace Classes
 
         public short field_13C; // 0x13c
         public byte field_13E; // 0x13e;
-        public byte field_13F; // 0x13f;
-        public byte field_140; // 0x140;
+        public byte head_portrait; // 0x13f;
+        public byte body_portrait; // 0x140;
         public byte head_icon; // 0x141;
         public byte weapon_icon; // 0x142;
         public byte icon_id; // 0x143;

@@ -42,10 +42,61 @@ namespace engine
                                         "Gems", "Jewelry" };
 
 
+        static byte[] head_list = { 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 };
+        static byte[] body_list = { 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 };
+
+        internal static void playerNextHead(Player player)
+        {
+            if (player.head_portrait >= head_list.Length)
+            {
+                player.head_portrait = 1;
+            }
+            else
+            {
+                player.head_portrait++;
+            }
+        }
+        internal static void playerNextBody(Player player)
+        {
+            if (player.body_portrait >= body_list.Length)
+            {
+                player.body_portrait = 1;
+            }
+            else
+            {
+                player.body_portrait++;
+            }
+        }
+        internal static void playerDisplayPortrait(Player player)
+        {
+            if (player.body_portrait != 0 && player.head_portrait != 0)
+            {
+                ovr008.set_and_draw_head_body(3, body_list[player.body_portrait - 1], head_list[player.head_portrait - 1], 1, 28);
+            }
+        }
         internal static void playerDisplayFull(Player player, bool cur = false)
         {
-            seg037.DrawFrame_Outer();
+            Display.UpdateStop();
+            seg037.DrawFrame_DisplayFull();
 
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                playerDisplayPortrait(player);
+                playerDisplayFullCurse(player, cur);
+            }
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                playerDisplayFullCurse(player, cur);
+            }
+            else if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                playerDisplayFullSecret(player, cur);
+            }
+            Display.UpdateStart();
+        }
+
+        internal static void playerDisplayFullCurse(Player player, bool cur = false)
+        {
             ovr025.displayPlayerName(false, 1, 1, player);
 
             if (player.control_morale >= Control.NPC_Base)
