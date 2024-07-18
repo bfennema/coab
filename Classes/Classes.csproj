@@ -181,6 +181,10 @@
     <Compile Include="Set.cs">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="SecretAffect.cs" />
+    <Compile Include="SecretItem.cs" />
+    <Compile Include="SecretPlayer.cs" />
+    <Compile Include="SecretSpells.cs" />
     <Compile Include="SpellList.cs" />
     <Compile Include="Spells.cs" />
     <Compile Include="SteppingPath.cs" />
