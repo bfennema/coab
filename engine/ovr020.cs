@@ -43,8 +43,12 @@ namespace engine
 
         internal static void playerDisplayFull(Player player, bool cur = false)
         {
-            gbl.game.DrawFrame_Outer();
-
+            Display.UpdateStop();
+            gbl.game.DrawFrame_Portrait();
+            if (gbl.game.Portrait && player.body_portrait != 0 && player.head_portrait != 0)
+            {
+                ovr008.set_and_draw_head_body(3, gbl.game.PortraitBody[player.body_portrait - 1], gbl.game.PortraitHead[player.head_portrait - 1], 1, 28);
+            }
             ovr025.displayPlayerName(false, 1, 1, player);
 
             if (player.control_morale >= Control.NPC_Base)
@@ -189,6 +193,8 @@ namespace engine
 
             seg041.displayString("Status", 0, 15, yCol, 1);
             seg041.displayString(statusString[(int)player.health_status], 0, 10, yCol, 8);
+
+            Display.UpdateStart();
         }
 
         internal static void displayMoney()

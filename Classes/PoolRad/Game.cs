@@ -4,6 +4,8 @@ namespace Classes.PoolRad
 {
     public class Game : Classes.Game
     {
+        readonly static internal byte[] portraitHead = { 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 };
+        readonly static internal byte[] portraitBody = { 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 };
         public override Logging.Game Name { get => Logging.Game.PoolOfRadiance; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Pool; }
         public override int InitialExp { get => 0; }
@@ -46,5 +48,9 @@ namespace Classes.PoolRad
         public override void DrawFrame_Memorize() { Draw.Frame_Memorize(); }
         public override void DrawFrame_Combat() { Draw.Frame_Combat(); }
         public override void DrawFrame_List() { Draw.Frame_List(); }
+        public override void DrawFrame_Portrait() { Draw.Frame_Portrait(); }
+        public override bool Portrait { get => true; }
+        public override byte[] PortraitBody { get => portraitBody; }
+        public override byte[] PortraitHead { get => portraitHead; }
     }
 }

@@ -40,5 +40,9 @@ namespace Classes
         public abstract void DrawFrame_Memorize();
         public abstract void DrawFrame_Combat();
         public abstract void DrawFrame_List();
+        public abstract void DrawFrame_Portrait();
+        public abstract bool Portrait { get; }
+        public abstract byte[] PortraitBody { get; }
+        public abstract byte[] PortraitHead { get; }
     }
 }

@@ -377,6 +377,8 @@ namespace engine
             player.thac0 = 40;
             player.health_status = Status.okey;
             player.in_combat = true;
+            player.head_portrait = 1;
+            player.body_portrait = 1;
             player.icon_dimensions = 1;
             player.mod_id = (byte)seg051.Random(256);
             player.icon_id = 0x0A;
@@ -903,6 +905,11 @@ namespace engine
             {
                 player.name = seg041.getUserInputString(15, 0, 13, "Character name: ");
             } while (player.name.Length == 0);
+
+            if (gbl.game.Portrait)
+            {
+                portrait_builder();
+            }
 
             icon_builder();
 
@@ -1617,6 +1624,42 @@ namespace engine
         internal static void duplicateCombatIcon(bool recolour, byte destIndex, byte sourceIndex) /* sub_4FC5B */
         {
             gbl.combat_icons[destIndex].DuplicateIcon(recolour, gbl.combat_icons[sourceIndex], gbl.SelectedPlayer);
+        }
+
+        internal static void portrait_builder()
+        {
+            Player player = gbl.SelectedPlayer;
+            byte body_portrait = player.body_portrait;
+            byte head_portrait = player.head_portrait;
+            char input_key;
+            do
+            {
+                input_key = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Head Body Keep", string.Empty);
+                switch (input_key)
+                {
+                    case 'H':
+                        if (player.head_portrait >= gbl.game.PortraitHead.Length)
+                        {
+                            player.head_portrait = 1;
+                        }
+                        else
+                        {
+                            player.head_portrait++;
+                        }
+                        break;
+                    case 'B':
+                        if (player.body_portrait >= gbl.game.PortraitBody.Length)
+                        {
+                            player.body_portrait = 1;
+                        }
+                        else
+                        {
+                            player.body_portrait++;
+                        }
+                        break;
+                }
+                ovr008.set_and_draw_head_body(3, gbl.game.PortraitBody[player.body_portrait - 1], gbl.game.PortraitHead[player.head_portrait - 1], 1, 28);
+            } while (input_key != 'K');
         }
 
         static Set unk_4FE94 = new Set(0, 69);

@@ -202,7 +202,7 @@ namespace engine
         }
 
 
-        internal static void set_and_draw_head_body(byte area, byte body_id, byte head_id) /* sub_30543 */
+        internal static void set_and_draw_head_body(byte area, byte body_id, byte head_id, byte rowY, byte colX) /* sub_30543 */
         {
             gbl.byte_1EE8D = false;
 
@@ -210,7 +210,7 @@ namespace engine
             gbl.body_block_id = body_id;
 
             ovr030.head_body(area, body_id, head_id);
-            ovr030.draw_head_and_body(true, 3, 3);
+            ovr030.draw_head_and_body(true, rowY, colX);
         }
 
 
@@ -264,7 +264,7 @@ namespace engine
                     }
                     else
                     {
-                        set_and_draw_head_body(gbl.game_area, pic_block_id, (byte)gbl.area2_ptr.HeadBlockId);
+                        set_and_draw_head_body(gbl.game_area, pic_block_id, (byte)gbl.area2_ptr.HeadBlockId, 3, 3);
                         flags[1] = true;
                         gbl.byte_1EE8D = false;
                     }

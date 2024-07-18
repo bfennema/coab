@@ -338,7 +338,7 @@ namespace engine
                 }
                 else
                 {
-                    ovr008.set_and_draw_head_body(gbl.game_area, blockId, (byte)gbl.area2_ptr.HeadBlockId);
+                    ovr008.set_and_draw_head_body(gbl.game_area, blockId, (byte)gbl.area2_ptr.HeadBlockId, 3, 3);
                 }
             }
             else

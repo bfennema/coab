@@ -127,9 +127,9 @@ namespace Classes.PoolRad
         [DataOffset(0xBA, DataType.Byte)]
         public byte field_BA; // 0xBA
         [DataOffset(0xBB, DataType.Byte)]
-        public byte field_BB; // 0xBB
+        public byte head_portrait; // 0xBB
         [DataOffset(0xBC, DataType.Byte)]
-        public byte field_BC; // 0xBC
+        public byte body_portrait; // 0xBC
         [DataOffset(0xBD, DataType.Byte)]
         public byte head_icon; // 0xBD
         [DataOffset(0xBE, DataType.Byte)]
@@ -269,8 +269,8 @@ namespace Classes.PoolRad
 
             field_BA = player.field_13E;
 
-            field_BB = player.field_13F;
-            field_BC = player.field_140;
+            head_portrait = player.head_portrait;
+            body_portrait = player.body_portrait;
 
             head_icon = player.head_icon;
             weapon_icon = player.weapon_icon;
@@ -464,9 +464,9 @@ namespace Classes.PoolRad
             player.field_13C = field_B8;
 
             player.field_13E = field_BA;
-            player.field_13F = field_BB;
+            player.head_portrait = head_portrait;
 
-            player.field_140 = field_BC;
+            player.body_portrait = body_portrait;
             player.head_icon = head_icon;
             player.weapon_icon = weapon_icon;
             player.icon_size = icon_size;

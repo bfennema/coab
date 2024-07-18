@@ -49,5 +49,9 @@ namespace Classes.Curse
         public override void DrawFrame_Memorize() { Draw.Frame_Memorize(); }
         public override void DrawFrame_Combat() { Draw.Frame_Combat(); }
         public override void DrawFrame_List() { Draw.Frame_List(); }
+        public override void DrawFrame_Portrait() { Draw.Frame_Outer(); }
+        public override bool Portrait { get => false; }
+        public override byte[] PortraitBody { get => []; }
+        public override byte[] PortraitHead { get => []; }
     }
 }
