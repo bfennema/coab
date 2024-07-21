@@ -170,11 +170,9 @@ namespace engine
             }
         }
 
-        const int MapSize = 16; // 16x16 so 0-15
-
         internal static bool MapCoordIsValid(int mapY, int mapX)
         { /*sub_71542*/
-            return (mapX < MapSize && mapX >= 0 && mapY < MapSize && mapX >= 0);
+            return (mapX < gbl.geo_ptr.maps.GetLength(1) && mapX >= 0 && mapY < gbl.geo_ptr.maps.GetLength(0) && mapX >= 0);
         }
 
 
@@ -186,8 +184,8 @@ namespace engine
                 return 0;
             }
 
-            mapX = Sys.WrapMinMax(mapX, 0, 15);
-            mapY = Sys.WrapMinMax(mapY, 0, 15);
+            mapX = Sys.WrapMinMax(mapX, 0, gbl.geo_ptr.maps.GetLength(1) - 1);
+            mapY = Sys.WrapMinMax(mapY, 0, gbl.geo_ptr.maps.GetLength(0) - 1);
 
             MapInfo mi = gbl.geo_ptr.maps[mapY, mapX];
             byte var_1 = 1;
@@ -261,22 +259,22 @@ namespace engine
             }
             else
             {
-                if (mapX > 0x0F)
+                if (mapX > gbl.geo_ptr.maps.GetLength(1) - 1)
                 {
                     mapX = 0;
                 }
                 else if (mapX < 0)
                 {
-                    mapX = 0x0F;
+                    mapX = gbl.geo_ptr.maps.GetLength(1) - 1;
                 }
 
-                if (mapY > 0x0F)
+                if (mapY > gbl.geo_ptr.maps.GetLength(0) - 1)
                 {
                     mapY = 0;
                 }
                 else if (mapY < 0)
                 {
-                    mapY = 0x0F;
+                    mapY = gbl.geo_ptr.maps.GetLength(0) - 1;
                 }
 
                 mi = gbl.geo_ptr.maps[mapY, mapX];
@@ -294,22 +292,22 @@ namespace engine
                 return 0;
             }
 
-            if (mapX > 0x0F)
+            if (mapX > gbl.geo_ptr.maps.GetLength(1) - 1)
             {
                 mapX = 0;
             }
             if (mapX < 0)
             {
-                mapX = 0x0F;
+                mapX = gbl.geo_ptr.maps.GetLength(1) - 1;
             }
 
-            if (mapY > 0x0F)
+            if (mapY > gbl.geo_ptr.maps.GetLength(0) - 1)
             {
                 mapY = 0;
             }
             if (mapY < 0)
             {
-                mapY = 0x0F;
+                mapY = gbl.geo_ptr.maps.GetLength(0) - 1;
             }
 
             MapInfo mi = gbl.geo_ptr.maps[mapY, mapX];
