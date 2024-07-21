@@ -9,18 +9,18 @@ namespace Classes
         byte[] data;
         public MapInfo[,] maps;
 
-        public void LoadData(byte[] _data)
+        public void LoadData(byte[] _data, int offset = 2, int max_x = 16, int max_y = 16)
         {
-            data = new byte[0x400];
-            System.Array.Copy(_data, 2, data, 0, 0x400);
+            data = new byte[max_x * max_y * 4];
+            System.Array.Copy(_data, offset, data, 0, max_x * max_y * 4);
 
-            maps = new MapInfo[16, 16];
+            maps = new MapInfo[max_y, max_x];
 
-            for (int y = 0; y < 16; y++)
+            for (int y = 0; y < max_y; y++)
             {
-                for (int x = 0; x < 16; x++)
+                for (int x = 0; x < max_x; x++)
                 {
-                    maps[y, x] = new MapInfo(data, x, y);
+                    maps[y, x] = new MapInfo(data, x, y * max_x);
                 }
             }
         }
@@ -104,18 +104,16 @@ namespace Classes
         public byte x3_dir_4;
         public byte x3_dir_6;
 
-        internal MapInfo(byte[] data, int map_x, int map_y)
+        internal MapInfo(byte[] data, int map_x, int map_y_offset)
         {
-            int map_y_x16 = map_y << 4;
+            wall_type_dir_0 = (byte)((data[map_x + map_y_offset] >> 4) & 0x0f);
+            wall_type_dir_2 = (byte)((data[map_x + map_y_offset]) & 0x0f);
+            wall_type_dir_4 = (byte)((data[0x100 + map_x + map_y_offset] >> 4) & 0x0f);
+            wall_type_dir_6 = (byte)((data[0x100 + map_x + map_y_offset]) & 0x0f);
 
-            wall_type_dir_0 = (byte)((data[map_x + map_y_x16] >> 4) & 0x0f);
-            wall_type_dir_2 = (byte)((data[map_x + map_y_x16]) & 0x0f);
-            wall_type_dir_4 = (byte)((data[0x100 + map_x + map_y_x16] >> 4) & 0x0f);
-            wall_type_dir_6 = (byte)((data[0x100 + map_x + map_y_x16]) & 0x0f);
+            x2 = data[0x200 + map_y_offset + map_x];
 
-            x2 = data[0x200 + map_y_x16 + map_x];
-
-            byte b = data[0x300 + map_y_x16 + map_x];
+            byte b = data[0x300 + map_y_offset + map_x];
 
             x3_dir_6 = (byte)((b >> 6) & 3);
             x3_dir_4 = (byte)((b >> 4) & 3);
