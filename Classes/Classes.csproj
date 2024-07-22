@@ -164,7 +164,7 @@
     <Compile Include="Limits.cs" />
     <Compile Include="MenuItem.cs" />
     <Compile Include="MoneySet.cs" />
-    <Compile Include="Opperation.cs" />
+    <Compile Include="CmdOperation.cs" />
     <Compile Include="Player.cs">
       <SubType>Code</SubType>
     </Compile>

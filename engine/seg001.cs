@@ -197,11 +197,7 @@ namespace engine
 
             ovr016.BuildEffectNameMap();
 
-            for (int i = 0; i < gbl.cmdOppsLimit; i++)
-            {
-                gbl.cmd_opps[i] = new Opperation();
-                gbl.cmd_opps[i].getMemoryValue = ovr008.vm_GetMemoryValue;
-            }
+            gbl.cmd_ops.Init(ovr008.vm_GetMemoryValue);
 
             gbl.cursor_bkup = new DaxBlock(0, 1, 1, 8);
             gbl.cursor = new DaxBlock(0, 1, 1, 8);

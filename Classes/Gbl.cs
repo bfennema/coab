@@ -568,8 +568,8 @@ namespace Classes
 
         public static string[] unk_1D972 = new string[15] { string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty };
 
-        public const int cmdOppsLimit = 0x40;
-        public static Opperation[] cmd_opps = new Opperation[cmdOppsLimit];
+        public const int cmdOpsLimit = 0x40;
+        public static CmdOperation cmd_ops = new CmdOperation(cmdOpsLimit);
 
         public static SpellEntry[] spellCastingTable = { /* seg600:37DC asc_19AEC */
             null,
