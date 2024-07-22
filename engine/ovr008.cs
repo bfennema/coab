@@ -10,10 +10,7 @@ namespace engine
         {
             byte strIndex = 0;
 
-            foreach (Opperation opp in gbl.cmd_opps)
-            {
-                opp.Clear();
-            }
+            gbl.cmd_ops.Clear();
 
             for (int loop_var = 1; loop_var <= numberOfSets; loop_var++)
             {
@@ -21,8 +18,8 @@ namespace engine
                 byte low = gbl.ecl_ptr[gbl.ecl_offset + 2 - gbl.initial_ecl_offset];
 
 
-                gbl.cmd_opps[loop_var].Code = code;
-                gbl.cmd_opps[loop_var].Low = low;
+                gbl.cmd_ops[loop_var].Code = code;
+                gbl.cmd_ops[loop_var].Low = low;
 
                 gbl.ecl_offset += 2;
 
@@ -31,7 +28,7 @@ namespace engine
                     gbl.ecl_offset++;
                     byte high = gbl.ecl_ptr[gbl.ecl_offset - gbl.initial_ecl_offset];
 
-                    gbl.cmd_opps[loop_var].High = high;
+                    gbl.cmd_ops[loop_var].High = high;
 
                     //System.Console.WriteLine("   code: {0,2:X} low: {1,2:X} high: {2,2:X}",
                     //   code, low, high);
@@ -60,9 +57,9 @@ namespace engine
                     gbl.ecl_offset++;
                     byte high = gbl.ecl_ptr[gbl.ecl_offset - gbl.initial_ecl_offset];
 
-                    gbl.cmd_opps[loop_var].High = high;
+                    gbl.cmd_ops[loop_var].High = high;
 
-                    ushort loc = gbl.cmd_opps[loop_var].Word;
+                    ushort loc = gbl.cmd_ops[loop_var].Word;
 
                     vm_CopyStringFromMemory(loc, strIndex);
 
@@ -81,7 +78,7 @@ namespace engine
 
         internal static ushort vm_GetCmdValue(int arg_0) // sub_30168
         {
-            return gbl.cmd_opps[arg_0].GetCmdValue();
+            return gbl.cmd_ops[arg_0].GetCmdValue();
             //TODO replace calls to vm_GetCmdValue function with gbl.cmd_opps[arg_0].GetCmdValue();
         }
 
@@ -113,15 +110,15 @@ namespace engine
             gbl.area_ptr.can_cast_spells = false;
 
             vm_LoadCmdSets(1);
-            gbl.vm_run_addr_1 = gbl.cmd_opps[1].Word;
+            gbl.vm_run_addr_1 = gbl.cmd_ops[1].Word;
             vm_LoadCmdSets(1);
-            gbl.SearchLocationAddr = gbl.cmd_opps[1].Word;
+            gbl.SearchLocationAddr = gbl.cmd_ops[1].Word;
             vm_LoadCmdSets(1);
-            gbl.PreCampCheckAddr = gbl.cmd_opps[1].Word;
+            gbl.PreCampCheckAddr = gbl.cmd_ops[1].Word;
             vm_LoadCmdSets(1);
-            gbl.CampInterruptedAddr = gbl.cmd_opps[1].Word;
+            gbl.CampInterruptedAddr = gbl.cmd_ops[1].Word;
             vm_LoadCmdSets(1);
-            gbl.ecl_initial_entryPoint = gbl.cmd_opps[1].Word;
+            gbl.ecl_initial_entryPoint = gbl.cmd_ops[1].Word;
 
             gbl.area_ptr.inDungeon = 1;
 

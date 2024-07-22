@@ -45,7 +45,7 @@ namespace engine
         internal static void CMD_Goto()
         {
             ovr008.vm_LoadCmdSets(1);
-            ushort newOffset = gbl.cmd_opps[1].Word;
+            ushort newOffset = gbl.cmd_ops[1].Word;
 
             VmLog.WriteLine("CMD_Goto: was: 0x{0:X} now: 0x{1:X}", gbl.ecl_offset, newOffset);
 
@@ -56,7 +56,7 @@ namespace engine
         internal static void CMD_Gosub()
         {
             ovr008.vm_LoadCmdSets(1);
-            ushort newOffset = gbl.cmd_opps[1].Word;
+            ushort newOffset = gbl.cmd_ops[1].Word;
 
             VmLog.WriteLine("CMD_Gosub: was: 0x{0:X} now: 0x{1:X}", gbl.ecl_offset, newOffset);
 
@@ -69,8 +69,8 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(2);
 
-            if (gbl.cmd_opps[1].Code >= 0x80 ||
-                gbl.cmd_opps[2].Code >= 0x80)
+            if (gbl.cmd_ops[1].Code >= 0x80 ||
+                gbl.cmd_ops[2].Code >= 0x80)
             {
                 VmLog.WriteLine("CMD_Compare: Strings '{0}' '{1}'", gbl.unk_1D972[2], gbl.unk_1D972[1]);
 
@@ -96,7 +96,7 @@ namespace engine
             ushort val_a = ovr008.vm_GetCmdValue(1);
             ushort val_b = ovr008.vm_GetCmdValue(2);
 
-            ushort location = gbl.cmd_opps[3].Word;
+            ushort location = gbl.cmd_ops[3].Word;
 
             switch (gbl.command)
             {
@@ -140,7 +140,7 @@ namespace engine
                 rand_max++;
             }
 
-            ushort loc = gbl.cmd_opps[2].Word;
+            ushort loc = gbl.cmd_ops[2].Word;
 
             byte val = seg051.Random(rand_max);
 
@@ -154,9 +154,9 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(2);
 
-            ushort loc = gbl.cmd_opps[2].Word;
+            ushort loc = gbl.cmd_ops[2].Word;
 
-            if (gbl.cmd_opps[1].Code < 0x80)
+            if (gbl.cmd_ops[1].Code < 0x80)
             {
                 ushort val = ovr008.vm_GetCmdValue(1);
 
@@ -361,7 +361,7 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(2);
 
-            ushort loc = gbl.cmd_opps[2].Word;
+            ushort loc = gbl.cmd_ops[2].Word;
 
             ushort var_4 = seg041.getUserInputShort(0, 0x0a, string.Empty);
 
@@ -373,7 +373,7 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(2);
 
-            ushort loc = gbl.cmd_opps[2].Word;
+            ushort loc = gbl.cmd_ops[2].Word;
 
             string str = seg041.getUserInputString(0x28, 0, 10, string.Empty);
 
@@ -391,12 +391,12 @@ namespace engine
             ovr008.vm_LoadCmdSets(1);
 
             VmLog.WriteLine("CMD_Print: '{0}'",
-                gbl.cmd_opps[1].Code < 0x80 ? ovr008.vm_GetCmdValue(1).ToString() : gbl.unk_1D972[1]);
+                gbl.cmd_ops[1].Code < 0x80 ? ovr008.vm_GetCmdValue(1).ToString() : gbl.unk_1D972[1]);
 
             gbl.bottomTextHasBeenCleared = false;
             gbl.DelayBetweenCharacters = true;
 
-            if (gbl.cmd_opps[1].Code < 0x80)
+            if (gbl.cmd_ops[1].Code < 0x80)
             {
                 gbl.unk_1D972[1] = ovr008.vm_GetCmdValue(1).ToString();
             }
@@ -612,7 +612,7 @@ namespace engine
             ushort val_a = ovr008.vm_GetCmdValue(1);
             ushort val_b = ovr008.vm_GetCmdValue(2);
 
-            ushort loc = gbl.cmd_opps[3].Word;
+            ushort loc = gbl.cmd_ops[3].Word;
             string sym;
             if (gbl.command == 0x2F)
             {
@@ -636,10 +636,10 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(3);
 
-            ushort var_2 = gbl.cmd_opps[1].Word;
+            ushort var_2 = gbl.cmd_ops[1].Word;
             byte var_9 = (byte)ovr008.vm_GetCmdValue(2);
 
-            ushort result_loc = gbl.cmd_opps[3].Word;
+            ushort result_loc = gbl.cmd_ops[3].Word;
 
             ushort var_6 = (ushort)(var_9 + var_2);
 
@@ -654,7 +654,7 @@ namespace engine
 
             ushort var_6 = ovr008.vm_GetCmdValue(1);
 
-            ushort result_loc = gbl.cmd_opps[2].Word;
+            ushort result_loc = gbl.cmd_ops[2].Word;
             result_loc += ovr008.vm_GetCmdValue(3);
 
             ovr008.vm_SetMemoryValue(var_6, result_loc);
@@ -666,7 +666,7 @@ namespace engine
             gbl.bottomTextHasBeenCleared = false;
 
             ovr008.vm_LoadCmdSets(3);
-            ushort mem_loc = gbl.cmd_opps[1].Word;
+            ushort mem_loc = gbl.cmd_ops[1].Word;
 
             string delay_text = gbl.unk_1D972[1];
 
@@ -702,7 +702,7 @@ namespace engine
 
             ovr008.vm_LoadCmdSets(2);
 
-            ushort loc = gbl.cmd_opps[1].Word;
+            ushort loc = gbl.cmd_ops[1].Word;
             byte string_count = (byte)ovr008.vm_GetCmdValue(2);
 
             gbl.ecl_offset--;
@@ -804,7 +804,7 @@ namespace engine
                 power_value += (byte)(((cleric_power * 4) + hit_points + (armor_class * 5) + (hit_bonus * 5) + (magic_power * 8)) / 10);
             }
 
-            ushort loc = gbl.cmd_opps[1].Word;
+            ushort loc = gbl.cmd_ops[1].Word;
             ovr008.vm_SetMemoryValue(power_value, loc);
         }
 
@@ -826,9 +826,9 @@ namespace engine
 
             ovr008.vm_LoadCmdSets(6);
 
-            if (gbl.cmd_opps[1].Code == 1)
+            if (gbl.cmd_ops[1].Code == 1)
             {
-                var_2 = gbl.cmd_opps[1].Word;
+                var_2 = gbl.cmd_ops[1].Word;
             }
             else
             {
@@ -837,10 +837,10 @@ namespace engine
 
             Affects affect_id = (Affects)ovr008.vm_GetCmdValue(2);
 
-            var loc_a = gbl.cmd_opps[3].Word;
-            var loc_b = gbl.cmd_opps[4].Word;
-            var loc_c = gbl.cmd_opps[5].Word;
-            var loc_d = gbl.cmd_opps[6].Word;
+            var loc_a = gbl.cmd_ops[3].Word;
+            var loc_b = gbl.cmd_ops[4].Word;
+            var loc_c = gbl.cmd_ops[5].Word;
+            var loc_d = gbl.cmd_ops[6].Word;
 
             var_4 = 0;
             byte val_a = 0x0FF;
@@ -923,8 +923,8 @@ namespace engine
                 }
             }
 
-            ushort loc_a = gbl.cmd_opps[1].Word;
-            ushort loc_b = gbl.cmd_opps[2].Word;
+            ushort loc_a = gbl.cmd_ops[1].Word;
+            ushort loc_b = gbl.cmd_ops[2].Word;
 
             ovr008.vm_SetMemoryValue(val_a, loc_a);
             ovr008.vm_SetMemoryValue(val_b, loc_b);
@@ -1039,7 +1039,7 @@ namespace engine
 
             if (var_1 < var_2)
             {
-                ushort newloc = gbl.cmd_opps[var_1 + 1].Word;
+                ushort newloc = gbl.cmd_ops[var_1 + 1].Word;
                 VmLog.WriteLine("CMD_OnGotoGoSub: {4} A: {0} B: {1} Was: 0x{2:X} Now: 0x{3:X}",
                     var_1, var_2, gbl.ecl_offset, newloc,
                     gbl.command == 0x25 ? "Goto" : "Gosub");
@@ -1254,7 +1254,7 @@ namespace engine
             gbl.area2_ptr.max_encounter_distance = ovr008.vm_GetCmdValue(2);
             gbl.pic_block_id = (byte)ovr008.vm_GetCmdValue(3);
 
-            var_43D = gbl.cmd_opps[4].Word;
+            var_43D = gbl.cmd_ops[4].Word;
 
             for (int i = 0; i < 5; i++)
             {
@@ -1549,7 +1549,7 @@ namespace engine
 
             int menu_selected = ovr008.sub_317AA(false, false, gbl.defaultMenuColors, "~HAUGHTY ~SLY ~NICE ~MEEK ~ABUSIVE", " ");
 
-            ushort location = gbl.cmd_opps[6].Word;
+            ushort location = gbl.cmd_ops[6].Word;
 
             byte value = values[menu_selected];
 
@@ -1787,8 +1787,8 @@ namespace engine
             ovr008.vm_LoadCmdSets(3);
 
             byte spell_id = (byte)ovr008.vm_GetCmdValue(1);
-            ushort loc_a = gbl.cmd_opps[2].Word;
-            ushort loc_b = gbl.cmd_opps[3].Word;
+            ushort loc_a = gbl.cmd_ops[2].Word;
+            ushort loc_b = gbl.cmd_ops[3].Word;
 
             byte spell_index = 1;
             byte player_index = 0;
@@ -1833,7 +1833,7 @@ namespace engine
         {
             ovr008.vm_LoadCmdSets(1);
 
-            ushort var_2 = gbl.cmd_opps[1].Word;
+            ushort var_2 = gbl.cmd_ops[1].Word;
             ushort var_4 = (ushort)(var_2 - 0x7fff);
 
             VmLog.WriteLine("CMD_Call: {0:X}", var_4);
