@@ -541,6 +541,7 @@ namespace engine
             EffectNameMap.Add(Affects.poisoned, "Poisoned");
             EffectNameMap.Add(Affects.regenerate, "Regenerating");
             EffectNameMap.Add(Affects.fire_resist, "Fire Resistance");
+            EffectNameMap.Add(Affects.weap_frost_brand, "Fire Resistance");
             EffectNameMap.Add(Affects.minor_globe_of_invulnerability, "Minor Globe of Invulnerability");
             EffectNameMap.Add(Affects.feeblemind, "enfeebled");
             EffectNameMap.Add(Affects.invisible_to_animals, "invisible to animals");

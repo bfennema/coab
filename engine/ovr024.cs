@@ -200,6 +200,7 @@ namespace engine
                 case CheckType.PreDamage:
                     calc_affect_effect(Affects.efreeti_fire_resist, player);
                     calc_affect_effect(Affects.fire_resist, player);
+                    calc_affect_effect(Affects.weap_frost_brand, player);
                     calc_affect_effect(Affects.resist_cold, player);
                     calc_affect_effect(Affects.resist_fire, player);
                     calc_affect_effect(Affects.resist_magic_50_percent, player);
@@ -290,6 +291,7 @@ namespace engine
                     calc_affect_effect(Affects.prot_from_good_10_radius, player);
                     calc_affect_effect(Affects.prayer, player);
                     calc_affect_effect(Affects.fire_resist, player);
+                    calc_affect_effect(Affects.weap_frost_brand, player);
                     calc_affect_effect(Affects.prot_paralysis_poison, player);
                     calc_affect_effect(Affects.prot_sleep_charm_paralysis_poison, player);
                     calc_affect_effect(Affects.con_saving_bonus, player);
