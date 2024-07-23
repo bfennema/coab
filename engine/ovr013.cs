@@ -94,7 +94,7 @@ namespace engine
 		}
 
 
-		internal static void BonusVsMonstersX(Effect arg_0, object param, Player player) // sub_3A17A
+		internal static void AffectFlameTongue(Effect arg_0, object param, Player player) // sub_3A17A
 		{
 			int bonus = 0;
 
@@ -1789,7 +1789,7 @@ namespace engine
 			affect_table.Add(Affects.sticks_to_snakes, ovr013.SticksToSnakes);
 			affect_table.Add(Affects.dispel_evil, ovr013.DispelEvil);
 			affect_table.Add(Affects.detect_magic, ovr013.empty);
-			affect_table.Add(Affects.weap_flame_tongue, ovr013.BonusVsMonstersX);
+			affect_table.Add(Affects.weap_flame_tongue, ovr013.AffectFlameTongue);
 			affect_table.Add(Affects.faerie_fire, ovr013.FaerieFire);
 			affect_table.Add(Affects.protection_from_evil, ovr013.affect_protect_evil);
 			affect_table.Add(Affects.protection_from_good, ovr013.affect_protect_good);
