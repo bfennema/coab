@@ -475,7 +475,7 @@ namespace engine
                 ovr025.GetCurrentAttackItem(out rangedItem, player) == true)
             {
                 foundRanged = true;
-                int numAttacks = gbl.ItemDataTable[player.activeItems.primaryWeapon.type].numberAttacks;
+                int numAttacks = player.activeItems.primaryWeapon.itemData.numberAttacks;
 
                 if (numAttacks < 2)
                 {
@@ -782,7 +782,7 @@ namespace engine
                 if (attacker.activeItems.primaryWeapon != null &&
                     (target.icon_dimensions > 0x80 || (target.icon_dimensions & 7) > 1))
                 {
-                    ItemData itemData = gbl.ItemDataTable[attacker.activeItems.primaryWeapon.type];
+                    ItemData itemData = attacker.activeItems.primaryWeapon.itemData;
 
                     attacker.attack1_DiceCount = itemData.diceCountLarge;
                     attacker.attack1_DiceSize = itemData.diceSizeLarge;
@@ -1038,7 +1038,7 @@ namespace engine
             {
                 int range = ovr025.getTargetRange(target, attacker);
 
-                int oneThirdRange = (gbl.ItemDataTable[attacker.activeItems.primaryWeapon.type].range - 1) / 3;
+                int oneThirdRange = (attacker.activeItems.primaryWeapon.itemData.range - 1) / 3;
                 int acAdjustment = 0;
 
                 if (range > oneThirdRange)
@@ -2162,7 +2162,7 @@ namespace engine
             {
                 if (attacker.activeItems.primaryWeapon != null)
                 {
-                    maxRange = gbl.ItemDataTable[attacker.activeItems.primaryWeapon.type].range - 1;
+                    maxRange = attacker.activeItems.primaryWeapon.itemData.range - 1;
                 }
                 else
                 {

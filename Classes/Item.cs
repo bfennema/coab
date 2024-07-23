@@ -37,9 +37,11 @@ namespace Classes
         public byte affect_2; // 0x3D
         public byte affect_3; // 0x3E
 
+        public ItemData itemData;
+
         public byte HandsCount()
         {
-            return gbl.ItemDataTable[type].handsCount;
+            return itemData.handsCount;
         }
 
         public bool CheckMaskedAffect(int i, byte masked_val)
@@ -49,7 +51,7 @@ namespace Classes
 
         public bool IsScroll()
         {
-            return (gbl.ItemDataTable[type].item_slot >= ItemSlot.Arrow && gbl.ItemDataTable[type].item_slot <= ItemSlot.slot_13);
+            return (itemData.item_slot >= ItemSlot.Arrow && itemData.item_slot <= ItemSlot.slot_13);
         }
 
         public Affects getAffect(int i)
@@ -185,32 +187,6 @@ namespace Classes
             this(Affects.none, Affects.none, Affects.none, __value, _count, _weight, _cursed, _name_flags,
                 _readied, _plus_save, _plus, _namenum3, _namenum2, _namenum1, _type, AddToLibrary)
         {
-        }
-
-        public Item(byte[] data, int offset)
-        {
-            name = Sys.ArrayToString(data, offset, 0x2a);
-
-            type = (Type)data[offset + 0x2e];
-            namenum = new Names[3];
-            namenum[0] = (Names)data[offset + 0x2f];
-            namenum[1] = (Names)data[offset + 0x30];
-            namenum[2] = (Names)data[offset + 0x31];
-            plus = (sbyte)data[offset + 0x32];
-            plus_save = data[offset + 0x33];
-            readied = (data[offset + 0x34] != 0);
-            hidden_names_flag = data[offset + 0x35];
-            cursed = (data[offset + 0x36] != 0);
-
-            weight = Sys.ArrayToShort(data, offset + 0x37);
-            count = data[offset + 0x39];
-            _value = Sys.ArrayToShort(data, offset + 0x3a);
-            affect_1 = data[offset + 0x3C];
-            affect_2 = data[offset + 0x3D];
-            affect_3 = data[offset + 0x3E];
-
-            ItemLibrary.Add(this);
-            //AddItemsText(string.Format("{0},{1},{2},{3},{4}", type, namenum1, namenum2, namenum3, GenerateName(0)));
         }
 
         public Item ShallowClone()
@@ -837,10 +813,9 @@ namespace Classes
             return GenerateName(0);
         }
 
-
         public bool IsRanged()
         {
-            return gbl.ItemDataTable[type].range > 1;
+            return itemData.range > 1;
         }
     }
 }

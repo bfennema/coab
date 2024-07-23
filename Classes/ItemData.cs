@@ -1,3 +1,4 @@
+using Logging;
 using System;
 using System.IO;
 
@@ -61,16 +62,17 @@ namespace Classes
             stream.Close();
         }
 
-        public ItemData this[Item.Type index]
+        public ItemData this[int index]
         {
-            get { return table[(int)index]; }
-            set { table[(int)index] = value; }
+            get { return table[index]; }
+            set { table[index] = value; }
         }
     }
 
     /// <summary>
     /// Summary description for Struct_1C020.
     /// </summary>
+    [Serializable]
     public class ItemData
     {
         public ItemSlot item_slot; //seg600:5D10 unk_1C020 - field_0
@@ -109,6 +111,10 @@ namespace Classes
             classFlags = data[offset + 0xd];
             field_E = (ItemDataFlags)data[offset + 0xe];
             field_F = data[offset + 0xf];
+        }
+
+        public ItemData()
+        {
         }
 
         public override string ToString()

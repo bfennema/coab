@@ -699,7 +699,7 @@ namespace engine
 
             foreach (var item in player.items)
             {
-                if ((gbl.ItemDataTable[item.type].classFlags & player.classFlags) == 0 &&
+                if ((item.itemData.classFlags & player.classFlags) == 0 &&
                     item.cursed == false)
                 {
                     item.readied = false;

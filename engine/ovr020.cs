@@ -542,10 +542,10 @@ namespace engine
             }
 
             seg041.displayString("dice large:   ", 0, 10, 14, 1);
-            seg041.displayString(gbl.ItemDataTable[arg_0.type].diceCountLarge.ToString(), 0, 10, 14, 0x14);
+            seg041.displayString(arg_0.itemData.diceCountLarge.ToString(), 0, 10, 14, 0x14);
 
             seg041.displayString("sides large:  ", 0, 10, 15, 1);
-            seg041.displayString(gbl.ItemDataTable[arg_0.type].diceSizeLarge.ToString(), 0, 10, 15, 0x14);
+            seg041.displayString(arg_0.itemData.diceSizeLarge.ToString(), 0, 10, 15, 0x14);
 
             seg041.DisplayAndPause("press a key", 10);
         }
@@ -958,7 +958,7 @@ namespace engine
                     result = Weld.HandsFull;
                 }
 
-                ItemSlot item_slot = gbl.ItemDataTable[item.type].item_slot;
+                ItemSlot item_slot = item.itemData.item_slot;
 
                 if (item_slot >= ItemSlot.Weapon && item_slot <= ItemSlot.Boots)
                 {
@@ -993,7 +993,7 @@ namespace engine
                     }
                 }
 
-                if ((player.classFlags & gbl.ItemDataTable[item.type].classFlags) == 0)
+                if ((player.classFlags & item.itemData.classFlags) == 0)
                 {
                     result = Weld.WrongClass;
                 }

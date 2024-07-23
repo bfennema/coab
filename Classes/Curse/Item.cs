@@ -448,6 +448,7 @@
             {
                 name = name,
                 type = type_map[(Type)type][0],
+                itemData = gbl.ItemDataTable[type],
                 namenum = new Classes.Item.Names[3] { names_map[(Names)namenum[0]][0], names_map[(Names)namenum[1]][0], names_map[(Names)namenum[2]][0] },
                 plus = plus,
                 plus_save = plus_save,
