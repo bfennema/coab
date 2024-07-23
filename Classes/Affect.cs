@@ -156,6 +156,7 @@ namespace Classes
         do_items_affect = 0x93,
         mummy_disease_healing = 0x94,
         stirge_suck_blood = 0x95,
+        weap_undead_slayer = 0x96,
         affect_97 = 0x97,
         affect_98 = 0x98,
         affect_99 = 0x99,

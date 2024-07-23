@@ -181,6 +181,7 @@ namespace engine
                     calc_affect_effect(Affects.weap_dragon_slayer, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
                     calc_affect_effect(Affects.ranger_vs_giant, player);
+                    calc_affect_effect(Affects.weap_undead_slayer, player);
                     break;
 
                 case CheckType.Type_5:
@@ -276,6 +277,7 @@ namespace engine
                     calc_affect_effect(Affects.dwarf_vs_orc_goblin, player);
                     calc_affect_effect(Affects.weap_dragon_slayer, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
+                    calc_affect_effect(Affects.weap_undead_slayer, player);
                     break;
 
                 case CheckType.Type_11:

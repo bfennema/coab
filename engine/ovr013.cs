@@ -126,6 +126,27 @@ namespace engine
 			gbl.damage_flags = DamageType.Magic | DamageType.Fire;
 		}
 
+		internal static void AffectUndeadSlayer(Effect arg_0, object param, Player player) // sub_3A17A
+		{
+			int bonus = 0;
+
+			if (player.actions != null &&
+				player.actions.target != null)
+			{
+				gbl.spell_target = player.actions.target;
+
+				if (gbl.spell_target.flags.HasFlag(Flags.Undead))
+				{
+					bonus = 1;
+				}
+				else
+				{
+					bonus = 0;
+				}
+			}
+			gbl.attack_roll += bonus;
+			gbl.damage += bonus;
+		}
 
 		internal static void FaerieFire(Effect arg_0, object param, Player player)
 		{
@@ -2143,6 +2164,7 @@ namespace engine
 			affect_table.Add(Affects.charming_gaze, ovr023.AffectCharmingGaze);
 			affect_table.Add(Affects.energy_drain_1, ovr013.AffectEnergyDrain);
 			affect_table.Add(Affects.energy_drain_2, ovr013.AffectEnergyDrain);
+			affect_table.Add(Affects.weap_undead_slayer, ovr013.AffectUndeadSlayer);
 		}
 
 		internal static void CallAffectTable(Effect add_remove, object parameter, Player player, Affects affect) /* sub_630C7 */

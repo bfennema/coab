@@ -150,6 +150,7 @@ namespace Classes
 
             mapping.Add(Affects.bless, Classes.Affects.bless);
             mapping.Add(Affects.cursed, Classes.Affects.cursed);
+            mapping.Add(Affects.weap_undead_slayer, Classes.Affects.weap_undead_slayer);
             mapping.Add(Affects.studying_manual_bodily_health, Classes.Affects.studying_manual_bodily_health);
             mapping.Add(Affects.detect_magic, Classes.Affects.detect_magic);
             mapping.Add(Affects.weap_flame_tongue, Classes.Affects.weap_flame_tongue);
