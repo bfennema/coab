@@ -959,6 +959,25 @@ namespace engine
 
 		internal static void AffectFrostBrand(Effect arg_0, object param, Player player) // sub_3B772
 		{
+			if ((gbl.damage_flags & DamageType.Fire) != 0)
+			{
+				for (int i = 1; i <= gbl.dice_count; i++)
+				{
+					gbl.damage -= 2;
+
+					if (gbl.damage < gbl.dice_count)
+					{
+						gbl.damage = gbl.dice_count;
+					}
+				}
+
+				gbl.savingThrowRoll += 4;
+
+				if ((gbl.damage_flags & DamageType.Magic) == 0)
+				{
+					Protected();
+				}
+			}
 			if (player.actions != null)
 			{
 				gbl.spell_target = player.actions.target;
@@ -1309,7 +1328,8 @@ namespace engine
 
 			if (gbl.spell_target.HasAffect(Affects.resist_fire) == false &&
 				gbl.spell_target.HasAffect(Affects.cold_fire_shield) == false &&
-				gbl.spell_target.HasAffect(Affects.fire_resist) == false)
+				gbl.spell_target.HasAffect(Affects.fire_resist) == false &&
+				gbl.spell_target.HasAffect(Affects.weap_frost_brand) == false)
 			{
 				gbl.damage += ovr024.roll_dice(6, 1);
 			}
