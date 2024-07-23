@@ -15,18 +15,16 @@ namespace engine
 
 			if (item != null)
 			{
-				ItemType item_type = item.type;
-
 				player.hitBonus = player.thac0;
 
-				if ((gbl.ItemDataTable[item_type].field_E & ItemDataFlags.flag_02) != 0)
+				if ((item.itemData.field_E & ItemDataFlags.flag_02) != 0)
 				{
                     player.hitBonus += DexReactionAdj(player);
 				}
 
-				player.attack1_DamageBonus = gbl.ItemDataTable[item_type].bonusNormal;
+				player.attack1_DamageBonus = item.itemData.bonusNormal;
 
-				if ((gbl.ItemDataTable[item_type].field_E & ItemDataFlags.melee) != 0)
+				if ((item.itemData.field_E & ItemDataFlags.melee) != 0)
 				{
 					player.hitBonus += strengthHitBonus(player);
 					player.attack1_DamageBonus += strengthDamBonus(player);
@@ -34,13 +32,13 @@ namespace engine
 
 				int bonus = item.plus;
 
-				if ((gbl.ItemDataTable[item_type].field_E & ItemDataFlags.quarrels) != 0 &&
+				if ((item.itemData.field_E & ItemDataFlags.quarrels) != 0 &&
                     player.activeItems.quarrels != null)
 				{
                     bonus += player.activeItems.quarrels.plus;
 				}
 
-				if ((gbl.ItemDataTable[item_type].field_E & ItemDataFlags.arrows) != 0 &&
+				if ((item.itemData.field_E & ItemDataFlags.arrows) != 0 &&
                     player.activeItems.arrows != null)
 				{
                     bonus += player.activeItems.arrows.plus;
@@ -60,15 +58,15 @@ namespace engine
 				}
 
 				player.hitBonus += bonus;
-				player.attack1_DiceCount = gbl.ItemDataTable[item_type].diceCountNormal;
-				player.attack1_DiceSize = gbl.ItemDataTable[item_type].diceSizeNormal;
+				player.attack1_DiceCount = item.itemData.diceCountNormal;
+				player.attack1_DiceSize = item.itemData.diceSizeNormal;
 			}
 		}
 
 
 		internal static void CalcArmorWeightEffect(Item item, Player player) // sub_6621E
 		{
-			if (gbl.ItemDataTable[item.type].item_slot == ItemSlot.Armor)
+			if (item.itemData.item_slot == ItemSlot.Armor)
 			{
 				if (item.weight >= 0 && item.weight <= 150)
 				{
@@ -93,11 +91,11 @@ namespace engine
 
 		internal static void sub_662A6(ref byte output, ref sbyte[] bonus, Item item, Player player)
 		{
-			byte var_1 = gbl.ItemDataTable[item.type].field_6;
+			byte var_1 = item.itemData.field_6;
 			if (var_1 > 0x7f)
 			{
 				var_1 &= 0x7F;
-				ItemSlot itemSlot = gbl.ItemDataTable[item.type].item_slot;
+				ItemSlot itemSlot = item.itemData.item_slot;
 				if (itemSlot == ItemSlot.Shield)
 				{
 					bonus[1] = (sbyte)(item.plus + var_1);
@@ -373,7 +371,7 @@ namespace engine
 				{
 					totalItemWeight += item_weight;
 
-					ItemSlot slot = gbl.ItemDataTable[item.type].item_slot;
+					ItemSlot slot = item.itemData.item_slot;
 
 					if (slot >= ItemSlot.Weapon && slot <= ItemSlot.Boots)
 					{
@@ -1665,7 +1663,7 @@ namespace engine
 			var rangedMelee = (ItemDataFlags.flag_10 | ItemDataFlags.melee);
 			return item != null &&
                 item.IsRanged() &&
-				 (gbl.ItemDataTable[item.type].field_E & rangedMelee) == rangedMelee;
+				 (item.itemData.field_E & rangedMelee) == rangedMelee;
 		}
 
 		internal static bool is_weapon_ranged(Player player) /* offset_above_1 */
@@ -1688,7 +1686,7 @@ namespace engine
             Item item = player.activeItems.primaryWeapon;
 			if (item != null)
 			{
-				flags = gbl.ItemDataTable[item.type].field_E;
+				flags = item.itemData.field_E;
 
 				if ((flags & ItemDataFlags.flag_10) != 0)
 				{

@@ -1266,7 +1266,7 @@ namespace engine
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
 			if (item != null &&
-				gbl.ItemDataTable[item.type].field_7 == 1)
+				item.itemData.field_7 == 1)
 			{
 				gbl.damage = 1;
 			}
@@ -1373,7 +1373,7 @@ namespace engine
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
 			if (item != null &&
-				(gbl.ItemDataTable[item.type].field_7 & 0x81) != 0)
+				(item.itemData.field_7 & 0x81) != 0)
 			{
 				gbl.damage /= 2;
 			}
@@ -1635,8 +1635,8 @@ namespace engine
 
 			if (weapon != null)
 			{
-				if (gbl.ItemDataTable[weapon.type].field_7 == 0 ||
-					(gbl.ItemDataTable[weapon.type].field_7 & 1) != 0)
+				if (weapon.itemData.field_7 == 0 ||
+					(weapon.itemData.field_7 & 1) != 0)
 				{
 					gbl.damage /= 2;
 				}

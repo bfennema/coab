@@ -564,7 +564,7 @@ namespace engine
 
                     if (player.activeItems.primaryWeapon != null)
                     {
-                        range = gbl.ItemDataTable[player.activeItems.primaryWeapon.type].range - 1;
+                        range = player.activeItems.primaryWeapon.itemData.range - 1;
                     }
 
                     if (range == 0 || range == 0xff || range == -1)
@@ -817,7 +817,7 @@ namespace engine
 
         static int CalcItemPowerRating(Item item, Player player) // sub_36535
         {
-            ItemData itemData = gbl.ItemDataTable[item.type];
+            ItemData itemData = item.itemData;
 
             int rating = itemData.diceSizeNormal * itemData.diceCountNormal;
 
@@ -895,15 +895,13 @@ namespace engine
 
             foreach (Item item in player.items)
             {
-                ItemType item_type = item.type;
-
-                if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.Weapon &&
-                    (gbl.ItemDataTable[item_type].classFlags & player.classFlags) != 0)
+                if (item.itemData.item_slot == ItemSlot.Weapon &&
+                    (item.itemData.classFlags & player.classFlags) != 0)
                 {
                     int power_rating = CalcItemPowerRating(item, player);
 
-                    if ((gbl.ItemDataTable[item_type].field_E & ItemDataFlags.flag_08) != 0 ||
-                        (gbl.ItemDataTable[item_type].field_E & ItemDataFlags.flag_10) != 0)
+                    if ((item.itemData.field_E & ItemDataFlags.flag_08) != 0 ||
+                        (item.itemData.field_E & ItemDataFlags.flag_10) != 0)
                     {
                         if (power_rating > var_15)
                         {
@@ -912,7 +910,7 @@ namespace engine
                         }
                     }
 
-                    if ((gbl.ItemDataTable[item_type].field_E & ItemDataFlags.flag_08) == 0 &&
+                    if ((item.itemData.field_E & ItemDataFlags.flag_08) == 0 &&
                         power_rating > var_16)
                     {
                         var_8 = item;
@@ -921,9 +919,9 @@ namespace engine
                 }
 
 
-                if (gbl.ItemDataTable[item_type].item_slot == ItemSlot.Shield)
+                if (item.itemData.item_slot == ItemSlot.Shield)
                 {
-                    if ((gbl.ItemDataTable[item_type].classFlags & player.classFlags) != 0)
+                    if ((item.itemData.classFlags & player.classFlags) != 0)
                     {
                         int bonus = item.plus >= 0 ? item.plus + 1 : 0;
 
@@ -943,7 +941,7 @@ namespace engine
 
             if (var_4 != null)
             {
-                itemFlags = gbl.ItemDataTable[var_4.type].field_E;
+                itemFlags = var_4.itemData.field_E;
 
                 if ((itemFlags & ItemDataFlags.flag_10) != 0)
                 {

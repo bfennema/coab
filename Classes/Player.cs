@@ -412,7 +412,7 @@ namespace Classes
             for (int item_slot = 0; item_slot < ItemSlots; item_slot++)
             {
                 if (itemArray[item_slot] != null &&
-                    (gbl.ItemDataTable[itemArray[item_slot].type].classFlags & classFlags) == 0 &&
+                    (itemArray[item_slot].itemData.classFlags & classFlags) == 0 &&
                     itemArray[item_slot].cursed == false)
                 {
                     itemArray[item_slot].readied = false;
