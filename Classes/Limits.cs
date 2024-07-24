@@ -174,8 +174,8 @@ namespace Classes
                         if (skill == SkillType.MagicUser)
                         {
                             if (class_lvl == 8 ||
-                                (class_lvl == 7 && player.stats2.Str.full == 17) ||
-                                (class_lvl == 6 && player.stats2.Str.full < 17))
+                                (class_lvl == 7 && player.stats2.Int.full == 17) ||
+                                (class_lvl == 6 && player.stats2.Int.full < 17))
                             {
                                 race_limited = true;
                             }
