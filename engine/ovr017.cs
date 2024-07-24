@@ -1076,6 +1076,18 @@ namespace engine
                     string file_name = Path.Combine(Config.GetSavePath(gbl.game), "SAVGAM" + save_letter.ToString() + ".DAT");
 
                     loadSaveGame(file_name);
+
+                    file_name = Path.Combine(Config.GetSavePath(gbl.game), "VAULT" + save_letter.ToString() + ".DAT");
+                    if (seg042.file_find(file_name) == true)
+                    {
+                        loadVault(file_name);
+                    }
+                    else
+                    {
+                        file_name = Path.Combine(Config.GetSavePath(gbl.game), "VAULT.DAT");
+                        if (seg042.file_find(file_name) == true)
+                            loadVault(file_name);
+                    }
                 }
             }
         }
@@ -1236,6 +1248,66 @@ namespace engine
             }
         }
 
+        internal static void loadVault(string file_name)
+        {
+            Classes.File file;
+            seg042.find_and_open_file(out file, true, file_name);
+
+            byte[] money_data = new byte[28];
+
+            seg051.BlockRead(28, money_data, file);
+            for (int i = Money.Copper; i <= Money.Jewelry; i++)
+            {
+                gbl.vault_money.SetCoins(i, Sys.ArrayToInt(money_data, i*4));
+            }
+
+            while (true)
+            {
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+                    byte[] data = new byte[PoolRadItem.StructSize];
+                    if (seg051.BlockRead(PoolRadItem.StructSize, data, file) == PoolRadItem.StructSize)
+                    {
+                        gbl.items_vault.Add(new PoolRadItem(data, 0).Load());
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    byte[] data = new byte[CurseItem.StructSize];
+                    if (seg051.BlockRead(CurseItem.StructSize, data, file) == CurseItem.StructSize)
+                    {
+                        gbl.items_vault.Add(new CurseItem(data, 0).Load());
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    byte[] data = new byte[SecretItem.StructSize];
+                    if (seg051.BlockRead(SecretItem.StructSize, data, file) == SecretItem.StructSize)
+                    {
+                        gbl.items_vault.Add(new SecretItem(data, 0).Load());
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            seg051.Close(file);
+        }
+
         static Set save_slots = new Set(0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // unk_4AEA0
         static Set unk_4AEEF = new Set(0, 2, 18); 
 
@@ -1344,9 +1416,53 @@ namespace engine
                     remove_player_file(tmp_player);
                 }
 
+                saveVault(Path.Combine(Config.GetSavePath(gbl.game), "VAULT" + Char.ToUpper(inputKey) + ".DAT"));
+                saveVault(Path.Combine(Config.GetSavePath(gbl.game), "VAULT.DAT"));
+
                 gbl.gameSaved = true;
                 ovr027.ClearPromptArea();
             }
+        }
+
+        internal static void saveVault(string file_name)
+        {
+            Classes.File save_file = new Classes.File();
+
+            do
+            {
+                save_file.Assign(file_name);
+                seg051.Rewrite(save_file);
+
+                if (unk_4AEEF.MemberOf(gbl.FIND_result) == false)
+                {
+                    seg041.DisplayAndPause("Unexpected error during save: " + gbl.FIND_result.ToString(), 14);
+                    seg051.Close(save_file);
+                    return;
+                }
+            } while (unk_4AEEF.MemberOf(gbl.FIND_result) == false);
+
+            byte[] money_data = new byte[28];
+
+            for (int i = Money.Copper; i <= Money.Jewelry; i++)
+            {
+                Sys.IntToArray(gbl.vault_money.GetCoins(i), money_data, i * 4);
+            }
+            seg051.BlockWrite(28, money_data, save_file);
+
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                gbl.items_vault.ForEach(item => seg051.BlockWrite(PoolRadItem.StructSize, new PoolRadItem(item).Save(), save_file));
+            }
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                gbl.items_vault.ForEach(item => seg051.BlockWrite(CurseItem.StructSize, new CurseItem(item).Save(), save_file));
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                gbl.items_vault.ForEach(item => seg051.BlockWrite(SecretItem.StructSize, new SecretItem(item).Save(), save_file));
+            }
+
+            seg051.Close(save_file);
         }
     }
 }

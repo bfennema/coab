@@ -305,6 +305,7 @@ namespace engine
 
             gbl.bigpic_dax = null;
             gbl.items_pointer = new System.Collections.Generic.List<Item>();
+            gbl.items_vault = new System.Collections.Generic.List<Item>();
 
             gbl.mapPosX = 0;
             gbl.mapPosY = 0;

@@ -277,5 +277,94 @@ namespace engine
 
             } while (exitShop == false);
         }
+
+        internal static void vault() // sub_2F6E7
+        {
+            bool reloadPics = false; /* Simeon */
+            bool items_on_ground;
+            bool money_on_ground;
+            char inputKey;
+
+            gbl.game_state = GameState.Shop;
+            gbl.redrawBoarder = (gbl.area_ptr.inDungeon == 0);
+
+            ovr025.LoadPic();
+            gbl.redrawBoarder = true;
+            ovr025.PartySummary(gbl.SelectedPlayer);
+
+            gbl.pooled_money = gbl.vault_money;
+            gbl.items_pointer = gbl.items_vault;
+
+            bool exitShop = false;
+
+            do
+            {
+                ovr022.treasureOnGround(out items_on_ground, out money_on_ground);
+
+                string text;
+                if (items_on_ground == true || money_on_ground == true)
+                {
+                    text = "View Take Pool Exit";
+                }
+                else
+                {
+                    text = "View Pool Exit";
+                }
+
+                bool controlKey;
+
+                inputKey = ovr027.displayInput(out controlKey, false, 1, gbl.defaultMenuColors, text, string.Empty);
+
+                switch (inputKey)
+                {
+                    case 'V':
+                        ovr020.viewPlayer();
+                        break;
+
+                    case 'T':
+                        ovr006.take_treasure(ref items_on_ground, ref money_on_ground);
+                        break;
+
+                    case 'P':
+                        if (controlKey == false)
+                        {
+                            ovr022.poolMoney();
+                        }
+                        break;
+
+                    case 'E':
+                        ovr022.treasureOnGround(out items_on_ground, out money_on_ground);
+
+                        exitShop = true;
+                        break;
+
+                    case 'G':
+                        ovr020.scroll_team_list(inputKey);
+                        break;
+
+                    case 'O':
+                        ovr020.scroll_team_list(inputKey);
+                        break;
+                }
+
+                if (inputKey == 'T')
+                {
+                    ovr025.LoadPic();
+                }
+                else if (reloadPics == true)
+                {
+                    ovr025.LoadPic();
+                    reloadPics = false;
+                }
+
+                ovr025.PartySummary(gbl.SelectedPlayer);
+
+            } while (exitShop == false);
+
+            gbl.vault_money = new MoneySet(gbl.pooled_money);
+            gbl.pooled_money.ClearAll();
+            gbl.items_vault = new List<Item>(gbl.items_pointer);
+            gbl.items_pointer.Clear();
+        }
     }
 }

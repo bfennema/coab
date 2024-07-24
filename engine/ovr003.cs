@@ -1011,6 +1011,12 @@ namespace engine
 
                     ovr005.temple_shop();
                 }
+                else if (gbl.area_ptr.field_3F8 == 1)
+                {
+                    ovr007.vault();
+
+                    gbl.area_ptr.field_3F8 = 0;
+                }
                 else
                 {
                     ovr006.AfterCombatExpAndTreasure();

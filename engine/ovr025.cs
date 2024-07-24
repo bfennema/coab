@@ -782,6 +782,17 @@ namespace engine
 			}
 		}
 
+        internal static void deposit_item(Item item, Player player)
+        {
+            if (!player.items.Remove(item))
+            {
+                seg041.DisplayAndPause("Tried to Lose item & couldn't find it!", 14);
+            }
+			else
+			{
+				gbl.items_pointer.Add(item);
+			}
+        }
 
         internal static void string_print01(string text)
 		{

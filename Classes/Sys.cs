@@ -40,6 +40,14 @@ namespace Classes
             data[offset + 1] = (byte)((value >> 8) & 0x00ff);
         }
 
+        public static void IntToArray(int value, byte[] data, int offset)
+        {
+            data[offset + 0] = (byte)(value & 0x000000ff);
+            data[offset + 1] = (byte)(value & 0x0000ff00);
+            data[offset + 2] = (byte)(value & 0x00ff0000);
+            data[offset + 3] = (byte)(value & 0xff000000);
+        }
+
         /// <summary>
         /// Converts a Pascal string array to a C# string.
         /// </summary>

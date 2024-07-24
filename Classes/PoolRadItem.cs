@@ -448,10 +448,17 @@ namespace Classes
             return item;
         }
 
-        public byte[] Save(Player player, List<PoolRadAffect> affects)
+        public byte[] Save()
         {
             byte[] data = new byte[StructSize];
 
+            DataIO.WriteObject(this, data);
+
+            return data;
+        }
+
+        public byte[] Save(Player player, List<PoolRadAffect> affects)
+        {
             if (readied > 0 && type == (byte)ItemType.Gauntlets && affect_2 == 38 && affect_3 == 131)
             {
                 byte affect_data;
@@ -467,9 +474,7 @@ namespace Classes
                 affects.Add(affect);
             }
 
-            DataIO.WriteObject(this, data);
-
-            return data;
+            return Save();
         }
 
         public enum PoolRadTypes

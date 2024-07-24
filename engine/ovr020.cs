@@ -321,7 +321,7 @@ namespace engine
             }
 
             if (player.activeItems.armor != null)
-        {
+            {
                 ovr025.ItemDisplayNameBuild(true, false, 22, 1, player.activeItems.armor);
             }
         }
@@ -518,7 +518,14 @@ namespace engine
 
                 if (hasMoney)
                 {
-                    text += "Drop ";
+                    if (gbl.area_ptr.field_3F8 == 1)
+                    {
+                        text += "Deposit ";
+                    }
+                    else
+                    {
+                        text += "Drop ";
+                    }
                 }
 
                 if (CanCastHeal(gbl.SelectedPlayer) == true)
@@ -552,7 +559,14 @@ namespace engine
                         break;
 
                     case 'D':
-                        drop_coin();
+                        if (gbl.area_ptr.field_3F8 == 1)
+                        {
+                            deposit_coin();
+                        }
+                        else
+                        {
+                            drop_coin();
+                        }
                         displayMoney(7, 12, 8, -9);
                         break;
 
@@ -729,7 +743,14 @@ namespace engine
                         }
                     }
 
-                    text += " Drop";
+                    if (gbl.area_ptr.field_3F8 == 1)
+                    {
+                        text += " Deposit";
+                    }
+                    else
+                    {
+                        text += " Drop";
+                    }
 
                     if (player.items.Count < Player.MaxItems)
                     {
@@ -738,7 +759,7 @@ namespace engine
 
                     text += " Join";
 
-                    if (gbl.game_state == GameState.Shop)
+                    if (gbl.game_state == GameState.Shop && gbl.area_ptr.field_3F8 == 0)
                     {
                         if (player.control_morale < Control.NPC_Base ||
                             player.in_combat == false ||
@@ -828,12 +849,22 @@ namespace engine
                                 {
                                     ovr025.ItemDisplayNameBuild(false, false, 0, 0, curr_item);
 
-                                    seg041.press_any_key("Your " + curr_item.name + " will be gone forever", true, 14, 22, 0x26, 21, 1);
-
-                                    if (ovr027.yes_no(gbl.defaultMenuColors, "Drop It? ") == 'Y')
+                                    if (gbl.area_ptr.field_3F8 == 1)
                                     {
-                                        ovr025.lose_item(curr_item, gbl.SelectedPlayer);
+                                        seg041.press_any_key("Your " + curr_item.name + " will be left in the vault", true, 14, 22, 0x26, 21, 1);
+
+                                        ovr025.deposit_item(curr_item, gbl.SelectedPlayer);
                                         redraw_items = true;
+                                    }
+                                    else
+                                    {
+                                        seg041.press_any_key("Your " + curr_item.name + " will be gone forever", true, 14, 22, 0x26, 21, 1);
+
+                                        if (ovr027.yes_no(gbl.defaultMenuColors, "Drop It? ") == 'Y')
+                                        {
+                                            ovr025.lose_item(curr_item, gbl.SelectedPlayer);
+                                            redraw_items = true;
+                                        }
                                     }
 
                                     seg037.draw8x8_clear_area(TextRegion.Normal2);
@@ -853,7 +884,7 @@ namespace engine
                                 break;
 
                             case 'S':
-                                if (CanSellDropTradeItem(curr_item) == true)
+                                if (CanSellDropTradeItem(curr_item) == true && gbl.area_ptr.field_3F8 == 0)
                                 {
                                     ShopSellItem(curr_item);
                                 }
@@ -1611,6 +1642,53 @@ namespace engine
                     int money_slot = ovr022.GetMoneyIndexFromString(out text, selected.Text);
 
                     text = "How much " + text + "will you drop? ";
+
+                    short num_coins = ovr022.AskNumberValue(10, text, gbl.SelectedPlayer.Money.GetCoins(money_slot));
+
+                    ovr022.DropCoins(money_slot, num_coins, gbl.SelectedPlayer);
+
+                    noMoreMoney = !gbl.SelectedPlayer.Money.AnyMoney();
+                }
+
+                menuList.Clear();
+            } while (noMoreMoney == false);
+        }
+
+        internal static void deposit_coin()
+        {
+            bool noMoreMoney;
+
+            do
+            {
+                displayMoney(7, 12, 8, -9);
+                List<MenuItem> menuList = new List<MenuItem>();
+
+                for (int coin = 0; coin < 7; coin++)
+                {
+                    if (gbl.SelectedPlayer.Money.GetCoins(coin) != 0)
+                    {
+                        menuList.Add(new MenuItem(string.Format("{0,8} {1}", moneyString[coin], gbl.SelectedPlayer.Money.GetCoins(coin))));
+                    }
+                }
+
+                int index = 0;
+                bool redrawMenuItems = true;
+
+                MenuItem selected;
+                ovr027.sl_select_item(out selected, ref index, ref redrawMenuItems, true, menuList, 13, 0x19, 7,
+                    12, gbl.defaultMenuColors, " Select", "Select type of coin ");
+
+                if (selected == null)
+                {
+                    noMoreMoney = true;
+                }
+                else
+                {
+                    string text;
+
+                    int money_slot = ovr022.GetMoneyIndexFromString(out text, selected.Text);
+
+                    text = "How many " + text + "will you deposit? ";
 
                     short num_coins = ovr022.AskNumberValue(10, text, gbl.SelectedPlayer.Money.GetCoins(money_slot));
 
