@@ -1204,7 +1204,7 @@ namespace engine
                     text = "takes 1 point of damage ";
                 }
 
-                int mask = (int)gbl.damage_flags & 0xf7;
+                int mask = (int)(gbl.damage_flags & ~DamageType.Magic);
                 if (mask == 0x01)
                 {
                     text += "from Fire";
