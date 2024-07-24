@@ -243,12 +243,12 @@ namespace engine
 
             if (player.HasAffect(Affects.slow) == true)
             {
-                movement *= 2;
+                movement /= 2;
             }
 
             if (player.HasAffect(Affects.haste) == true)
             {
-                movement /= 2;
+                movement *= 2;
             }
 
             seg041.displayString("Movement ", 0, 15, yCol + 1, xCol + 3);
