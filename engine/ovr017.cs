@@ -68,7 +68,7 @@ namespace engine
 
             if (gbl.import_from == ImportSource.Curse)
             {
-                BuildLoadablePlayersLists(ref fileNames, ref displayNames, Player.StructSize, NpcFileOffset[0], PlayerNameOffset[0], "*.guy");
+                BuildLoadablePlayersLists(ref fileNames, ref displayNames, CursePlayer.StructSize, NpcFileOffset[0], PlayerNameOffset[0], "*.guy");
             }
             else if (gbl.import_from == ImportSource.Pool)
             {
@@ -228,7 +228,7 @@ namespace engine
                     file.Assign(filePath + ".SWG");
                     seg051.Rewrite(file);
 
-                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new CurseItem(item).Save(), file));
+                    player.items.ForEach(item => seg051.BlockWrite(CurseItem.StructSize, new CurseItem(item).Save(), file));
 
                     seg051.Close(file);
                 }
@@ -429,8 +429,8 @@ namespace engine
 
             if (gbl.import_from == ImportSource.Curse)
             {
-                byte[] data = new byte[Player.StructSize];
-                seg051.BlockRead(Player.StructSize, data, file);
+                byte[] data = new byte[CursePlayer.StructSize];
+                seg051.BlockRead(CursePlayer.StructSize, data, file);
                 seg051.Close(file);
 
                 player = new CursePlayer(data, 0).Load();
@@ -503,8 +503,14 @@ namespace engine
                     }
                         else if (gbl.game == Game.CurseOfTheAzureBonds)
                         {
+                        byte[] data = new byte[CurseItem.StructSize];
+                        if (seg051.BlockRead(CurseItem.StructSize, data, file) == CurseItem.StructSize)
+                        {
                             player.items.Add(new CurseItem(data, 0).Load());
                         }
+                        else
+                        {
+                            break;
                     }
                     else
                     {
@@ -518,12 +524,12 @@ namespace engine
             filename = Path.Combine(Config.GetSavePath(gbl.game), arg_8 + ".fx");
             if (seg042.file_find(filename) == true)
             {
-                byte[] data = new byte[Affect.StructSize];
+                byte[] data = new byte[CurseAffect.StructSize];
                 seg042.find_and_open_file(out file, false, filename);
 
                 while (true)
                 {
-                    if (seg051.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
+                    if (seg051.BlockRead(CurseAffect.StructSize, data, file) == Affect.StructSize)
                     {
                         new CurseAffect(data, 0).Load(player);
                     }
