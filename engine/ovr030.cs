@@ -55,7 +55,7 @@ namespace engine
                     ushort uncompressed_size;
                     byte[] uncompressed_data;
 
-                    seg042.load_decode_dax(out uncompressed_data, out uncompressed_size, block_id, file_name + gbl.game_area.ToString() + ".dax");
+                    seg042.load_decode_dax(out uncompressed_data, out uncompressed_size, block_id, file_name + ".dax");
 
                     if (uncompressed_size == 0)
                     {
@@ -165,14 +165,12 @@ namespace engine
         }
 
 
-        internal static void head_body(byte body_id, byte head_id)
+        internal static void head_body(byte area, byte body_id, byte head_id)
         {
-            string text = gbl.game_area.ToString();
-
             if (head_id != 0xff &&
                 (gbl.current_head_id == 0xff || gbl.current_head_id != head_id))
             {
-                gbl.headX_dax = seg040.LoadDax(0, 0, head_id, "HEAD" + text);
+                gbl.headX_dax = seg040.LoadDax(0, 0, head_id, "HEAD" + area.ToString());
 
                 if (gbl.headX_dax == null)
                 {
@@ -185,7 +183,7 @@ namespace engine
             if (body_id != 0xff &&
                 (gbl.current_body_id == 0xff || gbl.current_body_id != body_id))
             {
-                gbl.bodyX_dax = seg040.LoadDax(0, 0, body_id, "BODY" + text);
+                gbl.bodyX_dax = seg040.LoadDax(0, 0, body_id, "BODY" + area.ToString());
                 if (gbl.bodyX_dax == null)
                 {
                     seg041.DisplayAndPause("body not found", 14);

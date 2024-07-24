@@ -4,14 +4,20 @@ namespace engine
 {
     class seg037
     {
-        static int[] por_outer_frame_horizontal /*unk_16EB0*/ = { 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0 };
+        static int[] por_outer_frame_horizontal = { 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0 };
+        static int[] por_outer_frame_horizontal2 = { 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0 };
         static int[] coab_outer_frame_bottom /*unk_16EB0*/ = { 1, 8, 6, 1, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 1, 1, 6, 8, 1, 1, 1, 4, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 1, 4, 3 };
+        static int[] secret_outer_frame_horizontal = { 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3 };
 
         static byte[] por_inner_frame_horizontal = { 0, 0, 0, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 0, 0, 0 };
         static byte[] coab_inner_frame_top = { 4, 3, 0, 6, 1, 1, 1, 1, 8, 1, 1, 4, 1, 1, 2, 1, 4 };
+        static byte[] secret_inner_frame_horizontal = { 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7 };
 
         static byte[] por_frame_middle_vertical = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
         static byte[] coab_frame_middle_vertical = { 0, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 5, 2, 9, 4 };
+        static byte[] secret_frame_middle_vertical1 = { 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3 };
+
+        static byte[] secret_frame_middle_vertical2 = { 3, 3, 3, 3, 3, 3, 3, 3, 3, 0, 1, 1, 1, 1, 1, 1, 3, 1, 1, 2, 3 };
 
         static int[] coab_outer_frame_top /*byte_16E60*/ = { 0, 6, 1, 1, 1, 1, 1, 1, 6, 1, 1, 1, 1, 4, 1, 1, 1, 6, 1, 1, 1, 1, 1, 1, 1, 8, 1, 1, 1, 1, 1, 1, 1, 4, 1, 1, 1, 6, 1, 2 };
 
@@ -20,13 +26,21 @@ namespace engine
 
         static byte[] coab_inner_frame_bottom = { 1, 2, 1, 4, 1, 1, 1, 1, 1, 1, 8, 4, 1, 1, 3 };
         static int[] por_outer_frame_vertical  /*unk_16EF2*/ = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
+        static int[] por_outer_frame_vertical2  /*unk_16EF2*/ = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
         static int[] coab_outer_frame_left  /*unk_16EF2*/ = { 0, 2, 9, 5, 2, 2, 2, 2, 2, 2, 5, 7, 2, 2, 2, 2, 2, 9, 7, 2, 2, 2, 7, 1 };
         static int[] coab_outer_frame_right /*unk_16F1B*/ = { 2, 2, 9, 7, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 2, 2, 2, 2, 5, 2 };
+        static int[] secret_outer_frame_vertical1 = { 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3 };
+        static int[] secret_outer_frame_vertical2 = { 3, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 3 };
+        static int[] secret_outer_frame_vertical3 = { 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3, 0, 1, 1, 1, 1, 2, 3 };
+        static int[] secret_outer_frame_vertical4 = { 3, 0, 1, 1, 1, 1, 1, 2, 3, 0, 1, 1, 1, 1, 1, 2, 3, 0, 1, 2, 3, 0, 2, 3 };
+        static int[] secret_outer_frame_vertical5 = { 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3 };
 
         static byte[] por_inner_frame_vertical = { 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
         static byte[] coab_inner_frame_left = { 5, 2, 0, 2, 7, 2, 2, 2, 2, 5, 2, 2, 2, 2, 1 };
         static byte[] coab_inner_frame_right = { 2, 1, 2, 5, 9, 2, 2, 2, 7, 5, 2, 2, 2, 2, 3 };
+        static byte[] secret_inner_frame_vertical = { 7, 7, 7, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 7 };
         static byte[] por_combat_frame_vertical = { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
+        static byte[] secret_combat_frame_vertical = { 3, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 3 };
         static byte[] unk_16F4D = { 0, 2, 9, 5, 2, 2, 2, 2, 2, 2, 5, 7, 2, 2, 2, 2, 2, 9, 7, 2, 2, 2, 1 };
         static byte[] unk_16F64 = { 0, 7, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 5, 2, 2, 2, 2, 2, 2, 5, 2, 4 };
         static byte[] unk_16F7B = { 2, 2, 9, 7, 2, 2, 2, 5, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 2, 2, 2, 2, 2 };
@@ -45,9 +59,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 0, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_outer_frame_top[col_x] + 0x11e, 0, col_x);
+                }
+                else
+                {
+                     ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0, col_x);
                 }
             }
 
@@ -58,10 +76,15 @@ namespace engine
                     ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical[row_y] + 0x114, row_y, 0);
                     ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical[row_y] + 0x114, row_y, 39);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_outer_frame_left[row_y] + 0x11e, row_y, 0);
                     ovr038.Put8x8Symbol(0, false, coab_outer_frame_right[row_y] + 0x11e, row_y, 39);
+                }
+                else
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical1[row_y] + 0x134, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical1[row_y] + 0x134, row_y, 39);
                 }
             }
 
@@ -71,9 +94,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 23, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_outer_frame_bottom[col_x] + 0x11e, 23, col_x);
+                }
+                else if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 23, col_x);
                 }
             }
 
@@ -87,7 +114,43 @@ namespace engine
 
             if (gbl.game == Game.PoolOfRadiance)
             {
-                DrawFrame_Outer();
+                draw8x8_clear_area(23, 38, 1, 1);
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 0, col_x);
+                }
+
+                for (int row_y = 0; row_y < 24; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical2[row_y] + 0x114, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical2[row_y] + 0x114, row_y, 39);
+                }
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 24, col_x);
+                }
+            }
+            else if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                draw8x8_clear_area(23, 38, 1, 1);
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 1, col_x);
+                }
+
+                for (int row_y = 2; row_y < 23; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical2[row_y] + 0x134, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical2[row_y] + 0x134, row_y, 39);
+                }
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 23, col_x);
+                }
             }
             else
             {
@@ -98,10 +161,9 @@ namespace engine
             {
                 if (gbl.game == Game.PoolOfRadiance)
                 {
-                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 3, col_x);
-                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 8, col_x);
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 4, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_frame_horizontal[col_x] + 0x11E, 3, col_x);
                     ovr038.Put8x8Symbol(0, false, coab_frame_horizontal[col_x] + 0x11E, 8, col_x);
@@ -116,7 +178,30 @@ namespace engine
         {
             Display.UpdateStop();
 
-            DrawFrame_Outer();
+            if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                draw8x8_clear_area(23, 38, 1, 1);
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0, col_x);
+                }
+
+                for (int row_y = 2; row_y < 23; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical3[row_y] + 0x134, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical3[row_y] + 0x134, row_y, 39);
+                }
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 23, col_x);
+                }
+            }
+            else
+            {
+                DrawFrame_Outer();
+            }
 
             for (int colX = 0; colX <= 39; colX++)
             {
@@ -124,9 +209,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_frame_horizontal[colX] + 0x114, 16, colX);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_frame_horizontal[colX] + 0x11E, 16, colX);
+                }
+                else //if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[colX] + 0x134, 16, colX);
                 }
             }
 
@@ -136,9 +225,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_frame_middle_vertical[rowY] + 0x114, rowY, 16);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_frame_middle_vertical[rowY] + 0x11E, rowY, 16);
+                }
+                else //if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_frame_middle_vertical1[rowY] + 0x134, rowY, 16);
                 }
             }
             
@@ -149,10 +242,15 @@ namespace engine
                     ovr038.Put8x8Symbol(0, false, por_inner_frame_horizontal[col_x] + 0x114, 2, col_x);
                     ovr038.Put8x8Symbol(0, false, por_inner_frame_horizontal[col_x] + 0x114, 14, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_inner_frame_top[col_x] + 0x114, 2, col_x);
                     ovr038.Put8x8Symbol(0, false, coab_inner_frame_bottom[col_x] + 0x114, 14, col_x);
+                }
+                else //if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_inner_frame_horizontal[col_x] + 0x134, 2, col_x);
+                    ovr038.Put8x8Symbol(0, false, secret_inner_frame_horizontal[col_x] + 0x134, 14, col_x);
                 }
             }
 
@@ -163,10 +261,15 @@ namespace engine
                     ovr038.Put8x8Symbol(0, false, por_inner_frame_vertical[row_y] + 0x114, row_y, 2);
                     ovr038.Put8x8Symbol(0, false, por_inner_frame_vertical[row_y] + 0x114, row_y, 14);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_inner_frame_left[row_y] + 0x114, row_y, 2);
                     ovr038.Put8x8Symbol(0, false, coab_inner_frame_right[row_y] + 0x114, row_y, 14);
+                }
+                else //if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_inner_frame_vertical[row_y] + 0x134, row_y, 2);
+                    ovr038.Put8x8Symbol(0, false, secret_inner_frame_vertical[row_y] + 0x134, row_y, 14);
                 }
             }
 
@@ -178,7 +281,30 @@ namespace engine
         {
             Display.UpdateStop();
 
-            DrawFrame_Outer();
+            if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                draw8x8_clear_area(23, 38, 1, 1);
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0, col_x);
+                }
+
+                for (int row_y = 2; row_y < 23; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical3[row_y] + 0x134, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical3[row_y] + 0x134, row_y, 39);
+                }
+
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 23, col_x);
+                }
+            }
+            else
+            {
+                DrawFrame_Outer();
+            }
 
             for (int col_x = 0; col_x <= 0x27; col_x++)
             {
@@ -186,9 +312,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_frame_horizontal[col_x] + 0x114, 0x10, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_frame_horizontal[col_x] + 0x11E, 0x10, col_x);
+                }
+                else // if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0x10, col_x);
                 }
             }
 
@@ -269,9 +399,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 0, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_outer_frame_top[col_x] + 0x11E, 0, col_x);
+                }
+                else if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0, col_x);
                 }
             }
 
@@ -284,11 +418,17 @@ namespace engine
                     ovr038.Put8x8Symbol(0, false, por_combat_frame_vertical[row_y] + 0x114, row_y, 22);
                     ovr038.Put8x8Symbol(0, false, por_combat_frame_vertical[row_y] + 0x114, row_y, 39);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, unk_16F4D[row_y] + 0x11e, row_y, 0);
                     ovr038.Put8x8Symbol(0, false, unk_16F64[row_y] + 0x11e, row_y, 22);
                     ovr038.Put8x8Symbol(0, false, unk_16F7B[row_y] + 0x11e, row_y, 39);
+                }
+                else if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_combat_frame_vertical[row_y] + 0x134, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, secret_combat_frame_vertical[row_y] + 0x134, row_y, 22);
+                    ovr038.Put8x8Symbol(0, false, secret_combat_frame_vertical[row_y] + 0x134, row_y, 39);
                 }
             }
 
@@ -299,9 +439,13 @@ namespace engine
                 {
                     ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 22, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_outer_frame_bottom[col_x] + 0x11e, 22, col_x);
+                }
+                else if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 22, col_x);
                 }
             }
 
@@ -319,11 +463,74 @@ namespace engine
             {
                 if (gbl.game == Game.PoolOfRadiance)
                 {
-                    ovr038.Put8x8Symbol(0, false, por_frame_horizontal[col_x] + 0x114, 2, col_x);
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 2, col_x);
                 }
-                else
+                else if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
                     ovr038.Put8x8Symbol(0, false, coab_frame_horizontal[col_x] + 0x11e, 2, col_x);
+                }
+                else // if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                }
+            }
+
+            Display.UpdateStart();
+        }
+
+        internal static void DrawFrame_DisplayFull()
+        {
+            Display.UpdateStop();
+
+            draw8x8_clear_area(22, 38, 1, 1);
+
+            if (gbl.game == Game.PoolOfRadiance)
+            {
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal2[col_x] + 0x114, 0, col_x);
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal[col_x] + 0x114, 23, col_x);
+                }
+
+                for (int col_x = 27; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_horizontal2[col_x] + 0x114, 12, col_x);
+                }
+
+                for (int row_y = 0; row_y < 23; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical[row_y] + 0x114, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical[row_y] + 0x114, row_y, 39);
+                }
+
+                for (int row_y = 0; row_y < 12; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, por_outer_frame_vertical[row_y] + 0x114, row_y, 27);
+                }
+            }
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                DrawFrame_Outer();
+            }
+            else if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                for (int col_x = 0; col_x <= 39; col_x++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0, col_x);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 8, col_x);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 16, col_x);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 20, col_x);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 23, col_x);
+                }
+
+                for (int row_y = 0; row_y < 23; row_y++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical4[row_y] + 0x134, row_y, 0);
+                    ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical4[row_y] + 0x134, row_y, 39);
+                }
+
+                for (int row_y = 8; row_y < 20; row_y ++)
+                {
+                    ovr038.Put8x8Symbol(0, false, secret_frame_middle_vertical2[row_y] + 0x134, row_y, 19);
                 }
             }
 

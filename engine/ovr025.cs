@@ -247,7 +247,7 @@ namespace engine
 					displayPlayerName(false, y_pos, x_pos, tmp_player);
 				}
 
-                seg041.displayString(string.Format("{0,-3}", tmp_player.DisplayAc), 0, 10, y_pos, 0x1F);
+				seg041.displayString(string.Format("{0,3}", tmp_player.DisplayAc), 0, 10, y_pos, 0x20);
 
 				int hpXPos = 0;
 				if (tmp_player.hit_point_current >= 0 && tmp_player.hit_point_current <= 9)
@@ -783,7 +783,7 @@ namespace engine
 		}
 
 
-		internal static void string_print01(string text)
+        internal static void string_print01(string text)
 		{
 			ovr027.ClearPromptAreaNoUpdate();
 
@@ -1417,13 +1417,13 @@ namespace engine
 						seg037.DrawFrame_Dungeon();
 					}
 
-					if (gbl.lastDaxBlockId == 0x50)
+					if (gbl.area2_ptr.HeadBlockId == 0xff)
 					{
 						ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
 					}
 					else
 					{
-						ovr030.head_body(gbl.body_block_id, gbl.head_block_id);
+						ovr030.head_body(gbl.game_area, gbl.body_block_id, gbl.head_block_id);
 						ovr030.draw_head_and_body(true, 3, 3);
 					}
 
@@ -1433,7 +1433,14 @@ namespace engine
 
 				case GameState.Camping:
 					seg037.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, 0x1d, "PIC");
+					if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+					{
+						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 29, "PIC" + gbl.game_area.ToString());
+					}
+					else //if (gbl.game == Game.SecretOfTheSilverBlades)
+					{
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, 59, "PIC4");
+                    }
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
 					break;
@@ -1463,7 +1470,14 @@ namespace engine
 
 				case GameState.AfterCombat:
 					seg037.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, 1, "PIC");
+					if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+					{
+						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 1, "PIC");
+					}
+					else
+					{
+						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 60, "PIC4");
+					}
 					PartySummary(gbl.SelectedPlayer);
 					break;
 			}
@@ -1574,7 +1588,14 @@ namespace engine
 
 		internal static void RedrawCombatScreen() // sub_68DC0
 		{
-			ovr033.Color_0_8_inverse();
+			if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+			{
+				ovr033.Color_0_8_inverse();
+			}
+			else // if (gbl.game == Game.SecretOfTheSilverBlades)
+			{
+				ovr033.Color_0_8_normal();
+			}
 			seg037.DrawFrame_Combat();
 
 			ovr033.redrawCombatArea(8, 0xff, gbl.mapToBackGroundTile.mapScreenTopLeft + Point.ScreenCenter);

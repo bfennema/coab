@@ -321,9 +321,15 @@ namespace engine
 
                 if (gbl.area2_ptr.HeadBlockId == 0xff)
                 {
+                    int bigpic_blockId = 0x78;
                     gbl.byte_1EE8D = true;
 
-                    if (blockId >= 0x78)
+                    if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        bigpic_blockId = 0x70;
+                    }
+
+                    if (blockId >= bigpic_blockId)
                     {
                         ovr030.load_bigpic(blockId);
                         ovr030.draw_bigpic();
@@ -331,13 +337,13 @@ namespace engine
                     }
                     else
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, blockId, "PIC");
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, blockId, "PIC" + gbl.game_area.ToString());
                         ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
                     }
                 }
                 else
                 {
-                    ovr008.set_and_draw_head_body(blockId, (byte)gbl.area2_ptr.HeadBlockId);
+                    ovr008.set_and_draw_head_body(gbl.game_area, blockId, (byte)gbl.area2_ptr.HeadBlockId, 3, 3);
                 }
             }
             else
@@ -517,8 +523,7 @@ namespace engine
             {
                 gbl.filesLoaded = true;
 
-                if (var_3 != 0xff &&
-                    var_3 != 0x7f &&
+                if ((var_3 & 0x7f) != 0x7f &&
                     gbl.area_ptr.inDungeon != 0)
                 {
                     gbl.area_ptr.current_3DMap_block_id = var_3;
@@ -526,7 +531,7 @@ namespace engine
                     gbl.area2_ptr.field_592 = 0;
                 }
 
-                if (var_1 != 0xff &&
+                if ((var_1 & 0x7f) != 0x7f &&
                     gbl.area_ptr.inDungeon == 0 &&
                     gbl.lastDaxBlockId != 0x50)
                 {
@@ -546,19 +551,19 @@ namespace engine
                     if (gbl.area_ptr.field_1CE != 0 &&
                         gbl.area_ptr.field_1D0 != 0)
                     {
-                        if (var_3 != 0xff)
+                        if ((var_3 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(1, var_3);
                         }
 
-                        if (var_1 != 0xff)
+                        if ((var_1 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(3, var_1);
                         }
                     }
                     else
                     {
-                        if (var_3 != 0xff)
+                        if ((var_3 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(1, var_3);
                         }
@@ -567,7 +572,7 @@ namespace engine
                             gbl.setBlocks[0].Reset();
                         }
 
-                        if (var_2 != 0xff)
+                        if ((var_2 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(2, var_2);
                         }
@@ -576,7 +581,7 @@ namespace engine
                             gbl.setBlocks[1].Reset();
                         }
 
-                        if (var_1 != 0xff)
+                        if ((var_1 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(3, var_1);
                         }
@@ -1881,6 +1886,7 @@ namespace engine
                     break;
                 case 0x2C90: // por
                 case 0x2E10: // coab
+                case 0x2DCB: // secret
                     gbl.mapWallRoof = ovr031.get_wall_x2(gbl.mapPosY, gbl.mapPosX);
 
                     if (gbl.byte_1AB0B == true)
@@ -2317,7 +2323,15 @@ namespace engine
 
                 if (gbl.inDemo == true)
                 {
-                    gbl.EclBlockId = 0x52;
+                    switch (gbl.game)
+                    {
+                        case Game.CurseOfTheAzureBonds:
+                            gbl.EclBlockId = 82;
+                            break;
+                        case Game.SecretOfTheSilverBlades:
+                            gbl.EclBlockId = 3;
+                            break;
+                    }
                 }
                 else
                 {
@@ -2328,6 +2342,9 @@ namespace engine
                             break;
                         case Game.CurseOfTheAzureBonds:
                             gbl.EclBlockId = 1;
+                            break;
+                        case Game.SecretOfTheSilverBlades:
+                            gbl.EclBlockId = 16;
                             break;
                     }
 

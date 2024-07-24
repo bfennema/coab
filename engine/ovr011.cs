@@ -757,16 +757,23 @@ namespace engine
 
         static void SetupGroundTiles() // sub_38030
         {
-            if (gbl.area_ptr.inDungeon != 0)
+            if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
             {
-                ovr034.Load24x24Set(25, 0, 1, "DungCom");
-            }
-            else
-            {
-                 ovr034.Load24x24Set(34, 0, 1, "WildCom");
-            }
+                if (gbl.area_ptr.inDungeon != 0)
+                {
+                    ovr034.Load24x24Set(25, 0, 1, "DungCom");
+                }
+                else
+                {
+                    ovr034.Load24x24Set(34, 0, 1, "WildCom");
+                }
 
-            ovr034.Load24x24Set(6, 34, 1, "RandCom");
+                ovr034.Load24x24Set(6, 34, 1, "RandCom");
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                ovr034.Load24x24Set(30, 0, 1, "DungCom");
+            }
 
             gbl.mapToBackGroundTile = new Struct_1D1BC();
 

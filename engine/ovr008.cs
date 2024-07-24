@@ -202,15 +202,15 @@ namespace engine
         }
 
 
-        internal static void set_and_draw_head_body(byte body_id, byte head_id) /* sub_30543 */
+        internal static void set_and_draw_head_body(byte area, byte body_id, byte head_id, byte rowY, byte colX) /* sub_30543 */
         {
             gbl.byte_1EE8D = false;
 
             gbl.head_block_id = head_id;
             gbl.body_block_id = body_id;
 
-            ovr030.head_body(body_id, head_id);
-            ovr030.draw_head_and_body(true, 3, 3);
+            ovr030.head_body(area, body_id, head_id);
+            ovr030.draw_head_and_body(true, rowY, colX);
         }
 
 
@@ -229,7 +229,7 @@ namespace engine
 
                     if (gbl.area_ptr.inDungeon != 0)
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 1, sprite_block_id, "SPRIT");
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 1, sprite_block_id, "SPRIT" + gbl.game_area.ToString());
                         flags[0] = true;
                         gbl.displayPlayerSprite = true;
                     }
@@ -257,14 +257,14 @@ namespace engine
                     gbl.spriteChanged = true;
                     if (gbl.area2_ptr.HeadBlockId == 0xff)
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, pic_block_id, "PIC");
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, pic_block_id, "PIC" + gbl.game_area.ToString());
                         flags[1] = true;
 
                         ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
                     }
                     else
                     {
-                        set_and_draw_head_body(pic_block_id, (byte)gbl.area2_ptr.HeadBlockId);
+                        set_and_draw_head_body(gbl.game_area, pic_block_id, (byte)gbl.area2_ptr.HeadBlockId, 3, 3);
                         flags[1] = true;
                         gbl.byte_1EE8D = false;
                     }
@@ -647,7 +647,14 @@ namespace engine
             }
             else if (switch_var == 0x312)
             {
-                seg042.set_game_area((byte)(set_value));
+                if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    seg042.set_game_area((byte)((set_value + 1) >> 1));
+                }
+                else
+                {
+                    seg042.set_game_area((byte)(set_value));
+                }
             }
             else if (switch_var == 0x322)
             {

@@ -16,46 +16,63 @@ namespace engine
 
         static bool CastCureAnyway(string text)
         {
-            ovr025.DisplayPlayerStatusString(false, 0, text, gbl.SelectedPlayer);
+            if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                ovr025.DisplayPlayerStatusString(false, 0, text, gbl.SelectedPlayer);
 
-            char ret_val = ovr027.yes_no(gbl.defaultMenuColors, "cast cure anyway: ");
+                char ret_val = ovr027.yes_no(gbl.defaultMenuColors, "cast cure anyway: ");
 
-            ovr025.ClearPlayerTextArea();
+                ovr025.ClearPlayerTextArea();
 
-            return ret_val == 'Y';
+                return ret_val == 'Y';
+            }
+            else
+            {
+                ovr025.DisplayPlayerStatusString(true, 0, text.TrimEnd('.'), gbl.SelectedPlayer);
+                return false;
+            }
         }
 
 
         internal static bool buy_cure(int cost, string cure_name) /* buy_cure */
         {
-            string text = string.Format("{0} will only cost {1} gold pieces.", cure_name, cost);
-            seg041.press_any_key(text, true, 10, TextRegion.NormalBottom);
-
+            bool cast = true;
             bool buy = false;
 
-            if ('Y' == ovr027.yes_no(gbl.defaultMenuColors, "pay for cure "))
+            if (gbl.game != Game.PoolOfRadiance && gbl.game != Game.CurseOfTheAzureBonds && gbl.SelectedPlayer.hit_point_current >= gbl.SelectedPlayer.hit_point_max)
             {
-                if (cost <= gbl.SelectedPlayer.Money.GetGoldWorth())
-                {
-                    gbl.SelectedPlayer.Money.SubtractGoldWorth(cost);
-                    buy = true;
-                }
-                else if (cost <= gbl.pooled_money.GetGoldWorth())
-                {
-                    gbl.pooled_money.SubtractGoldWorth(cost);
-                    buy = true;
-                }
-                else
-                {
-                    ovr025.string_print01("Not enough money.");
-                    buy = false;
-                }
+                cast = CastCureAnyway("has no need of healing.");
             }
 
-            if (buy)
+            if (cast)
             {
-                ovr025.ClearPlayerTextArea();
-                ovr025.DisplayPlayerStatusString(true, 0, "is cured.", gbl.SelectedPlayer);
+                string text = string.Format("{0} will only cost {1} gold pieces.", cure_name, cost);
+                seg041.press_any_key(text, true, 10, TextRegion.NormalBottom);
+
+                if ('Y' == ovr027.yes_no(gbl.defaultMenuColors, "pay for cure "))
+                {
+                    if (cost <= gbl.SelectedPlayer.Money.GetGoldWorth())
+                    {
+                        gbl.SelectedPlayer.Money.SubtractGoldWorth(cost);
+                        buy = true;
+                    }
+                    else if (cost <= gbl.pooled_money.GetGoldWorth())
+                    {
+                        gbl.pooled_money.SubtractGoldWorth(cost);
+                        buy = true;
+                    }
+                    else
+                    {
+                        ovr025.string_print01("Not enough money.");
+                        buy = false;
+                    }
+                }
+
+                if (buy)
+                {
+                    ovr025.ClearPlayerTextArea();
+                    ovr025.DisplayPlayerStatusString(true, 0, "is cured.", gbl.SelectedPlayer);
+                }
             }
 
             return buy;
@@ -309,7 +326,10 @@ namespace engine
 
             for (int i = 0; i < 10; i++)
             {
-                stringList.Add(new MenuItem(temple_sl[i]));
+                if (gbl.game != Game.PoolOfRadiance || i != 5)
+                {
+                    stringList.Add(new MenuItem(temple_sl[i]));
+                }
             }
 
             ovr027.ClearPromptAreaNoUpdate();
@@ -350,23 +370,58 @@ namespace engine
                             break;
 
                         case 5:
-                            cure_wounds(4);
+                            if (gbl.game == Game.PoolOfRadiance)
+                            {
+                                cure_poison2();
+                            }
+                            else
+                            {
+                                cure_wounds(4);
+                            }
                             break;
 
                         case 6:
-                            cure_poison2();
+                            if (gbl.game == Game.PoolOfRadiance)
+                            {
+                                raise_dead();
+                            }
+                            else
+                            {
+                                cure_poison2();
+                            }
                             break;
 
                         case 7:
-                            raise_dead();
+                            if (gbl.game == Game.PoolOfRadiance)
+                            {
+                                remove_curse();
+                            }
+                            else
+                            {
+                                raise_dead();
+                            }
                             break;
 
                         case 8:
-                            remove_curse();
+                            if (gbl.game == Game.PoolOfRadiance)
+                            {
+                                stone_to_flesh();
+                            }
+                            else
+                            {
+                                remove_curse();
+                            }
                             break;
 
                         case 9:
-                            stone_to_flesh();
+                            if (gbl.game == Game.PoolOfRadiance)
+                            {
+                                end_shop = true;
+                            }
+                            else
+                            {
+                                stone_to_flesh();
+                            }
                             break;
 
                         case 10:

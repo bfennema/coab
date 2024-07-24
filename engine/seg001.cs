@@ -112,11 +112,7 @@ namespace engine
             //}
             //Logging.Logger.Debug("");
 
-
-            gbl.game = Game.PoolOfRadiance;
-            //gbl.game = Game.CurseOfTheAzureBonds;
-
-            if (gbl.game == Game.CurseOfTheAzureBonds)
+            if (gbl.game != Game.PoolOfRadiance)
             {
                 gbl.sky_dax_250 = seg040.LoadDax(13, 1, 250, "SKY");
                 gbl.sky_dax_251 = seg040.LoadDax(13, 1, 251, "SKY");
@@ -128,13 +124,23 @@ namespace engine
                 ovr002.title_screen();
             }
 
+            char inputKey = 'P';
+            if (gbl.game == Game.CurseOfTheAzureBonds)
+            {
             gbl.displayInputSecondsToWait = 30;
             gbl.displayInputTimeoutValue = 'D';
 
-            char inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
+                inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
 
             gbl.displayInputSecondsToWait = 0;
             gbl.displayInputTimeoutValue = '\0';
+            }
+            else if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg041.displayString("      Secret of the Silver Blades      ", 10, 0, 22, 0);
+                seg041.displayString("   Version 1.30           May 18,1990  ", 10, 0, 23, 0);
+                inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "              ");
+            }
 
             if (inputKey == 'D')
             {
@@ -151,7 +157,14 @@ namespace engine
             {
                 if (gbl.inDemo == true)
                 {
-                    gbl.game_area = 1;
+                    if (gbl.game == Game.CurseOfTheAzureBonds)
+                    {
+                        gbl.game_area = 1; // 1:82
+                    }
+                    else if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        gbl.game_area = 1; // 1:3
+                    }
                     gbl.game_speed_var = 9;
                 }
                 else
@@ -159,7 +172,14 @@ namespace engine
                     switch (gbl.game)
                     {
                         case Game.PoolOfRadiance:
-                            gbl.game_area = 3;
+                            gbl.game_area = 3; // 3:0
+                            gbl.game_speed_var = 1;
+                            gbl.last_game_state = GameState.Shop;
+                            gbl.area_ptr.field_3F6 = 0xFFFF;
+                            gbl.area_ptr.field_3F8 = 0xFFFF;
+                            gbl.area_ptr.field_3FA = 1;
+                            gbl.area_ptr.field_3FC = 0xFFFF;
+                            //gbl.area_ptr.field_3FE = 0xFFFF;
                             gbl.vm_mem0_offset = 0x4900;
                             gbl.vm_mem0_size = 0x0400;
                             gbl.vm_mem1_offset = 0x6B00;
@@ -169,7 +189,17 @@ namespace engine
                             gbl.initial_ecl_offset = 0x9900;
                             break;
                         case Game.CurseOfTheAzureBonds:
-                            gbl.game_area = 2;
+                            gbl.game_area = 2; // 2:1
+                            gbl.vm_mem0_offset = 0x4B00;
+                            gbl.vm_mem0_size = 0x0400;
+                            gbl.vm_mem1_offset = 0x7C00;
+                            gbl.vm_mem1_size = 0x0400;
+                            gbl.vm_mem2_offset = 0x7A00;
+                            gbl.vm_mem2_size = 0x0200;
+                            gbl.initial_ecl_offset = 0x8000;
+                            break;
+                        case Game.SecretOfTheSilverBlades:
+                            gbl.game_area = 1; // 1:16
                             gbl.vm_mem0_offset = 0x4B00;
                             gbl.vm_mem0_size = 0x0400;
                             gbl.vm_mem1_offset = 0x7C00;

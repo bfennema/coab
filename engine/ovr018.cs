@@ -275,6 +275,7 @@ namespace engine
                                 if ((gbl.TeamList.Count > 0 && gbl.inDemo == true) ||
                                     (gbl.game == Game.PoolOfRadiance) ||
                                     (gbl.game == Game.CurseOfTheAzureBonds && gbl.area_ptr.field_3FA == 0) ||
+                                    (gbl.game == Game.SecretOfTheSilverBlades) ||
                                     gbl.inDemo == true)
                                 {
                                     gbl.game_state = gameStateBackup;
@@ -592,6 +593,10 @@ namespace engine
             {
                 player.exp = 25000;
             }
+            else if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                player.exp = 200000;
+            }
             player._class = ClassList[index - 1];
             player.HitDice = 1;
 
@@ -796,6 +801,7 @@ namespace engine
             Player gblPlayerPtrBkup = gbl.SelectedPlayer;
             gbl.SelectedPlayer = player;
             ovr020.playerDisplayFull(player);
+            char input_match;
 
             do
             {
@@ -976,7 +982,14 @@ namespace engine
                             break;
                     }
 
-                    ovr020.display_stat(false, stat, true);
+                    if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+                    {
+                        ovr020.display_stat(false, stat, (byte)stat + 7, 5, true);
+                    }
+                    else // if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        ovr020.display_stat(false, stat, (byte)stat + 9, 5, true);
+                    }
                 }
 
                 player.hit_point_current = player.hit_point_max;
@@ -1054,7 +1067,7 @@ namespace engine
                             {
                                 player.spellBook.LearnSpell(Spells.shield);
                             }
-                            else if (gbl.game == Game.CurseOfTheAzureBonds)
+                            else if (gbl.game == Game.CurseOfTheAzureBonds || gbl.game == Game.SecretOfTheSilverBlades)
                             {
                                 player.spellBook.LearnSpell(Spells.enlarge);
                             }
@@ -1124,13 +1137,33 @@ namespace engine
                     }
                 }
 
-                seg041.displayString(text, 0, 15, 15, 7);
-                ovr020.display_player_stats01();
-                ovr020.displayMoney();
+                if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    seg041.displayString(text, 0, 15, 15, 7);
+                    ovr020.display_player_stats01(2, 3, 17, 1, 8, 22, 11, -4);
+                    ovr020.displayMoney(7, 12, 8, -6);
+                }
+                else // if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    seg041.displayString(text, 0, 15, 7, 7);
+                    ovr020.display_player_stats01(3, 2, 17, 1, -1, 20, -11, 6);
+                    seg041.displayString(player.hit_point_current.ToString() + "/" + player.hit_point_max.ToString(), 0, 10, 3, 31);
+                    ovr020.displayMoney(9, 20, -8, 9);
+                }
 
-                input_key = ovr027.yes_no(gbl.defaultMenuColors, "Reroll stats? ");
+                if (gbl.game == Game.PoolOfRadiance)
+                {
+                    text = "Keep this character? ";
+                    input_match = 'Y';
+                }
+                else
+                {
+                    text = "Reroll stats? ";
+                    input_match = 'N';
+                }
+                input_key = ovr027.yes_no(gbl.defaultMenuColors, text);
 
-            } while (input_key != 'N');
+            } while (input_key != input_match);
 
             ovr020.playerDisplayFull(player);
 
@@ -1224,7 +1257,7 @@ namespace engine
         {
             if (edited_stat >= 0 && edited_stat <= 5)
             {
-                ovr020.display_stat(highlighted, (Stat)edited_stat, cur);
+                ovr020.display_stat(highlighted, (Stat)edited_stat, edited_stat+7, 5, cur);
             }
             else if (edited_stat == 6)
             {
@@ -1638,7 +1671,7 @@ namespace engine
                 }
 
                 ovr025.reclac_player_values(gbl.SelectedPlayer);
-                ovr020.display_player_stats01();
+                ovr020.display_player_stats01(2, 3, 17, 1, 8, 22, 11, -4);
 
                 draw_highlight_stat(true, edited_stat, name_cursor_pos, true);
             } while (controlkey == true || inputkey != 0x4B);
@@ -1658,25 +1691,57 @@ namespace engine
         {
             seg037.draw8x8_clear_area(0x16, 0x26, 1, 1);
 
-            char input_key = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Curse Pool Hillsfar Exit", "Add from where? ");
-
-            switch (input_key)
+            if (gbl.game == Game.PoolOfRadiance)
             {
-                case 'C':
-                    gbl.import_from = ImportSource.Curse;
-                    break;
+                gbl.import_from = ImportSource.Pool;
+            }
+            else
+            {
+                string text;
+                if (gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    text = "Curse Pool Hillsfar";
+                }
+                else //if (gbl.game == Game.SecretOfTheSilverBlades)
+                {
+                    text = "Secret Curse";
+                }
+                char input_key = ovr027.displayInput(false, 0, gbl.defaultMenuColors, text + " Exit", "Add from where? ");
 
-                case 'P':
-                    gbl.import_from = ImportSource.Pool;
-                    break;
+                switch (input_key)
+                {
+                    case 'C':
+                        if (gbl.game == Game.CurseOfTheAzureBonds || gbl.game == Game.SecretOfTheSilverBlades)
+                        {
+                            gbl.import_from = ImportSource.Curse;
+                        }
+                        break;
 
-                case 'H':
-                    gbl.import_from = ImportSource.Hillsfar;
-                    break;
+                    case 'P':
+                        if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+                        {
+                            gbl.import_from = ImportSource.Pool;
+                        }
+                        break;
 
-                case 'E':
-                case '\0':
-                    return;
+                    case 'H':
+                        if (gbl.game == Game.CurseOfTheAzureBonds)
+                        {
+                            gbl.import_from = ImportSource.Hillsfar;
+                        }
+                        break;
+
+                    case 'S':
+                        if (gbl.game == Game.SecretOfTheSilverBlades)
+                        {
+                            gbl.import_from = ImportSource.Secret;
+                        }
+                        break;
+
+                    case 'E':
+                    case '\0':
+                        return;
+                }
             }
 
             List<MenuItem> strList;
@@ -1690,6 +1755,7 @@ namespace engine
                 int strList_index = 0;
                 MenuItem select_sl;
                 bool menuRedraw = true;
+                char input_key;
 
                 do
                 {
@@ -2741,20 +2807,62 @@ namespace engine
                     switch (player.magic_user_lvl)
                     {
                         case 2:
-                            player.spellBook.LearnSpell(Spells.magic_missile);
+                            player.spellBook.LearnSpell(Spells.magic_missile); // 1
                             break;
 
                         case 3:
-                            player.spellBook.LearnSpell(Spells.stinking_cloud);
-                            player.spellBook.LearnSpell(Spells.charm_person);
+                            player.spellBook.LearnSpell(Spells.stinking_cloud); // 2
+                            if (gbl.game != Game.SecretOfTheSilverBlades)
+                            {
+                                player.spellBook.LearnSpell(Spells.charm_person); // 1
+                            }
                             break;
 
                         case 4:
-                            player.spellBook.LearnSpell(Spells.knock);
+                            if (gbl.game != Game.SecretOfTheSilverBlades)
+                            {
+                                player.spellBook.LearnSpell(Spells.knock); // 2
+                            }
+                            else
+                            {
+                                player.spellBook.LearnSpell(Spells.shield); // 1
+                            }
                             break;
 
                         case 5:
-                            player.spellBook.LearnSpell(Spells.fireball);
+                            player.spellBook.LearnSpell(Spells.fireball); // 3
+                            break;
+
+                        case 6:
+                            player.spellBook.LearnSpell(Spells.invisibility); // 2
+                            player.spellBook.LearnSpell(Spells.lightning_bolt); // 3
+                            player.spellBook.LearnSpell(Spells.protect_from_normal_missiles); // 3
+                            break;
+
+                        case 7:
+                            player.spellBook.LearnSpell(Spells.friends); // 1
+                            player.spellBook.LearnSpell(Spells.protect_from_evil_MU); // 1
+                            player.spellBook.LearnSpell(Spells.strength); // 2
+                            player.spellBook.LearnSpell(Spells.detect_invisibility); // 2
+                            player.spellBook.LearnSpell(Spells.blink); // 3
+                            player.spellBook.LearnSpell(Spells.haste); // 3
+                            player.spellBook.LearnSpell(Spells.charm_monsters); // 4
+                            break;
+
+                        case 8:
+                            player.spellBook.LearnSpell(Spells.charm_person); // 1
+                            player.spellBook.LearnSpell(Spells.burning_hands); // 1
+                            player.spellBook.LearnSpell(Spells.mirror_image); // 2
+                            player.spellBook.LearnSpell(Spells.slow); // 3
+                            player.spellBook.LearnSpell(Spells.fire_shield); // 4
+                            break;
+
+                        case 9:
+                            player.spellBook.LearnSpell(Spells.invisibility_10_radius); // 3
+                            player.spellBook.LearnSpell(Spells.protect_from_evil_10_rad); // 3
+                            player.spellBook.LearnSpell(Spells.confusion); // 4
+                            player.spellBook.LearnSpell(Spells.minor_globe_of_invuln); // 4
+                            player.spellBook.LearnSpell(Spells.hold_monsters); // 5
                             break;
                     }
                 }

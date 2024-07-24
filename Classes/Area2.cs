@@ -262,7 +262,14 @@ namespace Classes
                     break;
 
                 case 0x624:
-                    game_area = (byte)value;
+                    if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        game_area = (byte)((value + 1) >> 1);
+                    }
+                    else
+                    {
+                        game_area = (byte)value;
+                    }
                     break;
 
                 case 0x6d8:

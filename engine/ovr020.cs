@@ -118,10 +118,10 @@ namespace engine
             {
                 text2 = statShortString[(byte)stat];
                 seg041.displayString(text2, 0, 10, (byte)stat + 7, 1);
-                display_stat(false, stat, cur);
+                display_stat(false, stat, (byte)stat+7, 5, cur);
             }
 
-            displayMoney();
+            displayMoney(7, 12, 8, -6);
             seg041.displayString("Level", 0, 15, 15, 1);
 
             displaySlash = false;
@@ -170,7 +170,7 @@ namespace engine
             text = "Exp " + player.exp.ToString();
             seg041.displayString(text, 0, 15, 15, 17);
 
-            ovr020.display_player_stats01();
+            ovr020.display_player_stats01(2, 3, 17, 1, 8, 22, 11, -4);
             int yCol = 20;
 
             if (player.activeItems.primaryWeapon != null)
@@ -192,18 +192,151 @@ namespace engine
             seg041.displayString(statusString[(int)player.health_status], 0, 10, yCol, 8);
         }
 
-        internal static void displayMoney()
+        internal static void playerDisplayFullSecret(Player player, bool cur = false)
         {
-            seg037.draw8x8_clear_area(14, 26, 7, 12);
+            ovr025.displayPlayerName(false, 1, 1, player);
 
-            int yCol = 7;
+            if (player.control_morale >= Control.NPC_Base)
+            {
+                seg041.displayString("(NPC)", 0, 10, 1, player.name.Length + 3);
+            }
+            seg041.displayString("Status:", 0, 15, 1, 20);
+            seg041.displayString(statusString[(int)player.health_status], 0, 10, 1, 27);
+
+            seg041.displayString(sexString[player.sex], 0, 15, 3, 1);
+
+            seg041.displayString(player.age.ToString() + " years", 0, 15, 3, 8);
+            seg041.displayString("Hit Points", 0, 15, 3, 20);
+            seg041.displayString(player.hit_point_current.ToString() + "/" + player.hit_point_max.ToString(), 0, 10, 3, 31);
+
+            seg041.displayString(alignmentString[player.alignment], 0, 15, 4, 1);
+
+            seg041.displayString(raceString[(int)player.race], 0, 15, 4, 20);
+
+            bool displaySlash = false;
+            string text2 = string.Empty;
+
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                byte classLvl = player.ClassLevelsOld[(byte)skill];
+
+                if (classLvl > 0)
+                {
+                    if (displaySlash)
+                    {
+                        text2 += "/";
+                    }
+                    if (classLvl < ovr026.HumanCurrentClassLevel_Zero(player))
+                    {
+                        text2 += classString[(byte)skill];
+                    }
+                    else
+                    {
+                        text2 += "(" + classString[(byte)skill] + ")";
+                    }
+
+                    displaySlash = true;
+                }
+            }
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                byte classLvl = player.ClassLevel[(byte)skill];
+
+                if (classLvl > 0)
+                {
+                    if (displaySlash)
+                    {
+                        text2 += "/";
+                    }
+                    text2 += classString[(byte)skill];
+
+                    displaySlash = true;
+                }
+            }
+
+            seg041.displayString(text2, 0, 15, 5, 1);
+
+            seg041.displayString("Experience:", 0, 15, 6, 24);
+
+            seg041.displayString("Level", 0, 15, 7, 1);
+            seg041.displayString(string.Format("{0,13}", player.exp.ToString("n0")), 0, 10, 7, 20);
+
+            displaySlash = false;
+            text2 = string.Empty;
+
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                byte classLvl = player.ClassLevelsOld[(byte)skill];
+
+                if (classLvl > 0)
+                {
+                    if (displaySlash)
+                    {
+                        text2 += "/";
+                    }
+                    if (classLvl < ovr026.HumanCurrentClassLevel_Zero(player))
+                    {
+                        text2 += classLvl.ToString();
+                    }
+                    else
+                    {
+                        text2 += "(" + classLvl.ToString() + ")";
+                    }
+
+                    displaySlash = true;
+                }
+            }
+            for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
+            {
+                byte classLvl = player.ClassLevel[(byte)skill];
+
+                if (classLvl > 0)
+                {
+                    if (displaySlash)
+                    {
+                        text2 += "/";
+                    }
+                    text2 += classLvl.ToString();
+
+                    displaySlash = true;
+                }
+            }
+
+            seg041.displayString(text2, 0, 15, 7, 7);
+
+            for (Stat stat = Stat.STR; stat <= Stat.CHA; stat++)
+            {
+                text2 = statShortString[(byte)stat];
+                seg041.displayString(text2, 0, 10, (byte)stat + 9, 1);
+                display_stat(false, stat, (byte)stat + 9, 5, cur);
+            }
+
+            displayMoney(9, 20, -8, 9);
+
+            ovr020.display_player_stats01(3, 2, 17, 1, -1, 20, -11, 6);
+
+            if (player.activeItems.primaryWeapon != null)
+            {
+                ovr025.ItemDisplayNameBuild(true, false, 21, 1, player.activeItems.primaryWeapon);
+            }
+
+            if (player.activeItems.armor != null)
+        {
+                ovr025.ItemDisplayNameBuild(true, false, 22, 1, player.activeItems.armor);
+            }
+        }
+
+        internal static void displayMoney(int yCol, int xCol, int align1, int align2)
+        {
+            seg037.draw8x8_clear_area(14, 26, yCol, xCol);
 
             for (int coinType = 6; coinType >= 0; coinType--)
             {
                 if (gbl.SelectedPlayer.Money.GetCoins(coinType) > 0)
                 {
-                    string text = string.Format("{0,8} {1}", Money.names[coinType], gbl.SelectedPlayer.Money.GetCoins(coinType));
-                    seg041.displayString(text, 0, 10, yCol, 12);
+                    string text = string.Format("{0," + align1 + "} {1," + align2 + "}", Money.names[coinType], gbl.SelectedPlayer.Money.GetCoins(coinType));
+
+                    seg041.displayString(text, 0, 10, yCol, xCol);
 
                     yCol++;
                 }
@@ -211,34 +344,41 @@ namespace engine
         }
 
 
-        internal static void display_player_stats01()
+        internal static void display_player_stats01(int rows, int columns, int yCol, int xCol1, int xCol2, int xCol3, int align1, int align2)
         {
             Player player = gbl.SelectedPlayer;
 
             ovr025.reclac_player_values(player);
-            int yCol = 0x11;
-
-            seg041.displayString("AC    ", 0, 15, yCol, 1);
-            seg041.displayString(player.DisplayAc.ToString(), 0, 10, yCol, 4);
-
-            seg041.displayString("HP    ", 0, 15, yCol + 1, 1);
-            ovr025.display_hp(false, yCol + 1, 4, player);
-
-            int xCol = 8;
-
-            seg041.displayString("THAC0   ", 0, 15, yCol, xCol + 1);
-            seg041.displayString((0x3c - player.hitBonus).ToString(), 0, 10, yCol, xCol + 7);
-
 
             string damage = string.Format("{0}d{1}{2}{3}", player.attack1_DiceCount, player.attack1_DiceSize,
                 player.attack1_DamageBonus > 0 ? "+" : "", player.attack1_DamageBonus != 0 ? player.attack1_DamageBonus.ToString() : "");
 
-            seg041.displayString("Damage  ", 0, 15, yCol + 1, xCol);
-            seg041.displayString(damage, 0, 10, yCol + 1, xCol + 7);
+            if (columns == 3)
+            {
+                seg041.displayString("AC ", 0, 15, yCol, xCol1);
+                seg041.displayString(player.DisplayAc.ToString(), 0, 10, yCol, xCol1 + 3);
 
-            xCol = 0x16;
-            seg041.displayString("Encumbrance  ", 0, 15, yCol, xCol);
-            seg041.displayString(player.weight.ToString(), 0, 10, yCol, xCol + 12);
+                seg041.displayString("HP ", 0, 15, yCol + 1, xCol1);
+                ovr025.display_hp(false, yCol + 1, xCol1 + 3, player);
+
+                seg041.displayString("THAC0 ", 0, 15, yCol, xCol2 + 1);
+                seg041.displayString((0x3c - player.hitBonus).ToString(), 0, 10, yCol, xCol2 + 7);
+
+                seg041.displayString("Damage ", 0, 15, yCol + 1, xCol2);
+                seg041.displayString(damage, 0, 10, yCol + 1, xCol2 + 7);
+            }
+            else
+            {
+                seg041.displayString("Armor Class ", 0, 15, yCol, xCol1);
+                seg041.displayString(string.Format("{0,3}", player.DisplayAc), 0, 10, yCol, xCol1 + 14);
+                seg041.displayString("Thac0 ", 0, 15, yCol + 1, xCol1);
+                seg041.displayString(string.Format("{0,3}", 0x3c - player.hitBonus), 0, 10, yCol + 1, xCol1 + 14);
+                seg041.displayString("Damage ", 0, 15, yCol + 2, xCol1);
+                seg041.displayString(string.Format("{0,8}", damage), 0, 10, yCol + 2, xCol1 + 9);
+            }
+
+            seg041.displayString(string.Format("{0," + align1 + "}", "Encumbrance"), 0, 15, yCol, xCol3);
+            seg041.displayString(string.Format("{0," + align2 + "}", player.weight), 0, 10, yCol, xCol3 + 12);
 
             int movement = player.movement;
 
@@ -252,42 +392,42 @@ namespace engine
                 movement *= 2;
             }
 
-            seg041.displayString("Movement ", 0, 15, yCol + 1, xCol + 3);
-            seg041.displayString(movement.ToString(), 0, 10, yCol + 1, xCol + 12);
+            seg041.displayString(string.Format("{0," + align1 + "}", "Movement"), 0, 15, yCol + 1, xCol3);
+            seg041.displayString(string.Format("{0," + align2 + "}", movement), 0, 10, yCol + 1, xCol3 + 12);
         }
 
 
-        internal static void display_stat(bool highlighted, Stat stat, bool cur)
+        internal static void display_stat(bool highlighted, Stat stat, int yCol, int xCol, bool cur)
         {
             int color = highlighted ? 0x0D : 0x0A;
-            int col_x = 5;
-            seg037.draw8x8_clear_area((byte)stat + 7, 0x0b, (byte)stat + 7, col_x);
+            string pad = "";
+            seg037.draw8x8_clear_area((byte)stat + 7, 0x0b, yCol, xCol);
 
             if (cur)
             {
                 if (gbl.SelectedPlayer.stats2[(byte)stat].cur < 10)
                 {
-                    col_x++;
+                    pad = " ";
                 }
             }
             else
             {
                 if (gbl.SelectedPlayer.stats2[(byte)stat].full < 10)
                 {
-                    col_x++;
+                    pad = " ";
                 }
             }
 
             string s;
             if (cur)
             {
-                s = gbl.SelectedPlayer.stats2[(byte)stat].cur.ToString();
+                s = pad + gbl.SelectedPlayer.stats2[(byte)stat].cur.ToString();
             }
             else
             {
-                s = gbl.SelectedPlayer.stats2[(byte)stat].full.ToString();
+                s = pad + gbl.SelectedPlayer.stats2[(byte)stat].full.ToString();
             }
-            seg041.displayString(s, 0, color, (byte)stat + 7, col_x);
+            seg041.displayString(s, 0, color, yCol, xCol);
 
             if (cur)
             {
@@ -307,7 +447,7 @@ namespace engine
                         text = "00";
                     }
 
-                    seg041.displayString("(" + text + ")", 0, color, 7, 7);
+                    seg041.displayString("(" + text + ")", 0, color, yCol, xCol+2);
                 }
             }
             else
@@ -328,7 +468,7 @@ namespace engine
                         text = "00";
                     }
 
-                    seg041.displayString("(" + text + ")", 0, color, 7, 7);
+                    seg041.displayString("(" + text + ")", 0, color, yCol, xCol+2);
                 }
             }
         }
@@ -413,7 +553,7 @@ namespace engine
 
                     case 'D':
                         drop_coin();
-                        displayMoney();
+                        displayMoney(7, 12, 8, -9);
                         break;
 
                     case 'H':
@@ -1389,7 +1529,7 @@ namespace engine
                     playerDisplayFull(gbl.SelectedPlayer);
                     do
                     {
-                        displayMoney();
+                        displayMoney(7, 12, 8, -9);
                         gbl.tradeWith = dest;
 
                         List<MenuItem> list = new List<MenuItem>();
@@ -1442,7 +1582,7 @@ namespace engine
 
             do
             {
-                displayMoney();
+                displayMoney(7, 12, 8, -9);
                 List<MenuItem> menuList = new List<MenuItem>();
 
                 for (int coin = 0; coin < 7; coin++)

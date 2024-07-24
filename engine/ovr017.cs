@@ -58,8 +58,8 @@ namespace engine
             }
         }
 
-        static int[] PlayerNameOffset = { 0, 0, 4 };
-        static int[] NpcFileOffset = { 0xf7, 0x84, 0x13 };
+        static int[] PlayerNameOffset = { 0, 0, 4, 0 };
+        static int[] NpcFileOffset = { 0xf7, 0x84, 0x13, 0xff };
 
         internal static void BuildLoadablePlayersLists(out List<MenuItem> fileNames, out List<MenuItem> displayNames) // sub_47465
         {
@@ -78,6 +78,10 @@ namespace engine
             else if (gbl.import_from == ImportSource.Hillsfar)
             {
                 BuildLoadablePlayersLists(ref fileNames, ref  displayNames, HillsFarPlayer.StructSize, NpcFileOffset[2], PlayerNameOffset[2], "*.hil");
+            }
+            else if (gbl.import_from == ImportSource.Secret)
+            {
+                BuildLoadablePlayersLists(ref fileNames, ref displayNames, SecretPlayer.StructSize, NpcFileOffset[3], PlayerNameOffset[3], "*.who");
             }
         }
 
@@ -199,9 +203,13 @@ namespace engine
             {
                 seg051.BlockWrite(PoolRadPlayer.StructSize, new PoolRadPlayer(player).Save(), file);
             }
-            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 seg051.BlockWrite(CursePlayer.StructSize, new CursePlayer(player).Save(), file);
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg051.BlockWrite(SecretPlayer.StructSize, new SecretPlayer(player).Save(), file);
             }
             seg051.Close(file);
 
@@ -219,7 +227,7 @@ namespace engine
                     seg051.Close(file);
                 }
             }
-            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 seg042.delete_file(filePath + ".SWG");
 
@@ -229,6 +237,20 @@ namespace engine
                     seg051.Rewrite(file);
 
                     player.items.ForEach(item => seg051.BlockWrite(CurseItem.StructSize, new CurseItem(item).Save(), file));
+
+                    seg051.Close(file);
+                }
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg042.delete_file(filePath + ".STF");
+
+                if (player.items.Count > 0)
+                {
+                    file.Assign(filePath + ".STF");
+                    seg051.Rewrite(file);
+
+                    player.items.ForEach(item => seg051.BlockWrite(SecretItem.StructSize, new SecretItem(item).Save(), file));
 
                     seg051.Close(file);
                 }
@@ -269,7 +291,7 @@ namespace engine
                     seg051.Close(file);
                 }
             }
-            else /* if (gbl.game == Game.CurseOfTheAzureBonds) */
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 seg042.delete_file(filePath + ".FX");
 
@@ -281,6 +303,23 @@ namespace engine
                     foreach (Affect affect in player.affects)
                     {
                         seg051.BlockWrite(Affect.StructSize, new CurseAffect(affect, player).Save(), file);
+                    }
+
+                    seg051.Close(file);
+                }
+            }
+            else //if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg042.delete_file(filePath + ".SFX");
+
+                if (player.affects.Count > 0)
+                {
+                    file.Assign(filePath + ".SFX");
+                    seg051.Rewrite(file);
+
+                    foreach (Affect affect in player.affects)
+                    {
+                        seg051.BlockWrite(Affect.StructSize, new SecretAffect(affect, player).Save(), file);
                     }
 
                     seg051.Close(file);
@@ -461,10 +500,18 @@ namespace engine
 
                 var_1C4 = null;
             }
+            else if (gbl.import_from == ImportSource.Secret)
+            {
+                byte[] data = new byte[SecretPlayer.StructSize];
+                seg051.BlockRead(SecretPlayer.StructSize, data, file);
+                seg051.Close(file);
 
+                player = new SecretPlayer(data, 0).Load();
+            }
 
             if ((gbl.game == Game.PoolOfRadiance && gbl.import_from == ImportSource.Pool) ||
-                (gbl.game == Game.CurseOfTheAzureBonds && gbl.import_from == ImportSource.Curse))
+                (gbl.game == Game.CurseOfTheAzureBonds && gbl.import_from == ImportSource.Curse) ||
+                (gbl.game == Game.SecretOfTheSilverBlades && gbl.import_from == ImportSource.Secret))
             {
                 arg_8 = System.IO.Path.GetFileNameWithoutExtension(arg_8);
             }
@@ -478,10 +525,13 @@ namespace engine
             {
                 filename = Path.Combine(Config.GetSavePath(gbl.game), arg_8 + ".itm");
             }
-            else // if (gbl.game == Game.CurseOfTheAzureBonds)
-                filename = Path.Combine(Config.GetSavePath(gbl.game), arg_8 + ".swg");
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 filename = Path.Combine(Config.GetSavePath(gbl.game), arg_8 + ".swg");
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                filename = Path.Combine(Config.GetSavePath(gbl.game), arg_8 + ".stf");
             }
             if (seg042.file_find(filename) == true)
             {
@@ -501,8 +551,8 @@ namespace engine
                             break;
                         }
                     }
-                        else if (gbl.game == Game.CurseOfTheAzureBonds)
-                        {
+                    else if (gbl.game == Game.CurseOfTheAzureBonds)
+                    {
                         byte[] data = new byte[CurseItem.StructSize];
                         if (seg051.BlockRead(CurseItem.StructSize, data, file) == CurseItem.StructSize)
                         {
@@ -511,6 +561,19 @@ namespace engine
                         else
                         {
                             break;
+                        }
+                    }
+                    else if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        byte[] data = new byte[SecretItem.StructSize];
+                        if (seg051.BlockRead(SecretItem.StructSize, data, file) == SecretItem.StructSize)
+                        {
+                            player.items.Add(new SecretItem(data, 0).Load());
+                        }
+                        else
+                        {
+                            break;
+                        }
                     }
                     else
                     {
@@ -532,6 +595,27 @@ namespace engine
                     if (seg051.BlockRead(CurseAffect.StructSize, data, file) == Affect.StructSize)
                     {
                         new CurseAffect(data, 0).Load(player);
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                seg051.Close(file);
+            }
+
+            filename = Path.Combine(Config.GetSavePath(gbl.game), arg_8 + ".sfx");
+            if (seg042.file_find(filename) == true)
+            {
+                byte[] data = new byte[SecretAffect.StructSize];
+                seg042.find_and_open_file(out file, false, filename);
+
+                while (true)
+                {
+                    if (seg051.BlockRead(SecretAffect.StructSize, data, file) == Affect.StructSize)
+                    {
+                        new SecretAffect(data, 0).Load(player);
                     }
                     else
                     {
@@ -820,9 +904,13 @@ namespace engine
             {
                 player = new PoolRadPlayer(data).Load();
             }
-            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 player = new CursePlayer(data, 0).Load();
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                player = new SecretPlayer(data, 0).Load();
             }
 
             seg042.load_decode_dax(out data, out decode_size, monster_id, "MON" + area_text + "SPC.dax");
@@ -876,7 +964,6 @@ namespace engine
 
                 if (gbl.game == Game.PoolOfRadiance)
                 {
-
                     if (player.icon_size == 0)
                     {
                         player.icon_size = 2;
@@ -941,9 +1028,13 @@ namespace engine
             {
                 gbl.import_from = ImportSource.Pool;
             }
-            else // if (gbl.game == Game.CurseOfTheAzureBonds)
+            else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 gbl.import_from = ImportSource.Curse;
+            }
+            else // if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                gbl.import_from = ImportSource.Secret;
             }
 
             string games_list = string.Empty;
@@ -1012,8 +1103,11 @@ namespace engine
             seg051.BlockRead(0x400, data, file);
             gbl.stru_1B2CA = new Struct_1B2CA(data, 0);
 
-            seg051.BlockRead(0x1E00, data, file);
-            gbl.ecl_ptr = new EclBlock(data, 0);
+            if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+            {
+                seg051.BlockRead(0x1E00, data, file);
+                gbl.ecl_ptr = new EclBlock(data, 0);
+            }
 
             seg051.BlockRead(5, data, file);
             gbl.mapPosX = (sbyte)data[0];
@@ -1036,7 +1130,7 @@ namespace engine
                 gbl.game_state = GameState.DungeonMap;
             }
 
-            if (gbl.game == Game.CurseOfTheAzureBonds)
+            if (gbl.game == Game.CurseOfTheAzureBonds || gbl.game == Game.SecretOfTheSilverBlades)
             {
                 for (int i = 0; i < 3; i++)
                 {
@@ -1110,7 +1204,7 @@ namespace engine
 
             if (gbl.area_ptr.inDungeon != 0)
             {
-                if (gbl.game_state != GameState.StartGameMenu && gbl.game == Game.CurseOfTheAzureBonds)
+                if (gbl.game_state != GameState.StartGameMenu && (gbl.game == Game.CurseOfTheAzureBonds || gbl.game == Game.SecretOfTheSilverBlades))
                 {
                     if (gbl.setBlocks[0].blockId > 0)
                     {
@@ -1134,7 +1228,7 @@ namespace engine
             seg043.clear_keyboard();
             ovr027.ClearPromptArea();
 
-            if (gbl.game == Game.CurseOfTheAzureBonds)
+            if (gbl.game == Game.CurseOfTheAzureBonds || gbl.game == Game.SecretOfTheSilverBlades)
             {
                 gbl.last_game_state = gbl.game_state;
 
@@ -1190,7 +1284,10 @@ namespace engine
                 seg051.BlockWrite(0x800, gbl.area_ptr.ToByteArray(), save_file);
                 seg051.BlockWrite(0x800, gbl.area2_ptr.ToByteArray(), save_file);
                 seg051.BlockWrite(0x400, gbl.stru_1B2CA.ToByteArray(), save_file);
-                seg051.BlockWrite(0x1E00, gbl.ecl_ptr.ToByteArray(), save_file);
+                if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
+                {
+                    seg051.BlockWrite(0x1E00, gbl.ecl_ptr.ToByteArray(), save_file);
+                }
 
                 data[0] = (byte)gbl.mapPosX;
                 data[1] = (byte)gbl.mapPosY;
@@ -1212,7 +1309,7 @@ namespace engine
                 }
                 seg051.BlockWrite(1, data, save_file);
 
-                if (gbl.game == Game.CurseOfTheAzureBonds)
+                if (gbl.game == Game.CurseOfTheAzureBonds || gbl.game == Game.SecretOfTheSilverBlades)
                 {
                     for (int i = 0; i < 3; i++)
                     {
