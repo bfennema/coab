@@ -214,7 +214,7 @@ namespace engine
                     file.Assign(filePath + ".ITM");
                     seg051.Rewrite(file);
 
-                    player.items.ForEach(item => seg051.BlockWrite(Item.StructSize, new PoolRadItem(item).Save(player, poolrad_affects), file));
+                    player.items.ForEach(item => seg051.BlockWrite(PoolRadItem.StructSize, new PoolRadItem(item).Save(player, poolrad_affects), file));
 
                     seg051.Close(file);
                 }
@@ -485,18 +485,22 @@ namespace engine
             }
             if (seg042.file_find(filename) == true)
             {
-                byte[] data = new byte[Item.StructSize];
-
                 seg042.find_and_open_file(out file, false, filename);
 
                 while (true)
                 {
-                    if (seg051.BlockRead(Item.StructSize, data, file) == Item.StructSize)
+                    if (gbl.game == Game.PoolOfRadiance)
                     {
-                        if (gbl.game == Game.PoolOfRadiance)
+                        byte[] data = new byte[PoolRadItem.StructSize];
+                        if (seg051.BlockRead(PoolRadItem.StructSize, data, file) == PoolRadItem.StructSize)
                         {
                             player.items.Add(new PoolRadItem(data, 0).Load());
                         }
+                        else
+                        {
+                            break;
+                        }
+                    }
                         else if (gbl.game == Game.CurseOfTheAzureBonds)
                         {
                             player.items.Add(new CurseItem(data, 0).Load());
@@ -537,12 +541,12 @@ namespace engine
             {
                 if (seg042.file_find(filename) == true)
                 {
-                    byte[] data = new byte[Affect.StructSize];
+                    byte[] data = new byte[PoolRadAffect.StructSize];
                     seg042.find_and_open_file(out file, false, filename);
 
                     while (true)
                     {
-                        if (seg051.BlockRead(Affect.StructSize, data, file) == Affect.StructSize)
+                        if (seg051.BlockRead(PoolRadAffect.StructSize, data, file) == Affect.StructSize)
                         {
                             new PoolRadAffect(data, 0).Load(player);
                         }
@@ -1190,7 +1194,7 @@ namespace engine
                 seg051.BlockWrite(5, data, save_file);
 
                 data[0] = (byte)gbl.last_game_state;
-                if (gbl.game == Game.PoolOfRadiance && gbl.last_game_state == GameState.DungeonMap)
+                if (gbl.game == Game.PoolOfRadiance && gbl.last_game_state != GameState.WildernessMap)
                 {
                     data[0] = (byte)GameState.Shop;
                 }

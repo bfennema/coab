@@ -273,7 +273,7 @@ namespace engine
                             if (menuFlags[allow_begin] == true)
                             {
                                 if ((gbl.TeamList.Count > 0 && gbl.inDemo == true) ||
-                                    (gbl.game == Game.PoolOfRadiance && gbl.area_ptr.field_3FA == 1) ||
+                                    (gbl.game == Game.PoolOfRadiance) ||
                                     (gbl.game == Game.CurseOfTheAzureBonds && gbl.area_ptr.field_3FA == 0) ||
                                     gbl.inDemo == true)
                                 {
