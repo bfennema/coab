@@ -22,7 +22,22 @@ namespace Main.Properties {
                 return defaultInstance;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AllowPlayerModify
+        {
+            get
+            {
+                return ((bool)(this["AllowPlayerModify"]));
+            }
+            set
+            {
+                this["AllowPlayerModify"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
@@ -200,18 +215,6 @@ namespace Main.Properties {
             }
             set {
                 this["AnimationOn"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool AllowPlayerModify {
-            get {
-                return ((bool)(this["AllowPlayerModify"]));
-            }
-            set {
-                this["AllowPlayerModify"] = value;
             }
         }
         
