@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:logging="clr-namespace:Logging;assembly=Logging"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="clr-namespace:GoldBoxPlayer.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="400"
+             x:Class="GoldBoxPlayer.Views.MainView"
+             x:Name="MainViewUserControl"
+             Background="Black"
+             Focusable="true"
+             x:DataType="vm:MainViewModel">
+  <Design.DataContext>
+    <!-- This only sets the DataContext for the previewer in an IDE,
+         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainViewModel />
+  </Design.DataContext>
+  <UserControl.ContextMenu>
+    <ContextMenu>
+      <MenuItem Header="Games">
+        <MenuItem x:Name="PoolRadMenu"
+                  Header="Pool of Radiance"
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.PoolOfRadiance}">
+          <MenuItem Header="{Binding PoolRadData}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="PoolRadData"/>
+          <MenuItem Header="{Binding PoolRadSave}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="PoolRadSave"/>
+        </MenuItem>
+        <MenuItem x:Name="CurseMenu"
+                  Header="Curse of the Azure Bonds"
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.CurseOfTheAzureBonds}">
+          <MenuItem Header="{Binding CurseData}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="CurseData"/>
+          <MenuItem Header="{Binding CurseSave}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="CurseSave"/>
+        </MenuItem>
+        <MenuItem x:Name="SecretMenu"
+                  Header="Secret of the Silver Blades"
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.SecretOfTheSilverBlades}">
+          <MenuItem Header="{Binding SecretData}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="SecretData"/>
+          <MenuItem Header="{Binding SecretSave}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="SecretSave"/>
+        </MenuItem>
+      </MenuItem>
+      <MenuItem Header="Paste"/>
+    </ContextMenu>
+  </UserControl.ContextMenu>
+  <Canvas
+    x:Name="MainViewCanvas"
+    Background="Black">
+    <Image
+      x:Name="MainViewImage"
+      Source="{Binding MainViewBitmap}"
+      Stretch="Uniform"/>
+  </Canvas>
+</UserControl>
