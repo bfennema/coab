@@ -233,10 +233,10 @@ public class MainViewModel : ViewModelBase
     }
     public string SecretData
     {
-        get => "Data - " + (_SecretData != null ? _CurseData.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+        get => "Data - " + (_SecretData != null ? _SecretData.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
     }
     public string SecretSave
     {
-        get => "Save - " + (_SecretSave != null ? _CurseSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+        get => "Save - " + (_SecretSave != null ? _SecretSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
     }
 }

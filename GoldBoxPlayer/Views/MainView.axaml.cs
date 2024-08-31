@@ -1,31 +1,93 @@
-﻿using Avalonia.Controls;
+﻿using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Input;
+using Avalonia.Input.TextInput;
+using Avalonia.Interactivity;
 using Avalonia.Media;
 using GoldBoxPlayer.ViewModels;
+using static Logging.Config;
 
 namespace GoldBoxPlayer.Views;
 
 public partial class MainView : UserControl
 {
+    private readonly TextInputMethodClient _imClient = new();
     public MainView()
     {
         InitializeComponent();
+
+        TextInputMethodClientRequestedEvent.AddClassHandler<MainView>((uc, e) =>
+        {
+            if (!uc.IsReadOnly)
+            {
+                e.Client = uc._imClient;
+            }
+        });
 
         MainViewUserControl.SizeChanged += Control_SizeChanged;
         //MainViewCanvas.Focusable = true;
         //canvas.SizeChanged += Canvas_SizeChanged;
         //canvas.PointerPressed += Canvas_PointerPressed;
         MainViewUserControl.KeyDown += Canvas_KeyDown;
+        //MainViewUserControl.Focus();
         //canvas.KeyUp += Canvas_KeyUp;
         //MainViewCanvas.PointerEntered += Canvas_PointerEntered;
         //canvas.PointerExited += Canvas_PointerExited;
         //MainViewCanvas.Focusable = true;
         //canvas.Focus();
         //MainViewCanvas.SizeChanged += Canvas_SizeChanged;
+        //InputControl.Focus();
+        MainViewImage.KeyDown += Canvas_KeyDown;
 
         PoolRadMenu.PointerPressed += Menu_PointerPressed;
         CurseMenu.PointerPressed += Menu_PointerPressed;
         SecretMenu.PointerPressed += Menu_PointerPressed;
+
+        //var keyboard = Avalonia.Input.KeyboardDevice.Instance;
+        //var input = Avalonia.Input.InputManager.Instance;
+        //var keyboard = Avalonia.AvaloniaLocator.Current.GetService<IKeyboardDevice>() as KeyboardDevice;
+        //var focusManager = TopLevel.GetTopLevel(this).FocusManager;
+    }
+
+    protected override void OnLoaded(RoutedEventArgs e)
+    {
+        base.OnLoaded(e);
+
+        var insetsManager = TopLevel.GetTopLevel(this)?.InsetsManager;
+
+        if (insetsManager != null)
+        {
+            insetsManager.DisplayEdgeToEdge = true;
+            insetsManager.IsSystemBarVisible = false;
+        }
+
+        var inputPane = TopLevel.GetTopLevel(this)?.InputPane;
+
+        //Avalonia.Input.KeyboardDevice.
+        //Avalonia.Interactivity.Interactive.
+
+        if (inputPane != null)
+        {
+            //inputPane.Try
+        }
+
+        var focusManager = TopLevel.GetTopLevel(this)?.FocusManager;
+
+        if (focusManager != null)
+        {
+        }
+
+        //InputManager.
+
+        var platformSettings = TopLevel.GetTopLevel(this)?.PlatformSettings;
+
+        if (platformSettings != null)
+        {
+        }
+        //MainViewImage.Focus();
+        MainViewUserControl.Focus();
+        //InputControl.Focus();
+
     }
 
     private void Menu_PointerPressed(object? sender, PointerEventArgs e)
@@ -40,13 +102,52 @@ public partial class MainView : UserControl
             }
         }
     }
+    /*
     private void Canvas_PointerEntered(object? sender, PointerEventArgs e)
     {
         MainViewCanvas.Focus();
         MainViewCanvas.PointerEntered -= Canvas_PointerEntered;
         //(DataContext as MainViewModel).SetImage(this.FindControl<Image>("MainViewImage"));
     }
+    */
+    private void InputControl_PointerEntered(object? sender, PointerEventArgs e)
+    {
+        //InputControl.Focus();
+    }
+    private void InputControl_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        //MainViewImage.Focus();
+        //InputControl.Focus();
+    }
 
+    /*
+    private void InputControl_TextChanged(object? sender, TextChangedEventArgs e)
+    {
+        var text = InputControl.Text.ToString();
+        if (text.Length > 0)
+        {
+            ushort key = text[0];
+            if (key == '[')
+                engine.seg049.AddKey(0x4700);
+            else if (key == ']')
+                engine.seg049.AddKey(0x4F00);
+            else
+                engine.seg049.AddKey(key);
+        }
+        else
+        {
+            InputControl.Focus();
+        }
+
+        InputControl.Text = "";
+    }
+    */
+    private void InputControl_KeyUp(object? sender, KeyEventArgs e)
+    {
+        MainViewImage.Focus();
+        engine.seg049.AddKey(KeyToIBMKey(e.Key));
+        //InputControl.Focus();
+    }
     private void Canvas_KeyDown(object? sender, KeyEventArgs e)
     {
          engine.seg049.AddKey(KeyToIBMKey(e.Key));
@@ -176,10 +277,22 @@ public partial class MainView : UserControl
             }
             int height = (int)(200 * scale);
             int width = (int)(320 * scale);
-            MainViewCanvas.Width = width;
-            MainViewCanvas.Height = height;
+            //MainViewCanvas.Width = width;
+            //MainViewCanvas.Height = height;
             MainViewImage.Width = width;
             MainViewImage.Height = height;
+        }
+    }
+    public void ClickHandler(object sender, RoutedEventArgs args)
+    {
+        Button button = sender as Button;
+        if (button.Content.ToString() == "_")
+        {
+            engine.seg049.AddKey(0x20);
+        }
+        else
+        {
+            engine.seg049.AddKey((ushort)(button.Content.ToString()[0] - 'A' + 'a'));
         }
     }
 }

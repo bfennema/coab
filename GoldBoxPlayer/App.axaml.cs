@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Drawing;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
+using Classes;
 using GoldBoxPlayer.Services;
 using GoldBoxPlayer.ViewModels;
 using GoldBoxPlayer.Views;
@@ -49,6 +52,9 @@ public partial class App : Application
             model.LoadConfigs(TopLevel.GetTopLevel(singleViewPlatform.MainView));
             model.SetImage(singleViewPlatform.MainView.GetControl<Image>("MainViewImage"));
             Classes.gbl.StorageProvider = TopLevel.GetTopLevel(singleViewPlatform.MainView).StorageProvider;
+            //var insetsManager = TopLevel.GetTopLevel(singleViewPlatform.MainView).InsetsManager;
+            //insetsManager.IsSystemBarVisible = false;
+            //insetsManager.DisplayEdgeToEdge = true;
         }
         else
         {

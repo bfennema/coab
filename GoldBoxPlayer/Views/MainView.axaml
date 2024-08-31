@@ -4,11 +4,14 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:GoldBoxPlayer.ViewModels"
-             mc:Ignorable="d" d:DesignWidth="640" d:DesignHeight="400"
+             mc:Ignorable="d"
+             d:DesignWidth="640"
+             d:DesignHeight="400"
              x:Class="GoldBoxPlayer.Views.MainView"
              x:Name="MainViewUserControl"
-             Background="Black"
+             InputMethod.IsInputMethodEnabled="true"
              Focusable="true"
+             Background="Black"
              x:DataType="vm:MainViewModel">
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
@@ -61,12 +64,50 @@
       <MenuItem Header="Paste"/>
     </ContextMenu>
   </UserControl.ContextMenu>
-  <Canvas
-    x:Name="MainViewCanvas"
-    Background="Black">
-    <Image
-      x:Name="MainViewImage"
-      Source="{Binding MainViewBitmap}"
-      Stretch="Uniform"/>
-  </Canvas>
+  <Grid ColumnDefinitions="*" RowDefinitions="*">
+    <!--
+    <TextBox x:Name="InputControl"
+             Grid.Column="0"
+             Grid.Row="0"
+             PointerEntered="InputControl_PointerEntered"
+             PointerPressed="InputControl_PointerPressed"
+             InputMethod.IsInputMethodEnabled="false"
+             TextChanged="InputControl_TextChanged"
+             KeyUp="InputControl_KeyUp"/> -->
+    <Image x:Name="MainViewImage"
+           Grid.Column="0"
+           Grid.Row="0"
+           PointerEntered="InputControl_PointerEntered"
+           PointerPressed="InputControl_PointerPressed"
+           InputMethod.IsInputMethodEnabled="true"
+           KeyUp="InputControl_KeyUp"
+           Source="{Binding MainViewBitmap}"
+           Stretch="Uniform"/>
+  </Grid>
+  <!--
+  
+  <Grid ColumnDefinitions="*,11*" RowDefinitions="*,*,*,*,*,*">
+    <Button HorizontalContentAlignment="Center"
+            FontSize="40"
+            Width="55"
+            Grid.Column="0"
+            Grid.Row="0"
+            Click="ClickHandler"
+            Content="A"/>
+    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="1" Click="ClickHandler" Content="C"/>
+    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="2" Click="ClickHandler" Content="E"/>
+    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="3" Click="ClickHandler" Content="L"/>
+    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="4" Click="ClickHandler" Content="P"/>
+    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="5" Click="ClickHandler" Content="_"/>
+    <Canvas Grid.Column="1"
+            Grid.RowSpan="6"
+            x:Name="MainViewCanvas"
+            Background="Black">
+      <Image 
+        x:Name="MainViewImage"
+        Source="{Binding MainViewBitmap}"
+        Stretch="Uniform"/>
+    </Canvas>
+  </Grid>
+  -->
 </UserControl>
