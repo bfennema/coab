@@ -12,21 +12,14 @@ namespace Classes
 
         public Area2()
         {
-            constructorInit();
+            origData = new byte[Area2Size];
         }
 
-        public Area2(byte[] data, int offset)
+        public Area2(byte[] data, int offset) : this()
         {
-            constructorInit();
-
             DataIO.ReadObject(this, data, offset);
 
             System.Array.Copy(data, offset, origData, 0, Area2Size);
-        }
-
-        private void constructorInit()
-        {
-            origData = new byte[Area2Size];
         }
 
         public void Clear()

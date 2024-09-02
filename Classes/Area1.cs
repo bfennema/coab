@@ -11,22 +11,15 @@ namespace Classes
 
         public Area1()
         {
-            constructorInit();
+            field_200 = new short[33];
+            origData = new byte[Area1Size];
         }
 
-        public Area1(byte[] data, int offset)
+        public Area1(byte[] data, int offset) : this()
         {
-            constructorInit();
-
             DataIO.ReadObject(this, data, offset);
 
             System.Array.Copy(data, offset, origData, 0, Area1Size);
-        }
-
-        private void constructorInit()
-        {
-            field_200 = new short[33];
-            origData = new byte[Area1Size];
         }
 
         public void Clear()
