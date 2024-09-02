@@ -112,11 +112,19 @@ namespace engine
         }
 
 
-        internal static void load_decode_dax(out byte[] out_data, out ushort decodeSize, int block_id, string file_name)
+        internal static void load_decode_dax(out byte[] out_data, out ushort decodeSize, int block_id, string filename, byte filenum)
         {
             seg044.PlaySound(Sound.sound_0);
 
-            out_data = Classes.DaxFiles.DaxCache.LoadDax(file_name.ToLower(), block_id);
+            out_data = Classes.DaxFiles.DaxCache.LoadDax(filename, filenum, block_id);
+            decodeSize = out_data == null ? (ushort)0 : (ushort)out_data.Length;
+        }
+
+        internal static void load_decode_dax(out byte[] out_data, out ushort decodeSize, int block_id, string filename)
+        {
+            seg044.PlaySound(Sound.sound_0);
+
+            out_data = Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
             decodeSize = out_data == null ? (ushort)0 : (ushort)out_data.Length;
         }
 

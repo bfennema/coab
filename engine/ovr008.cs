@@ -142,7 +142,7 @@ namespace engine
                 ovr027.ClearPromptArea();
                 seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-                seg042.load_decode_dax(out block_mem, out block_size, block_id, string.Format("ECL{0}.dax", gbl.game_area));
+                seg042.load_decode_dax(out block_mem, out block_size, block_id, "ECL", gbl.GameArea);
             } while (block_size < 2);
 
             gbl.ecl_ptr.SetData(block_mem, 2, block_size - 2);
@@ -229,7 +229,7 @@ namespace engine
 
                     if (gbl.area_ptr.inDungeon != 0)
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 1, sprite_block_id, "SPRIT" + gbl.game_area.ToString());
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 1, sprite_block_id, "SPRIT", gbl.GameArea);
                         flags[0] = true;
                         gbl.displayPlayerSprite = true;
                     }
@@ -257,7 +257,7 @@ namespace engine
                     gbl.spriteChanged = true;
                     if (gbl.area2_ptr.HeadBlockId == 0xff)
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, pic_block_id, "PIC" + gbl.game_area.ToString());
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, pic_block_id, "PIC", gbl.GameArea);
                         flags[1] = true;
 
                         ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);

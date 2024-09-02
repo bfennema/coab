@@ -32,9 +32,9 @@ namespace engine
         }
 
 
-        internal static void load_pic_final(ref DaxArray daxArray, byte masked, byte block_id, string file_name)
+        internal static void load_pic_final(ref DaxArray daxArray, byte masked, byte block_id, string filename, byte filenum)
         {
-            if (file_name != gbl.lastDaxFile ||
+            if (filename != gbl.lastDaxFile ||
                 block_id != gbl.lastDaxBlockId)
             {
                 if (block_id != 0xff)
@@ -47,15 +47,15 @@ namespace engine
 
                     DaxArrayFreeDaxBlocks(daxArray);
 
-                    gbl.lastDaxFile = file_name;
+                    gbl.lastDaxFile = filename;
                     gbl.lastDaxBlockId = block_id;
 
-                    bool is_pic_or_final = (file_name == "PIC" || file_name == "FINAL");
+                    bool is_pic_or_final = (filename == "PIC" || filename == "FINAL");
 
                     ushort uncompressed_size;
                     byte[] uncompressed_data;
 
-                    seg042.load_decode_dax(out uncompressed_data, out uncompressed_size, block_id, file_name + ".dax");
+                    seg042.load_decode_dax(out uncompressed_data, out uncompressed_size, block_id, filename, filenum);
 
                     if (uncompressed_size == 0)
                     {
@@ -170,7 +170,7 @@ namespace engine
             if (head_id != 0xff &&
                 (gbl.current_head_id == 0xff || gbl.current_head_id != head_id))
             {
-                gbl.headX_dax = seg040.LoadDax(0, 0, head_id, "HEAD" + area.ToString());
+                gbl.headX_dax = seg040.LoadDax(0, 0, head_id, "HEAD", area);
 
                 if (gbl.headX_dax == null)
                 {
@@ -183,7 +183,7 @@ namespace engine
             if (body_id != 0xff &&
                 (gbl.current_body_id == 0xff || gbl.current_body_id != body_id))
             {
-                gbl.bodyX_dax = seg040.LoadDax(0, 0, body_id, "BODY" + area.ToString());
+                gbl.bodyX_dax = seg040.LoadDax(0, 0, body_id, "BODY", area);
                 if (gbl.bodyX_dax == null)
                 {
                     seg041.DisplayAndPause("body not found", 14);
@@ -236,7 +236,7 @@ namespace engine
 
             if (gbl.bigpic_block_id != block_id)
             {
-                gbl.bigpic_dax = seg040.LoadDax(0, 0, block_id, "bigpic" + gbl.game_area.ToString());
+                gbl.bigpic_dax = seg040.LoadDax(0, 0, block_id, "BIGPIC", gbl.GameArea);
                 gbl.bigpic_block_id = block_id;
             }
         }

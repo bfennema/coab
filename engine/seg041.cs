@@ -29,11 +29,11 @@ namespace engine
 
             if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
             {
-                seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8d1.dax");
+                seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8D1");
             }
             else // if (gbl.game == Game.SecretOfTheSilverBlades)
             {
-                seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8d5.dax");
+                seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8D5");
             }
 
             if (block_size != 0)

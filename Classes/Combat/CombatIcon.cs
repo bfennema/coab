@@ -28,20 +28,20 @@ namespace Classes.Combat
             attack_f = null;
         }
 
-        private static DaxBlock LoadIconHelper(int maskColor, int masked, int block_id, string file_text)
+        private static DaxBlock LoadIconHelper(int maskColor, int masked, int block_id, string filename)
         {
-            var data = Classes.DaxFiles.DaxCache.LoadDax(file_text + ".dax", block_id);
+            var data = Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
             return new DaxBlock(data, masked, maskColor);
         }
 
 
-        public void LoadIcons(int maskColor, int masked, string file_text, int normal_id, int attack_id)
+        public void LoadIcons(int maskColor, int masked, string filename, int normal_id, int attack_id)
         {
-            normal = LoadIconHelper(maskColor, masked, normal_id, file_text);
-            normal_f = LoadIconHelper(maskColor, masked, normal_id, file_text);
+            normal = LoadIconHelper(maskColor, masked, normal_id, filename);
+            normal_f = LoadIconHelper(maskColor, masked, normal_id, filename);
             normal_f.FlipIconLeftToRight();
-            attack = LoadIconHelper(maskColor, masked, attack_id, file_text);
-            attack_f = LoadIconHelper(maskColor, masked, attack_id, file_text);
+            attack = LoadIconHelper(maskColor, masked, attack_id, filename);
+            attack_f = LoadIconHelper(maskColor, masked, attack_id, filename);
             attack_f.FlipIconLeftToRight();
         }
 

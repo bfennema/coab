@@ -1444,11 +1444,11 @@ namespace engine
 					seg037.DrawFrame_Dungeon();
 					if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
 					{
-						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 29, "PIC" + gbl.game_area.ToString());
+						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 29, "PIC", gbl.GameArea);
 					}
 					else //if (gbl.game == Game.SecretOfTheSilverBlades)
 					{
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, 59, "PIC4");
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, 59, "PIC", gbl.GameArea);
                     }
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
@@ -1481,11 +1481,11 @@ namespace engine
 					seg037.DrawFrame_Dungeon();
 					if (gbl.game == Game.PoolOfRadiance || gbl.game == Game.CurseOfTheAzureBonds)
 					{
-						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 1, "PIC");
+						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 1, "PIC", gbl.GameArea);
 					}
 					else
 					{
-						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 60, "PIC4");
+						ovr030.load_pic_final(ref gbl.byte_1D556, 0, 60, "PIC", gbl.GameArea);
 					}
 					PartySummary(gbl.SelectedPlayer);
 					break;

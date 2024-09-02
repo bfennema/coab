@@ -337,7 +337,7 @@ namespace engine
                     }
                     else
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, blockId, "PIC" + gbl.game_area.ToString());
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, blockId, "PIC", gbl.GameArea);
                         ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
                     }
                 }
@@ -1112,12 +1112,11 @@ namespace engine
 
             if (block_id < 0x80)
             {
-                string filename = string.Format("ITEM{0}.dax", gbl.game_area);
-                seg042.load_decode_dax(out data, out dataSize, block_id, filename);
+                seg042.load_decode_dax(out data, out dataSize, block_id, "ITEM", gbl.GameArea);
 
                 if (dataSize == 0)
                 {
-                    Logger.LogAndExit("Unable to find item file: {0}", filename);
+                    Logger.LogAndExit("Unable to find item file: {0}{1}", "ITEM", gbl.GameArea);
                 }
 
                 for (int offset = 0; offset < dataSize; offset += Item.StructSize)

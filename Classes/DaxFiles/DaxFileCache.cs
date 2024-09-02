@@ -1,35 +1,49 @@
 ﻿using Logging;
 using System.Collections.Generic;
-using System.IO;
 
 namespace Classes.DaxFiles
 {
     class DaxFileCache
     {
         Dictionary<int, byte[]> entries;
+        List<string> files;
 
-        internal DaxFileCache(string filename)
+        internal DaxFileCache(string filename, string filenum)
         {
             entries = new Dictionary<int, byte[]>();
+            files = new List<string>();
 
-            LoadFile(filename);
+            LoadFile(filename, filenum);
+            files.Add(filenum);
+        }
+        internal DaxFileCache(string filename, byte filenum) : this(filename, filenum.ToString()) { }
+
+        public bool Add(string filename, string filenum)
+        {
+            if (files.Contains(filenum))
+            {
+                return false;
+            }
+            else
+            {
+                LoadFile(filename, filenum);
+                files.Add(filenum);
+                return true;
+            }
+        }
+        public bool Add(string filename, byte filenum) {
+            return Add(filename, filenum.ToString());
         }
 
-        private void LoadFile(string fileName)
+        private async void LoadFile(string filename, string filenum)
         {
-            int dataOffset = 0;
-            string filePath = Path.Combine(Config.GetDataPath(gbl.game), fileName);
-
-            if (System.IO.File.Exists(filePath) == false)
-            {
-                filePath = Path.Combine(Path.Combine(gbl.exe_path, "Data"), fileName);
-            }
-
+            string name = string.Format("{0}{1}.DAX", filename, filenum);
+            var path = Config.GetDataPath(gbl.game);
             System.IO.BinaryReader fileA;
 
             try
             {
-                System.IO.FileStream fsA = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+                var fsA = await gbl.file.Open(path, name);
 
                 fileA = new System.IO.BinaryReader(fsA);
             }
@@ -38,7 +52,7 @@ namespace Classes.DaxFiles
                 return;
             }
 
-            dataOffset = fileA.ReadInt16() + 2;
+            int dataOffset = fileA.ReadInt16() + 2;
 
             List<DaxHeaderEntry> headers = new List<DaxHeaderEntry>();
 

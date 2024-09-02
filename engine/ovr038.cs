@@ -9,12 +9,11 @@ namespace engine
         {
             if (symbolSet >= 0 && symbolSet < 5)
             {
-                string text = "8x8d" + gbl.game_area.ToString();
-                gbl.symbol_8x8_set[symbolSet] = seg040.LoadDax(13, 1, block_id, text);
+                gbl.symbol_8x8_set[symbolSet] = seg040.LoadDax(13, 1, block_id, string.Format("8X8D{0}", gbl.GameArea));
 
                 if (gbl.symbol_8x8_set[symbolSet] == null)
                 {
-                    Logger.LogAndExit("Unable to load {0} from 8x8D{1}", block_id, gbl.game_area);
+                    Logger.LogAndExit("Unable to load {0} from 8x8D{1}", block_id, gbl.GameArea);
                 }
 
                 seg043.clear_keyboard();

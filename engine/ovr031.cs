@@ -649,16 +649,15 @@ namespace engine
         {
             if (symbolSet >= 1 && symbolSet < 4)
             {
-                string area_text = gbl.game_area.ToString();
                 byte[] data;
 
                 ushort decode_size;
-                seg042.load_decode_dax(out data, out decode_size, block_id, "WALLDEF" + area_text + ".dax");
+                seg042.load_decode_dax(out data, out decode_size, block_id, "WALLDEF", gbl.GameArea);
 
                 if (decode_size == 0 ||
                     ((decode_size / 0x30C) + symbolSet) > 4)
                 {
-                    Logger.LogAndExit("Unable to load {0} from WALLDEF{1}.", block_id, area_text);
+                    Logger.LogAndExit("Unable to load {0} from WALLDEF{1}.DAX", block_id, gbl.GameArea);
                 }
 
                 int var_A = gbl.symbol_set_fix[symbolSet] - gbl.symbol_set_fix[1];
@@ -705,7 +704,7 @@ namespace engine
             byte[] data;
             ushort bytesRead;
 
-            seg042.load_decode_dax(out data, out bytesRead, blockId, "GEO" + gbl.game_area.ToString() + ".dax");
+            seg042.load_decode_dax(out data, out bytesRead, blockId, "GEO", gbl.GameArea);
 
             if (bytesRead == 0 || bytesRead != 0x402)
             {

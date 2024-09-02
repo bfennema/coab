@@ -519,6 +519,8 @@ namespace Classes
         public static byte game_area;
         public static byte game_area_backup;
 
+        public static byte GameArea { get => game_area; }
+
         public static Area1 area_ptr;
         public static Area2 area2_ptr;
 
