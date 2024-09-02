@@ -1420,7 +1420,7 @@ namespace engine
 					}
 					else
 					{
-						ovr030.head_body(gbl.body_block_id, gbl.head_block_id);
+						ovr030.head_body(gbl.game_area, gbl.body_block_id, gbl.head_block_id);
 						ovr030.draw_head_and_body(true, 3, 3);
 					}
 
@@ -1430,7 +1430,7 @@ namespace engine
 
 				case GameState.Camping:
 					gbl.game.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.CampingImage, "PIC");
+					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.CampingImage, "PIC", gbl.game_area);
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
 					break;
@@ -1452,7 +1452,7 @@ namespace engine
 
 				case GameState.AfterCombat:
 					gbl.game.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.TreasureImage, "PIC");
+					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.TreasureImage, "PIC", gbl.game_area);
 					PartySummary(gbl.SelectedPlayer);
 					break;
 			}

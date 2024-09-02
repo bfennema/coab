@@ -1,78 +1,109 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
 
 namespace Classes.DaxFiles
 {
     class DaxFileCache
     {
         Dictionary<int, byte[]> entries;
+        List<string> files;
 
-        internal DaxFileCache(string filename)
+        internal DaxFileCache(string filename, string filenum)
         {
             entries = new Dictionary<int, byte[]>();
+            files = new List<string>();
 
-            LoadFile(filename);
+            LoadFile(filename, filenum);
+            files.Add(filenum);
+        }
+        internal DaxFileCache(string filename, byte filenum) : this(filename, filenum.ToString()) { }
+
+        public bool Add(string filename, string filenum)
+        {
+            if (files.Contains(filenum))
+            {
+                return false;
+            }
+            else
+            {
+                LoadFile(filename, filenum);
+                files.Add(filenum);
+                return true;
+            }
+        }
+        public bool Add(string filename, byte filenum) {
+            return Add(filename, filenum.ToString());
         }
 
-        private void LoadFile(string filename)
+        private async void LoadFile(string filename, string filenum)
         {
-            int dataOffset = 0;
-            string filePath = System.IO.Path.Combine(Logging.Config.DataPath, filename);
-
-            if (System.IO.File.Exists(filePath) == false)
-            {
-                return;
-            }
-
+            string name = string.Format("{0}{1}.DAX", filename, filenum);
+            var path = Logging.Config.DataPath;
             System.IO.BinaryReader fileA;
 
             try
             {
-                System.IO.FileStream fsA = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+                var fsA = await gbl.file.Open(path, name);
 
-                fileA = new System.IO.BinaryReader(fsA);
+                if (fsA == null)
+                {
+                    return;
+                }
+                else
+                {
+                    fileA = new System.IO.BinaryReader(fsA);
+                }
             }
             catch (System.ApplicationException)
             {
                 return;
             }
 
-            dataOffset = fileA.ReadInt16() + 2;
+            int dataOffset = fileA.ReadInt16() + 2;
 
-            List<DaxHeaderEntry> headers = new List<DaxHeaderEntry>();
+            var headers = new List<DaxHeaderEntry>();
 
             const int headerEntrySize = 9;
 
             for (int i = 0; i < ((dataOffset - 2) / headerEntrySize); i++)
             {
-                DaxHeaderEntry dhe = new DaxHeaderEntry();
-                dhe.id = fileA.ReadByte();
-                dhe.offset = fileA.ReadInt32();
-                dhe.rawSize = fileA.ReadUInt16();
-                dhe.compSize = fileA.ReadUInt16();
+                var dhe = new DaxHeaderEntry()
+                {
+                    id = fileA.ReadByte(),
+                    offset = fileA.ReadInt32(),
+                    rawSize = fileA.ReadUInt16(),
+                    compSize = fileA.ReadUInt16(),
+                };
 
                 headers.Add(dhe);
             }
 
             foreach (DaxHeaderEntry dhe in headers)
             {
-                byte[] comp = new byte[dhe.compSize];
-                byte[] raw = new byte[dhe.rawSize];
+                var raw = new byte[dhe.rawSize];
 
                 fileA.BaseStream.Seek(dataOffset + dhe.offset, System.IO.SeekOrigin.Begin);
 
-                comp = fileA.ReadBytes(dhe.compSize);
+                var comp = fileA.ReadBytes(dhe.compSize);
 
                 Decode(dhe.rawSize, dhe.compSize, raw, comp);
 
-                entries.Add(dhe.id, raw);
+                if (entries.TryAdd(dhe.id, raw) == false)
+                {
+                    byte[] existing = entries[dhe.id];
+                    if (!existing.SequenceEqual(raw))
+                    {
+                        entries.Remove(dhe.id);
+                        entries.Add(dhe.id, raw);
+                    }
+                }
             }
 
             fileA.Close();
         }
 
-        void Decode(int decodeSize, int dataLength, byte[] output_ptr, byte[] input_ptr)
+        static void Decode(int decodeSize, int dataLength, byte[] output_ptr, byte[] input_ptr)
         {
             sbyte run_length;
             int output_index;

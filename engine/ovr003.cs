@@ -331,13 +331,13 @@ namespace engine
                     }
                     else
                     {
-                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, blockId, "PIC");
+                        ovr030.load_pic_final(ref gbl.byte_1D556, 0, blockId, "PIC", gbl.game_area);
                         ovr030.DrawMaybeOverlayed(gbl.byte_1D556.frames[0].picture, true, 3, 3);
                     }
                 }
                 else
                 {
-                    ovr008.set_and_draw_head_body(blockId, (byte)gbl.area2_ptr.HeadBlockId);
+                    ovr008.set_and_draw_head_body(gbl.game_area, blockId, (byte)gbl.area2_ptr.HeadBlockId);
                 }
             }
             else
@@ -1082,12 +1082,11 @@ namespace engine
 
             if (block_id < 0x80)
             {
-                string filename = string.Format("ITEM{0}.dax", gbl.game_area);
-                seg042.load_decode_dax(out data, out dataSize, block_id, filename);
+                seg042.load_decode_dax(out data, out dataSize, block_id, "ITEM", gbl.game_area);
 
                 if (dataSize == 0)
                 {
-                    Logger.LogAndExit("Unable to find item file: {0}", filename);
+                    Logger.LogAndExit("Unable to find item file: {0}{1}", "ITEM", gbl.game_area);
                 }
 
                 for (int offset = 0; offset < dataSize; offset += Item.StructSize)

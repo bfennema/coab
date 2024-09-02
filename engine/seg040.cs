@@ -4,11 +4,25 @@ namespace engine
 {
     class seg040
     {
-        internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string fileName) // load_dax
+        internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string filename, byte filenum) // load_dax
         {
             ushort pic_size;
             byte[] pic_data;
-            seg042.load_decode_dax(out pic_data, out pic_size, block_id, fileName + ".dax");
+            seg042.load_decode_dax(out pic_data, out pic_size, block_id, filename, filenum);
+
+            if (pic_size != 0)
+            {
+                return new DaxBlock(pic_data, masked, mask_colour);
+            }
+
+            return null;
+        }
+
+        internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string filename)
+        {
+            ushort pic_size;
+            byte[] pic_data;
+            seg042.load_decode_dax(out pic_data, out pic_size, block_id, filename);
 
             if (pic_size != 0)
             {

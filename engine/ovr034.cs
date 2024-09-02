@@ -6,14 +6,14 @@ namespace engine
 {
     class ovr034
     {
-        internal static void Load24x24Set(int cellCount, int destCellOffset, int block_id, string fileName)
+        internal static void Load24x24Set(int cellCount, int destCellOffset, int block_id, string filename)
         {
             if (destCellOffset > 0x30)
             {
                 Logger.LogAndExit("Start range error in Load24x24Set. {0}", destCellOffset);
             }
 
-            DaxBlock tmp_block = seg040.LoadDax(0, 0, block_id, fileName);
+            DaxBlock tmp_block = seg040.LoadDax(0, 0, block_id, filename);
 
             int dateLength = cellCount * tmp_block.bpp;
             int destByteOffset = destCellOffset * tmp_block.bpp;
@@ -77,7 +77,7 @@ namespace engine
             }
             else
             {
-                file_text += gbl.game_area.ToString();
+                file_text = string.Format("{0}{1}", file_text, gbl.game_area);
 
                 gbl.combat_icons[combat_icon_index].LoadIcons(0, 1, file_text, block_id, block_id + 0x80);
                 gbl.combat_icons[combat_icon_index].Recolor(false, unk_16E40, unk_16E30);

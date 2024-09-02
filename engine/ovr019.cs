@@ -415,7 +415,7 @@ namespace engine
 
             DaxArray animation = new DaxArray();
 
-            ovr030.load_pic_final(ref animation, 2, block_id, "PIC");
+            ovr030.load_pic_final(ref animation, 2, block_id, "PIC", gbl.game_area);
             seg040.OverlayBounded(animation.frames[0].picture, 0, 0, row_y - 1, col_x - 1);
             seg040.DrawOverlay();
 
@@ -513,7 +513,7 @@ namespace engine
 
             gbl.area_ptr.picture_fade = 0;
 
-            ovr030.head_body(0x41, 0x41);
+            ovr030.head_body(gbl.game_area, 0x41, 0x41);
             ovr030.draw_head_and_body(true, 3, 3);
 
             seg041.press_any_key(aTheKnightsOfMy, true, 10, TextRegion.NormalBottom);

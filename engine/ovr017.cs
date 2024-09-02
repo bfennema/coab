@@ -678,7 +678,7 @@ namespace engine
         {
             byte[] data;
             ushort decode_size;
-            seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}CHA.DAX", gbl.game_area));
+            seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}CHA", gbl.game_area));
 
             if (decode_size == 0)
             {
@@ -695,7 +695,7 @@ namespace engine
 
             Player player = new Classes.Curse.Player(data, 0).Load();
 
-            seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}SPC.DAX", gbl.game_area));
+            seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}SPC", gbl.game_area));
 
             if (decode_size != 0)
             {
@@ -709,7 +709,7 @@ namespace engine
                 } while (offset < decode_size);
             }
 
-            seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}ITM.DAX", gbl.game_area));
+            seg042.load_decode_dax(out data, out decode_size, monster_id, string.Format("MON{0}ITM", gbl.game_area));
 
             if (decode_size != 0)
             {
