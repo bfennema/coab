@@ -1637,15 +1637,15 @@ namespace engine
 
 			if (remove_affect == Effect.Remove)
 			{
-				ovr024.remove_affect(null, item.affect_2, player);
+				ovr024.remove_affect(null, item.Affect_2, player);
 			}
 			else
 			{
-				ovr024.add_affect(true, 0xff, 0, item.affect_2, player);
+				ovr024.add_affect(true, 0xff, 0, item.Affect_2, player);
 
 				if (gbl.game_state != GameState.Combat)
 				{
-					ovr013.CallAffectTable(Effect.Add, null, player, item.affect_2);
+					ovr013.CallAffectTable(Effect.Add, null, player, item.Affect_2);
 				}
 			}
 		}

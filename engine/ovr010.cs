@@ -853,13 +853,13 @@ namespace engine
                 rating = 0;
             }
 
-            if (item.affect_3 == Affects.cast_throw_lightening &&
+            if (item.Affect_3 == Affects.cast_throw_lightening &&
                 ((int)item.affect_2 & 0x0f) != player.alignment)
             {
                 rating = 0;
             }
 
-            if (item.affect_2 == Affects.petrifying_gaze)
+            if (item.Affect_2 == Affects.petrifying_gaze)
             {
                 rating = 0;
             }

@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace Classes
 {
@@ -11,7 +12,7 @@ namespace Classes
     {
 
         static string libraryPath = Logging.Config.AppDataPath;
-        static string libraryFile = Path.Combine(libraryPath, "ItemLibrary.dat");
+        static string libraryFile = Path.Combine(libraryPath, "ItemLibrary.xml");
 
         static List<Item> library = new List<Item>();
         public static void Add(Item item)
@@ -39,8 +40,8 @@ namespace Classes
                     return;
                 }
 
-                // Construct a BinaryFormatter and use it to serialize the data to the stream.
-                BinaryFormatter formatter = new BinaryFormatter();
+                // Construct a XmlSerializer and use it to serialize the data to the stream.
+                XmlSerializer formatter = new XmlSerializer(library.GetType());
                 try
                 {
                     library = (List<Item>)formatter.Deserialize(fs);
@@ -62,8 +63,8 @@ namespace Classes
             Directory.CreateDirectory(libraryPath);
             FileStream fs = new FileStream(libraryFile, FileMode.Create);
 
-            // Construct a BinaryFormatter and use it to serialize the data to the stream.
-            BinaryFormatter formatter = new BinaryFormatter();
+            // Construct a XmlSerializer and use it to serialize the data to the stream.
+            XmlSerializer formatter = new XmlSerializer(library.GetType());
             try
             {
                 formatter.Serialize(fs, library);

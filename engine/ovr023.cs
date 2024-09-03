@@ -1842,7 +1842,7 @@ namespace engine
 					if ((int)item.affect_3 > 0x7F)
 					{
 						gbl.applyItemAffect = true;
-						ovr013.CallAffectTable(Effect.Remove, item, gbl.spellTargets[0], item.affect_3);
+						ovr013.CallAffectTable(Effect.Remove, item, gbl.spellTargets[0], item.Affect_3);
 
 						var target = gbl.spellTargets[0];
 

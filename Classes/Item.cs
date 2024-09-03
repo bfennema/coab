@@ -33,9 +33,9 @@ namespace Classes
         public short weight; // 0x37
         public int count;   // 0x39 
         public short _value; // 0x3A "seams like value is in electrum, as value is doubled.";
-        public Affects affect_1; // 0x3C
-        public Affects affect_2; // 0x3D
-        public Affects affect_3; // 0x3E
+        public byte affect_1; // 0x3C
+        public byte affect_2; // 0x3D
+        public byte affect_3; // 0x3E
 
         public byte HandsCount()
         {
@@ -57,27 +57,39 @@ namespace Classes
             switch (i)
             {
                 case 1:
-                    return affect_1;
+                    return Affect_1;
                 case 2:
-                    return affect_2;
+                    return Affect_2;
                 case 3:
-                    return affect_3;
+                    return Affect_3;
                 default:
                     throw new System.ArgumentOutOfRangeException();
             }
+        }
+        public Affects Affect_1
+        {
+            get => (Affects)affect_1;
+        }
+        public Affects Affect_2
+        {
+            get => (Affects)affect_2;
+        }
+        public Affects Affect_3
+        {
+            get => (Affects)affect_3;
         }
         public void setAffect(int i, Affects value)
         {
             switch (i)
             {
                 case 1:
-                    affect_1 = value;
+                    affect_1 = (byte)value;
                     break;
                 case 2:
-                    affect_2 = value;
+                    affect_2 = (byte)value;
                     break;
                 case 3:
-                    affect_3 = value;
+                    affect_3 = (byte)value;
                     break;
                 default:
                     throw new System.ArgumentOutOfRangeException();
@@ -109,9 +121,9 @@ namespace Classes
             weight = _weight;
             count = _count;
             _value = __value;
-            affect_1 = _affect_1;
-            affect_2 = _affect_2;
-            affect_3 = _affect_3;
+            affect_1 = (byte)_affect_1;
+            affect_2 = (byte)_affect_2;
+            affect_3 = (byte)_affect_3;
 
             if (AddToLibrary)
             {
@@ -152,9 +164,9 @@ namespace Classes
             weight = Sys.ArrayToShort(data, offset + 0x37);
             count = data[offset + 0x39];
             _value = Sys.ArrayToShort(data, offset + 0x3a);
-            affect_1 = (Affects)data[offset + 0x3C];
-            affect_2 = (Affects)data[offset + 0x3D];
-            affect_3 = (Affects)data[offset + 0x3E];
+            affect_1 = data[offset + 0x3C];
+            affect_2 = data[offset + 0x3D];
+            affect_3 = data[offset + 0x3E];
 
             ItemLibrary.Add(this);
             //AddItemsText(string.Format("{0},{1},{2},{3},{4}", type, namenum1, namenum2, namenum3, GenerateName(0)));

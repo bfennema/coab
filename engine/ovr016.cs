@@ -78,9 +78,9 @@ namespace engine
             {
                 if (item.IsScroll() == true)
                 {
-                    item.affect_1 &= (Affects)0x7F;
-                    item.affect_2 &= (Affects)0x7F;
-                    item.affect_3 &= (Affects)0x7F;
+                    item.affect_1 &= 0x7F;
+                    item.affect_2 &= 0x7F;
+                    item.affect_3 &= 0x7F;
                 }
             }
         }
