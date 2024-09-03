@@ -7,32 +7,52 @@ using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
 using Main.Properties;
+using System.Drawing.Imaging;
 
 namespace Main
 {
 	public partial class MainForm : Form
 	{
+		Bitmap bm;
+		Rectangle rect;
+		int outputWidth;
+		int outputHeight;
+
 		public MainForm()
 		{
+			outputHeight = 200;
+			outputWidth = 320;
+
 			setSettings();
 
 			InitializeComponent();
+
+			bm = new Bitmap(outputWidth, outputHeight, PixelFormat.Format24bppRgb);
+			rect = new Rectangle(0, 0, outputWidth, outputHeight);
 
 			Classes.Display.UpdateCallback = UpdateDisplayCallback;
 		}
 
 		object obj = new object();
 
-		public void UpdateDisplayCallback()
+		public void UpdateDisplayCallback(byte[] videoRam, int videoRamSize)
 		{
-			if (displayArea.InvokeRequired)
-			{
-				displayArea.Invoke(new MethodInvoker(UpdateDisplayCallback));
-			}
-			else
-			{
-                displayArea.Image = (Image)Classes.Display.bm.Clone();
-			}
+			BitmapData bmpData =
+				bm.LockBits(rect, ImageLockMode.WriteOnly,
+				PixelFormat.Format24bppRgb);
+
+			IntPtr ptr = bmpData.Scan0;
+
+			System.Runtime.InteropServices.Marshal.Copy(videoRam, 0, ptr, videoRamSize);
+
+			bm.UnlockBits(bmpData);
+
+			displayArea.Invoke(new MethodInvoker(UpdateDisplayCallback));
+		}
+
+		void UpdateDisplayCallback()
+		{
+			displayArea.Image = (Image)bm.Clone();
 		}
 
 		private void MainForm_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
