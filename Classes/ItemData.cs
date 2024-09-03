@@ -42,20 +42,18 @@ namespace Classes
 
         public ItemDataTable(string fileName)
         {
-            string filePath = Path.Combine(Config.GetDataPath(gbl.game), fileName);
+            table = new ItemData[0x81];
+            Read(fileName);
+        }
 
-            if (System.IO.File.Exists(filePath) == false)
+        public async void Read(string fileName)
             {
-                filePath = Path.Combine(Path.Combine(gbl.exe_path, "Data"), fileName);
-            }
-
-            FileStream stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read);
+            var stream = await gbl.file.Open(Config.GetDataPath(gbl.game), fileName);
 
             stream.Seek(2, SeekOrigin.Begin);
             byte[] data = new byte[0x810];
             stream.Read(data, 0, 0x810);
 
-            table = new ItemData[0x81];
             for (int i = 0; i < 0x81; i++)
             {
                 table[i] = new ItemData(data, i * 0x10);

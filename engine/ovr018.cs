@@ -1694,7 +1694,7 @@ namespace engine
         }
 
 
-        internal static void AddPlayer()
+        internal static async void AddPlayer()
         {
             seg037.draw8x8_clear_area(0x16, 0x26, 1, 1);
 
@@ -1751,9 +1751,13 @@ namespace engine
                 }
             }
 
-            List<MenuItem> strList;
-            List<MenuItem> nameList;
-            ovr017.BuildLoadablePlayersLists(out strList, out nameList);
+            List<MenuItem> strList = new();
+            List<MenuItem> nameList = new();
+            await foreach((var a, var b) in ovr017.BuildLoadablePlayersLists())
+            {
+                strList.Add(new MenuItem(a));
+                nameList.Add(new MenuItem(b));
+            }
 
             if (nameList.Count > 0)
             {
@@ -1777,7 +1781,7 @@ namespace engine
 
                         MenuItem var_10 = ovr027.getStringListEntry(strList, strList_index);
 
-                        Player new_player = ovr017.import_char01(var_10.Text);
+                        Player new_player = await ovr017.import_char01(var_10.Text);
 
                         select_sl.Text = "* " + select_sl.Text;
                         pc_count = 0;

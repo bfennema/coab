@@ -4,14 +4,14 @@ using System.Text;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Runtime.Serialization;
+using System.Xml.Serialization;
 
 namespace Classes
 {
     public class ItemLibrary
     {
-
-        static string libraryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CotAB");
-        static string libraryFile = Path.Combine(libraryPath, "ItemLibrary.dat");
+        static string libraryPath = Logging.Config.GetAppDataPath();
+        static string libraryFile = Path.Combine(libraryPath, "ItemLibrary.xml");
 
         static List<Item> library = new List<Item>();
         public static void Add(Item item)
@@ -40,7 +40,7 @@ namespace Classes
                 }
 
                 // Construct a BinaryFormatter and use it to serialize the data to the stream.
-                BinaryFormatter formatter = new BinaryFormatter();
+                XmlSerializer formatter = new XmlSerializer(library.GetType());
                 try
                 {
                     library = (List<Item>)formatter.Deserialize(fs);
@@ -63,7 +63,7 @@ namespace Classes
             FileStream fs = new FileStream(libraryFile, FileMode.Create);
 
             // Construct a BinaryFormatter and use it to serialize the data to the stream.
-            BinaryFormatter formatter = new BinaryFormatter();
+            XmlSerializer formatter = new XmlSerializer(library.GetType());
             try
             {
                 formatter.Serialize(fs, library);
