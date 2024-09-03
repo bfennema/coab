@@ -1,6 +1,5 @@
 ﻿using Avalonia.Controls;
 using GoldBoxPlayer.ViewModels;
-using System.ComponentModel;
 
 namespace GoldBoxPlayer.Views;
 

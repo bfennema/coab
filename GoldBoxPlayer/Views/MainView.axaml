@@ -12,6 +12,8 @@
              InputMethod.IsInputMethodEnabled="true"
              Focusable="true"
              Background="Black"
+             SizeChanged="MainViewUserControl_SizeChanged"
+             KeyDown="MainViewImage_KeyDown"
              x:DataType="vm:MainViewModel">
   <Design.DataContext>
     <!-- This only sets the DataContext for the previewer in an IDE,
@@ -25,6 +27,7 @@
                   Header="Pool of Radiance"
                   GroupName="Games"
                   ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
                   Command="{Binding SelectGameCommand}"
                   CommandParameter="{x:Static logging:Game.PoolOfRadiance}">
           <MenuItem Header="{Binding PoolRadData}"
@@ -38,6 +41,7 @@
                   Header="Curse of the Azure Bonds"
                   GroupName="Games"
                   ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
                   Command="{Binding SelectGameCommand}"
                   CommandParameter="{x:Static logging:Game.CurseOfTheAzureBonds}">
           <MenuItem Header="{Binding CurseData}"
@@ -51,6 +55,7 @@
                   Header="Secret of the Silver Blades"
                   GroupName="Games"
                   ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
                   Command="{Binding SelectGameCommand}"
                   CommandParameter="{x:Static logging:Game.SecretOfTheSilverBlades}">
           <MenuItem Header="{Binding SecretData}"
@@ -64,50 +69,8 @@
       <MenuItem Header="Paste"/>
     </ContextMenu>
   </UserControl.ContextMenu>
-  <Grid ColumnDefinitions="*" RowDefinitions="*">
-    <!--
-    <TextBox x:Name="InputControl"
-             Grid.Column="0"
-             Grid.Row="0"
-             PointerEntered="InputControl_PointerEntered"
-             PointerPressed="InputControl_PointerPressed"
-             InputMethod.IsInputMethodEnabled="false"
-             TextChanged="InputControl_TextChanged"
-             KeyUp="InputControl_KeyUp"/> -->
-    <Image x:Name="MainViewImage"
-           Grid.Column="0"
-           Grid.Row="0"
-           PointerEntered="InputControl_PointerEntered"
-           PointerPressed="InputControl_PointerPressed"
-           InputMethod.IsInputMethodEnabled="true"
-           KeyUp="InputControl_KeyUp"
-           Source="{Binding MainViewBitmap}"
-           Stretch="Uniform"/>
-  </Grid>
-  <!--
-  
-  <Grid ColumnDefinitions="*,11*" RowDefinitions="*,*,*,*,*,*">
-    <Button HorizontalContentAlignment="Center"
-            FontSize="40"
-            Width="55"
-            Grid.Column="0"
-            Grid.Row="0"
-            Click="ClickHandler"
-            Content="A"/>
-    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="1" Click="ClickHandler" Content="C"/>
-    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="2" Click="ClickHandler" Content="E"/>
-    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="3" Click="ClickHandler" Content="L"/>
-    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="4" Click="ClickHandler" Content="P"/>
-    <Button HorizontalContentAlignment="Center" FontSize="40" Width="55" Grid.Column="0" Grid.Row="5" Click="ClickHandler" Content="_"/>
-    <Canvas Grid.Column="1"
-            Grid.RowSpan="6"
-            x:Name="MainViewCanvas"
-            Background="Black">
-      <Image 
-        x:Name="MainViewImage"
-        Source="{Binding MainViewBitmap}"
-        Stretch="Uniform"/>
-    </Canvas>
-  </Grid>
-  -->
+
+  <Image x:Name="MainViewImage"
+         Source="{Binding MainViewBitmap}"
+         Stretch="Uniform"/>
 </UserControl>

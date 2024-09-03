@@ -9,14 +9,12 @@ using System;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
 using Avalonia.Controls.ApplicationLifetimes;
-using System.Reflection.Metadata;
-using System.ComponentModel;
 
 namespace GoldBoxPlayer.ViewModels;
 
 public class MainViewModel : ViewModelBase
 {
-    private WriteableBitmap? _bitmap;
+    private WriteableBitmap _bitmap;
     private Image? _image;
     IStorageFolder? _PoolRadData;
     IStorageFolder? _PoolRadSave;
@@ -27,6 +25,7 @@ public class MainViewModel : ViewModelBase
 
     public MainViewModel()
     {
+        _bitmap = new WriteableBitmap(new Avalonia.PixelSize(320, 200), new Avalonia.Vector(96, 96), Avalonia.Platform.PixelFormats.Bgr24);
         SelectDirectoryCommand = ReactiveCommand.CreateFromTask<string>(RunSelectDirectoryCommand);
         SelectGameCommand = ReactiveCommand.Create<Logging.Game>(RunSelectGameCommand);
     }
@@ -171,11 +170,15 @@ public class MainViewModel : ViewModelBase
         Classes.gbl.Exit = true;
     }
 
-    public void UpdateDisplayCallback()
+    public void UpdateDisplayCallback(byte[] videoRam, int videoRamSize)
     {
         try
         {
-            Dispatcher.UIThread.Invoke(new Action(UpdateDisplayCallback2));
+            using (var fb = _bitmap.Lock())
+            {
+                System.Runtime.InteropServices.Marshal.Copy(videoRam, 0, fb.Address, videoRamSize);
+            }
+            Dispatcher.UIThread.Invoke(new Action(UpdateDisplay));
         }
         catch (Exception ex)
         {
@@ -203,9 +206,8 @@ public class MainViewModel : ViewModelBase
     }
 
 
-    public void UpdateDisplayCallback2()
+    public void UpdateDisplay()
     {
-        MainViewBitmap = Classes.Display.bm;
         _image?.InvalidateVisual();
     }
 

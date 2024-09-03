@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Drawing;
 using System.Threading;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Controls.Primitives;
 using Avalonia.Markup.Xaml;
-using Classes;
 using GoldBoxPlayer.Services;
 using GoldBoxPlayer.ViewModels;
 using GoldBoxPlayer.Views;
@@ -27,6 +25,8 @@ public partial class App : Application
     {
         var services = new ServiceCollection();
         MainViewModel model = null;
+        MainView view = null;
+        Classes.gbl.file = new File();
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -37,8 +37,7 @@ public partial class App : Application
             };
             services.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
             model.LoadConfigs(desktop.MainWindow);
-            var view = desktop.MainWindow.GetControl<MainView>("MainView");
-            model.SetImage(view.GetControl<Image>("MainViewImage"));
+            view = desktop.MainWindow.GetControl<MainView>("MainView");
             Classes.gbl.StorageProvider = desktop.MainWindow.StorageProvider;
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
@@ -50,15 +49,26 @@ public partial class App : Application
             };
             services.AddSingleton<IFilesService>(x => new FilesService(singleViewPlatform.MainView));
             model.LoadConfigs(TopLevel.GetTopLevel(singleViewPlatform.MainView));
-            model.SetImage(singleViewPlatform.MainView.GetControl<Image>("MainViewImage"));
+            view = (MainView)singleViewPlatform.MainView;
             Classes.gbl.StorageProvider = TopLevel.GetTopLevel(singleViewPlatform.MainView).StorageProvider;
-            //var insetsManager = TopLevel.GetTopLevel(singleViewPlatform.MainView).InsetsManager;
-            //insetsManager.IsSystemBarVisible = false;
-            //insetsManager.DisplayEdgeToEdge = true;
         }
         else
         {
             return;
+        }
+
+        model.SetImage(view.GetControl<Image>("MainViewImage"));
+        if (Logging.Config.GetGame() == Logging.Game.PoolOfRadiance)
+        {
+            view.GetControl<MenuItem>("PoolRadMenu").IsChecked = true;
+        }
+        else if (Logging.Config.GetGame() == Logging.Game.CurseOfTheAzureBonds)
+        {
+            view.GetControl<MenuItem>("CurseMenu").IsChecked = true;
+        }
+        else if (Logging.Config.GetGame() == Logging.Game.SecretOfTheSilverBlades)
+        {
+            view.GetControl<MenuItem>("SecretMenu").IsChecked = true;
         }
 
         Services = services.BuildServiceProvider();
