@@ -1357,7 +1357,7 @@ namespace engine
 			else
 			{
 				ovr024.ApplyAttackSpellAffect("is fire resistant", true, gbl.spellCastingTable[gbl.spell_id].damageOnSave,
-					false, 4, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.resist_fire,
+					false, 4, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.spell_resist_fire,
 					gbl.spellTargets[0]);
 			}
 		}

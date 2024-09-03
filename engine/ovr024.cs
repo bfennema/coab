@@ -208,10 +208,10 @@ namespace engine
                     calc_affect_effect(Affects.protection_from_fire, player);
                     calc_affect_effect(Affects.protection_from_lightning, player);
                     calc_affect_effect(Affects.efreeti_fire_resist, player);
-                    calc_affect_effect(Affects.fire_resist, player);
+                    calc_affect_effect(Affects.item_fire_resist, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
-                    calc_affect_effect(Affects.resist_cold, player);
-                    calc_affect_effect(Affects.resist_fire, player);
+                    calc_affect_effect(Affects.spell_resist_cold, player);
+                    calc_affect_effect(Affects.spell_resist_fire, player);
                     calc_affect_effect(Affects.resist_lightning, player);
                     calc_affect_effect(Affects.resist_magic_50_percent, player);
                     calc_affect_effect(Affects.resist_magic_15_percent, player);
@@ -295,16 +295,16 @@ namespace engine
                 case CheckType.SavingThrow:
                     calc_affect_effect(Affects.protection_from_evil, player);
                     calc_affect_effect(Affects.protection_from_good, player);
-                    calc_affect_effect(Affects.resist_cold, player);
+                    calc_affect_effect(Affects.spell_resist_cold, player);
                     calc_affect_effect(Affects.shield, player);
-                    calc_affect_effect(Affects.resist_fire, player);
+                    calc_affect_effect(Affects.spell_resist_fire, player);
                     calc_affect_effect(Affects.resist_lightning, player);
                     calc_affect_effect(Affects.blinded, player);
                     calc_affect_effect(Affects.bestow_curse, player);
                     calc_affect_effect(Affects.prot_from_evil_10_radius, player);
                     calc_affect_effect(Affects.prot_from_good_10_radius, player);
                     calc_affect_effect(Affects.prayer, player);
-                    calc_affect_effect(Affects.fire_resist, player);
+                    calc_affect_effect(Affects.item_fire_resist, player);
                     calc_affect_effect(Affects.weap_frost_brand, player);
                     calc_affect_effect(Affects.prot_paralysis_poison, player);
                     calc_affect_effect(Affects.prot_sleep_charm_paralysis_poison, player);
