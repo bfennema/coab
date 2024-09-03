@@ -1506,9 +1506,9 @@ namespace engine
 		{
 			gbl.spell_target = player.actions.target;
 
-			if (gbl.spell_target.HasAffect(Affects.resist_fire) == false &&
+			if (gbl.spell_target.HasAffect(Affects.spell_resist_fire) == false &&
 				gbl.spell_target.HasAffect(Affects.cold_fire_shield) == false &&
-				gbl.spell_target.HasAffect(Affects.fire_resist) == false &&
+				gbl.spell_target.HasAffect(Affects.item_fire_resist) == false &&
 				gbl.spell_target.HasAffect(Affects.weap_frost_brand) == false &&
 				gbl.spell_target.HasAffect(Affects.protection_from_fire) == false)
 			{
@@ -2014,7 +2014,7 @@ namespace engine
 			affect_table.Add(Affects.faerie_fire, ovr013.FaerieFire);
 			affect_table.Add(Affects.protection_from_evil, ovr013.affect_protect_evil);
 			affect_table.Add(Affects.protection_from_good, ovr013.affect_protect_good);
-			affect_table.Add(Affects.resist_cold, ovr013.affect_resist_cold);
+			affect_table.Add(Affects.spell_resist_cold, ovr013.affect_resist_cold);
 			affect_table.Add(Affects.charm_person, ovr013.affect_charm_person);
 			affect_table.Add(Affects.enlarge, ovr013.empty);
 			affect_table.Add(Affects.reduce, ovr013.Suffocates);
@@ -2024,7 +2024,7 @@ namespace engine
 			affect_table.Add(Affects.shield, ovr013.AffectShield);
 			affect_table.Add(Affects.gnome_vs_goblin_kobold, ovr013.AffectGnomeVsGoblinKobold);
 			affect_table.Add(Affects.find_traps, ovr013.empty);
-			affect_table.Add(Affects.resist_fire, ovr013.AffectResistFire);
+			affect_table.Add(Affects.spell_resist_fire, ovr013.AffectResistFire);
 			affect_table.Add(Affects.silence_15_radius, ovr013.is_silenced1);
 			affect_table.Add(Affects.slow_poison, ovr013.AffectSlowPoison);
 			affect_table.Add(Affects.spiritual_hammer, ovr013.affect_spiritual_hammer);
@@ -2065,7 +2065,7 @@ namespace engine
 			affect_table.Add(Affects.clear_movement, ovr013.AffectClearMovement);
 			affect_table.Add(Affects.regenerate, ovr013.AffectRegenration);
 			affect_table.Add(Affects.resist_normal_weapons, ovr013.AffectResistWeapons);
-			affect_table.Add(Affects.fire_resist, ovr013.AffectFireResist);
+			affect_table.Add(Affects.item_fire_resist, ovr013.AffectFireResist);
 			affect_table.Add(Affects.highConRegen, ovr013.AffectHighConRegen);
 			affect_table.Add(Affects.minor_globe_of_invulnerability, ovr013.AffectMinorGlobeOfInvulnerability);
 			affect_table.Add(Affects.poison_plus_0, ovr013.AffectPoisonPlus0);

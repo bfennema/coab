@@ -5,7 +5,7 @@ namespace Classes
     /// </summary>
     public class SecretAffect
     {
-        enum Affects
+        public enum Affects
         {
             none = 0,
             bless = 0x1,
@@ -17,7 +17,7 @@ namespace Classes
             faerie_fire = 0x7,
             protection_from_evil = 0x8,
             protection_from_good = 0x9,
-            resist_cold = 0xa,
+            spell_resist_cold = 0xa,
             charm_person = 0xb,
             enlarge = 0xc,
             reduce = 0xd,
@@ -27,7 +27,7 @@ namespace Classes
             shield = 0x11,
             gnome_vs_goblin_kobold = 0x12,
             find_traps = 0x13,
-            resist_fire = 0x14,
+            spell_resist_fire = 0x14,
             silence_15_radius = 0x15,
             slow_poison = 0x16,
             spiritual_hammer = 0x17,
@@ -68,7 +68,7 @@ namespace Classes
             clear_movement = 0x3a,
             regenerate = 0x3b,
             resist_normal_weapons = 0x3c,
-            fire_resist = 0x3d,
+            item_fire_resist = 0x3d,
             highConRegen = 0x3e,
             minor_globe_of_invulnerability = 0x3f,
             poison_plus_0 = 0x40,
@@ -83,9 +83,9 @@ namespace Classes
             prot_drag_breath = 0x49,
             affect_4a = 0x4a,
             weap_dragon_slayer = 0x4b,
-            weap_frost_brand = 0x4c,
+            periapt_health = 0x4c,
             berserk = 0x4d,
-            affect_4e = 0x4e,
+            stone_good_luck = 0x4e,
             fireAttack_2d10 = 0x4f,
             ankheg_melee_acid_attack = 0x50,
             half_damage = 0x51,
@@ -116,8 +116,8 @@ namespace Classes
             resist_magic_15_percent = 0x6a,
             elf_resist_sleep = 0x6b,
             protect_charm_sleep = 0x6c,
-            resist_paralyze = 0x6d,
-            immune_to_cold = 0x6e,
+            paladinDailyHealCast = 0x6d,
+            paladinDailyCureRefresh = 0x6e,
             prot_paralysis_poison = 0x6f,
             immune_to_fire = 0x70,
             efreeti_fire_resist = 0x71,
@@ -136,7 +136,7 @@ namespace Classes
             dracolich_paralytic_gaze = 0x7e,
             reflectable_gaze = 0x7f,
             breath_fire = 0x80,
-            item_affect_0 = 0x80,
+            item_affect = 0x80,
             protect_magic = 0x81,
             vuln_blessed_quarrel = 0x82,
             cast_breath_fire = 0x83,
@@ -149,8 +149,8 @@ namespace Classes
             confuse_berserk = 0x89,
             add_invisibility = 0x8a,
             affect_8b = 0x8b,
-            paladinDailyHealCast = 0x8c,
-            paladinDailyCureRefresh = 0x8d,
+            affect_8c = 0x8c,
+            affect_8d = 0x8d,
             fear = 0x8e,
             fire_shield_damage = 0x8f,
             owlbear_hug_round_attack = 0x90,
@@ -179,7 +179,7 @@ namespace Classes
             mapping.Add(Affects.faerie_fire, Classes.Affects.faerie_fire);
             mapping.Add(Affects.protection_from_evil, Classes.Affects.protection_from_evil);
             mapping.Add(Affects.protection_from_good, Classes.Affects.protection_from_good);
-            mapping.Add(Affects.resist_cold, Classes.Affects.resist_cold);
+            mapping.Add(Affects.spell_resist_cold, Classes.Affects.spell_resist_cold);
             mapping.Add(Affects.charm_person, Classes.Affects.charm_person);
             mapping.Add(Affects.enlarge, Classes.Affects.enlarge);
             mapping.Add(Affects.reduce, Classes.Affects.reduce);
@@ -189,7 +189,7 @@ namespace Classes
             mapping.Add(Affects.shield, Classes.Affects.shield);
             mapping.Add(Affects.gnome_vs_goblin_kobold, Classes.Affects.gnome_vs_goblin_kobold);
             mapping.Add(Affects.find_traps, Classes.Affects.find_traps);
-            mapping.Add(Affects.resist_fire, Classes.Affects.resist_fire);
+            mapping.Add(Affects.spell_resist_fire, Classes.Affects.spell_resist_fire);
             mapping.Add(Affects.silence_15_radius, Classes.Affects.silence_15_radius);
             mapping.Add(Affects.slow_poison, Classes.Affects.slow_poison);
             mapping.Add(Affects.spiritual_hammer, Classes.Affects.spiritual_hammer);
@@ -230,7 +230,7 @@ namespace Classes
             mapping.Add(Affects.clear_movement, Classes.Affects.clear_movement);
             mapping.Add(Affects.regenerate, Classes.Affects.regenerate);
             mapping.Add(Affects.resist_normal_weapons, Classes.Affects.resist_normal_weapons);
-            mapping.Add(Affects.fire_resist, Classes.Affects.fire_resist);
+            mapping.Add(Affects.item_fire_resist, Classes.Affects.item_fire_resist);
             mapping.Add(Affects.highConRegen, Classes.Affects.highConRegen);
             mapping.Add(Affects.minor_globe_of_invulnerability, Classes.Affects.minor_globe_of_invulnerability);
             mapping.Add(Affects.poison_plus_0, Classes.Affects.poison_plus_0);
@@ -245,9 +245,9 @@ namespace Classes
             mapping.Add(Affects.prot_drag_breath, Classes.Affects.prot_drag_breath);
             mapping.Add(Affects.affect_4a, Classes.Affects.affect_4a);
             mapping.Add(Affects.weap_dragon_slayer, Classes.Affects.weap_dragon_slayer);
-            mapping.Add(Affects.weap_frost_brand, Classes.Affects.weap_frost_brand);
+            mapping.Add(Affects.periapt_health, Classes.Affects.periapt_health);
             mapping.Add(Affects.berserk, Classes.Affects.berserk);
-            mapping.Add(Affects.affect_4e, Classes.Affects.affect_4e);
+            mapping.Add(Affects.stone_good_luck, Classes.Affects.stone_good_luck);
             mapping.Add(Affects.fireAttack_2d10, Classes.Affects.fireAttack_2d10);
             mapping.Add(Affects.ankheg_melee_acid_attack, Classes.Affects.ankheg_melee_acid_attack);
             mapping.Add(Affects.half_damage, Classes.Affects.half_damage);
@@ -278,8 +278,6 @@ namespace Classes
             mapping.Add(Affects.resist_magic_15_percent, Classes.Affects.resist_magic_15_percent);
             mapping.Add(Affects.elf_resist_sleep, Classes.Affects.elf_resist_sleep);
             mapping.Add(Affects.protect_charm_sleep, Classes.Affects.protect_charm_sleep);
-            mapping.Add(Affects.resist_paralyze, Classes.Affects.resist_paralyze);
-            mapping.Add(Affects.immune_to_cold, Classes.Affects.immune_to_cold);
             mapping.Add(Affects.prot_paralysis_poison, Classes.Affects.prot_paralysis_poison);
             mapping.Add(Affects.immune_to_fire, Classes.Affects.immune_to_fire);
             mapping.Add(Affects.efreeti_fire_resist, Classes.Affects.efreeti_fire_resist);
@@ -298,7 +296,7 @@ namespace Classes
             mapping.Add(Affects.dracolich_paralytic_gaze, Classes.Affects.dracolich_paralytic_gaze);
             mapping.Add(Affects.reflectable_gaze, Classes.Affects.reflectable_gaze);
             mapping.Add(Affects.breath_fire, Classes.Affects.breath_fire);
-            mapping.Add(Affects.item_affect_0, Classes.Affects.item_affect_0);
+            mapping.Add(Affects.item_affect, Classes.Affects.item_affect);
             mapping.Add(Affects.protect_magic, Classes.Affects.protect_magic);
             mapping.Add(Affects.vuln_blessed_quarrel, Classes.Affects.vuln_blessed_quarrel);
             mapping.Add(Affects.cast_breath_fire, Classes.Affects.cast_breath_fire);
@@ -318,6 +316,20 @@ namespace Classes
             mapping.Add(Affects.dispel_evil_banish, Classes.Affects.dispel_evil_banish);
             mapping.Add(Affects.strength_spell, Classes.Affects.strength_spell);
             mapping.Add(Affects.do_items_affect, Classes.Affects.do_items_affect);
+        }
+
+        public static Classes.Affects Map(Affects affect)
+        {
+            if (mapping == null) { InitMapping(); }
+
+            return mapping[affect][0];
+        }
+
+        public static Affects Map(Classes.Affects affect)
+        {
+            if (mapping == null) { InitMapping(); }
+
+            return mapping[affect][0];
         }
 
         private SecretAffect(Affects _type, ushort _minutes, byte _affect_data, bool _call_spell_jump_list)
