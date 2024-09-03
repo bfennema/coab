@@ -503,8 +503,8 @@ namespace engine
         internal static void BuildEffectNameMap()
         {
             Affects[] affects = { Affects.bless, Affects.cursed, Affects.detect_magic, Affects.protection_from_evil, 
-                                  Affects.protection_from_good, Affects.resist_cold, Affects.charm_person, Affects.enlarge, 
-                                  Affects.friends, Affects.read_magic, Affects.shield, Affects.find_traps, Affects.resist_fire, 
+                                  Affects.protection_from_good, Affects.spell_resist_cold, Affects.charm_person, Affects.enlarge, 
+                                  Affects.friends, Affects.read_magic, Affects.shield, Affects.find_traps, Affects.spell_resist_fire, 
                                   Affects.silence_15_radius, Affects.slow_poison, Affects.spiritual_hammer, Affects.detect_invisibility, 
                                   Affects.invisibility, Affects.mirror_image, Affects.ray_of_enfeeblement, Affects.animate_dead, 
                                   Affects.blinded, Affects.cause_disease_1, Affects.bestow_curse, Affects.blink, Affects.strength, 
@@ -540,7 +540,7 @@ namespace engine
             EffectNameMap.Add(Affects.cold_fire_shield, "Cold Fire Shield");
             EffectNameMap.Add(Affects.poisoned, "Poisoned");
             EffectNameMap.Add(Affects.regenerate, "Regenerating");
-            EffectNameMap.Add(Affects.fire_resist, "Fire Resistance");
+            EffectNameMap.Add(Affects.item_fire_resist, "Fire Resistance");
             EffectNameMap.Add(Affects.weap_frost_brand, "Fire Resistance");
             EffectNameMap.Add(Affects.minor_globe_of_invulnerability, "Minor Globe of Invulnerability");
             EffectNameMap.Add(Affects.feeblemind, "enfeebled");

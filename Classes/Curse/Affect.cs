@@ -32,7 +32,7 @@ namespace Classes.Curse
             map.Add(Affects.faerie_fire, Classes.Affects.faerie_fire);
             map.Add(Affects.protection_from_evil, Classes.Affects.protection_from_evil);
             map.Add(Affects.protection_from_good, Classes.Affects.protection_from_good);
-            map.Add(Affects.resist_cold, Classes.Affects.resist_cold);
+            map.Add(Affects.spell_resist_cold, Classes.Affects.spell_resist_cold);
             map.Add(Affects.charm_person, Classes.Affects.charm_person);
             map.Add(Affects.enlarge, Classes.Affects.enlarge);
             map.Add(Affects.reduce, Classes.Affects.reduce);
@@ -42,7 +42,7 @@ namespace Classes.Curse
             map.Add(Affects.shield, Classes.Affects.shield);
             map.Add(Affects.gnome_vs_goblin_kobold, Classes.Affects.gnome_vs_goblin_kobold);
             map.Add(Affects.find_traps, Classes.Affects.find_traps);
-            map.Add(Affects.resist_fire, Classes.Affects.resist_fire);
+            map.Add(Affects.spell_resist_fire, Classes.Affects.spell_resist_fire);
             map.Add(Affects.silence_15_radius, Classes.Affects.silence_15_radius);
             map.Add(Affects.slow_poison, Classes.Affects.slow_poison);
             map.Add(Affects.spiritual_hammer, Classes.Affects.spiritual_hammer);
@@ -83,7 +83,7 @@ namespace Classes.Curse
             map.Add(Affects.clear_movement, Classes.Affects.clear_movement);
             map.Add(Affects.regenerate, Classes.Affects.regenerate);
             map.Add(Affects.resist_normal_weapons, Classes.Affects.resist_normal_weapons);
-            map.Add(Affects.fire_resist, Classes.Affects.fire_resist);
+            map.Add(Affects.item_fire_resist, Classes.Affects.item_fire_resist);
             map.Add(Affects.highConRegen, Classes.Affects.highConRegen);
             map.Add(Affects.minor_globe_of_invulnerability, Classes.Affects.minor_globe_of_invulnerability);
             map.Add(Affects.poison_plus_0, Classes.Affects.poison_plus_0);
@@ -151,7 +151,7 @@ namespace Classes.Curse
             map.Add(Affects.dracolich_paralytic_gaze, Classes.Affects.dracolich_paralytic_gaze);
             map.Add(Affects.reflectable_gaze, Classes.Affects.reflectable_gaze);
             map.Add(Affects.breath_fire, Classes.Affects.breath_fire);
-            map.Add(Affects.item_affect, Classes.Affects.item_affect_0);
+            map.Add(Affects.item_affect, Classes.Affects.item_affect);
             map.Add(Affects.protect_magic, Classes.Affects.protect_magic);
             map.Add(Affects.vuln_blessed_quarrel, Classes.Affects.vuln_blessed_quarrel);
             map.Add(Affects.cast_breath_fire, Classes.Affects.cast_breath_fire);
@@ -227,7 +227,7 @@ namespace Classes.Curse
             faerie_fire = 0x7,
             protection_from_evil = 0x8,
             protection_from_good = 0x9,
-            resist_cold = 0xa,
+            spell_resist_cold = 0xa,
             charm_person = 0xb,
             enlarge = 0xc,
             reduce = 0xd,
@@ -237,7 +237,7 @@ namespace Classes.Curse
             shield = 0x11,
             gnome_vs_goblin_kobold = 0x12,
             find_traps = 0x13,
-            resist_fire = 0x14,
+            spell_resist_fire = 0x14,
             silence_15_radius = 0x15,
             slow_poison = 0x16,
             spiritual_hammer = 0x17,
@@ -278,7 +278,7 @@ namespace Classes.Curse
             clear_movement = 0x3a,
             regenerate = 0x3b,
             resist_normal_weapons = 0x3c,
-            fire_resist = 0x3d,
+            item_fire_resist = 0x3d,
             highConRegen = 0x3e,
             minor_globe_of_invulnerability = 0x3f,
             poison_plus_0 = 0x40,
