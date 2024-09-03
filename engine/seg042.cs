@@ -22,38 +22,23 @@ namespace engine
 
 
 
-        internal static bool find_and_open_file(out File file_ptr, bool noError, string full_file_name)
+        internal static async System.Threading.Tasks.Task<System.IO.Stream> find_and_open_file(bool noError, string dir_path, string file_name)
         {
-            string file_name = System.IO.Path.GetFileName(full_file_name);
-            string dir_path = System.IO.Path.GetDirectoryName(full_file_name);
+            System.IO.Stream file_ptr;
 
             if (dir_path.Length == 0)
             {
                 dir_path = gbl.exe_path;
             }
 
-            bool file_found;
+            file_ptr = await gbl.file.Open(dir_path, file_name);
 
-            file_found = System.IO.File.Exists(System.IO.Path.Combine(dir_path, file_name));
-
-            if (file_found == false && noError == false)
+            if (file_ptr == null && noError == false)
             {
                 debug_display("Couldn't find " + file_name + ". Check install.");
             }
 
-            if (file_found == true)
-            {
-                file_ptr = new File();
-                file_ptr.Assign(System.IO.Path.Combine(dir_path, file_name));
-
-                seg051.Reset(file_ptr);
-            }
-            else
-            {
-                file_ptr = null;
-            }
-
-            return file_found;
+            return file_ptr;
         }
 
 

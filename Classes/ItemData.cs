@@ -41,15 +41,18 @@ namespace Classes
 
         public ItemDataTable(string fileName)
         {
-            string filePath = Path.Combine(Logging.Config.DataPath, fileName);
+            table = new ItemData[0x81];
+            Read(fileName);
+        }
 
-            FileStream stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read);
+        public async void Read(string fileName)
+        {
+            var stream = await gbl.file.Open(Logging.Config.DataPath, fileName);
 
             stream.Seek(2, SeekOrigin.Begin);
             byte[] data = new byte[0x810];
             stream.Read(data, 0, 0x810);
 
-            table = new ItemData[0x81];
             for (int i = 0; i < 0x81; i++)
             {
                 table[i] = new ItemData(data, i * 0x10);

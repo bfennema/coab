@@ -534,6 +534,8 @@ namespace Classes
 
         public static MoneySet pooled_money = new MoneySet();
 
+        public static File file;
+
 
         /// <summary>
         /// 0 ==, 1 !=, 2 &lt;, 3 &gt;, 4 &lt;=, 5 &gt;=
