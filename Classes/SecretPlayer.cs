@@ -71,7 +71,7 @@ namespace Classes
         [DataOffset(0x6C, DataType.Byte)]
         public byte _class; // 0x6C;
         [DataOffset(0x6D, DataType.Byte)]
-        public byte field_6D; // 0x6D
+        public byte paladinCuresLeft; // 0x6D
         [DataOffset(0x6E, DataType.SWord)]
         public short age; // 0x6E;
 
@@ -289,6 +289,7 @@ namespace Classes
             }
 
             _class = (byte)player._class;
+            paladinCuresLeft = player.paladinCuresLeft;
             age = player.age;
 
             hit_point_max = player.hit_point_max;
@@ -437,10 +438,6 @@ namespace Classes
             field_19A = player.field_186;
             weight = player.weight;
 
-            //paladinCuresLeft = player.paladinCuresLeft;
-            //field_192 = player.field_192;
-            //field_193 = player.field_193;
-            //field_194 = player.field_194;
             health_status = (byte)player.health_status;
             in_combat = player.in_combat;
             combat_team = (byte)player.combat_team;
@@ -505,6 +502,7 @@ namespace Classes
             }
 
             player._class = (ClassId)_class;
+            player.paladinCuresLeft = paladinCuresLeft;
             player.age = age;
 
             player.hit_point_max = hit_point_max;

@@ -554,6 +554,8 @@ namespace engine
             EffectNameMap.Add(Affects.displace, "Displaced");
             EffectNameMap.Add(Affects.mummy_disease_rot, "Dreaded mummy disease");
             EffectNameMap.Add(Affects.item_invisibility, "Invisible (Ring)");
+            EffectNameMap.Add(Affects.periapt_health, "Immune to Disease");
+            EffectNameMap.Add(Affects.stone_good_luck, "Carrying magical stone");
 
         }
 

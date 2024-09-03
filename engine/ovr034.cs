@@ -86,7 +86,6 @@ namespace engine
             seg043.clear_keyboard();
         }
 
-
         internal static void draw_combat_icon(int iconIndex, Icon iconState, int direction, int tileY, int tileX) /* sub_76504 */
         {
             DaxBlock icon = gbl.combat_icons[iconIndex].GetIcon(iconState, direction);
@@ -94,6 +93,18 @@ namespace engine
             if (icon != null)
             {
                 seg040.draw_combat_picture(icon, (tileY * 3) + 1, (tileX * 3) + 1, 0);
+            }
+        }
+        internal static void draw_combat_icon(Player player, Icon iconState, int direction, int tileY, int tileX)
+        {
+            if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg040.draw_clipped_recolor(8, 0);
+            }
+            draw_combat_icon(player.icon_id, iconState, direction, tileY, tileX);
+            if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                seg040.draw_clipped_recolor(17, 17);
             }
         }
     }

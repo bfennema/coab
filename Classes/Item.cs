@@ -506,6 +506,8 @@ namespace Classes
 
             Cart = 0x11E,
             Bodily_Health = 0x11F,
+            Good_Luck = 0x120,
+            Health = 0x121,
         };
 
         static string GetName(ItemNames item)

@@ -872,7 +872,10 @@ namespace engine
 
 		internal static void sub_3B27B(Effect arg_0, object param, Player player) // sub_3B27B
 		{
-			ovr024.add_affect(false, 12, 1, Affects.invisibility, player);
+			if (param != null)
+			{
+				ovr024.add_affect(false, 12, 1, Affects.invisibility, player);
+			}
 		}
 
 

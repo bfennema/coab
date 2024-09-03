@@ -119,6 +119,12 @@ namespace engine
                 gbl.sky_dax_252 = seg040.LoadDax(13, 1, 252, "SKY");
             }
 
+            if (gbl.game == Game.SecretOfTheSilverBlades)
+            {
+                DaxCache.PreloadDax("PIC", 4);
+                DaxCache.PreloadDax("PIC", 5);
+            }
+
             if (Cheats.skip_title_screen == false)
             {
                 ovr002.title_screen();
@@ -127,13 +133,13 @@ namespace engine
             char inputKey = 'P';
             if (gbl.game == Game.CurseOfTheAzureBonds)
             {
-            gbl.displayInputSecondsToWait = 30;
-            gbl.displayInputTimeoutValue = 'D';
+                gbl.displayInputSecondsToWait = 30;
+                gbl.displayInputTimeoutValue = 'D';
 
                 inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
 
-            gbl.displayInputSecondsToWait = 0;
-            gbl.displayInputTimeoutValue = '\0';
+                gbl.displayInputSecondsToWait = 0;
+                gbl.displayInputTimeoutValue = '\0';
             }
             else if (gbl.game == Game.SecretOfTheSilverBlades)
             {
@@ -160,10 +166,12 @@ namespace engine
                     if (gbl.game == Game.CurseOfTheAzureBonds)
                     {
                         gbl.game_area = 1; // 1:82
+                        gbl.game_speed_var = 9;
                     }
                     else if (gbl.game == Game.SecretOfTheSilverBlades)
                     {
                         gbl.game_area = 1; // 1:3
+                        gbl.game_speed_var = 5;
                     }
                     gbl.game_speed_var = 9;
                 }
@@ -199,7 +207,7 @@ namespace engine
                             gbl.initial_ecl_offset = 0x8000;
                             break;
                         case Game.SecretOfTheSilverBlades:
-                            gbl.game_area = 1; // 1:16
+                            gbl.game_area = 2; // 2:17
                             gbl.vm_mem0_offset = 0x4B00;
                             gbl.vm_mem0_size = 0x0400;
                             gbl.vm_mem1_offset = 0x7C00;
@@ -225,13 +233,23 @@ namespace engine
                     ovr002.title_screen();
                     seg043.clear_keyboard();
 
-                    gbl.displayInputSecondsToWait = 10;
-                    gbl.displayInputTimeoutValue = 'D';
+                    if (gbl.game == Game.CurseOfTheAzureBonds)
+                    {
 
-                    inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
+                        gbl.displayInputSecondsToWait = 10;
+                        gbl.displayInputTimeoutValue = 'D';
 
-                    gbl.displayInputSecondsToWait = 0;
-                    gbl.displayInputTimeoutValue = '\0';
+                        inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "Curse of the Azure Bonds v1.3 ");
+
+                        gbl.displayInputSecondsToWait = 0;
+                        gbl.displayInputTimeoutValue = '\0';
+                    }
+                    else if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        seg041.displayString("      Secret of the Silver Blades      ", 10, 0, 22, 0);
+                        seg041.displayString("   Version 1.30           May 18,1990  ", 10, 0, 23, 0);
+                        inputKey = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Play Demo", "              ");
+                    }
 
                     gbl.inDemo = (inputKey == 'D');
 

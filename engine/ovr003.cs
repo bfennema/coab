@@ -1129,7 +1129,12 @@ namespace engine
                     {
                         gbl.items_pointer.Add(new CurseItem(data, offset).Load());
                     }
+                    else if (gbl.game == Game.SecretOfTheSilverBlades)
+                    {
+                        gbl.items_pointer.Add(new SecretItem(data, offset).Load());
+                    }
                 }
+
 
                 data = null;
             }
@@ -2337,6 +2342,7 @@ namespace engine
                             gbl.EclBlockId = 3;
                             break;
                     }
+                    seg037.DrawFrame_Dungeon();
                 }
                 else
                 {
@@ -2349,7 +2355,7 @@ namespace engine
                             gbl.EclBlockId = 1;
                             break;
                         case Game.SecretOfTheSilverBlades:
-                            gbl.EclBlockId = 16;
+                            gbl.EclBlockId = 17;
                             break;
                     }
 

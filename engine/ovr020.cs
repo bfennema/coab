@@ -406,6 +406,8 @@ namespace engine
 
             if (columns == 3)
             {
+                seg037.draw8x8_clear_area(yCol+2, 38, yCol, xCol1);
+
                 seg041.displayString("AC ", 0, 15, yCol, xCol1);
                 seg041.displayString(player.DisplayAc.ToString(), 0, 10, yCol, xCol1 + 3);
 
@@ -498,7 +500,11 @@ namespace engine
                         text = "00";
                     }
 
-                    seg041.displayString("(" + text + ")", 0, color, yCol, xCol+2);
+                    seg041.displayString("(" + text + ")", 0, color, yCol, xCol + 2);
+                }
+                else
+                {
+                    seg041.displayString("    ", 0, color, yCol, xCol + 2);
                 }
             }
             else
@@ -519,8 +525,27 @@ namespace engine
                         text = "00";
                     }
 
-                    seg041.displayString("(" + text + ")", 0, color, yCol, xCol+2);
+                    seg041.displayString("(" + text + ")", 0, color, yCol, xCol + 2);
                 }
+                else
+                {
+                    seg041.displayString("    ", 0, color, yCol, xCol + 2);
+                }
+
+                if (stat == Stat.STR &&
+                    gbl.SelectedPlayer.stats2.Str00.cur != gbl.SelectedPlayer.stats2.Str00.full)
+                {
+                    seg041.displayString("*", 0, color, yCol, xCol + 7);
+                }
+            }
+            if (stat == Stat.STR &&
+                gbl.SelectedPlayer.stats2.Str00.cur != gbl.SelectedPlayer.stats2.Str00.full)
+            {
+                seg041.displayString("*", 0, color, yCol, xCol + 7);
+            }
+            else if (gbl.SelectedPlayer.stats2[(byte)stat].cur != gbl.SelectedPlayer.stats2[(byte)stat].full)
+            {
+                seg041.displayString("*", 0, color, yCol, xCol + 7);
             }
         }
 
@@ -1001,9 +1026,16 @@ namespace engine
                 case 1: // ring of wizardy
                     if (add_item == true)
                     {
-                        player.spellCastCount[2][0] *= 2;
-                        player.spellCastCount[2][1] *= 2;
-                        player.spellCastCount[2][2] *= 2;
+                        if (gbl.game == Game.CurseOfTheAzureBonds)
+                        {
+                            player.spellCastCount[2][0] *= 2;
+                            player.spellCastCount[2][1] *= 2;
+                            player.spellCastCount[2][2] *= 2;
+                        }
+                        else if (gbl.game == Game.SecretOfTheSilverBlades)
+                        {
+                            player.spellCastCount[2][4] *= 2;
+                        }
                     }
                     else
                     {
@@ -1080,11 +1112,11 @@ namespace engine
                     }
                     break;
 
-                case 4:
+                case 4: // Alignment specific weapon
                     if (((int)item.affect_2 & 0x0f) != player.alignment)
                     {
                         item.readied = false;
-                        int damage = (int)item.affect_2 << 4;
+                        int damage = (int)item.affect_2 >> 4;
 
                         gbl.damage_flags = DamageType.Magic;
                         if (gbl.game_state == GameState.Combat)
@@ -1097,16 +1129,8 @@ namespace engine
                     }
                     break;
 
-                case 5:
-                    if (item.affect_2 == Affects.displace)
-                    {
-                        gbl.applyItemAffect = true;
-                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
-                    }
-                    else
-                    {
-                        ovr024.CalcStatBonuses(Stat.STR, player);
-                    }
+                case 5: // Girdle of Giant Strength
+                    ovr024.CalcStatBonuses(Stat.STR, player);
                     break;
 
                 case 6: // Girdle of the Dwarves
@@ -1115,7 +1139,7 @@ namespace engine
                     ovr026.recalc_saving_throws(player);
                     break;
 
-                case 8: //Ioun Stone
+                case 8: // Ioun Stone
                     switch ((int)item.affect_2)
                     {
                         case 0:
@@ -1129,34 +1153,26 @@ namespace engine
                     }
                     break;
 
-                case 9:
+                case 9: // Spiritual Hammer
                     if (add_item == false)
                     {
                         ovr024.remove_affect(null, Affects.spiritual_hammer, player);
                     }
                     break;
 
-                case 10:
+                case 10: // Gauntlets of Fumbling
                     ovr024.CalcStatBonuses(Stat.DEX, player);
                     break;
 
-                case 11: // Ring of Invisibility (por)
-                    if (item.affect_2 > 0)
-                    {
-                        gbl.applyItemAffect = true;
-                        ovr013.CallAffectTable((add_item) ? Effect.Add : Effect.Remove, item, player, item.affect_3);
-                    }
-                    else // Gloves of Thievery
-                    {
-                        ovr026.recalc_thief_skills(player);
-                    }
+                case 11: // Gloves of Thievery
+                    ovr026.recalc_thief_skills(player);
                     break;
 
-                case 12:
+                case 12: // Hat of stupidity
                     ovr024.CalcStatBonuses(Stat.INT, player);
                     break;
 
-                case 13:
+                case 13: // Robe of Powerlessness
                     ovr024.CalcStatBonuses(Stat.STR, player);
                     ovr024.CalcStatBonuses(Stat.INT, player);
                     break;

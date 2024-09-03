@@ -274,6 +274,8 @@
 
         static public void Save(SpellList spellList, byte[] data, int size)
         {
+            if (mapping == null) { InitMapping(); }
+
             for (int i = 0; i < size; i++)
             {
                 data[i] = 0;
@@ -290,6 +292,8 @@
         }
         static public void Save(SpellBook spellBook, byte[] data, int size)
         {
+            if (mapping == null) { InitMapping(); }
+
             for (int i = 0; i < size; i++)
             {
                 data[i] = 0;

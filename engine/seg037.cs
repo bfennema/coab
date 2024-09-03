@@ -187,7 +187,7 @@ namespace engine
                     ovr038.Put8x8Symbol(0, false, secret_outer_frame_horizontal[col_x] + 0x134, 0, col_x);
                 }
 
-                for (int row_y = 2; row_y < 23; row_y++)
+                for (int row_y = 1; row_y < 23; row_y++)
                 {
                     ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical3[row_y] + 0x134, row_y, 0);
                     ovr038.Put8x8Symbol(0, false, secret_outer_frame_vertical3[row_y] + 0x134, row_y, 39);

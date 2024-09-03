@@ -1601,7 +1601,7 @@ namespace engine
 			{
 				ovr033.Color_0_8_inverse();
 			}
-			else // if (gbl.game == Game.SecretOfTheSilverBlades)
+			else
 			{
 				ovr033.Color_0_8_normal();
 			}

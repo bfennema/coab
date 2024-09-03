@@ -160,6 +160,7 @@ namespace Classes
             mapping.Add(SilverNames.Gem, ItemNames.Gem);
             mapping.Add(SilverNames.Girdle, ItemNames.Girdle);
             mapping.Add(SilverNames.Helm, ItemNames.Helm);
+            mapping.Add(SilverNames.Stone, ItemNames.Stone);
             mapping.Add(SilverNames.Mirror, ItemNames.Mirror);
             mapping.Add(SilverNames.Necklace, ItemNames.Necklace);
             mapping.Add(SilverNames.Robe, ItemNames.Robe);
@@ -209,6 +210,9 @@ namespace Classes
             mapping.Add(SilverNames.Diamond, ItemNames.Diamond);
             mapping.Add(SilverNames.Emerald, ItemNames.Emerald);
             mapping.Add(SilverNames.Saphire, ItemNames.Saphire);
+            mapping.Add(SilverNames.Periapt, ItemNames.Periapt);
+            mapping.Add(SilverNames.Good_Luck, ItemNames.Good_Luck);
+            mapping.Add(SilverNames.Health, ItemNames.Health);
         }
 
         public SecretItem(byte[] data, int offset)
@@ -236,6 +240,11 @@ namespace Classes
             affect_1 = (byte)item.affect_1;
             affect_2 = (byte)item.affect_2;
             affect_3 = (byte)item.affect_3;
+
+            if (item.affect_3 == Affects.item_affect)
+            {
+                affect_2 = (byte)SecretAffect.Map(item.affect_2);
+            }
         }
 
         public Item Load()
@@ -260,6 +269,11 @@ namespace Classes
                 affect_2 = (Affects)affect_2,
                 affect_3 = (Affects)affect_3
             };
+
+            if (item.affect_3 == Affects.item_affect)
+            {
+                item.affect_2 = SecretAffect.Map((SecretAffect.Affects)affect_2);
+            }
 
             ItemLibrary.Add(item);
 
@@ -303,7 +317,8 @@ namespace Classes
             CompositeShortBow = 23,
             LongBow = 24,
             ShortBow = 25,
-            LightCrossbow = 26,
+            FineLongBow = 26,
+            LightCrossbow = 27,
             Sling = 28,
             StaffSling = 29,
             Arrow = 30,
