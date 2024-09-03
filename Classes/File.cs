@@ -1,25 +1,40 @@
-using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Classes
 {
-    /// <summary>
-    /// Summary description for File.
-    /// </summary>
-    public class File
+    public interface File
     {
-        public File()
+        public IAsyncEnumerable<(string,Stream)> OpenAll(string path, string filter = "*");
+        public Task<Stream?> Open(string path, string filename);
+        public Task<Stream?> Create(string path, string filename);
+        public void Delete(string path, string filename);
+        public Task<bool> Find(string path, string filename);
+
+        public void Reset(Stream stream)
         {
-            // TODO tidy-up this pascal based concept.
+            stream.Seek(0, System.IO.SeekOrigin.Begin);
         }
 
-        public string name;
-
-        public System.IO.FileStream stream;
-
-        public void Assign(string fileString)
+        public void Rewrite(Stream stream)
         {
-            name = fileString;
-            stream = System.IO.File.Open(fileString, System.IO.FileMode.OpenOrCreate);
+            stream.SetLength(0);
+        }
+
+        public void Close(Stream stream)
+        {
+            stream.Close();
+        }
+
+        public int BlockRead(int count, byte[] data, Stream stream)
+        {
+            return stream.Read(data, 0, count);
+        }
+
+        public void BlockWrite(int count, byte[] data, Stream stream)
+        {
+            stream.Write(data, 0, count);
         }
     }
 }
