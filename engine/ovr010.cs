@@ -895,7 +895,7 @@ namespace engine
 
             foreach (Item item in player.items)
             {
-                if (item.itemData.item_slot == ItemSlot.Weapon &&
+                if (item.itemData.itemSlot == ItemSlot.Weapon &&
                     (item.itemData.classFlags & player.classFlags) != 0)
                 {
                     int power_rating = CalcItemPowerRating(item, player);
@@ -919,7 +919,7 @@ namespace engine
                 }
 
 
-                if (item.itemData.item_slot == ItemSlot.Shield)
+                if (item.itemData.itemSlot == ItemSlot.Shield)
                 {
                     if ((item.itemData.classFlags & player.classFlags) != 0)
                     {

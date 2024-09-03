@@ -371,7 +371,7 @@ namespace engine
 		{
 			if (gbl.SelectedPlayer.HasAffect(Affects.read_magic) == true ||
 				((gbl.SelectedPlayer.cleric_lvl > 0 || gbl.SelectedPlayer.cleric_old_lvl > gbl.SelectedPlayer.multiclassLevel) &&
-				  gbl.currentScroll.itemData.item_slot == ItemSlot.Quarrel))
+				  gbl.currentScroll.itemData.itemSlot == ItemSlot.ScrollCL))
 			{
 				gbl.currentScroll.hidden_names_flag = 0;
 			}

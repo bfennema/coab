@@ -66,7 +66,7 @@ namespace engine
 
 		internal static void CalcArmorWeightEffect(Item item, Player player) // sub_6621E
 		{
-			if (item.itemData.item_slot == ItemSlot.Armor)
+			if (item.itemData.itemSlot == ItemSlot.Armor)
 			{
 				if (item.weight >= 0 && item.weight <= 150)
 				{
@@ -91,11 +91,11 @@ namespace engine
 
 		internal static void sub_662A6(ref byte output, ref sbyte[] bonus, Item item, Player player)
 		{
-			byte var_1 = item.itemData.field_6;
+			byte var_1 = item.itemData.armorClass;
 			if (var_1 > 0x7f)
 			{
 				var_1 &= 0x7F;
-				ItemSlot itemSlot = item.itemData.item_slot;
+				ItemSlot itemSlot = item.itemData.itemSlot;
 				if (itemSlot == ItemSlot.Shield)
 				{
 					bonus[1] = (sbyte)(item.plus + var_1);
@@ -371,7 +371,7 @@ namespace engine
 				{
 					totalItemWeight += item_weight;
 
-					ItemSlot slot = item.itemData.item_slot;
+					ItemSlot slot = item.itemData.itemSlot;
 
 					if (slot >= ItemSlot.Weapon && slot <= ItemSlot.Boots)
 					{

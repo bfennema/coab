@@ -31,9 +31,19 @@ namespace Classes
         Boots = 8,
         Ring1 = 9,
         Ring2 = 10,
+        ScrollMU = 11,
+        ScrollCL = 12,
         Arrow = 11,
         Quarrel = 12,
-        slot_13 = 13
+        slot_74 = 74,
+        slot_75 = 75,
+        slot_77 = 77,
+        slot_78 = 78,
+        slot_80 = 80,
+        slot_81 = 81,
+        slot_82 = 82,
+        slot_83 = 83,
+        slot_91 = 91,
     }
 
     public class ItemDataTable
@@ -47,7 +57,7 @@ namespace Classes
         }
 
         public async void Read(string fileName)
-            {
+        {
             var stream = await gbl.file.Open(Config.GetDataPath(gbl.game), fileName);
 
             stream.Seek(2, SeekOrigin.Begin);
@@ -75,14 +85,14 @@ namespace Classes
     [Serializable]
     public class ItemData
     {
-        public ItemSlot item_slot; //seg600:5D10 unk_1C020 - field_0
+        public ItemSlot itemSlot; //seg600:5D10 unk_1C020 - field_0
         public byte handsCount; //seg600:5D11 unk_1C021
         public byte diceCountLarge; //seg600:5D12 unk_1C022
         public byte diceSizeLarge; //seg600:5D13 unk_1C023
         public sbyte bonusLarge; //seg600:5D14
         public int numberAttacks; //seg600:5D15
-        public byte field_6; //seg600:5D16 unk_1C026
-        public byte field_7; //seg600:5D17 unk_1C027
+        public byte armorClass; //seg600:5D16 unk_1C026
+        public WeaponDamageType damageType; //seg600:5D17 unk_1C027
         public byte field_8; //seg600:5D18
         public byte diceCountNormal; //seg600:5D19 field_9 maybe ranged 
         public byte diceSizeNormal; //seg600:5D1A field_A  maybe ranged
@@ -95,14 +105,14 @@ namespace Classes
 
         public ItemData(byte[] data, int offset)
         {
-            item_slot = (ItemSlot)data[offset + 0];
+            itemSlot = (ItemSlot)data[offset + 0];
             handsCount = data[offset + 1];
             diceCountLarge = data[offset + 2];
             diceSizeLarge = data[offset + 3];
             bonusLarge = (sbyte)data[offset + 4];
             numberAttacks = data[offset + 5];
-            field_6 = data[offset + 6];
-            field_7 = data[offset + 7];
+            armorClass = data[offset + 6];
+            damageType = (WeaponDamageType)data[offset + 7];
             field_8 = data[offset + 8];
             diceCountNormal = data[offset + 9];
             diceSizeNormal = data[offset + 0xa];
@@ -120,7 +130,7 @@ namespace Classes
         public override string ToString()
         {
             return string.Format("{0}, {1}, {2}, {3}, {4}, {5}, {6}, {7}, {8}, {9}, {10}, {11}, {12}, {13}, {14}, {15}",
-                   item_slot, handsCount, diceCountLarge, diceSizeLarge, bonusLarge, numberAttacks, field_6, field_7, field_8,
+                   itemSlot, handsCount, diceCountLarge, diceSizeLarge, bonusLarge, numberAttacks, armorClass, damageType, field_8,
                    diceCountNormal, diceSizeNormal, bonusNormal, range, classFlags, field_E, field_F);
         }
     }
@@ -240,5 +250,11 @@ namespace Classes
         Type_109 = 109,
         Type_110 = 110,
         Type_128 = 128,
+    }
+    public enum WeaponDamageType
+    {
+        Slash = 0,
+        Pierce = 1,
+        Blunt = 128,
     }
 }

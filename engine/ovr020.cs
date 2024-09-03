@@ -1205,7 +1205,7 @@ namespace engine
                     result = Weld.HandsFull;
                 }
 
-                ItemSlot item_slot = item.itemData.item_slot;
+                ItemSlot item_slot = item.itemData.itemSlot;
 
                 if (item_slot >= ItemSlot.Weapon && item_slot <= ItemSlot.Boots)
                 {

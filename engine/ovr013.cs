@@ -1266,7 +1266,7 @@ namespace engine
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
 			if (item != null &&
-				item.itemData.field_7 == 1)
+				item.itemData.damageType == WeaponDamageType.Pierce)
 			{
 				gbl.damage = 1;
 			}
@@ -1373,7 +1373,7 @@ namespace engine
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
 			if (item != null &&
-				(item.itemData.field_7 & 0x81) != 0)
+				(item.itemData.damageType != WeaponDamageType.Pierce || item.itemData.damageType == WeaponDamageType.Blunt))
 			{
 				gbl.damage /= 2;
 			}
@@ -1635,8 +1635,8 @@ namespace engine
 
 			if (weapon != null)
 			{
-				if (weapon.itemData.field_7 == 0 ||
-					(weapon.itemData.field_7 & 1) != 0)
+				if (weapon.itemData.damageType == WeaponDamageType.Slash ||
+					(weapon.itemData.damageType == WeaponDamageType.Pierce))
 				{
 					gbl.damage /= 2;
 				}

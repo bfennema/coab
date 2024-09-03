@@ -51,7 +51,7 @@ namespace Classes
 
         public bool IsScroll()
         {
-            return (itemData.item_slot >= ItemSlot.Arrow && itemData.item_slot <= ItemSlot.slot_13);
+            return (itemData.itemSlot >= ItemSlot.ScrollMU && itemData.itemSlot <= ItemSlot.ScrollCL);
         }
 
         public Affects getAffect(int i)
