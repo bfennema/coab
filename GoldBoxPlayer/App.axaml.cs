@@ -38,7 +38,7 @@ public partial class App : Application
             services.AddSingleton<IFilesService>(x => new FilesService(desktop.MainWindow));
             model.LoadConfigs(desktop.MainWindow);
             view = desktop.MainWindow.GetControl<MainView>("MainView");
-            Classes.gbl.StorageProvider = desktop.MainWindow.StorageProvider;
+            File.SetStorageProvider(desktop.MainWindow.StorageProvider);
         }
         else if (ApplicationLifetime is ISingleViewApplicationLifetime singleViewPlatform)
         {
@@ -50,7 +50,7 @@ public partial class App : Application
             services.AddSingleton<IFilesService>(x => new FilesService(singleViewPlatform.MainView));
             model.LoadConfigs(TopLevel.GetTopLevel(singleViewPlatform.MainView));
             view = (MainView)singleViewPlatform.MainView;
-            Classes.gbl.StorageProvider = TopLevel.GetTopLevel(singleViewPlatform.MainView).StorageProvider;
+            File.SetStorageProvider(TopLevel.GetTopLevel(singleViewPlatform.MainView).StorageProvider);
         }
         else
         {

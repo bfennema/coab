@@ -8,10 +8,15 @@ namespace GoldBoxPlayer;
 
 public partial class File : Classes.File
 {
+    static IStorageProvider StorageProvider = null;
+    public static void SetStorageProvider(IStorageProvider storageProvider)
+    {
+        StorageProvider = storageProvider;
+    }
     internal async static Task<IStorageFile?> InternalOpen(string path, string filename)
     {
         IStorageFile? storageFile = null;
-        var folder = await gbl.StorageProvider.OpenFolderBookmarkAsync(path);
+        var folder = await StorageProvider.OpenFolderBookmarkAsync(path);
         await foreach (var file in folder.GetItemsAsync())
         {
             if (string.Equals(file.Name, filename, System.StringComparison.OrdinalIgnoreCase))
@@ -28,7 +33,7 @@ public partial class File : Classes.File
     public async IAsyncEnumerable<(string,Stream)> OpenAll(string path, string filter = "*")
     {
         IStorageFile? storageFile = null;
-        var folder = await gbl.StorageProvider.OpenFolderBookmarkAsync(path);
+        var folder = await StorageProvider.OpenFolderBookmarkAsync(path);
         await foreach (var file in folder.GetItemsAsync())
         {
             bool match = false;
