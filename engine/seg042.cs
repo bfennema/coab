@@ -63,11 +63,11 @@ namespace engine
         }
 
 
-        static char[] unk_16FA9 = { ' ', '.', '*', ',', '?', '/', '\\', ':', ';', '|' };
+        static char[] invalid_characters = { ' ', '.', '*', ',', '?', '/', '\\', ':', ';', '|' };
 
         internal static string clean_string(string s)
         {
-            string cleanStr = s.Trim(unk_16FA9).ToLower();
+            string cleanStr = string.Join("", s.Split(invalid_characters)).ToUpper();
 
             if (cleanStr.Length > 8)
             {
