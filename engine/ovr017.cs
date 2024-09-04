@@ -213,8 +213,7 @@ namespace engine
                 }
             }
 
-            System.IO.Stream file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.{1}", file_text, ext_text));
-
+            System.IO.Stream file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.{1}", file_text, ext_text));
             gbl.file.Rewrite(file);
 
             List<PoolRadAffect> poolrad_affects = new List<PoolRadAffect>();
@@ -237,7 +236,7 @@ namespace engine
             {
                 if (player.items.Count > 0)
                 {
-                    file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.ITM", file_text));
+                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.ITM", file_text));
                     gbl.file.Rewrite(file);
 
                     player.items.ForEach(item => gbl.file.BlockWrite(PoolRadItem.StructSize, new PoolRadItem(item).Save(player, poolrad_affects), file));
@@ -253,7 +252,7 @@ namespace engine
             {
                 if (player.items.Count > 0)
                 {
-                    file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.SWG", file_text));
+                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.SWG", file_text));
                     gbl.file.Rewrite(file);
 
                     player.items.ForEach(item => gbl.file.BlockWrite(CurseItem.StructSize, new CurseItem(item).Save(), file));
@@ -269,7 +268,7 @@ namespace engine
             {
                 if (player.items.Count > 0)
                 {
-                    file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.STF", file_text));
+                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.STF", file_text));
                     gbl.file.Rewrite(file);
 
                     player.items.ForEach(item => gbl.file.BlockWrite(SecretItem.StructSize, new SecretItem(item).Save(), file));
@@ -286,7 +285,7 @@ namespace engine
             {
                 if (player.affects.Count > 0)
                 {
-                    file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.SPC", file_text));
+                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.SPC", file_text));
                     gbl.file.Rewrite(file);
 
                     foreach (Affect affect in player.affects)
@@ -323,7 +322,7 @@ namespace engine
             {
                 if (player.affects.Count > 0)
                 {
-                    file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.FX", file_text));
+                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.FX", file_text));
                     gbl.file.Rewrite(file);
 
                     foreach (Affect affect in player.affects)
@@ -342,7 +341,7 @@ namespace engine
             {
                 if (player.affects.Count > 0)
                 {
-                    file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.SFX", file_text));
+                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.SFX", file_text));
                     gbl.file.Rewrite(file);
 
                     foreach (Affect affect in player.affects)
@@ -358,7 +357,7 @@ namespace engine
                 }
             }
             System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(player.GetType());
-            System.IO.Stream stream = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.XML", file_text));
+            System.IO.Stream stream = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.XML", file_text));
             gbl.file.Rewrite(stream);
             x.Serialize(stream, player);
             stream.Close();
@@ -1382,7 +1381,7 @@ namespace engine
 
                 do
                 {
-                    save_file = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("SAVGAM{0}.DAT", inputKey));
+                    save_file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("SAVGAM{0}.DAT", inputKey));
                     gbl.file.Rewrite(save_file);
 
                     if (unk_4AEEF.MemberOf(gbl.FIND_result) == false)
@@ -1482,7 +1481,7 @@ namespace engine
 
             do
             {
-                save_file = await gbl.file.Open(Config.GetSavePath(gbl.game), file_name);
+                save_file = await gbl.file.Create(Config.GetSavePath(gbl.game), file_name);
                 gbl.file.Rewrite(save_file);
 
                 if (unk_4AEEF.MemberOf(gbl.FIND_result) == false)

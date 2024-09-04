@@ -68,8 +68,19 @@ public partial class File : Classes.File
             return null;
         }
 
-        var stream = await storageFile.OpenReadAsync();
+        return await storageFile.OpenReadAsync();
+    }
+    public async Task<Stream?> Create(string path, string filename)
+    {
+        var folder = await StorageProvider.OpenFolderBookmarkAsync(path);
+        IStorageFile? storageFile = await folder.CreateFileAsync(filename);
 
+        if (storageFile == null)
+        {
+            return null;
+        }
+
+        var stream =  await storageFile.OpenWriteAsync();
         return stream;
     }
     public async void Delete(string path, string filename)
