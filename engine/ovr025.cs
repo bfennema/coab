@@ -74,16 +74,21 @@ namespace engine
 				}
 				else if (item.weight >= 151 && item.weight <= 399)
 				{
-					player.movement = 9;
+                    if (item.plus == 0)
+                    {
+                        player.movement = 9;
+                    }
 				}
 				else
 				{
-					player.movement = 6;
-				}
-
-				if (player.movement != 0 && player.movement <= 9)
-				{
-					player.movement += 3;
+                    if (item.plus == 0)
+                    {
+                        player.movement = 6;
+                    }
+                    else
+                    {
+                        player.movement = 9;
+                    }
 				}
 			}
 		}
