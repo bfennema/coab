@@ -114,32 +114,32 @@ public class MainViewModel : ViewModelBase
         if (parameter == "PoolRadSave")
         {
             this.RaiseAndSetIfChanged(ref _PoolRadSave, folder, nameof(PoolRadSave));
-            Logging.Config.SetSavePath(Logging.Game.PoolOfRadiance, folder);
+            Logging.Config.SetSavePath(Logging.Game.PoolOfRadiance, await folder.SaveBookmarkAsync());
         }
         else if (parameter == "PoolRadData")
         {
             this.RaiseAndSetIfChanged(ref _PoolRadData, folder, nameof(PoolRadData));
-            Logging.Config.SetDataPath(Logging.Game.PoolOfRadiance, folder);
+            Logging.Config.SetDataPath(Logging.Game.PoolOfRadiance, await folder.SaveBookmarkAsync());
         }
         else if (parameter == "CurseSave")
         {
             this.RaiseAndSetIfChanged(ref _CurseSave, folder, nameof(CurseSave));
-            Logging.Config.SetSavePath(Logging.Game.CurseOfTheAzureBonds, folder);
+            Logging.Config.SetSavePath(Logging.Game.CurseOfTheAzureBonds, await folder.SaveBookmarkAsync());
         }
         else if (parameter == "CurseData")
         {
             this.RaiseAndSetIfChanged(ref _CurseData, folder, nameof(CurseData));
-            Logging.Config.SetDataPath(Logging.Game.CurseOfTheAzureBonds, folder);
+            Logging.Config.SetDataPath(Logging.Game.CurseOfTheAzureBonds, await folder.SaveBookmarkAsync());
         }
         else if (parameter == "SecretSave")
         {
             this.RaiseAndSetIfChanged(ref _SecretSave, folder, nameof(SecretSave));
-            Logging.Config.SetSavePath(Logging.Game.SecretOfTheSilverBlades, folder);
+            Logging.Config.SetSavePath(Logging.Game.SecretOfTheSilverBlades, await folder.SaveBookmarkAsync());
         }
         else if (parameter == "SecretData")
         {
             this.RaiseAndSetIfChanged(ref _SecretData, folder, nameof(SecretData));
-            Logging.Config.SetDataPath(Logging.Game.SecretOfTheSilverBlades, folder);
+            Logging.Config.SetDataPath(Logging.Game.SecretOfTheSilverBlades, await folder.SaveBookmarkAsync());
         }
     }
 
