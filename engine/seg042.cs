@@ -45,7 +45,7 @@ namespace engine
 
         internal static string clean_string(string s)
         {
-            string cleanStr = s.Trim(unk_16FA9).ToLower();
+            string cleanStr = string.Join("", s.Split(unk_16FA9)).ToUpper();
 
             if (cleanStr.Length > 8)
             {
