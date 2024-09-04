@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using static Classes.CurseItem;
 using static Classes.Item;
 
 namespace Classes
@@ -382,6 +381,8 @@ namespace Classes
 
         public PoolRadItem(byte[] data, int offset)
         {
+            if (mapping == null) { InitMapping(); }
+
             DataIO.ReadObject(this, data, offset);
         }
 
@@ -403,15 +404,39 @@ namespace Classes
             count = (byte)item.count;
             _value = item._value;
             affect_1 = (byte)item.affect_1;
-            if (item.type == ItemType.Gauntlets && item.affect_3 == (Affects)131)
+            affect_2 = (byte)item.affect_2;
+            affect_3 = (byte)item.affect_3;
+
+            if (item.type == ItemType.Gauntlets && item.affect_2 == 0 && item.affect_3 == (Affects)131) // gauntlets of ogre power
             {
-                affect_2 = (byte)38;
+                affect_2 = (byte)Affects.strength;
                 affect_3 = (byte)131;
             }
-            else
+            else if (item.type == ItemType.Cloak && item.affect_2 == Affects.displace && item.affect_3 == Affects.item_affect) // cloak of displacement
             {
-                affect_2 = (byte)item.affect_2;
-                affect_3 = (byte)item.affect_3;
+                affect_3 = (byte)133;
+            }
+            else if (item.type == ItemType.Cloak && item.affect_2 == Affects.camouflage && item.affect_3 == Affects.item_affect) // cloak of elvenkind
+            {
+                affect_3 = (byte)134;
+            }
+            else if (item.type == ItemType.Ring && item.affect_2 == Affects.item_invisibility && item.affect_3 == Affects.item_affect) // ring of invisibility
+            {
+                affect_3 = (byte)139;
+            }
+            else if (item.type == ItemType.Ring && item.affect_2 == Affects.item_fire_resist && item.affect_3 == Affects.item_affect) // ring of fire resistance
+            {
+                affect_3 = (byte)129;
+            }
+            else if (item.type != ItemType.ClrcScroll && item.type != ItemType.MUScroll && item.affect_2 == Affects.weap_flame_tongue && item.affect_3 == Affects.item_affect) // flame tongue
+            {
+                affect_2 = (byte)22;
+                affect_3 = (byte)0;
+            }
+            else if (item.type != ItemType.ClrcScroll && item.type != ItemType.MUScroll && item.affect_2 == Affects.weap_undead_slayer && item.affect_3 == Affects.item_affect) // undead slayer
+            {
+                affect_2 = (byte)PoolRadAffect.Affects.weap_undead_slayer;
+                affect_3 = (byte)136;
             }
         }
 
@@ -438,9 +463,35 @@ namespace Classes
                 affect_3 = (Affects)affect_3
             };
 
-            if (item.type == ItemType.Gauntlets && item.affect_2 == (Affects)38 && item.affect_3 == (Affects)131)
+            if (item.type == ItemType.Gauntlets && item.affect_2 == Affects.strength && item.affect_3 == (Affects)131) // gauntlets of ogre power
             {
                 item.affect_2 = 0;
+            }
+            else if (item.type == ItemType.Cloak && item.affect_2 == Affects.displace && item.affect_3 == (Affects)133) // cloak of displacement
+            {
+                item.affect_3 = Affects.item_affect;
+            }
+            else if (item.type == ItemType.Cloak && item.affect_2 == Affects.camouflage && item.affect_3 == (Affects)134) // cloak of elvenkind
+            {
+                item.affect_3 = Affects.item_affect;
+            }
+            else if (item.type == ItemType.Ring && item.affect_2 == Affects.item_invisibility && item.affect_3 == (Affects)139) // ring of invisibility
+            {
+                item.affect_3 = Affects.item_affect;
+            }
+            else if (item.type == ItemType.Ring && item.affect_2 == Affects.item_fire_resist && item.affect_3 == (Affects)129) // ring of fire resistance
+            {
+                item.affect_3 = Affects.item_affect;
+            }
+            else if (item.type != ItemType.ClrcScroll && item.type != ItemType.MUScroll && item.affect_1 == 0 && item.affect_2 == (Affects)22 && item.affect_3 == 0) // flame tongue
+            {
+                item.affect_2 = Affects.weap_flame_tongue;
+                item.affect_3 = Affects.item_affect;
+            }
+            else if (item.affect_2 == (Affects)PoolRadAffect.Affects.weap_undead_slayer && item.affect_3 == (Affects)136) // weapon vs undead
+            {
+                item.affect_2 = Affects.weap_undead_slayer;
+                item.affect_3 = Affects.item_affect;
             }
 
             ItemLibrary.Add(item);
@@ -459,7 +510,7 @@ namespace Classes
 
         public byte[] Save(Player player, List<PoolRadAffect> affects)
         {
-            if (readied > 0 && type == (byte)ItemType.Gauntlets && affect_2 == 38 && affect_3 == 131)
+            if (readied > 0 && type == (byte)ItemType.Gauntlets && affect_2 == (byte)Affects.strength && affect_3 == 131)
             {
                 byte affect_data;
                 if (player.stats2.Str.cur == 18)
