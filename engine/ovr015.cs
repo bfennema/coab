@@ -450,7 +450,7 @@ namespace engine
 
                     ovr025.display_map_position_time();
 
-                } while (stop_loop == false);
+                } while (gbl.Exit == false && stop_loop == false);
             }
             else if (gbl.game == Game.PoolOfRadiance && gbl.game_state == GameState.WildernessMap)
             {

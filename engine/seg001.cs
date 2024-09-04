@@ -1,5 +1,6 @@
 using Classes;
 using Classes.Combat;
+using Classes.DaxFiles;
 using Logging;
 
 namespace engine
@@ -14,7 +15,8 @@ namespace engine
         internal static void EngineStop()
         {
             EngineStoppedCallback();
-            EngineThread.Abort();
+            gbl.Exit = true;
+            //EngineThread.Abort();
         }
 
         public static void __SystemInit(VoidDelegate stoppedCallback)
@@ -47,6 +49,10 @@ namespace engine
             gbl.game = Config.GetGame();
             while (Config.GetDataPath(gbl.game).Length == 0)
             {
+                if (gbl.Exit == true)
+                {
+                    return;
+                }
                 seg041.GameDelay();
                 gbl.game = Config.GetGame();
             }
@@ -159,7 +165,7 @@ namespace engine
                 ovr004.copy_protection();
             }
 
-            while (true)
+            while (gbl.Exit == false)
             {
                 if (gbl.inDemo == true)
                 {
@@ -173,7 +179,6 @@ namespace engine
                         gbl.game_area = 1; // 1:3
                         gbl.game_speed_var = 5;
                     }
-                    gbl.game_speed_var = 9;
                 }
                 else
                 {
@@ -222,6 +227,10 @@ namespace engine
                 if (gbl.inDemo == false)
                 {
                     ovr018.startGameMenu();
+                    if (gbl.Exit == true)
+                    {
+                        return;
+                    }
                 }
 
                 ovr003.sub_29758();

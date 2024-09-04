@@ -12,7 +12,7 @@ namespace engine
 
             var timeEnd = DateTime.Now.AddSeconds(seconds);
 
-            while (seg049.KEYPRESSED() == false &&
+            while (gbl.Exit == false && seg049.KEYPRESSED() == false &&
                 DateTime.Now < timeEnd)
             {
                 seg049.SysDelay(100);

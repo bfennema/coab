@@ -2527,7 +2527,7 @@ namespace engine
                             }
                         }
                     }
-                } while (gbl.party_killed == false);
+                } while (gbl.Exit == false && gbl.party_killed == false);
 
                 gbl.party_killed = false;
             }

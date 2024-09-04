@@ -328,7 +328,7 @@ namespace engine
 
                 seg049.SysDelay(20);
 
-            } while (stopLoop == false);
+            } while (gbl.Exit == false && stopLoop == false);
 
             gbl.area_ptr.picture_fade = 0;
 
