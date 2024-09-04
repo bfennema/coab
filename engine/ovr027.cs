@@ -324,7 +324,7 @@ namespace engine
 
                 seg049.SysDelay(20);
 
-            } while (stopLoop == false);
+            } while (gbl.Exit == false && stopLoop == false);
 
             gbl.area_ptr.picture_fade = 0;
 
@@ -683,7 +683,7 @@ namespace engine
             {
                 inputKey = displayInput(false, 0, colors, "Yes No", inputString);
 
-            } while (inputKey != 'N' && inputKey != 'Y');
+            } while (gbl.Exit == false && inputKey != 'N' && inputKey != 'Y');
 
             return inputKey;
         }

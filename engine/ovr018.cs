@@ -72,7 +72,7 @@ namespace engine
             gbl.game_state = GameState.StartGameMenu;
             bool reclac_menus = true;
 
-            while (true)
+            while (gbl.Exit == false)
             {
                 if (reclac_menus == true)
                 {

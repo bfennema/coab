@@ -1188,7 +1188,7 @@ namespace engine
                     ovr025.PartySummary(gbl.SelectedPlayer);
                     key_pressed = '\0';
                 }
-            } while (validkeys.MemberOf(key_pressed) == false && (key_pressed != '\r' || acceptReturn == false));
+            } while (gbl.Exit == false && validkeys.MemberOf(key_pressed) == false && (key_pressed != '\r' || acceptReturn == false));
 
             if (key_pressed == '\r')
             {
