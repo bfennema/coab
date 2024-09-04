@@ -65,21 +65,24 @@ namespace engine
 
         static System.Media.SoundPlayer[] sounds;
 
-        internal static void SoundInit()
+        internal static void SoundInit(string resourceName)
         {
-            var resources = new System.Resources.ResourceManager("Main.Resource", System.Reflection.Assembly.GetEntryAssembly());
+            if (System.Reflection.Assembly.GetEntryAssembly() != null)
+            {
+                var resources = new System.Resources.ResourceManager(resourceName, System.Reflection.Assembly.GetEntryAssembly());
 
-            sounds = new System.Media.SoundPlayer[13];
+                sounds = new System.Media.SoundPlayer[13];
 
-            sounds[1] = new System.Media.SoundPlayer(resources.GetStream("missle"));
-            sounds[2] = new System.Media.SoundPlayer(resources.GetStream("magic_hit"));
-            sounds[4] = new System.Media.SoundPlayer(resources.GetStream("death"));
-            sounds[5] = new System.Media.SoundPlayer(resources.GetStream("sound_5"));
-            sounds[6] = new System.Media.SoundPlayer(resources.GetStream("hit"));
-            sounds[8] = new System.Media.SoundPlayer(resources.GetStream("miss"));
-            sounds[9] = new System.Media.SoundPlayer(resources.GetStream("step"));
-            sounds[10] = new System.Media.SoundPlayer(resources.GetStream("sound_10"));
-            sounds[12] = new System.Media.SoundPlayer(resources.GetStream("start_sound"));
+                sounds[1] = new System.Media.SoundPlayer(resources.GetStream("missle"));
+                sounds[2] = new System.Media.SoundPlayer(resources.GetStream("magic_hit"));
+                sounds[4] = new System.Media.SoundPlayer(resources.GetStream("death"));
+                sounds[5] = new System.Media.SoundPlayer(resources.GetStream("sound_5"));
+                sounds[6] = new System.Media.SoundPlayer(resources.GetStream("hit"));
+                sounds[8] = new System.Media.SoundPlayer(resources.GetStream("miss"));
+                sounds[9] = new System.Media.SoundPlayer(resources.GetStream("step"));
+                sounds[10] = new System.Media.SoundPlayer(resources.GetStream("sound_10"));
+                sounds[12] = new System.Media.SoundPlayer(resources.GetStream("start_sound"));
+            }
         }
     }
 }

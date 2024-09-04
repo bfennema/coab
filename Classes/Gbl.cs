@@ -326,7 +326,7 @@ namespace Classes
 
         public static byte byte_1BF12; // TODO remove or workout what it's was for?
 
-        public static SoundType soundType = SoundType.None; // byte_1BF14
+        public static SoundType soundType = SoundType.PC; // byte_1BF14
 
         public static bool gameSaved; // byte_1C01B
         public static byte[] monoCharData = new byte[8]; // byte_1C8C2

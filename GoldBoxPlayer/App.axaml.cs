@@ -90,7 +90,7 @@ public partial class App : Application
 
     static void EngineThread(MainViewModel model)
     {
-        engine.seg001.__SystemInit(model.EngineStopped);
+        engine.seg001.__SystemInit(model.EngineStopped, "GoldBoxPlayer.Desktop.Properties.Resources");
         engine.seg001.PROGRAM();
 
         model.EngineStopped();
