@@ -8,6 +8,7 @@ namespace Classes
     {
         public IAsyncEnumerable<(string,Stream)> OpenAll(string path, string filter = "*");
         public Task<Stream?> Open(string path, string filename);
+        public Task<Stream?> Create(string path, string filename);
         public void Delete(string path, string filename);
         public Task<bool> Find(string path, string filename);
 
