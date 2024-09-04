@@ -265,7 +265,7 @@ namespace engine
                     //xPos -= 1;
                 }
 
-            } while (ch != 0x0d && ch != 0x1B && gbl.inDemo == false);
+            } while (gbl.Exit == false && ch != 0x0d && ch != 0x1B && gbl.inDemo == false);
 
             ovr027.ClearPromptAreaNoUpdate();
 

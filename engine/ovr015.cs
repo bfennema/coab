@@ -449,7 +449,7 @@ namespace engine
 
                     ovr025.display_map_position_time();
 
-                } while (stop_loop == false);
+                } while (gbl.Exit == false && stop_loop == false);
             }
 
             if (gbl.bottomTextHasBeenCleared == false)

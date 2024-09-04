@@ -267,7 +267,7 @@ namespace engine
 
                 ovr025.PartySummary(gbl.SelectedPlayer);
 
-            } while (exitShop == false);
+            } while (gbl.Exit == false && exitShop == false);
         }
     }
 }

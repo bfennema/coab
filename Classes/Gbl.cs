@@ -545,6 +545,7 @@ namespace Classes
         public static int game_speed_var;
 
         public static bool inDemo;
+        public static bool Exit = false;
         public static bool AnimationsOn = true;
         public static bool PicsOn = true;
 

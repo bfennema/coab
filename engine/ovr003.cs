@@ -2151,7 +2151,8 @@ namespace engine
 
             //System.Console.Out.WriteLine("RunEclVm {0,4:X} start", offset);
 
-            while (gbl.stopVM == false &&
+            while (gbl.Exit == false &&
+                   gbl.stopVM == false &&
                    gbl.party_killed == false)
             {
                 gbl.command = gbl.ecl_ptr[gbl.ecl_offset - gbl.initial_ecl_offset];
@@ -2389,7 +2390,7 @@ namespace engine
                             }
                         }
                     }
-                } while (gbl.party_killed == false);
+                } while (gbl.Exit == false && gbl.party_killed == false);
 
                 gbl.party_killed = false;
             }

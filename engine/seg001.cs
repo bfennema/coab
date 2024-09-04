@@ -13,7 +13,8 @@ namespace engine
         internal static void EngineStop()
         {
             EngineStoppedCallback();
-            EngineThread.Abort();
+            gbl.Exit = true;
+            //EngineThread.Abort();
         }
 
         public static void __SystemInit(VoidDelegate stoppedCallback, string resourceName)
@@ -130,7 +131,7 @@ namespace engine
                 ovr004.copy_protection();
             }
 
-            while (true)
+            while (gbl.Exit == false)
             {
                 if (gbl.inDemo == true)
                 {
@@ -152,6 +153,10 @@ namespace engine
                 if (gbl.inDemo == false)
                 {
                     ovr018.startGameMenu();
+                    if (gbl.Exit == true)
+                    {
+                        return;
+                    }
                 }
 
                 ovr003.sub_29758();

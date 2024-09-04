@@ -669,7 +669,7 @@ namespace engine
                         ovr025.PartySummary(gbl.SelectedPlayer);
                         break;
                 }
-            } while (done == false);
+            } while (gbl.Exit == false && done == false);
         }
 
 

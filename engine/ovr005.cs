@@ -501,7 +501,7 @@ namespace engine
                 }
 
                 ovr025.PartySummary(gbl.SelectedPlayer);
-            } while (stop_loop == false);
+            } while (gbl.Exit == false && stop_loop == false);
         }
     }
 }

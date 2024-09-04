@@ -96,7 +96,7 @@ namespace engine
                     yield return output_player;
                 }
 
-            } while (output_player != null);
+            } while (gbl.Exit == false && output_player != null);
         }
 
 
@@ -166,7 +166,7 @@ namespace engine
                 {
                     bool var_2 = false;
 
-                    while (var_2 == false)
+                    while (gbl.Exit == false && var_2 == false)
                     {
                         combat_menu(out var_1, player);
 
@@ -355,7 +355,7 @@ namespace engine
                     arg_0 = '\0';
                 }
 
-            } while (unk_33768.MemberOf(arg_0) == false);
+            } while (gbl.Exit == false && unk_33768.MemberOf(arg_0) == false);
 
             ovr027.ClearPromptArea();
         }
@@ -396,7 +396,8 @@ namespace engine
 
             bool battleOver = false;
 
-            if (gbl.friends_count == 0 ||
+            if (gbl.Exit == true ||
+                gbl.friends_count == 0 ||
                 gbl.foe_count == 0 ||
                 gbl.combat_round >= gbl.combat_round_no_action_limit)
             {

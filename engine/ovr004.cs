@@ -97,9 +97,9 @@ namespace engine
                 {
                     return;
                 }
-            } while (input_key != input_expected && attempt < 3);
+            } while (gbl.Exit == false && input_key != input_expected && attempt < 3);
 
-            if (attempt >= 3)
+            if (gbl.Exit == false && attempt >= 3)
             {
                 seg044.PlaySound(Sound.sound_1);
                 seg044.PlaySound(Sound.sound_5);
