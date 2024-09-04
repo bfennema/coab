@@ -2442,7 +2442,7 @@ namespace engine
 			{
 				bool saved = ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
 
-				ovr024.ApplyAttackSpellAffect("is confused", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout(Spells.confusion), Affects.cause_disease_2, target);
+				ovr024.ApplyAttackSpellAffect("is confused", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout(Spells.confusion), Affects.confuse, target);
 			}
 		}
 
