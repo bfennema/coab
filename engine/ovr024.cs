@@ -15,21 +15,21 @@ namespace engine
         Type_5 = 5,
         PreDamage = 6,
         PlayerRestrained = 7,
-        Type_8 = 8,
+        BattleSetup1 = 8,
         MagicResistance = 9,
-        Type_10 = 10,
+        CanHitAttacker = 10,
         Type_11 = 11,
         SavingThrow = 12,
         Death = 13,
         Type_14 = 14,
         Type_15 = 15,
-        Type_16 = 16,
+        CanHitTarget = 16,
         Morale = 17,
         Movement = 18,
-        Type_19 = 19,
+        BattleRound = 19,
         FireShield = 20,
         Confusion = 21,
-        Type_22 = 22,
+        BattleSetup2 = 22,
         Type_23 = 23
     }
 
@@ -242,7 +242,7 @@ namespace engine
                     calc_affect_effect(Affects.entangle, player);
                     break;
 
-                case CheckType.Type_8:
+                case CheckType.BattleSetup1:
                     calc_affect_effect(Affects.fight_unconscious, player);
                     calc_affect_effect(Affects.resist_fire_and_cold, player);
                     calc_affect_effect(Affects.displace, player);
@@ -266,7 +266,7 @@ namespace engine
                     calc_affect_effect(Affects.protect_magic, player);
                     break;
 
-                case CheckType.Type_10:
+                case CheckType.CanHitAttacker:
                     calc_affect_effect(Affects.bless, player);
                     calc_affect_effect(Affects.cursed, player);
                     calc_affect_effect(Affects.blinded, player);
@@ -343,7 +343,7 @@ namespace engine
                     calc_affect_effect(Affects.berserk, player);
                     break;
 
-                case CheckType.Type_16:
+                case CheckType.CanHitTarget:
                     calc_affect_effect(Affects.invisibility, player);
                     calc_affect_effect(Affects.invisible, player);
                     calc_affect_effect(Affects.blink, player);
@@ -365,7 +365,7 @@ namespace engine
                     calc_affect_effect(Affects.clear_movement, player);
                     break;
 
-                case CheckType.Type_19:
+                case CheckType.BattleRound:
                     calc_affect_effect(Affects.regen_3_hp, player);
                     calc_affect_effect(Affects.spiritual_hammer, player);
                     calc_affect_effect(Affects.camouflage, player);
@@ -382,7 +382,7 @@ namespace engine
                     calc_affect_effect(Affects.confuse, player);
                     break;
 
-                case CheckType.Type_22:
+                case CheckType.BattleSetup2:
                     calc_affect_effect(Affects.add_invisibility, player);
                     break;
 
@@ -515,7 +515,7 @@ namespace engine
                     gbl.attack_roll = 100;
                 }
 
-                CheckAffectsEffect(target, CheckType.Type_16);
+                CheckAffectsEffect(target, CheckType.CanHitTarget);
 
                 if (gbl.attack_roll >= 0)
                 {
@@ -544,8 +544,8 @@ namespace engine
                     gbl.attack_roll = 100;
                 }
 
-                CheckAffectsEffect(attacker, CheckType.Type_10);
-                CheckAffectsEffect(target, CheckType.Type_16);
+                CheckAffectsEffect(attacker, CheckType.CanHitAttacker);
+                CheckAffectsEffect(target, CheckType.CanHitTarget);
 
                 int team_bonus;
                 if (attacker.combat_team == CombatTeam.Ours)
@@ -890,7 +890,7 @@ namespace engine
 
                     if (stat_index == Stat.STR)
                     {
-                        if (var_12 == 3 && ((int)item.affect_2 == 0 || (PoolRadAffect.Affects)item.affect_2 == PoolRadAffect.Affects.strength)) // Gauntlets of Ogre Power
+                        if (var_12 == 3) // Gauntlets of Ogre Power
                         {
                             stat_b = 18;
                             str_00_b = 100;
@@ -974,11 +974,18 @@ namespace engine
                                 stat_a++;
                             }
                         }
-                        else if (var_12 == 12)
+                        else if (var_12 == 12) // hat of stupidity
                         {
-                            var_11 = 7;
+                            if (player.stats2.Int.cur < 7)
+                            {
+                                stat_a--;
+                            }
+                            else
+                            {
+                                var_11 = 7;
+                            }
                         }
-                        else if (var_12 == 13)
+                        else if (var_12 == 13) // robe of powerlessness
                         {
                             var_11 = 3;
                         }
