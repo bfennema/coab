@@ -1149,7 +1149,7 @@ namespace engine
                 {
                     seg041.displayString(text, 0, 15, 7, 7);
                     ovr020.display_player_stats01(3, 2, 17, 1, -1, 20, -11, 6);
-                    seg041.displayString(player.hit_point_current.ToString() + "/" + player.hit_point_max.ToString(), 0, 10, 3, 31);
+                    seg041.displayString(player.hit_point_current.ToString() + "/" + player.hit_point_max.ToString() + "  ", 0, 10, 3, 31);
                     ovr020.displayMoney(9, 20, -8, 9);
                 }
 
@@ -1303,7 +1303,8 @@ namespace engine
                 ((gbl.SelectedPlayer.exp != 0 &&
                 gbl.SelectedPlayer.exp != 8333 &&
                 gbl.SelectedPlayer.exp != 12500 &&
-                gbl.SelectedPlayer.exp != 25000) ||
+                gbl.SelectedPlayer.exp != 25000 &&
+                gbl.SelectedPlayer.exp != 200000) ||
                 gbl.SelectedPlayer.multiclassLevel != 0))
             {
                 seg041.DisplayStatusText(0, 14, gbl.SelectedPlayer.name + " can't be modified.");
