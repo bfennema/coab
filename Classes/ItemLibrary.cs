@@ -10,7 +10,7 @@ namespace Classes
     public class ItemLibrary
     {
 
-        static string libraryPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "CotAB");
+        static string libraryPath = Logging.Config.AppDataPath;
         static string libraryFile = Path.Combine(libraryPath, "ItemLibrary.dat");
 
         static List<Item> library = new List<Item>();

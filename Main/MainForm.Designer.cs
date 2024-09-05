@@ -158,7 +158,7 @@ namespace Main
             // 
             // alwayAllowAreaMapToolStripMenuItem
             // 
-            this.alwayAllowAreaMapToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.AlwayShowAreaMap;
+            this.alwayAllowAreaMapToolStripMenuItem.Checked = settings.AlwaysShowAreaMap;
             this.alwayAllowAreaMapToolStripMenuItem.CheckOnClick = true;
             this.alwayAllowAreaMapToolStripMenuItem.Name = "alwayAllowAreaMapToolStripMenuItem";
             this.alwayAllowAreaMapToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -167,7 +167,7 @@ namespace Main
             // 
             // allowPlayerModifyToolStripMenuItem
             // 
-            this.allowPlayerModifyToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.AllowPlayerModify;
+            this.allowPlayerModifyToolStripMenuItem.Checked = settings.AllowPlayerModify;
             this.allowPlayerModifyToolStripMenuItem.CheckOnClick = true;
             this.allowPlayerModifyToolStripMenuItem.Name = "allowPlayerModifyToolStripMenuItem";
             this.allowPlayerModifyToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -176,7 +176,7 @@ namespace Main
             // 
             // allowGodsInterveneToolStripMenuItem
             // 
-            this.allowGodsInterveneToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.AllowGodsIntervene;
+            this.allowGodsInterveneToolStripMenuItem.Checked = settings.AllowGodsIntervene;
             this.allowGodsInterveneToolStripMenuItem.CheckOnClick = true;
             this.allowGodsInterveneToolStripMenuItem.Name = "allowGodsInterveneToolStripMenuItem";
             this.allowGodsInterveneToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -185,7 +185,7 @@ namespace Main
             // 
             // displayItemsFullNameToolStripMenuItem
             // 
-            this.displayItemsFullNameToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.DisplayFullItemNames;
+            this.displayItemsFullNameToolStripMenuItem.Checked = settings.DisplayFullItemNames;
             this.displayItemsFullNameToolStripMenuItem.CheckOnClick = true;
             this.displayItemsFullNameToolStripMenuItem.Name = "displayItemsFullNameToolStripMenuItem";
             this.displayItemsFullNameToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -194,7 +194,7 @@ namespace Main
             // 
             // freeTrainingToolStripMenuItem
             // 
-            this.freeTrainingToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.FreeTraining;
+            this.freeTrainingToolStripMenuItem.Checked = settings.FreeTraining;
             this.freeTrainingToolStripMenuItem.CheckOnClick = true;
             this.freeTrainingToolStripMenuItem.Name = "freeTrainingToolStripMenuItem";
             this.freeTrainingToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -203,7 +203,7 @@ namespace Main
             // 
             // improvedAreaMapToolStripMenuItem
             // 
-            this.improvedAreaMapToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.ImprovedAreaMap;
+            this.improvedAreaMapToolStripMenuItem.Checked = settings.ImprovedAreaMap;
             this.improvedAreaMapToolStripMenuItem.CheckOnClick = true;
             this.improvedAreaMapToolStripMenuItem.Name = "improvedAreaMapToolStripMenuItem";
             this.improvedAreaMapToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -212,7 +212,7 @@ namespace Main
             // 
             // playersAlwayMakeSavingThrowToolStripMenuItem
             // 
-            this.playersAlwayMakeSavingThrowToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.PlayerAlwaysSaves;
+            this.playersAlwayMakeSavingThrowToolStripMenuItem.Checked = settings.PlayerAlwaysSaves;
             this.playersAlwayMakeSavingThrowToolStripMenuItem.CheckOnClick = true;
             this.playersAlwayMakeSavingThrowToolStripMenuItem.Name = "playersAlwayMakeSavingThrowToolStripMenuItem";
             this.playersAlwayMakeSavingThrowToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -221,7 +221,7 @@ namespace Main
             // 
             // skipCopyProtectionToolStripMenuItem
             // 
-            this.skipCopyProtectionToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.SkipCopyProtection;
+            this.skipCopyProtectionToolStripMenuItem.Checked = settings.SkipCopyProtection;
             this.skipCopyProtectionToolStripMenuItem.CheckOnClick = true;
             this.skipCopyProtectionToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.skipCopyProtectionToolStripMenuItem.Name = "skipCopyProtectionToolStripMenuItem";
@@ -231,7 +231,7 @@ namespace Main
             // 
             // skipTitleScreenToolStripMenuItem
             // 
-            this.skipTitleScreenToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.SkipTitleScreen;
+            this.skipTitleScreenToolStripMenuItem.Checked = settings.SkipTitleScreen;
             this.skipTitleScreenToolStripMenuItem.CheckOnClick = true;
             this.skipTitleScreenToolStripMenuItem.Name = "skipTitleScreenToolStripMenuItem";
             this.skipTitleScreenToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -240,7 +240,7 @@ namespace Main
             // 
             // viewItemsStatsToolStripMenuItem
             // 
-            this.viewItemsStatsToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.ViewItemsStats;
+            this.viewItemsStatsToolStripMenuItem.Checked = settings.ViewItemsStats;
             this.viewItemsStatsToolStripMenuItem.CheckOnClick = true;
             this.viewItemsStatsToolStripMenuItem.Name = "viewItemsStatsToolStripMenuItem";
             this.viewItemsStatsToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -249,7 +249,7 @@ namespace Main
             // 
             // noRaceClassLimitsToolStripMenuItem
             // 
-            this.noRaceClassLimitsToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.NoRaceClassLimits;
+            this.noRaceClassLimitsToolStripMenuItem.Checked = settings.NoRaceClassLimits;
             this.noRaceClassLimitsToolStripMenuItem.CheckOnClick = true;
             this.noRaceClassLimitsToolStripMenuItem.Name = "noRaceClassLimitsToolStripMenuItem";
             this.noRaceClassLimitsToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -258,7 +258,7 @@ namespace Main
             // 
             // noRaceLevelLimitsToolStripMenuItem
             // 
-            this.noRaceLevelLimitsToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.NoRaceLevelLimits;
+            this.noRaceLevelLimitsToolStripMenuItem.Checked = settings.NoRaceLevelLimits;
             this.noRaceLevelLimitsToolStripMenuItem.CheckOnClick = true;
             this.noRaceLevelLimitsToolStripMenuItem.Name = "noRaceLevelLimitsToolStripMenuItem";
             this.noRaceLevelLimitsToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -267,7 +267,7 @@ namespace Main
             // 
             // sortTreasureToolStripMenuItem
             // 
-            this.sortTreasureToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.SortTreasure;
+            this.sortTreasureToolStripMenuItem.Checked = settings.SortTreasure;
             this.sortTreasureToolStripMenuItem.CheckOnClick = true;
             this.sortTreasureToolStripMenuItem.Name = "sortTreasureToolStripMenuItem";
             this.sortTreasureToolStripMenuItem.Size = new System.Drawing.Size(253, 22);
@@ -287,7 +287,7 @@ namespace Main
             // 
             // soundOnToolStripMenuItem
             // 
-            this.soundOnToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.SoundOn;
+            this.soundOnToolStripMenuItem.Checked = settings.SoundOn;
             this.soundOnToolStripMenuItem.CheckOnClick = true;
             this.soundOnToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.soundOnToolStripMenuItem.Name = "soundOnToolStripMenuItem";
@@ -297,7 +297,7 @@ namespace Main
             // 
             // animationsOnToolStripMenuItem
             // 
-            this.animationsOnToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.AnimationOn;
+            this.animationsOnToolStripMenuItem.Checked = settings.AnimationOn;
             this.animationsOnToolStripMenuItem.CheckOnClick = true;
             this.animationsOnToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.animationsOnToolStripMenuItem.Name = "animationsOnToolStripMenuItem";
@@ -307,7 +307,7 @@ namespace Main
             // 
             // picturesOnToolStripMenuItem
             // 
-            this.picturesOnToolStripMenuItem.Checked = global::Main.Properties.Settings.Default.PictureOn;
+            this.picturesOnToolStripMenuItem.Checked = settings.PictureOn;
             this.picturesOnToolStripMenuItem.CheckOnClick = true;
             this.picturesOnToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
             this.picturesOnToolStripMenuItem.Name = "picturesOnToolStripMenuItem";

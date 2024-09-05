@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using Main.Properties;
 using System.Drawing.Imaging;
+using System.Runtime;
 
 namespace Main
 {
@@ -17,13 +18,15 @@ namespace Main
 		Rectangle rect;
 		int outputWidth;
 		int outputHeight;
+		Settings settings;
 
 		public MainForm()
 		{
 			outputHeight = 200;
 			outputWidth = 320;
 
-			setSettings();
+			settings = Settings.LoadSettings(Logging.Config.AppDataPath, Directory.GetCurrentDirectory(), Logging.Config.SaveBasePath);
+			settings.Set();
 
 			InitializeComponent();
 
@@ -114,135 +117,75 @@ namespace Main
 			}
 		}
 
-		private void setSettings()
-		{
-			Settings.Default.Upgrade();
-			Settings.Default.Save();
-
-			Classes.Cheats.PlayerAlwaysSavesSet(Settings.Default.PlayerAlwaysSaves);
-			Classes.Cheats.AlwayShowAreaMapSet(Settings.Default.AlwayShowAreaMap);
-			Classes.Cheats.FreeTrainingSet(Settings.Default.FreeTraining);
-			Classes.Cheats.SkipCopyProtectionSet(Settings.Default.SkipCopyProtection);
-			Classes.Cheats.AllowPlayerModifySet(Settings.Default.AllowPlayerModify);
-			Classes.Cheats.AllowGodsInterveneSet(Settings.Default.AllowGodsIntervene);
-			Classes.Cheats.DisplayFullItemNamesSet(Settings.Default.DisplayFullItemNames);
-			Classes.Cheats.ViewItemStatsSet(Settings.Default.ViewItemsStats);
-			Classes.Cheats.SkipTitleScreenSet(Settings.Default.SkipTitleScreen);
-			Classes.Cheats.ImprovedAreaMapSet(Settings.Default.ImprovedAreaMap);
-			Classes.Cheats.NoRaceLevelLimits(Settings.Default.NoRaceClassLimits);
-			Classes.Cheats.NoRaceClassRestrictions(Settings.Default.NoRaceClassLimits);
-			Classes.Cheats.SortTreasureSet(Settings.Default.SortTreasure);
-
-			engine.seg044.SetSound(Settings.Default.SoundOn);
-            engine.seg044.SetPicture(Settings.Default.PictureOn);
-            engine.seg044.SetAnimation(Settings.Default.AnimationOn);
-		}
-
 		private void playersAlwayMakeSavingThrowToolStripMenuItem_CheckedChanged(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.PlayerAlwaysSaves;
-			Settings.Default.PlayerAlwaysSaves = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.PlayerAlwaysSavesSet(flipped);
+			bool flipped = !settings.PlayerAlwaysSaves;
+			settings.PlayerAlwaysSaves = flipped;
 		}
 
 		private void alwayAllowAreaMapToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			Settings.Default.AlwayShowAreaMap = !Settings.Default.AlwayShowAreaMap;
-			Settings.Default.Save();
-
-			Classes.Cheats.AlwayShowAreaMapSet(Settings.Default.AlwayShowAreaMap);
+			settings.AlwaysShowAreaMap = !settings.AlwaysShowAreaMap;
 		}
 
 		private void freeTrainingToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.FreeTraining;
-			Settings.Default.FreeTraining = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.FreeTrainingSet(flipped);
+			bool flipped = !settings.FreeTraining;
+			settings.FreeTraining = flipped;
 		}
 
 		private void skipCopyProtectionToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.SkipCopyProtection;
-			Settings.Default.SkipCopyProtection = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.SkipCopyProtectionSet(flipped);
+			bool flipped = !settings.SkipCopyProtection;
+			settings.SkipCopyProtection = flipped;
 		}
 
 		private void skipTitleScreenToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.SkipTitleScreen;
-			Settings.Default.SkipTitleScreen = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.SkipTitleScreenSet(flipped);
+			bool flipped = !settings.SkipTitleScreen;
+			settings.SkipTitleScreen = flipped;
 		}
 
 		private void allowPlayerModifyToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.AllowPlayerModify;
-			Settings.Default.AllowPlayerModify = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.AllowPlayerModifySet(flipped);
+			bool flipped = !settings.AllowPlayerModify;
+			settings.AllowPlayerModify = flipped;
 		}
 
 		private void allowGodsInterveneToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.AllowGodsIntervene;
-			Settings.Default.AllowGodsIntervene = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.AllowGodsInterveneSet(flipped);
+			bool flipped = !settings.AllowGodsIntervene;
+			settings.AllowGodsIntervene = flipped;
 		}
 
 		private void displayItemsFullNameToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.DisplayFullItemNames;
-			Settings.Default.DisplayFullItemNames = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.DisplayFullItemNamesSet(flipped);
+			bool flipped = !settings.DisplayFullItemNames;
+			settings.DisplayFullItemNames = flipped;
 		}
 
 		private void viewItemsStatsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.ViewItemsStats;
-			Settings.Default.ViewItemsStats = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.ViewItemStatsSet(flipped);
+			bool flipped = !settings.ViewItemsStats;
+			settings.ViewItemsStats = flipped;
 		}
 
 		private void improvedAreaMapToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.ImprovedAreaMap;
-			Settings.Default.ImprovedAreaMap = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.ImprovedAreaMapSet(flipped);
+			bool flipped = !settings.ImprovedAreaMap;
+			settings.ImprovedAreaMap = flipped;
 		}
 
 		private void noRaceLevelLimitsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.NoRaceLevelLimits;
-			Settings.Default.NoRaceLevelLimits = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.NoRaceLevelLimits(flipped);
+			bool flipped = !settings.NoRaceLevelLimits;
+			settings.NoRaceLevelLimits = flipped;
 		}
 
 		private void noRaceClassLimitsToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.NoRaceClassLimits;
-			Settings.Default.NoRaceClassLimits = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.NoRaceClassRestrictions(flipped);
+			bool flipped = !settings.NoRaceClassLimits;
+			settings.NoRaceClassLimits = flipped;
 		}
 
 		private void dumpMonstersToolStripMenuItem_Click(object sender, EventArgs e)
@@ -257,44 +200,30 @@ namespace Main
 
 		private void soundOnToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.SoundOn;
-			Settings.Default.SoundOn = flipped;
-			Settings.Default.Save();
-
-			engine.seg044.SetSound(flipped);
+			bool flipped = !settings.SoundOn;
+			settings.SoundOn = flipped;
 		}
 
         private void PictureOnToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            bool flipped = !Settings.Default.PictureOn;
-            Settings.Default.PictureOn = flipped;
+            bool flipped = !settings.PictureOn;
+            settings.PictureOn = flipped;
             if (flipped == false)
             {
-                Settings.Default.AnimationOn = false;
-                engine.seg044.SetAnimation(false);
+                settings.AnimationOn = false;
             }
-            Settings.Default.Save();
-
-            engine.seg044.SetPicture(flipped);
-
         }
 
         private void AnimationOnToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            bool flipped = !Settings.Default.AnimationOn;
-            Settings.Default.AnimationOn = flipped;
-            Settings.Default.Save();
-
-            engine.seg044.SetAnimation(flipped);
+            bool flipped = !settings.AnimationOn;
+            settings.AnimationOn = flipped;
         }
 
 		private void sortTreasureToolStripMenuItem_Click(object sender, EventArgs e)
 		{
-			bool flipped = !Settings.Default.SortTreasure;
-			Settings.Default.SortTreasure = flipped;
-			Settings.Default.Save();
-
-			Classes.Cheats.SortTreasureSet(flipped);
+			bool flipped = !settings.SortTreasure;
+			settings.SortTreasure = flipped;
 		}
 
  	}

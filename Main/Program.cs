@@ -19,8 +19,6 @@ namespace Main
         [STAThread]
         static void Main()
         {
-            Config.Setup();
-
             //Environment.OSVersion.Platform
             AppDomain.CurrentDomain.UnhandledException
                 += delegate(object sender, UnhandledExceptionEventArgs args)

@@ -15,7 +15,7 @@ namespace engine
 
             byte[] data = new byte[16];
 
-            foreach (string filePath in Directory.GetFiles(Config.GetSavePath(), fileFilter))
+            foreach (string filePath in Directory.GetFiles(Config.SavePath, fileFilter))
             {
                 FileStream stream = System.IO.File.Open(filePath, FileMode.Open, FileAccess.Read);
 
@@ -124,7 +124,7 @@ namespace engine
 
         internal static void remove_player_file(Player player)
         {
-            string full_path = Path.Combine(Config.GetSavePath(), seg042.clean_string(player.name));
+            string full_path = Path.Combine(Config.SavePath, seg042.clean_string(player.name));
 
             seg042.delete_file(full_path + ".guy");
             seg042.delete_file(full_path + ".swg");
@@ -156,7 +156,7 @@ namespace engine
 
             while (input_key == 'N' &&
                 arg_0.Length == 0 &&
-                seg042.file_find(Path.Combine(Config.GetSavePath(), file_text) + ext_text) == true)
+                seg042.file_find(Path.Combine(Config.SavePath, file_text) + ext_text) == true)
             {
                 input_key = ovr027.yes_no(gbl.alertMenuColors, "Overwrite " + file_text + "? ");
 
@@ -171,7 +171,7 @@ namespace engine
                 }
             }
 
-            string filePath = Path.Combine(Config.GetSavePath(), file_text);
+            string filePath = Path.Combine(Config.SavePath, file_text);
 
             file.Assign(filePath + ext_text);
 
@@ -212,7 +212,7 @@ namespace engine
         {
             byte[] data = new byte[0x10];
 
-            foreach (string filename in Directory.GetFiles(Config.GetSavePath(), "*" + fileExt))
+            foreach (string filename in Directory.GetFiles(Config.SavePath, "*" + fileExt))
             {
                 FileStream stream = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read);
 
@@ -487,7 +487,7 @@ namespace engine
         {
             Classes.File file;
 
-            seg042.find_and_open_file(out file, false, Path.Combine(Config.GetSavePath(), arg_8));
+            seg042.find_and_open_file(out file, false, Path.Combine(Config.SavePath, arg_8));
 
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
@@ -533,7 +533,7 @@ namespace engine
                 arg_8 = seg042.clean_string(player.name);
             }
 
-            string filename = Path.Combine(Config.GetSavePath(), arg_8 + ".swg");
+            string filename = Path.Combine(Config.SavePath, arg_8 + ".swg");
             if (seg042.file_find(filename) == true)
             {
                 byte[] data = new byte[Item.StructSize];
@@ -555,7 +555,7 @@ namespace engine
                 seg051.Close(file);
             }
 
-            filename = Path.Combine(Config.GetSavePath(), arg_8 + ".fx");
+            filename = Path.Combine(Config.SavePath, arg_8 + ".fx");
             if (seg042.file_find(filename) == true)
             {
                 byte[] data = new byte[Affect.StructSize];
@@ -578,7 +578,7 @@ namespace engine
                 seg051.Close(file);
             }
 
-            filename = Path.Combine(Config.GetSavePath(), arg_8 + ".spc");
+            filename = Path.Combine(Config.SavePath, arg_8 + ".spc");
             if (gbl.import_from == ImportSource.Pool)
             {
                 if (seg042.file_find(filename) == true)
@@ -626,7 +626,7 @@ namespace engine
 
             if (PlayerFileExists(fileExt, hf_player.name) == true)
             {
-                string savename = Path.Combine(Config.GetSavePath(), Path.ChangeExtension(arg_8, fileExt));
+                string savename = Path.Combine(Config.SavePath, Path.ChangeExtension(arg_8, fileExt));
 
                 seg042.find_and_open_file(out file, false, savename);
 
@@ -686,7 +686,7 @@ namespace engine
                 {
                     byte[] data = new byte[PoolRadPlayer.StructSize];
 
-                    string savename = System.IO.Path.Combine(Config.GetSavePath(), Path.ChangeExtension(arg_8, fileExt));
+                    string savename = System.IO.Path.Combine(Config.SavePath, Path.ChangeExtension(arg_8, fileExt));
 
                     seg042.find_and_open_file(out file, false, savename);
 
@@ -934,7 +934,7 @@ namespace engine
 
             for (char save_letter = 'A'; save_letter <= 'J'; save_letter++)
             {
-                string file_name = Path.Combine(Config.GetSavePath(), "savgam" + save_letter.ToString() + ".dat");
+                string file_name = Path.Combine(Config.SavePath, "savgam" + save_letter.ToString() + ".dat");
 
                 if (seg042.file_find(file_name) == true)
                 {
@@ -959,14 +959,14 @@ namespace engine
                     if (save_game_keys.MemberOf(input_key) == true)
                     {
                         save_letter = input_key;
-                        string file_name = Path.Combine(Config.GetSavePath(), "savgam" + save_letter.ToString() + ".dat");
+                        string file_name = Path.Combine(Config.SavePath, "savgam" + save_letter.ToString() + ".dat");
                         stop_loop = seg042.file_find(file_name);
                     }
                 } while (stop_loop == false);
 
                 if (save_letter != '\0')
                 {
-                    string file_name = Path.Combine(Config.GetSavePath(), "savgam" + save_letter.ToString() + ".dat");
+                    string file_name = Path.Combine(Config.SavePath, "savgam" + save_letter.ToString() + ".dat");
 
                     loadSaveGame(file_name);
                 }
@@ -1038,7 +1038,7 @@ namespace engine
             {
                 string var_1F6 = seg042.clean_string(var_148[index]);
 
-                if (seg042.file_find(Path.Combine(Config.GetSavePath(), var_1F6 + ".sav")) == true)
+                if (seg042.file_find(Path.Combine(Config.SavePath, var_1F6 + ".sav")) == true)
                 {
                     Player player = new Player();
 
@@ -1126,7 +1126,7 @@ namespace engine
 
                 do
                 {
-                    save_file.Assign(Path.Combine(Config.GetSavePath(), "savgam" + inputKey + ".dat"));
+                    save_file.Assign(Path.Combine(Config.SavePath, "savgam" + inputKey + ".dat"));
                     seg051.Rewrite(save_file);
                     var_1FC = gbl.FIND_result;
 
