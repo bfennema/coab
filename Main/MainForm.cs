@@ -30,6 +30,16 @@ namespace Main
 
 			InitializeComponent();
 
+			if (settings.CurseOfTheAzureBondsDataPath.Length > 0)
+			{
+				this.dataToolStripMenuItem1.Text += " - " + settings.CurseOfTheAzureBondsDataPath;
+			}
+
+			if (settings.CurseOfTheAzureBondsSavePath.Length > 0)
+			{
+				this.saveToolStripMenuItem1.Text += " - " + settings.CurseOfTheAzureBondsSavePath;
+			}
+
 			bm = new Bitmap(outputWidth, outputHeight, PixelFormat.Format24bppRgb);
 			rect = new Rectangle(0, 0, outputWidth, outputHeight);
 
@@ -204,21 +214,21 @@ namespace Main
 			settings.SoundOn = flipped;
 		}
 
-        private void PictureOnToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            bool flipped = !settings.PictureOn;
-            settings.PictureOn = flipped;
-            if (flipped == false)
-            {
-                settings.AnimationOn = false;
-            }
-        }
+		private void PictureOnToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			bool flipped = !settings.PictureOn;
+			settings.PictureOn = flipped;
+			if (flipped == false)
+			{
+				settings.AnimationOn = false;
+			}
+		}
 
-        private void AnimationOnToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            bool flipped = !settings.AnimationOn;
-            settings.AnimationOn = flipped;
-        }
+		private void AnimationOnToolStripMenuItem_Click(object sender, EventArgs e)
+		{
+			bool flipped = !settings.AnimationOn;
+			settings.AnimationOn = flipped;
+		}
 
 		private void sortTreasureToolStripMenuItem_Click(object sender, EventArgs e)
 		{
@@ -226,5 +236,22 @@ namespace Main
 			settings.SortTreasure = flipped;
 		}
 
- 	}
+		private void DataToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = settings.CurseOfTheAzureBondsDataPath;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			settings.CurseOfTheAzureBondsDataPath = folderBrowserDialog1.SelectedPath;
+			dataToolStripMenuItem1.Text = "Data - " + settings.CurseOfTheAzureBondsDataPath;
+		}
+
+		private void SaveToolStripMenuItem1_Click(object sender, EventArgs e)
+		{
+			folderBrowserDialog1.SelectedPath = settings.CurseOfTheAzureBondsSavePath;
+			var result = folderBrowserDialog1.ShowDialog();
+			if (!result.Equals(DialogResult.OK)) return;
+			settings.CurseOfTheAzureBondsSavePath = folderBrowserDialog1.SelectedPath;
+			saveToolStripMenuItem1.Text = "Save - " + settings.CurseOfTheAzureBondsSavePath;
+		}
+	}
 }

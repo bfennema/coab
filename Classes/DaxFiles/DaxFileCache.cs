@@ -18,8 +18,9 @@ namespace Classes.DaxFiles
         private void LoadFile(string filename)
         {
             int dataOffset = 0;
+            string filePath = System.IO.Path.Combine(Logging.Config.DataPath, filename);
 
-            if (System.IO.File.Exists(filename) == false)
+            if (System.IO.File.Exists(filePath) == false)
             {
                 return;
             }
@@ -28,7 +29,7 @@ namespace Classes.DaxFiles
 
             try
             {
-                System.IO.FileStream fsA = new System.IO.FileStream(filename, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+                System.IO.FileStream fsA = new System.IO.FileStream(filePath, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
 
                 fileA = new System.IO.BinaryReader(fsA);
             }

@@ -65,6 +65,11 @@ namespace Main
             this.toolStripMenuItem8 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem9 = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem10 = new System.Windows.Forms.ToolStripMenuItem();
+            this.gamesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.curseOfTheAzureBondsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dataToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.displayArea)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -85,7 +90,8 @@ namespace Main
             this.ddfsdToolStripMenuItem,
             this.screenCaptureToolStripMenuItem,
             this.cheatsToolStripMenuItem,
-            this.optionsToolStripMenuItem});
+            this.optionsToolStripMenuItem,
+            this.gamesToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
             this.contextMenuStrip1.Size = new System.Drawing.Size(155, 114);
             // 
@@ -384,6 +390,37 @@ namespace Main
             this.toolStripMenuItem10.Name = "toolStripMenuItem10";
             this.toolStripMenuItem10.Size = new System.Drawing.Size(80, 22);
             this.toolStripMenuItem10.Text = "9";
+            //
+            // gamesToolStripMenuItem
+            //
+            this.gamesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.curseOfTheAzureBondsToolStripMenuItem});
+            this.gamesToolStripMenuItem.Name = "gamesToolStripMenuItem";
+            this.gamesToolStripMenuItem.Size = new System.Drawing.Size(240, 32);
+            this.gamesToolStripMenuItem.Text = "Games";
+            //
+            // curseOfTheAzureBondsToolStripMenuItem
+            //
+            this.curseOfTheAzureBondsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dataToolStripMenuItem1,
+            this.saveToolStripMenuItem1});
+            this.curseOfTheAzureBondsToolStripMenuItem.Name = "curseOfTheAzureBondsToolStripMenuItem";
+            this.curseOfTheAzureBondsToolStripMenuItem.Size = new System.Drawing.Size(317, 34);
+            this.curseOfTheAzureBondsToolStripMenuItem.Text = "Curse of the Azure Bonds";
+            //
+            // dataToolStripMenuItem2
+            //
+            this.dataToolStripMenuItem1.Name = "dataToolStripMenuItem2";
+            this.dataToolStripMenuItem1.Size = new System.Drawing.Size(270, 34);
+            this.dataToolStripMenuItem1.Text = "Data";
+            this.dataToolStripMenuItem1.Click += new System.EventHandler(this.DataToolStripMenuItem1_Click);
+            //
+            // saveToolStripMenuItem2
+            //
+            this.saveToolStripMenuItem1.Name = "saveToolStripMenuItem2";
+            this.saveToolStripMenuItem1.Size = new System.Drawing.Size(270, 34);
+            this.saveToolStripMenuItem1.Text = "Save";
+            this.saveToolStripMenuItem1.Click += new System.EventHandler(this.SaveToolStripMenuItem1_Click);
             // 
             // MainForm
             // 
@@ -443,6 +480,11 @@ namespace Main
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem8;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem9;
         private System.Windows.Forms.ToolStripMenuItem toolStripMenuItem10;
+        private System.Windows.Forms.ToolStripMenuItem gamesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem curseOfTheAzureBondsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dataToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem1;
+        private System.Windows.Forms.FolderBrowserDialog folderBrowserDialog1;
     }
 }
 
