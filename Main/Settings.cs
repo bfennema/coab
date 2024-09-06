@@ -116,7 +116,7 @@ namespace Main
             engine.seg044.SetAnimation(animationOn);
 
             Classes.Cheats.PlayerAlwaysSavesSet(playerAlwaysSaves);
-            Classes.Cheats.AlwayShowAreaMapSet(alwaysShowAreaMap);
+            Classes.Cheats.AlwaysShowAreaMapSet(alwaysShowAreaMap);
             Classes.Cheats.FreeTrainingSet(freeTraining);
             Classes.Cheats.SkipCopyProtectionSet(skipCopyProtection);
             Classes.Cheats.AllowPlayerModifySet(allowPlayerModify);
@@ -192,7 +192,7 @@ namespace Main
             {
                 alwaysShowAreaMap = value;
                 Save();
-                Classes.Cheats.AlwayShowAreaMapSet(value);
+                Classes.Cheats.AlwaysShowAreaMapSet(value);
             }
         }
         [XmlIgnore]

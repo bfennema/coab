@@ -13,7 +13,7 @@ namespace Classes
         }
 
         public static bool always_show_areamap = false;
-        public static void AlwayShowAreaMapSet(bool value)
+        public static void AlwaysShowAreaMapSet(bool value)
         {
             always_show_areamap = value;
         }
