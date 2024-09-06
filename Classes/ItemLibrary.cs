@@ -10,7 +10,7 @@ namespace Classes
 {
     public class ItemLibrary
     {
-        static string libraryPath = Logging.Config.GetAppDataPath();
+        static string libraryPath = Logging.Config.AppDataPath;
         static string libraryFile = Path.Combine(libraryPath, "ItemLibrary.xml");
 
         static List<Item> library = new List<Item>();

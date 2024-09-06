@@ -19,84 +19,10 @@ namespace Logging
         static string basePath;
         static string appDataPath;
         static string logPath;
-        static Settings settings;
-
-        public class Settings
-        {
-            private string configFile;
-            public string[] savePath = new string[(int)Game.MaxGames];
-            public string[] dataPath = new string[(int)Game.MaxGames];
-            public Game game = Game.None;
-
-
-            public Settings()
-            {
-                configFile = "";
-            }
-
-            public Settings(string appDataPath, string defaultSavePath)
-            {
-                configFile = configFile = Path.Combine(appDataPath, "Settings.xml");
-                for (Game i = Game.None; i < Game.MaxGames; i++)
-                {
-                    savePath[(int)i] = Path.Combine(defaultSavePath, Enum.GetName<Game>(i));
-                    dataPath[(int)i] = "";
-                }
-                if (File.Exists(configFile))
-                {
-                    FileStream fs = new FileStream(configFile, FileMode.Open);
-
-                    if (fs.Length > 0)
-                    {
-                        Settings? saved = null;
-                        XmlSerializer formatter = new XmlSerializer(this.GetType());
-                        try
-                        {
-                            saved = (Settings?)formatter.Deserialize(fs);
-                        }
-                        catch (SerializationException e)
-                        {
-                            throw;
-                        }
-                        finally
-                        {
-                            fs.Close();
-                        }
-
-                        if (saved != null)
-                        {
-                            for (int i = (int)Game.None; i < (int)Game.MaxGames; i++)
-                            {
-                                savePath[i] = saved.savePath[i];
-                                dataPath[i] = saved.dataPath[i];
-                            }
-                            game = saved.game;
-                        }
-                    }
-                }
-            }
-
-            public void Save()
-            {
-                FileStream fs = new FileStream(configFile, FileMode.Create);
-
-                // Construct a BinaryFormatter and use it to serialize the data to the stream.
-                XmlSerializer formatter = new XmlSerializer(this.GetType());
-                try
-                {
-                    formatter.Serialize(fs, this);
-                }
-                catch (SerializationException e)
-                {
-                    //Console.WriteLine("Failed to serialize. Reason: " + e.Message);
-                    throw;
-                }
-                finally
-                {
-                    fs.Close();
-                }
-            }
-        }
+        static string saveBasePath;
+        static string savePath;
+        static string dataPath;
+        static Game game;
 
         static Config()
         {
@@ -115,7 +41,7 @@ namespace Logging
 
             Logger.Setup(logPath);
 
-            string saveBasePath = Path.Combine(basePath, "Save");
+            saveBasePath = Path.Combine(basePath, "Save");
 
             appDataPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Gold Box Player");
 
@@ -124,20 +50,40 @@ namespace Logging
                 Directory.CreateDirectory(appDataPath);
             }
 
-            settings = new Settings(appDataPath, saveBasePath);
+            savePath = "";
+            dataPath = "";
+            game = Game.None;
         }
-
-        public static string GetLogPath() { return logPath; }
-        public static string GetAppDataPath() { return appDataPath; }
-        public static void SetSavePath(Game which, string path) { settings.savePath[(int)which] = path; settings.Save(); }
-        public static void SetDataPath(Game which, string path) { settings.dataPath[(int)which] = path; settings.Save(); }
-        public static string GetSavePath(Game which) { return settings.savePath[(int)which]; }
-        public static string GetDataPath(Game which) { return settings.dataPath[(int)which]; }
-        public static string GetBasePath() { return basePath; }
-        public static void SetGame(int which) { settings.game = (Game)which; settings.Save(); }
-        public static void SetGame(Game which) { settings.game = which; settings.Save(); }
-        public static Game GetGame() { return settings.game; }
-
-
+        public static string BasePath
+        {
+            get => basePath;
+        }
+        public static string LogPath
+        {
+            get => logPath;
+        }
+        public static string AppDataPath
+        {
+            get => appDataPath;
+        }
+        public static string SaveBasePath
+        {
+            get => saveBasePath;
+        }
+        public static string SavePath
+        {
+            get => savePath;
+            set => savePath = value;
+        }
+        public static string DataPath
+        {
+            get => dataPath;
+            set => dataPath = value;
+        }
+        public static Game Game
+        {
+            get => game;
+            set => game = value;
+        }
     }
 }

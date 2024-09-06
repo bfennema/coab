@@ -46,15 +46,15 @@ namespace engine
 
             ovr003.SetupCommandTable();
 
-            gbl.game = Config.GetGame();
-            while (Config.GetDataPath(gbl.game).Length == 0)
+            gbl.game = Config.Game;
+            while (Config.DataPath.Length == 0)
             {
                 if (gbl.Exit == true)
                 {
                     return;
                 }
                 seg041.GameDelay();
-                gbl.game = Config.GetGame();
+                gbl.game = Config.Game;
             }
 
             InitFirst();

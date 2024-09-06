@@ -12,7 +12,7 @@ namespace engine
         {
             byte[] data = new byte[16];
 
-            await foreach ((var filePath, var stream) in gbl.file.OpenAll(Config.GetSavePath(gbl.game), fileFilter))
+            await foreach ((var filePath, var stream) in gbl.file.OpenAll(Config.SavePath, fileFilter))
             {
                 if (stream.Length == playerFileSize)
                 {
@@ -145,21 +145,21 @@ namespace engine
 
             if (gbl.game == Game.PoolOfRadiance)
             {
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.SAV", filename));
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.ITM", filename));
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.SPC", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.SAV", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.ITM", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.SPC", filename));
             }
             else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.GUY", filename));
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.SWG", filename));
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.FX", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.GUY", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.SWG", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.FX", filename));
             }
             else if (gbl.game == Game.SecretOfTheSilverBlades)
             {
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.WHO", filename));
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.STF", filename));
-                gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.SFX", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.WHO", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.STF", filename));
+                gbl.file.Delete(Config.SavePath, string.Format("{0}.SFX", filename));
             }
         }
 
@@ -198,7 +198,7 @@ namespace engine
 
             while (input_key == 'N' &&
                 arg_0.Length == 0 &&
-                await gbl.file.Find(Config.GetSavePath(gbl.game), string.Format("{0}.{1}", file_text, ext_text)) == true)
+                await gbl.file.Find(Config.SavePath, string.Format("{0}.{1}", file_text, ext_text)) == true)
             {
                 input_key = ovr027.yes_no(gbl.alertMenuColors, "Overwrite " + file_text + "? ");
 
@@ -213,7 +213,7 @@ namespace engine
                 }
             }
 
-            System.IO.Stream file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.{1}", file_text, ext_text));
+            System.IO.Stream file = await gbl.file.Create(Config.SavePath, string.Format("{0}.{1}", file_text, ext_text));
             gbl.file.Rewrite(file);
 
             List<PoolRadAffect> poolrad_affects = new List<PoolRadAffect>();
@@ -236,7 +236,7 @@ namespace engine
             {
                 if (player.items.Count > 0)
                 {
-                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.ITM", file_text));
+                    file = await gbl.file.Create(Config.SavePath, string.Format("{0}.ITM", file_text));
                     gbl.file.Rewrite(file);
 
                     player.items.ForEach(item => gbl.file.BlockWrite(PoolRadItem.StructSize, new PoolRadItem(item).Save(player, poolrad_affects), file));
@@ -245,14 +245,14 @@ namespace engine
                 }
                 else
                 {
-                    gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.ITM", file_text));
+                    gbl.file.Delete(Config.SavePath, string.Format("{0}.ITM", file_text));
                 }
             }
             else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 if (player.items.Count > 0)
                 {
-                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.SWG", file_text));
+                    file = await gbl.file.Create(Config.SavePath, string.Format("{0}.SWG", file_text));
                     gbl.file.Rewrite(file);
 
                     player.items.ForEach(item => gbl.file.BlockWrite(CurseItem.StructSize, new CurseItem(item).Save(), file));
@@ -261,14 +261,14 @@ namespace engine
                 }
                 else
                 {
-                    gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.SWG", file_text));
+                    gbl.file.Delete(Config.SavePath, string.Format("{0}.SWG", file_text));
                 }
             }
             else // if (gbl.game == Game.SecretOfTheSilverBlades)
             {
                 if (player.items.Count > 0)
                 {
-                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.STF", file_text));
+                    file = await gbl.file.Create(Config.SavePath, string.Format("{0}.STF", file_text));
                     gbl.file.Rewrite(file);
 
                     player.items.ForEach(item => gbl.file.BlockWrite(SecretItem.StructSize, new SecretItem(item).Save(), file));
@@ -277,7 +277,7 @@ namespace engine
                 }
                 else
                 {
-                    gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.STF", file_text));
+                    gbl.file.Delete(Config.SavePath, string.Format("{0}.STF", file_text));
                 }
             }
 
@@ -285,7 +285,7 @@ namespace engine
             {
                 if (player.affects.Count > 0)
                 {
-                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.SPC", file_text));
+                    file = await gbl.file.Create(Config.SavePath, string.Format("{0}.SPC", file_text));
                     gbl.file.Rewrite(file);
 
                     foreach (Affect affect in player.affects)
@@ -315,14 +315,14 @@ namespace engine
                 }
                 else
                 {
-                    gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.SPC", file_text));
+                    gbl.file.Delete(Config.SavePath, string.Format("{0}.SPC", file_text));
                 }
             }
             else if (gbl.game == Game.CurseOfTheAzureBonds)
             {
                 if (player.affects.Count > 0)
                 {
-                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.FX", file_text));
+                    file = await gbl.file.Create(Config.SavePath, string.Format("{0}.FX", file_text));
                     gbl.file.Rewrite(file);
 
                     foreach (Affect affect in player.affects)
@@ -334,14 +334,14 @@ namespace engine
                 }
                 else
                 {
-                    gbl.file.Delete(Config.GetSavePath(gbl.game), string.Format("{0}.FX", file_text));
+                    gbl.file.Delete(Config.SavePath, string.Format("{0}.FX", file_text));
                 }
             }
             else //if (gbl.game == Game.SecretOfTheSilverBlades)
             {
                 if (player.affects.Count > 0)
                 {
-                    file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.SFX", file_text));
+                    file = await gbl.file.Create(Config.SavePath, string.Format("{0}.SFX", file_text));
                     gbl.file.Rewrite(file);
 
                     foreach (Affect affect in player.affects)
@@ -353,11 +353,11 @@ namespace engine
                 }
                 else
                 {
-                    gbl.file.Delete(Config.GetSavePath(gbl.game), file_text + ".SFX");
+                    gbl.file.Delete(Config.SavePath, file_text + ".SFX");
                 }
             }
             System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(player.GetType());
-            System.IO.Stream stream = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("{0}.XML", file_text));
+            System.IO.Stream stream = await gbl.file.Create(Config.SavePath, string.Format("{0}.XML", file_text));
             gbl.file.Rewrite(stream);
             x.Serialize(stream, player);
             stream.Close();
@@ -367,7 +367,7 @@ namespace engine
         {
             byte[] data = new byte[0x10];
 
-            await foreach ((var filename, var stream) in gbl.file.OpenAll(Config.GetSavePath(gbl.game), string.Format("*{1}", fileExt)))
+            await foreach ((var filename, var stream) in gbl.file.OpenAll(Config.SavePath, string.Format("*{1}", fileExt)))
             {
                 stream.Seek(0, System.IO.SeekOrigin.Begin);
                 stream.Read(data, 0, 16);
@@ -487,7 +487,7 @@ namespace engine
             Player player = null;
             System.IO.Stream file;
 
-            file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), arg_8);
+            file = await seg042.find_and_open_file(false, Config.SavePath, arg_8);
 
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
@@ -559,9 +559,9 @@ namespace engine
             {
                 filename = filename = string.Format("{0}.STF", arg_8);
             }
-            if (await gbl.file.Find(Config.GetSavePath(gbl.game), filename) == true)
+            if (await gbl.file.Find(Config.SavePath, filename) == true)
             {
-                file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), filename);
+                file = await seg042.find_and_open_file(false, Config.SavePath, filename);
 
                 while (true)
                 {
@@ -611,10 +611,10 @@ namespace engine
             }
 
             filename = string.Format("{0}.SFX", arg_8);
-            if (await gbl.file.Find(Config.GetSavePath(gbl.game), filename) == true)
+            if (await gbl.file.Find(Config.SavePath, filename) == true)
             {
                 byte[] data = new byte[SecretAffect.StructSize];
-                file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), filename);
+                file = await seg042.find_and_open_file(false, Config.SavePath, filename);
 
                 while (true)
                 {
@@ -632,10 +632,10 @@ namespace engine
             }
 
             filename = string.Format("{0}.FX", arg_8);
-            if (await gbl.file.Find(Config.GetSavePath(gbl.game), filename) == true)
+            if (await gbl.file.Find(Config.SavePath, filename) == true)
             {
                 byte[] data = new byte[CurseAffect.StructSize];
-                file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), filename);
+                file = await seg042.find_and_open_file(false, Config.SavePath, filename);
 
                 while (true)
                 {
@@ -655,10 +655,10 @@ namespace engine
             filename = string.Format("{0}.SPC", arg_8);
             if (gbl.import_from == ImportSource.Pool)
             {
-                if (await gbl.file.Find(Config.GetSavePath(gbl.game), filename) == true)
+                if (await gbl.file.Find(Config.SavePath, filename) == true)
                 {
                     byte[] data = new byte[PoolRadAffect.StructSize];
-                    file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), filename);
+                    file = await seg042.find_and_open_file(false, Config.SavePath, filename);
 
                     while (true)
                     {
@@ -710,7 +710,7 @@ namespace engine
             {
                 string savename = System.IO.Path.ChangeExtension(arg_8, fileExt);
 
-                file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), savename);
+                file = await seg042.find_and_open_file(false, Config.SavePath, savename);
 
                 byte[] data = new byte[Player.StructSize];
 
@@ -770,7 +770,7 @@ namespace engine
 
                     string savename = System.IO.Path.ChangeExtension(arg_8, fileExt);
 
-                    file = await seg042.find_and_open_file(false, Config.GetSavePath(gbl.game), savename);
+                    file = await seg042.find_and_open_file(false, Config.SavePath, savename);
 
                     gbl.file.BlockRead(PoolRadPlayer.StructSize, data, file);
                     gbl.file.Close(file);
@@ -1098,7 +1098,7 @@ namespace engine
 
             for (char save_letter = 'A'; save_letter <= 'J'; save_letter++)
             {
-                if (await gbl.file.Find(Config.GetSavePath(gbl.game), string.Format("SAVGAM{0}.DAT", save_letter.ToString())) == true)
+                if (await gbl.file.Find(Config.SavePath, string.Format("SAVGAM{0}.DAT", save_letter.ToString())) == true)
                 {
                     games_list += save_letter.ToString() + " ";
                 }
@@ -1122,7 +1122,7 @@ namespace engine
                     {
                         save_letter = input_key;
                         string file_name = string.Format("SAVGAM{0}.DAT", save_letter.ToString());
-                        stop_loop = await gbl.file.Find(Config.GetSavePath(gbl.game), file_name);
+                        stop_loop = await gbl.file.Find(Config.SavePath, file_name);
                     }
                 } while (stop_loop == false);
 
@@ -1133,14 +1133,14 @@ namespace engine
                     loadSaveGame(string.Format("SAVGAM{0}.DAT", save_letter.ToString()));
 
                     file_name = string.Format("VAULT{0}.DAT", save_letter.ToString());
-                    if (await gbl.file.Find(Config.GetSavePath(gbl.game), file_name) == true)
+                    if (await gbl.file.Find(Config.SavePath, file_name) == true)
                     {
                         loadVault(file_name);
                     }
                     else
                     {
                         file_name = "VAULT.DAT";
-                        if (await gbl.file.Find(Config.GetSavePath(gbl.game), file_name) == true)
+                        if (await gbl.file.Find(Config.SavePath, file_name) == true)
                             loadVault(file_name);
                     }
                 }
@@ -1149,7 +1149,7 @@ namespace engine
 
         internal static async void loadSaveGame(string file_name)
         {
-            System.IO.Stream file = await seg042.find_and_open_file(true, Config.GetSavePath(gbl.game), file_name);
+            System.IO.Stream file = await seg042.find_and_open_file(true, Config.SavePath, file_name);
 
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
@@ -1227,15 +1227,15 @@ namespace engine
             {
                 string var_1F6 = seg042.clean_string(var_148[index]);
 
-                if (await gbl.file.Find(Config.GetSavePath(gbl.game), string.Format("{0}.XML", var_1F6)) == true)
+                if (await gbl.file.Find(Config.SavePath, string.Format("{0}.XML", var_1F6)) == true)
                 {
-                    System.IO.Stream stream = await gbl.file.Open(Config.GetSavePath(gbl.game), string.Format("{0}.XML", var_1F6));
+                    System.IO.Stream stream = await gbl.file.Open(Config.SavePath, string.Format("{0}.XML", var_1F6));
                     Player player = (Player)x.Deserialize(stream);
                     stream.Close();
                     player.stats2.ReInit();
                     AssignPlayerIconId(player);
                 }
-                else if (await gbl.file.Find(Config.GetSavePath(gbl.game), string.Format("{0}.SAV", var_1F6)) == true)
+                else if (await gbl.file.Find(Config.SavePath, string.Format("{0}.SAV", var_1F6)) == true)
                 {
                     Player player = await import_char01(string.Format("{0}.SAV", var_1F6));
                     AssignPlayerIconId(player);
@@ -1302,7 +1302,7 @@ namespace engine
 
         internal static async void loadVault(string file_name)
         {
-            System.IO.Stream file = await seg042.find_and_open_file(true, Config.GetSavePath(gbl.game), file_name);
+            System.IO.Stream file = await seg042.find_and_open_file(true, Config.SavePath, file_name);
 
             byte[] money_data = new byte[28];
 
@@ -1381,7 +1381,7 @@ namespace engine
 
                 do
                 {
-                    save_file = await gbl.file.Create(Config.GetSavePath(gbl.game), string.Format("SAVGAM{0}.DAT", inputKey));
+                    save_file = await gbl.file.Create(Config.SavePath, string.Format("SAVGAM{0}.DAT", inputKey));
                     gbl.file.Rewrite(save_file);
 
                     if (unk_4AEEF.MemberOf(gbl.FIND_result) == false)
@@ -1481,7 +1481,7 @@ namespace engine
 
             do
             {
-                save_file = await gbl.file.Create(Config.GetSavePath(gbl.game), file_name);
+                save_file = await gbl.file.Create(Config.SavePath, file_name);
                 gbl.file.Rewrite(save_file);
 
                 if (unk_4AEEF.MemberOf(gbl.FIND_result) == false)
