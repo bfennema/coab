@@ -1,14 +1,101 @@
 ﻿using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Platform;
+using System;
+using System.Reflection.Metadata;
 
 namespace GoldBoxPlayer.Views;
 
 public partial class MainView : UserControl
 {
+    private Settings settings;
     public MainView()
     {
         InitializeComponent();
+    }
+
+    public void UpdateMenuIsChecked(Settings _settings)
+    {
+        settings = _settings;
+        if (settings.Game == Logging.Game.PoolOfRadiance)
+        {
+            PoolRadMenu.IsChecked = true;
+        }
+        else if (settings.Game == Logging.Game.CurseOfTheAzureBonds)
+        {
+            CurseMenu.IsChecked = true;
+        }
+        else if (settings.Game == Logging.Game.SecretOfTheSilverBlades)
+        {
+            SecretMenu.IsChecked = true;
+        }
+
+        if (settings.PlayerAlwaysSaves)
+        {
+            PlayerAlwaysMakesSavingThrows.IsChecked = true;
+        }
+        if (settings.AlwaysShowAreaMap)
+        {
+            AllowAreaMap.IsChecked = true;
+        }
+        if (settings.FreeTraining)
+        {
+            FreeTraining.IsChecked = true;
+        }
+        if (settings.SkipCopyProtection)
+        {
+            SkipCopyProtection.IsChecked = true;
+        }
+        if (settings.AllowPlayerModify)
+        {
+            AllowPlayerModify.IsChecked = true;
+        }
+        if (settings.AllowGodsIntervene)
+        {
+            AllowGodsIntervene.IsChecked = true;
+        }
+        if (settings.DisplayFullItemNames)
+        {
+            DisplayItemsFullName.IsChecked = true;
+        }
+        if (settings.ViewItemStats)
+        {
+            ViewItemsStats.IsChecked = true;
+        }
+        if (settings.SkipTitleScreen)
+        {
+            SkipTitleScreen.IsChecked = true;
+        }
+        if (settings.ImprovedAreaMap)
+        {
+            ImprovedAreaMap.IsChecked = true;
+        }
+        if (settings.NoRaceLevelLimits)
+        {
+            NoRaceLevelLimits.IsChecked = true;
+        }
+        if (settings.NoRaceClassLimits)
+        {
+            NoRaceClassRestrictions.IsChecked = true;
+        }
+        if (settings.SortTreasure)
+        {
+            SortTreasure.IsChecked = true;
+        }
+
+        if (settings.SoundOn)
+        {
+            SoundOn.IsChecked = true;
+        }
+        if (settings.AnimationOn)
+        {
+            AnimationsOn.IsChecked = true;
+        }
+        if (settings.PictureOn)
+        {
+            PicturesOn.IsChecked = true;
+        }
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -26,6 +113,104 @@ public partial class MainView : UserControl
         MainViewUserControl.Focus();
     }
 
+    private void Debugging_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        MenuItem menu = (MenuItem)sender;
+
+        if (CommandDebugging == menu)
+        {
+            engine.seg043.ToggleCommandDebugging();
+        }
+        else if (DumpPlayerAffects == menu)
+        {
+            engine.seg043.DumpPlayerAffects();
+        }
+        else if (DumpMonsters == menu)
+        {
+            engine.seg043.DumpMonsters();
+        }
+        else if (DumpTreasureItems == menu)
+        {
+            engine.seg043.DumpTreasureItems();
+        }
+    }
+
+    private void Cheats_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        MenuItem menu = (MenuItem)sender;
+        bool toggle = !menu.IsChecked;
+
+        if (PlayerAlwaysMakesSavingThrows == menu)
+        {
+            settings.PlayerAlwaysSaves = toggle;
+        }
+        else if (AllowAreaMap == menu)
+        {
+            settings.AlwaysShowAreaMap = toggle;
+        }
+        else if (FreeTraining == menu)
+        {
+            settings.FreeTraining = toggle;
+        }
+        else if (SkipCopyProtection == menu)
+        {
+            settings.SkipCopyProtection = toggle;
+        }
+        else if (AllowPlayerModify == menu)
+        {
+            settings.AllowPlayerModify = toggle;
+        }
+        else if (AllowGodsIntervene == menu)
+        {
+            settings.AllowGodsIntervene = toggle;
+        }
+        else if (DisplayItemsFullName == menu)
+        {
+            settings.DisplayFullItemNames = toggle;
+        }
+        else if (ViewItemsStats == menu)
+        {
+            settings.ViewItemStats = toggle;
+        }
+        else if (SkipTitleScreen == menu)
+        {
+            settings.SkipTitleScreen = toggle;
+        }
+        else if (ImprovedAreaMap == menu)
+        {
+            settings.ImprovedAreaMap = toggle;
+        }
+        else if (NoRaceLevelLimits == menu)
+        {
+            settings.NoRaceLevelLimits = toggle;
+        }
+        else if (NoRaceClassRestrictions == menu)
+        {
+            settings.NoRaceClassLimits = toggle;
+        }
+        else if (SortTreasure == menu)
+        {
+            settings.SortTreasure = toggle;
+        }
+    }
+    private void Options_PointerPressed(object? sender, PointerPressedEventArgs e)
+    {
+        MenuItem menu = (MenuItem)sender;
+        bool toggle = !menu.IsChecked;
+
+        if (SoundOn == menu)
+        {
+            settings.SoundOn = toggle;
+        }
+        else if (AnimationsOn == menu)
+        {
+            settings.AnimationOn = toggle;
+        }
+        else if (PicturesOn == menu)
+        {
+            settings.PictureOn = toggle;
+        }
+    }
     private void Menu_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         MenuItem menu = (MenuItem)sender;

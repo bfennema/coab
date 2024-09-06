@@ -58,18 +58,8 @@ public partial class App : Application
         }
 
         model.SetImage(view.GetControl<Image>("MainViewImage"));
-        if (Logging.Config.GetGame() == Logging.Game.PoolOfRadiance)
-        {
-            view.GetControl<MenuItem>("PoolRadMenu").IsChecked = true;
-        }
-        else if (Logging.Config.GetGame() == Logging.Game.CurseOfTheAzureBonds)
-        {
-            view.GetControl<MenuItem>("CurseMenu").IsChecked = true;
-        }
-        else if (Logging.Config.GetGame() == Logging.Game.SecretOfTheSilverBlades)
-        {
-            view.GetControl<MenuItem>("SecretMenu").IsChecked = true;
-        }
+
+        view.UpdateMenuIsChecked(model.Settings);
 
         Services = services.BuildServiceProvider();
 

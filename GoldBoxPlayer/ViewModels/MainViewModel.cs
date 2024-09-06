@@ -22,12 +22,15 @@ public class MainViewModel : ViewModelBase
     IStorageFolder? _CurseSave;
     IStorageFolder? _SecretData;
     IStorageFolder? _SecretSave;
+    Settings _settings;
 
     public MainViewModel()
     {
         _bitmap = new WriteableBitmap(new Avalonia.PixelSize(320, 200), new Avalonia.Vector(96, 96), Avalonia.Platform.PixelFormats.Bgr24);
         SelectDirectoryCommand = ReactiveCommand.CreateFromTask<string>(RunSelectDirectoryCommand);
         SelectGameCommand = ReactiveCommand.Create<Logging.Game>(RunSelectGameCommand);
+        _settings = Settings.LoadSettings(Logging.Config.AppDataPath, "", Logging.Config.SaveBasePath);
+        _settings.Set();
     }
 
     public ReactiveCommand<string, Unit> SelectDirectoryCommand { get; }
@@ -35,38 +38,38 @@ public class MainViewModel : ViewModelBase
 
     public async void LoadConfigs(TopLevel top)
     {
-        string path = Logging.Config.GetSavePath(Logging.Game.PoolOfRadiance);
+        string path = _settings.PoolOfRadianceSavePath;
         IStorageFolder folder;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _PoolRadSave, folder, nameof(PoolRadSave));
         }
-        path = Logging.Config.GetDataPath(Logging.Game.PoolOfRadiance);
+        path = _settings.PoolOfRadianceDataPath;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _PoolRadData, folder, nameof(PoolRadData));
         }
-        path = Logging.Config.GetSavePath(Logging.Game.CurseOfTheAzureBonds);
+        path = _settings.CurseOfTheAzureBondsSavePath;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _CurseSave, folder, nameof(CurseSave));
         }
-        path = Logging.Config.GetDataPath(Logging.Game.CurseOfTheAzureBonds);
+        path = _settings.CurseOfTheAzureBondsDataPath;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _CurseData, folder, nameof(CurseData));
         }
-        path = Logging.Config.GetSavePath(Logging.Game.SecretOfTheSilverBlades);
+        path = _settings.SecretOfTheSilverBladesSavePath;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _SecretSave, folder, nameof(SecretSave));
         }
-        path = Logging.Config.GetDataPath(Logging.Game.SecretOfTheSilverBlades);
+        path = _settings.SecretOfTheSilverBladesDataPath;
         if (path != "")
         {
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
@@ -114,49 +117,43 @@ public class MainViewModel : ViewModelBase
         if (parameter == "PoolRadSave")
         {
             this.RaiseAndSetIfChanged(ref _PoolRadSave, folder, nameof(PoolRadSave));
-            Logging.Config.SetSavePath(Logging.Game.PoolOfRadiance, await folder.SaveBookmarkAsync());
+            _settings.PoolOfRadianceSavePath = await folder.SaveBookmarkAsync();
         }
         else if (parameter == "PoolRadData")
         {
             this.RaiseAndSetIfChanged(ref _PoolRadData, folder, nameof(PoolRadData));
-            Logging.Config.SetDataPath(Logging.Game.PoolOfRadiance, await folder.SaveBookmarkAsync());
+            _settings.PoolOfRadianceDataPath = await folder.SaveBookmarkAsync();
         }
         else if (parameter == "CurseSave")
         {
             this.RaiseAndSetIfChanged(ref _CurseSave, folder, nameof(CurseSave));
-            Logging.Config.SetSavePath(Logging.Game.CurseOfTheAzureBonds, await folder.SaveBookmarkAsync());
+            _settings.CurseOfTheAzureBondsSavePath = await folder.SaveBookmarkAsync();
         }
         else if (parameter == "CurseData")
         {
             this.RaiseAndSetIfChanged(ref _CurseData, folder, nameof(CurseData));
-            Logging.Config.SetDataPath(Logging.Game.CurseOfTheAzureBonds, await folder.SaveBookmarkAsync());
+            _settings.CurseOfTheAzureBondsDataPath = await folder.SaveBookmarkAsync();
         }
         else if (parameter == "SecretSave")
         {
             this.RaiseAndSetIfChanged(ref _SecretSave, folder, nameof(SecretSave));
-            Logging.Config.SetSavePath(Logging.Game.SecretOfTheSilverBlades, await folder.SaveBookmarkAsync());
+            _settings.SecretOfTheSilverBladesSavePath = await folder.SaveBookmarkAsync();
         }
         else if (parameter == "SecretData")
         {
             this.RaiseAndSetIfChanged(ref _SecretData, folder, nameof(SecretData));
-            Logging.Config.SetDataPath(Logging.Game.SecretOfTheSilverBlades, await folder.SaveBookmarkAsync());
+            _settings.SecretOfTheSilverBladesDataPath = await folder.SaveBookmarkAsync();
         }
     }
 
     public void RunSelectGameCommand(Logging.Game parameter)
     {
-        if (parameter == Logging.Game.PoolOfRadiance)
-        {
-            Logging.Config.SetGame(Logging.Game.PoolOfRadiance);
-        }
-        else if (parameter == Logging.Game.CurseOfTheAzureBonds)
-        {
-            Logging.Config.SetGame(Logging.Game.CurseOfTheAzureBonds);
-        }
-        else if (parameter == Logging.Game.SecretOfTheSilverBlades)
-        {
-            Logging.Config.SetGame(Logging.Game.SecretOfTheSilverBlades);
-        }
+        _settings.Game = parameter;
+    }
+
+    internal Settings Settings
+    {
+        get => _settings;
     }
 
     public void SetImage(Image image)

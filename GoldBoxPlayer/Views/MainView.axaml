@@ -22,6 +22,90 @@
   </Design.DataContext>
   <UserControl.ContextMenu>
     <ContextMenu>
+      <MenuItem Header="Debugging">
+        <MenuItem x:Name="CommandDebugging"
+                  Header="Command Debugging"
+                  ToggleType="CheckBox"
+                  PointerPressed="Debugging_PointerPressed"/>
+        <MenuItem x:Name="DumpPlayerAffects"
+                  Header="Dump Player Affects"
+                  PointerPressed="Debugging_PointerPressed"/>
+        <MenuItem x:Name="DumpMonsters"
+                  Header="Dump Monsters"
+                  PointerPressed="Debugging_PointerPressed"/>
+        <MenuItem x:Name="DumpTreasureItems"
+                  Header="Dump Treasure Items"
+                  PointerPressed="Debugging_PointerPressed"/>
+      </MenuItem>
+      <MenuItem Header="Screen Capture"></MenuItem>
+      <MenuItem Header="Cheats">
+        <MenuItem x:Name="AllowAreaMap"
+                  Header="Allow Area Map"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="AllowPlayerModify"
+                  Header="Allow Player Modify"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="AllowGodsIntervene"
+                  Header="Allow Gods Intervene"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="DisplayItemsFullName"
+                  Header="Display Item's Full Name"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="FreeTraining"
+                  Header="Free Training"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="ImprovedAreaMap"
+                  Header="Improved Area Map"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="PlayerAlwaysMakesSavingThrows"
+                  Header="Player Always Makes Saving Throws"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="SkipCopyProtection"
+                  Header="Skip Copy Protection"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="SkipTitleScreen"
+                  Header="Skip Title Screen"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="ViewItemsStats"
+                  Header="View Items Stats"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="NoRaceClassRestrictions"
+                  Header="No Race Class Restrictions"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="NoRaceLevelLimits"
+                  Header="No Race Level Limits"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="SortTreasure"
+                  Header="Sort Treasure"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+      </MenuItem>
+      <MenuItem Header="Options">
+        <MenuItem x:Name="SoundOn"
+                  Header="Sound On"
+                  ToggleType="CheckBox"
+                  PointerPressed="Options_PointerPressed"/>
+        <MenuItem x:Name="AnimationsOn"
+                  Header="Animations On"
+                  ToggleType="CheckBox"
+                  PointerPressed="Options_PointerPressed"/>
+        <MenuItem x:Name="PicturesOn"
+                  Header="Pictures On"
+                  ToggleType="CheckBox"
+                  PointerPressed="Options_PointerPressed"/>
+      </MenuItem>
       <MenuItem Header="Games">
         <MenuItem x:Name="PoolRadMenu"
                   Header="Pool of Radiance"
@@ -66,7 +150,6 @@
                     CommandParameter="SecretSave"/>
         </MenuItem>
       </MenuItem>
-      <MenuItem Header="Paste"/>
     </ContextMenu>
   </UserControl.ContextMenu>
 
