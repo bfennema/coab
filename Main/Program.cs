@@ -69,7 +69,7 @@ namespace Main
 
         static void EngineThread()
         {
-            engine.seg001.__SystemInit(EngineStopped);
+            engine.seg001.__SystemInit(EngineStopped, "Main.Resource");
             engine.seg001.PROGRAM();
 
             EngineStopped();

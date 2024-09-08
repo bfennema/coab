@@ -16,19 +16,19 @@ namespace engine
             EngineThread.Abort();
         }
 
-        public static void __SystemInit(VoidDelegate stoppedCallback)
+        public static void __SystemInit(VoidDelegate stoppedCallback, string resourceName)
         {
             EngineThread = System.Threading.Thread.CurrentThread;
             EngineStoppedCallback = stoppedCallback;
 
-            ConfigGame();
+            ConfigGame(resourceName);
         }
 
-        internal static void ConfigGame()
+        internal static void ConfigGame(string resourceName)
         {
             gbl.exe_path = System.IO.Directory.GetCurrentDirectory();
 
-            seg044.SoundInit();
+            seg044.SoundInit(resourceName);
         }
 
         public static void PROGRAM()
