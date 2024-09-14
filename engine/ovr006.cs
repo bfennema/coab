@@ -380,7 +380,7 @@ namespace engine
 
         internal static void displayCombatResults(int exp) /* sub_2DABC */
         {
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
 
             if (gbl.byte_1AB14 == true ||
                 gbl.combat_type == CombatType.duel)
@@ -442,7 +442,7 @@ namespace engine
 
         internal static void select_treasure(ref int index, out Item selectedItem, out char key) /* sub_2DD2B */
         {
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
 
             var list = new List<MenuItem>();
 
@@ -738,7 +738,7 @@ namespace engine
 
             if (treasureTaken)
             {
-                seg037.DrawFrame_Outer();
+                gbl.game.DrawFrame_Outer();
                 int yCol = 0;
 
                 foreach (Player player in gbl.TeamList)
@@ -801,7 +801,7 @@ namespace engine
                 else
                 {
                     gbl.area2_ptr.field_58E = 0x80;
-                    seg037.DrawFrame_Outer();
+                    gbl.game.DrawFrame_Outer();
                     gbl.textXCol = 2;
                     gbl.textYCol = 6;
                     seg041.press_any_key("The monsters rejoice for the party has been destroyed", true, 10, 0x16, 0x25, 5, 2);

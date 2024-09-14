@@ -585,7 +585,7 @@ namespace engine
                 var_C.Add(new MenuItem(" "));
             }
 
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
 
             bool dummyRedraw = true;
             int dummyIndex = 0;

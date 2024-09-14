@@ -313,7 +313,7 @@ namespace engine
 
             ovr027.ClearPromptAreaNoUpdate();
             bool redrawMenuItems = true;
-            seg037.DrawFrame_WildernessMap();
+            gbl.game.DrawFrame_Wilderness();
 
             do
             {

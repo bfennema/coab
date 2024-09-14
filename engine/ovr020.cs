@@ -43,7 +43,7 @@ namespace engine
 
         internal static void playerDisplayFull(Player player, bool cur = false)
         {
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
 
             ovr025.displayPlayerName(false, 1, 1, player);
 
@@ -479,7 +479,7 @@ namespace engine
 
         internal static void ItemDisplayStats(Item arg_0) /*sub_550A6*/
         {
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
 
             seg041.displayString("itemptr:      ", 0, 10, 1, 1);
             seg041.displayString(arg_0.type.ToString(), 0, 10, 1, 0x14);
@@ -614,7 +614,7 @@ namespace engine
 
                     if (redraw_player == true || gbl.byte_1D2C8 == true)
                     {
-                        seg037.draw8x8_07();
+                        gbl.game.DrawFrame_List();
 
                         ovr025.displayPlayerName(true, 1, 1, player);
 
@@ -1536,16 +1536,16 @@ namespace engine
                     {
                         if (arg_8 == SpellSource.Memorize)
                         {
-                            seg037.draw8x8_05();
+                            gbl.game.DrawFrame_Memorize();
                         }
                         else
                         {
-                            seg037.draw8x8_07();
+                            gbl.game.DrawFrame_List();
                         }
                     }
                     else
                     {
-                        seg037.DrawFrame_Outer();
+                        gbl.game.DrawFrame_Outer();
                     }
                 }
 

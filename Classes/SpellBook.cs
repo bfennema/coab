@@ -12,6 +12,19 @@ namespace Classes
         {
             spellBook.spellBook.ForEach(spell => LearnSpell(spell));
         }
+        public SpellBook(List<Spells> spells)
+        {
+            spells.ForEach(spell => LearnSpell(spell));
+        }
+        // overload operator +
+        public static SpellBook operator +(SpellBook a, SpellBook b)
+        {
+            var c = new SpellBook(a);
+
+            b.spellBook.ForEach(spell => c.LearnSpell(spell));
+
+            return c;
+        }
 
         public void Clear()
         {

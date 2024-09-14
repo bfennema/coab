@@ -76,7 +76,7 @@ namespace engine
             {
                 if (reclac_menus == true)
                 {
-                    seg037.DrawFrame_Outer();
+                    gbl.game.DrawFrame_Outer();
                     if (gbl.SelectedPlayer != null)
                     {
                         ovr025.PartySummary(gbl.SelectedPlayer);
@@ -249,11 +249,11 @@ namespace engine
                                     {
                                         if (gbl.game_state == GameState.WildernessMap)
                                         {
-                                            seg037.DrawFrame_WildernessMap();
+                                            gbl.game.DrawFrame_Wilderness();
                                         }
                                         else
                                         {
-                                            seg037.DrawFrame_Dungeon();
+                                            gbl.game.DrawFrame_Dungeon();
                                         }
                                         ovr025.PartySummary(gbl.SelectedPlayer);
                                     }
@@ -261,7 +261,7 @@ namespace engine
                                     {
                                         if (gbl.area_ptr.LastEclBlockId == 0)
                                         {
-                                            seg037.DrawFrame_Dungeon();
+                                            gbl.game.DrawFrame_Dungeon();
                                         }
                                     }
 
@@ -479,7 +479,7 @@ namespace engine
                 }
             } while (input_key != 'S');
 
-            player.exp = 25000;
+            player.exp = gbl.game.InitialExp;
             player._class = ClassList[index - 1];
             player.HitDice = 1;
 
@@ -506,58 +506,58 @@ namespace engine
             {
                 player.cleric_lvl = 1;
                 player.fighter_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_f_m)
             {
                 player.cleric_lvl = 1;
                 player.fighter_lvl = 1;
                 player.magic_user_lvl = 1;
-                player.exp = 8333;
+                player.exp /= 3;
             }
             else if (player._class == ClassId.mc_c_r)
             {
                 player.cleric_lvl = 1;
                 player.ranger_lvl = 1;
                 ovr024.add_affect(false, 0xff, 0, Affects.ranger_vs_giant, player);
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_mu)
             {
                 player.cleric_lvl = 1;
                 player.magic_user_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_t)
             {
                 player.cleric_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_f_mu)
             {
                 player.fighter_lvl = 1;
                 player.magic_user_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_f_t)
             {
                 player.fighter_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 12500;
+                player.exp /= 2;
             }
             else if (player._class == ClassId.mc_f_mu_t)
             {
                 player.fighter_lvl = 1;
                 player.magic_user_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 8333;
+                player.exp /= 3;
             }
             else if (player._class == ClassId.mc_mu_t)
             {
                 player.magic_user_lvl = 1;
                 player.thief_lvl = 1;
-                player.exp = 8333;
+                player.exp /= 2;
             }
 
             if (player.thief_lvl > 0)
@@ -792,17 +792,14 @@ namespace engine
                         }
                         else if (skill == SkillType.MagicUser)
                         {
-                            player.spellBook.LearnSpell(Spells.detect_magic_MU);
-                            player.spellBook.LearnSpell(Spells.read_magic);
-                            player.spellBook.LearnSpell(Spells.enlarge);
-                            player.spellBook.LearnSpell(Spells.sleep);
+                            player.spellBook += gbl.game.InitialMUSpells;
                         }
 
                         class_count++;
                     }
                 }
 
-                player.Money.SetCoins(Money.Platinum, 300);
+                player.Money = gbl.game.InitialMoney;
                 player.hit_point_rolled = roll_hp(0xff, player);
                 player.hit_point_max = player.hit_point_rolled;
 
@@ -1607,7 +1604,7 @@ namespace engine
 									   " Keep Exit",
 									   "Next Prev Keep Exit" };
 
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
             ovr033.Color_0_8_inverse();
 
             do

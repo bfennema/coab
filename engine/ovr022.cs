@@ -353,7 +353,7 @@ namespace engine
 
 			List<MenuItem> money = new List<MenuItem>();
 
-			seg037.DrawFrame_Outer();
+			gbl.game.DrawFrame_Outer();
 
 			do
 			{

@@ -1,0 +1,39 @@
+﻿using Classes.Curse;
+
+namespace Classes
+{
+    public abstract class Game
+    {
+        public abstract int InitialExp { get; }
+        public abstract MoneySet InitialMoney { get; }
+        public abstract byte DemoGameArea { get; }
+        public abstract int DemoGameSpeed { get; }
+        public abstract byte DemoEclBlockId { get; }
+        public abstract byte InitialGameArea { get; }
+        public abstract ushort InitialVmMem0Offset { get; }
+        public abstract ushort InitialVmMem0Size { get; }
+        public abstract ushort InitialVmMem1Offset { get; }
+        public abstract ushort InitialVmMem1Size { get; }
+        public abstract ushort InitialVmMem2Offset { get; }
+        public abstract ushort InitialVmMem2Size { get; }
+        public abstract ushort InitialEclOffset { get; }
+        public abstract byte InitialEclBlockId { get; }
+        public abstract SpellBook InitialMUSpells { get; }
+        public abstract byte CampingImage { get; }
+        public abstract byte TreasureImage { get; }
+        public abstract ushort CallRedraw { get; }
+        public abstract ushort CallDuelPlayer { get; }
+        public abstract ushort CallDuelMonster { get; }
+        public abstract ushort CallSound { get; }
+        public abstract ushort CallMove { get; }
+        public abstract ushort CallWall { get; }
+        public abstract ushort CallDemo { get; }
+        public abstract void DrawFrame_Outer();
+        public abstract void DrawCredits();
+        public abstract void DrawFrame_Dungeon();
+        public abstract void DrawFrame_Wilderness();
+        public abstract void DrawFrame_Memorize();
+        public abstract void DrawFrame_Combat();
+        public abstract void DrawFrame_List();
+    }
+}

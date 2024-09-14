@@ -105,7 +105,7 @@ namespace engine
 
         internal static void shop_buy() /* sub_2F474 */
         {
-            seg037.DrawFrame_Outer();
+            gbl.game.DrawFrame_Outer();
             gbl.shopRedrawMenuItems = true;
 
             int index = 0;

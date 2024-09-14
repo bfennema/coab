@@ -105,7 +105,7 @@ namespace engine
             //}
             //Logging.Logger.Debug("");
 
-
+            gbl.game = new Classes.Curse.Game();
 
             if (Cheats.skip_title_screen == false)
             {
@@ -135,19 +135,19 @@ namespace engine
             {
                 if (gbl.inDemo == true)
                 {
-                    gbl.game_area = 1;
-                    gbl.game_speed_var = 9;
+                    gbl.game_area = gbl.game.DemoGameArea;
+                    gbl.game_speed_var = gbl.game.DemoGameSpeed;
                 }
                 else
                 {
-                    gbl.game_area = 2;
-                    gbl.vm_mem0_offset = 0x4B00;
-                    gbl.vm_mem0_size = 0x0400;
-                    gbl.vm_mem1_offset = 0x7C00;
-                    gbl.vm_mem1_size = 0x0400;
-                    gbl.vm_mem2_offset = 0x7A00;
-                    gbl.vm_mem2_size = 0x0200;
-                    gbl.initial_ecl_offset = 0x8000;
+                    gbl.game_area = gbl.game.InitialGameArea;
+                    gbl.vm_mem0_offset = gbl.game.InitialVmMem0Offset;
+                    gbl.vm_mem0_size = gbl.game.InitialVmMem0Size;
+                    gbl.vm_mem1_offset = gbl.game.InitialVmMem1Offset;
+                    gbl.vm_mem1_size = gbl.game.InitialVmMem1Size;
+                    gbl.vm_mem2_offset = gbl.game.InitialVmMem2Offset;
+                    gbl.vm_mem2_size = gbl.game.InitialVmMem2Size;
+                    gbl.initial_ecl_offset = gbl.game.InitialEclOffset;
                 }
 
                 if (gbl.inDemo == false)
@@ -192,6 +192,13 @@ namespace engine
         static void InitFirst() /* sub_39054 */
         {
             seg051.Randomize();
+
+            gbl._displayString = seg041.displayString;
+            gbl._put8x8Symbol = ovr038.Put8x8Symbol;
+            gbl._draw8x8_clear_area = seg037.draw8x8_clear_area;
+            gbl._drawIsoTile = ovr034.DrawIsoTile;
+            gbl._load24x24Set = ovr034.Load24x24Set;
+            gbl._calcStatBonuses = ovr024.CalcStatBonuses;
 
             gbl.area_ptr = new Area1();
             gbl.area2_ptr = new Area2();

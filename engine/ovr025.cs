@@ -1405,13 +1405,13 @@ namespace engine
 			switch (gbl.game_state)
 			{
 				case GameState.StartGameMenu:
-					seg037.DrawFrame_Outer();
+					gbl.game.DrawFrame_Outer();
 					break;
 
 				case GameState.Shop:
 					if (gbl.redrawBoarder == true)
 					{
-						seg037.DrawFrame_Dungeon();
+						gbl.game.DrawFrame_Dungeon();
 					}
 
 					if (gbl.lastDaxBlockId == 0x50)
@@ -1429,14 +1429,14 @@ namespace engine
 					break;
 
 				case GameState.Camping:
-					seg037.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, 0x1d, "PIC");
+					gbl.game.DrawFrame_Dungeon();
+					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.CampingImage, "PIC");
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
 					break;
 
 				case GameState.DungeonMap:
-					seg037.DrawFrame_Dungeon();
+					gbl.game.DrawFrame_Dungeon();
 					ovr029.RedrawView();
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
@@ -1451,8 +1451,8 @@ namespace engine
 					break;
 
 				case GameState.AfterCombat:
-					seg037.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, 1, "PIC");
+					gbl.game.DrawFrame_Dungeon();
+					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.TreasureImage, "PIC");
 					PartySummary(gbl.SelectedPlayer);
 					break;
 			}
@@ -1517,7 +1517,7 @@ namespace engine
 		internal static void RedrawCombatScreen() // sub_68DC0
 		{
 			ovr033.Color_0_8_inverse();
-			seg037.DrawFrame_Combat();
+			gbl.game.DrawFrame_Combat();
 
 			ovr033.redrawCombatArea(8, 0xff, gbl.mapToBackGroundTile.mapScreenTopLeft + Point.ScreenCenter);
 		}

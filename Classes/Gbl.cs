@@ -66,6 +66,12 @@ namespace Classes
     public delegate bool spellDelegate(QuickFight quick_fight, int spellId);
     public delegate void spellDelegate2();
     public delegate void affectDelegate(Effect arg_0, object affect, Player player);
+    public delegate void DisplayString(string str, int bgColor, int fgColor, int yCol, int xCol);
+    public delegate void Put8x8Symbol(byte arg_0, bool use_overlay, int symbol_id, int rowY, int colX);
+    public delegate void Draw8x8_clear_area(int yEnd, int xEnd, int yStart, int xStart);
+    public delegate void DrawIsoTile(int tileIndex, int rowY, int colX);
+    public delegate void Load24x24Set(int cellCount, int destCellOffset, int block_id, string filename);
+    public delegate void CalcStatBonuses(Stat stat_index, Player player);
 
     [Flags]
     public enum DamageType
@@ -178,14 +184,22 @@ namespace Classes
         }
     }
 
-
-
-
-
-
-
     public class gbl
     {
+        public static DisplayString? _displayString;
+        public static Put8x8Symbol? _put8x8Symbol;
+        public static Draw8x8_clear_area? _draw8x8_clear_area;
+        public static DrawIsoTile? _drawIsoTile;
+        public static Load24x24Set? _load24x24Set;
+        public static CalcStatBonuses? _calcStatBonuses;
+
+        public static void displayString(string str, int bgColor, int fgColor, int yCol, int xCol) => _displayString?.Invoke(str, bgColor, fgColor, yCol, xCol);
+        public static void Put8x8Symbol(byte arg_0, bool use_overlay, int symbol_id, int rowY, int colX) => _put8x8Symbol?.Invoke(arg_0, use_overlay, symbol_id, rowY, colX);
+        public static void draw8x8_clear_area(int yEnd, int xEnd, int yStart, int xStart) => _draw8x8_clear_area?.Invoke(yEnd, xEnd, yStart, xStart);
+        public static void DrawIsoTile(int tileIndex, int rowY, int colX) => _drawIsoTile?.Invoke(tileIndex, rowY, colX);
+        public static void Load24x24Set(int cellCount, int destCellOffset, int block_id, string filename) => _load24x24Set?.Invoke(cellCount, destCellOffset, block_id, filename);
+        public static void CalcStatBonuses(Stat stat_index, Player player) => _calcStatBonuses?.Invoke(stat_index, player);
+
         public static MenuColorSet defaultMenuColors = new MenuColorSet(15, 10, 13);
         public static MenuColorSet alertMenuColors = new MenuColorSet(15, 10, 14);
 
@@ -535,6 +549,8 @@ namespace Classes
         public static MoneySet pooled_money = new MoneySet();
 
         public static File file;
+
+        public static Game game;
 
 
         /// <summary>

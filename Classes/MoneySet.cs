@@ -23,6 +23,11 @@ namespace Classes
     public class MoneySet : IDataIO
     {
         int[] money = new int[7];
+        public MoneySet() { }
+        public MoneySet(int coinType, int count)
+        {
+            money[coinType] = count;
+        }
 
         // overload operator +
         public static MoneySet operator +(MoneySet a, MoneySet b)
