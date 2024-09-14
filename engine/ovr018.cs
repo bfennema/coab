@@ -750,7 +750,7 @@ namespace engine
                 player.attacksCount = 2;
                 player.attack1_DiceCountBase = 1;
                 player.attack1_DiceSizeBase = 2;
-                player.field_125 = 1;
+                player.useStrBonus = 1;
                 player.base_movement = 12;
                 class_count = 0;
 

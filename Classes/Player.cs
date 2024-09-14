@@ -34,6 +34,11 @@ namespace Classes
         {
             full = cur = val;
         }
+        public void Load(byte[] data, int offset)
+        {
+            // enforce values in valid range
+            full = cur = Math.Max(Math.Min((int)data[offset], max), min);
+        }
 
         public void Assign(StatValue sv)
         {
@@ -163,13 +168,26 @@ namespace Classes
 
         public void Load(byte[] data)
         {
-            Str.Read(data, 0x00);
-            Int.Read(data, 0x02);
-            Wis.Read(data, 0x04);
-            Dex.Read(data, 0x06);
-            Con.Read(data, 0x08);
-            Cha.Read(data, 0x0a);
-            Str00.Read(data, 0x0c);
+            if (data.Length == 14)
+            {
+                Str.Read(data, 0x00);
+                Int.Read(data, 0x02);
+                Wis.Read(data, 0x04);
+                Dex.Read(data, 0x06);
+                Con.Read(data, 0x08);
+                Cha.Read(data, 0x0a);
+                Str00.Read(data, 0x0c);
+            }
+            else if (data.Length == 7)
+            {
+                Str.Load(data, 0x00);
+                Int.Load(data, 0x01);
+                Wis.Load(data, 0x02);
+                Dex.Load(data, 0x03);
+                Con.Load(data, 0x04);
+                Cha.Load(data, 0x05);
+                Str00.Load(data, 0x06);
+            }
         }
 
         public void Assign(PlayerStats ps)
@@ -534,7 +552,7 @@ namespace Classes
         public byte attack1_DamageBonusBase; // 0x122;
         public byte attack2_DamageBonusBase; // 0x123;
         public byte base_ac; // 0x124;
-        public byte field_125; // 0x125;
+        public byte useStrBonus; // 0x125;
         public byte mod_id; // 0x126; field_126
         public int exp; // 0x127
         public byte classFlags; // 0x12b;

@@ -105,7 +105,7 @@ namespace Classes.Curse
         [DataOffset(0x124, DataType.Byte)]
         public byte base_ac; // 0x124;
         [DataOffset(0x125, DataType.Byte)]
-        public byte field_125; // 0x125;
+        public byte useStrBonus; // 0x125;
         [DataOffset(0x126, DataType.Byte)]
         public byte mod_id; // 0x126;
         [DataOffset(0x127, DataType.Int)]
@@ -275,7 +275,7 @@ namespace Classes.Curse
             attack1_DamageBonusBase = player.attack1_DamageBonusBase;
             attack2_DamageBonusBase = player.attack2_DamageBonusBase;
             base_ac = player.base_ac;
-            field_125 = player.field_125;
+            useStrBonus = player.useStrBonus;
             mod_id = player.mod_id;
             exp = player.exp;
             classFlags = player.classFlags;
@@ -397,7 +397,7 @@ namespace Classes.Curse
             player.attack1_DamageBonusBase = attack1_DamageBonusBase;
             player.attack2_DamageBonusBase = attack2_DamageBonusBase;
             player.base_ac = base_ac;
-            player.field_125 = field_125;
+            player.useStrBonus = useStrBonus;
             player.mod_id = mod_id;
             player.exp = exp;
             player.classFlags = classFlags;

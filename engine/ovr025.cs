@@ -640,7 +640,7 @@ namespace engine
 			int str_bonus = 0;
 			int str_stat = player_strength_group(player);
 
-			if (player.field_125 != 0)
+			if (player.useStrBonus != 0)
 			{
 				if (str_stat >= 1 && str_stat <= 3)
 				{
@@ -686,7 +686,7 @@ namespace engine
 
 			int var_2 = player_strength_group(player);
 
-			if (player.field_125 != 0)
+			if (player.useStrBonus != 0)
 			{
 				if (var_2 == 1 || var_2 == 2)
 				{
