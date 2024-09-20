@@ -1984,6 +1984,8 @@ namespace engine
         }
 
 
+        static string translation = "A B C D E F G H I J K L M N O    P Q R S T U V W X Y Z 0 1 2 3 4 5 6 7 8 9";
+
         internal static void CMD_Protection() // sub_2923F
         {
             VmLog.WriteLine("CMD_Protection:");
@@ -1993,7 +1995,7 @@ namespace engine
             gbl.spriteChanged = false;
             ovr008.vm_LoadCmdSets(1);
 
-            if (Cheats.skip_copy_protection == false)
+            if (gbl.game.Name == Logging.Game.PoolOfRadiance)
             {
                 var sb = new System.Text.StringBuilder();
                 ushort addr = gbl.cmd_ops[1].Word;
@@ -2030,7 +2032,6 @@ namespace engine
                     ovr025.LoadPic();
                 }
             }
-            ovr025.LoadPic();
         }
 
 

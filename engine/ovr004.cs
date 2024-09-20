@@ -13,91 +13,59 @@ namespace engine
 								 "ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 							 };
 
+        static char[,] espruarTable =
+        {
+            {'\x41', '\x42' }, {'\x43', '\x44' }, {'\x45', '\x46' }, {'\x47', '\x48' }, {'\x49', '\x4A' },
+            {'\x4B', '\x4C' }, {'\x4D', '\x4E' }, {'\x4F', '\x50' }, {'\x51', '\x52' }, {'\x53', '\x54' },
+            {'\x55', '\x56' }, {'\x57', '\x58' }, {'\x59', '\x5A' }, {'\x5B', '\x5C' }, {'\x5D', '\x5E' },
+            {'\x62', '\x63' }, {'\x64', '\x65' }, {'\x66', '\x67' }, {'\x68', '\x69' }, {'\x6A', '\x6B' },
+            {'\x6C', '\x6D' }, {'\x6E', '\x6F' }, {'\x70', '\x71' }, {'\x72', '\x73' }, {'\x74', '\x75' },
+            {'\x76', '\x77' }, {'\x95', '\x96' }, {'\x97', '\x98' }, {'\x99', '\x9A' }, {'\x9B', '\x9C' },
+            {'\x9D', '\x9E' }, {'\x9F', '\xA0' }, {'\xA1', '\xA2' }, {'\xA3', '\xA4' }, {'\xA5', '\xA6' },
+        };
+
+        static char[,] dethekTable =
+        {
+            {'\xAC', '\xB0' }, {'\xAF', '\x00' }, {'\xAE', '\x00' }, {'\xAD', '\x00' }, {'\xAC', '\x00' },
+            {'\xB0', '\x00' }, {'\xAA', '\x00' }, {'\xA9', '\x00' }, {'\xA8', '\x00' }, {'\x93', '\x00' },
+            {'\x92', '\x00' }, {'\x91', '\x00' }, {'\x90', '\x00' }, {'\x8F', '\x00' }, {'\x8E', '\x00' },
+            {'\x8D', '\x00' }, {'\x8C', '\x00' }, {'\x8B', '\x00' }, {'\x8A', '\x00' }, {'\x89', '\x00' },
+            {'\x88', '\x00' }, {'\x87', '\x00' }, {'\x86', '\x00' }, {'\x85', '\x00' }, {'\x84', '\x00' },
+            {'\x83', '\x00' }, {'\x82', '\x00' }, {'\x81', '\x00' }, {'\x80', '\x00' }, {'\x7F', '\x00' },
+            {'\x7E', '\x00' }, {'\x7D', '\x00' }, {'\x7C', '\x00' }, {'\x7B', '\x00' }, {'\x7A', '\x00' },
+        };
+
+        static string[] porCodeWheel =
+        {
+            "SXERNTDEHIETTSWADGAREHNNKAEYDIRANSST",
+            "AAREOENLSSLHMXOWROIOLRARHTIRCAEGWTIU",
+            "MIAPGEEGAVGGGSNALHDIPDCEESBKLSNNOASO",
+            "OEWPARIORYNILSTTOOUVMCLVSFMKOAIURNAR",
+            "SXEORFROAXUNQLOPOUHAEIUYRUOGIMNGBGOT",
+            "0ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789",
+        };
+
         internal static void copy_protection()
         {
-            string code_path_str;
-            char input_expected;
-            char input_key;
-
-            ovr034.Load24x24Set(0x1A, 0, 1, "tiles");
-            ovr034.Load24x24Set(0x16, 0x1A, 2, "tiles");
-
-            gbl.game.DrawFrame_Outer();
-
-            seg041.displayString("Align the espruar and dethek runes", 0, 10, 2, 3);
-            seg041.displayString("shown below, on translation wheel", 0, 10, 3, 3);
-            seg041.displayString("like this:", 0, 10, 4, 3);
             int attempt = 0;
+            string input_expected;
+            string input;
+
+            gbl.game.DrawProtection();
 
             do
             {
+                (input_expected, string text) = gbl.game.CheckProtection();
 
-                int var_6 = seg051.Random(26);
-                int var_7 = seg051.Random(22);
+                input = seg041.getUserInputString((byte)input_expected.Length, 0, 13, text);
 
-                ovr034.DrawIsoTile(var_6, 3, 0x11);
-                ovr034.DrawIsoTile(var_7 + 0x1a, 7, 0x11);
-
-                seg040.DrawOverlay();
-                int code_path = seg051.Random(3);
-
-                switch (code_path)
-                {
-                    case 0:
-                        code_path_str = "-..-..-..";
-                        break;
-
-                    case 1:
-                        code_path_str = "- - - - -";
-                        break;
-
-                    case 2:
-                        code_path_str = ".........";
-                        break;
-
-                    default:
-                        code_path_str = string.Empty;
-                        break;
-                }
-
-                int code_row = seg051.Random(6);
-
-                string text = "Type the character in box number " + (6 - code_row);
-
-                seg041.displayString(text, 0, 10, 12, 3);
-
-                seg041.displayString("under the ", 0, 10, 13, 3);
-                seg041.displayString(code_path_str, 0, 15, 13, 14);
-                seg041.displayString("path.", 0, 10, 13, 0x19);
-
-                int code_index = var_6 + 0x22 - var_7 + (code_path * 12) + ((5 - code_row) << 1);
-
-                while (code_index < 0)
-                {
-                    code_index += 36;
-                }
-
-                while (code_index > 35)
-                {
-                    code_index -= 36;
-                }
-
-                input_expected = codeWheel[code_row][code_index];
-
-                string input = seg041.getUserInputString(1, 0, 13, "type character and press return: ");
-
-                input_key = (input == null || input.Length == 0) ? ' ' : input[0];
                 attempt++;
 
-                if (input_key != input_expected)
+                if (input != input_expected)
                 {
                     seg041.DisplayStatusText(0, 14, "Sorry, that's incorrect.");
                 }
-                else
-                {
-                    return;
-                }
-            } while (gbl.Exit == false && input_key != input_expected && attempt < 3);
+            } while (gbl.Exit == false && input != input_expected && attempt < 3);
 
             if (gbl.Exit == false && attempt >= 3)
             {

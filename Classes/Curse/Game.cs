@@ -53,5 +53,7 @@ namespace Classes.Curse
         public override bool Portrait { get => false; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
+        public override void DrawProtection() { CopyProtection.DrawProtection(); }
+        public override (string, string) CheckProtection() { return CopyProtection.CheckProtection(); }
     }
 }

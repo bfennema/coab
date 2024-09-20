@@ -14,6 +14,8 @@ namespace engine
         {
             EngineStoppedCallback();
             gbl.Exit = true;
+            seg049.AddKey('Q');
+
             //EngineThread.Abort();
         }
 

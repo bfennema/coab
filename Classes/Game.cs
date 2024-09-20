@@ -44,5 +44,7 @@ namespace Classes
         public abstract bool Portrait { get; }
         public abstract byte[] PortraitBody { get; }
         public abstract byte[] PortraitHead { get; }
+        public abstract void DrawProtection();
+        public abstract (string, string) CheckProtection();
     }
 }

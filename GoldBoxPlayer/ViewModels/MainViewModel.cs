@@ -165,6 +165,7 @@ public class MainViewModel : ViewModelBase
     public void Close()
     {
         Classes.gbl.Exit = true;
+        engine.seg049.AddKey('Q');
     }
 
     public void UpdateDisplayCallback(byte[] videoRam, int videoRamSize)
