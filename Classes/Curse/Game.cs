@@ -4,6 +4,7 @@ namespace Classes.Curse
 {
     public class Game : Classes.Game
     {
+        readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" };
         public override Logging.Game Name { get => Logging.Game.CurseOfTheAzureBonds; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Curse; }
         public override int InitialExp { get => 25000; }
@@ -50,9 +51,11 @@ namespace Classes.Curse
         public override void DrawFrame_Combat() { Draw.Frame_Combat(); }
         public override void DrawFrame_List() { Draw.Frame_List(); }
         public override void DrawFrame_Portrait() { Draw.Frame_Outer(); }
+        public override void DrawFrame_Temple() { Draw.Frame_Wilderness(); }
         public override bool Portrait { get => false; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
+        public override string[] TempleSpells { get => templeSpells; }
         public override void DrawProtection() { CopyProtection.DrawProtection(); }
         public override (string, string) CheckProtection() { return CopyProtection.CheckProtection(); }
     }

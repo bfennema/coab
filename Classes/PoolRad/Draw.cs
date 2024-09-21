@@ -23,6 +23,9 @@
         readonly static byte[] outer_frame_vertical_portrait =
             { 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
 
+        readonly static byte[] outer_frame_vertical_temple =
+            { 0, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 0 };
+
         readonly static int[] outer_frame_vertical_credits  =
             { 0, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0 };
 
@@ -256,6 +259,29 @@
             for (int col_x = 0; col_x <= 39; col_x++)
             {
                 gbl.Put8x8Symbol(0, false, outer_frame_horizontal[col_x] + 0x114, 23, col_x);
+            }
+
+            Display.UpdateStart();
+        }
+
+        internal static void Frame_Temple()
+        {
+            Display.UpdateStop();
+
+            gbl.draw8x8_clear_area(23, 39, 0, 0);
+
+            for (int col_x = 0; col_x <= 39; col_x++)
+            {
+                gbl.Put8x8Symbol(0, false, outer_frame_horizontal[col_x] + 0x114, 0, col_x);
+                gbl.Put8x8Symbol(0, false, outer_frame_horizontal[col_x] + 0x114, 2, col_x);
+                gbl.Put8x8Symbol(0, false, outer_frame_horizontal[col_x] + 0x114, 16, col_x);
+                gbl.Put8x8Symbol(0, false, outer_frame_horizontal[col_x] + 0x114, 23, col_x);
+            }
+
+            for (int row_y = 0; row_y <= 23; row_y++)
+            {
+                gbl.Put8x8Symbol(0, false, outer_frame_vertical_temple[row_y] + 0x114, row_y, 0);
+                gbl.Put8x8Symbol(0, false, outer_frame_vertical_temple[row_y] + 0x114, row_y, 39);
             }
 
             Display.UpdateStart();

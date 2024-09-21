@@ -6,6 +6,8 @@ namespace Classes.PoolRad
     {
         readonly static internal byte[] portraitHead = { 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 };
         readonly static internal byte[] portraitBody = { 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 };
+        readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh", "Exit" };
+
         public override Logging.Game Name { get => Logging.Game.PoolOfRadiance; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Pool; }
         public override int InitialExp { get => 0; }
@@ -49,9 +51,11 @@ namespace Classes.PoolRad
         public override void DrawFrame_Combat() { Draw.Frame_Combat(); }
         public override void DrawFrame_List() { Draw.Frame_List(); }
         public override void DrawFrame_Portrait() { Draw.Frame_Portrait(); }
+        public override void DrawFrame_Temple() { Draw.Frame_Temple(); }
         public override bool Portrait { get => true; }
         public override byte[] PortraitBody { get => portraitBody; }
         public override byte[] PortraitHead { get => portraitHead; }
+        public override string[] TempleSpells { get => templeSpells; }
         public override void DrawProtection() { CopyProtection.DrawProtection(); }
         public override (string, string) CheckProtection() {  return CopyProtection.CheckProtection(); }
     }

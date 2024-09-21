@@ -15,9 +15,6 @@ namespace engine
             (Classes.Affects)0x39
         };
 
-        static string[] temple_sl = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh", "Exit" };
-
-
         static bool CastCureAnyway(string text)
         {
             ovr025.DisplayPlayerStatusString(false, 0, text, gbl.SelectedPlayer);
@@ -311,14 +308,14 @@ namespace engine
 
             List<MenuItem> stringList = new List<MenuItem>(10);
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < gbl.game.TempleSpells.Length; i++)
             {
-                stringList.Add(new MenuItem(temple_sl[i]));
+                stringList.Add(new MenuItem(gbl.game.TempleSpells[i]));
             }
 
             ovr027.ClearPromptAreaNoUpdate();
             bool redrawMenuItems = true;
-            gbl.game.DrawFrame_Wilderness();
+            gbl.game.DrawFrame_Temple();
 
             do
             {
@@ -327,53 +324,53 @@ namespace engine
                 MenuItem dummySelected;
 
                 char sl_output = ovr027.sl_select_item(out dummySelected, ref sl_index, ref redrawMenuItems, false,
-                    stringList, 15, 0x26, 4, 2, gbl.defaultMenuColors, "Heal Exit", string.Empty);
+                    stringList, 15, 38, 4, 2, gbl.defaultMenuColors, "Heal Exit", string.Empty);
 
                 if (sl_output == 'H' || sl_output == 0x0d)
                 {
-                    switch (sl_index)
+                    switch (gbl.game.TempleSpells[sl_index])
                     {
-                        case 0:
+                        case "Cure Blindness":
                             cure_blindness();
                             break;
 
-                        case 1:
+                        case "Cure Disease":
                             cure_disease();
                             break;
 
-                        case 2:
+                        case "Cure Light Wounds":
                             cure_wounds(1);
                             break;
 
-                        case 3:
+                        case "Cure Serious Wounds":
                             cure_wounds(2);
                             break;
 
-                        case 4:
+                        case "Cure Critical Wounds":
                             cure_wounds(3);
                             break;
 
-                        case 5:
+                        case "Heal":
                             cure_wounds(4);
                             break;
 
-                        case 6:
+                        case "Neutralize Poison":
                             cure_poison2();
                             break;
 
-                        case 7:
+                        case "Raise Dead":
                             raise_dead();
                             break;
 
-                        case 8:
+                        case "Remove Curse":
                             remove_curse();
                             break;
 
-                        case 9:
+                        case "Stone to Flesh":
                             stone_to_flesh();
                             break;
 
-                        case 10:
+                        case "Exit":
                             end_shop = true;
                             break;
                     }
