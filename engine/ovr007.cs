@@ -5,7 +5,7 @@ namespace engine
 {
     class ovr007
     {
-        internal static char ShopChooseItem(ref int index, out Item selectedItem) // sub_2F04E
+        internal static char ShopChooseItem(ref int index, out Item selectedItem, int startY) // sub_2F04E
         {
             List<MenuItem> list = new List<MenuItem>();
             foreach (var item in gbl.items_pointer)
@@ -17,7 +17,7 @@ namespace engine
 
                 int val = ItemsValue(item);
 
-                list.Insert(0, new MenuItem(string.Format("{0,-21}{1,9}", item.name.Trim(), val), item));
+                list.Insert(0, new MenuItem(string.Format("{0,-26}{1,5}", item.name.Trim(), val), item));
             }
 
             gbl.menuSelectedWord = 0;
@@ -26,7 +26,7 @@ namespace engine
             selectedItem = null;
 
             char input_key = ovr027.sl_select_item(out mi, ref index, ref gbl.shopRedrawMenuItems, true, list,
-                0x16, 0x26, 1, 1, gbl.defaultMenuColors, "Buy", "Items: ");
+                22, 38, startY, 1, gbl.defaultMenuColors, "Buy", "Items: ");
 
             if (mi != null)
             {
@@ -107,12 +107,13 @@ namespace engine
         {
             gbl.game.DrawFrame_Outer();
             gbl.shopRedrawMenuItems = true;
-
+            var startY = gbl.game.ShopBuy();
             int index = 0;
+
             while (true)
             {
                 Item item;
-                char input_key = ShopChooseItem(ref index, out item);
+                char input_key = ShopChooseItem(ref index, out item, startY);
 
                 if (input_key != 'B' && input_key != 0x0d)
                 {

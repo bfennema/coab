@@ -52,6 +52,7 @@ namespace Classes.Curse
         public override void DrawFrame_List() { Draw.Frame_List(); }
         public override void DrawFrame_Portrait() { Draw.Frame_Outer(); }
         public override void DrawFrame_Temple() { Draw.Frame_Wilderness(); }
+        public override int ShopBuy() { return 1; }
         public override bool Portrait { get => false; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }

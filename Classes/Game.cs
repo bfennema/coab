@@ -42,6 +42,7 @@ namespace Classes
         public abstract void DrawFrame_List();
         public abstract void DrawFrame_Portrait();
         public abstract void DrawFrame_Temple();
+        public abstract int ShopBuy();
         public abstract bool Portrait { get; }
         public abstract byte[] PortraitBody { get; }
         public abstract byte[] PortraitHead { get; }
