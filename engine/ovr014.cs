@@ -2344,7 +2344,7 @@ namespace engine
                 ovr025.DisplayPlayerStatusString(true, 12, "engulfs " + target.name, attacker);
                 ovr024.add_affect(false, ovr033.GetPlayerIndex(target), 0, Classes.Affects.clear_movement, target);
 
-                ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.clear_movement);
+                Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.clear_movement);
                 ovr024.add_affect(false, ovr024.roll_dice(4, 2), 0, Classes.Affects.reduce, target);
                 ovr024.add_affect(true, ovr033.GetPlayerIndex(target), 0, Classes.Affects.affect_8b, attacker);
             }
@@ -2555,7 +2555,7 @@ namespace engine
                 ovr025.DisplayPlayerStatusString(true, 12, "hugs " + gbl.spell_target.name, player);
 
                 ovr024.add_affect(false, ovr033.GetPlayerIndex(gbl.spell_target), 0, Classes.Affects.clear_movement, gbl.spell_target);
-                ovr013.CallAffectTable(Effect.Add, null, gbl.spell_target, Classes.Affects.clear_movement);
+                Affects.Effect.Call(Effect.Add, null, gbl.spell_target, Classes.Affects.clear_movement);
 
                 ovr024.add_affect(true, ovr033.GetPlayerIndex(gbl.spell_target), 0, Classes.Affects.owlbear_hug_round_attack, player);
             }

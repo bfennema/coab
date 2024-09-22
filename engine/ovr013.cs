@@ -452,8 +452,8 @@ namespace engine
 
 		internal static void AffectCauseDisease(Effect add_remove, object param, Player player) // sub_3A974
 		{
-			ovr013.CallAffectTable(add_remove, param, player, Classes.Affects.weaken);
-			ovr013.CallAffectTable(add_remove, param, player, Classes.Affects.cause_disease_2);
+			Affects.Effect.Call(add_remove, param, player, Classes.Affects.weaken);
+			Affects.Effect.Call(add_remove, param, player, Classes.Affects.cause_disease_2);
 		}
 
 
@@ -485,7 +485,7 @@ namespace engine
 			else if (var_1 >= 61 && var_1 <= 80)
 			{
 				ovr024.ApplyAttackSpellAffect("goes berserk", false, DamageOnSave.Zero, true, (byte)player.combat_team, 1, Classes.Affects.confuse_berserk, player);
-				ovr013.CallAffectTable(Effect.Add, null, player, Classes.Affects.confuse_berserk);
+				Affects.Effect.Call(Effect.Add, null, player, Classes.Affects.confuse_berserk);
 			}
 			else if (var_1 >= 81 && var_1 <= 100)
 			{
@@ -1645,7 +1645,7 @@ namespace engine
 
 				if (gbl.game_state != GameState.Combat)
 				{
-					ovr013.CallAffectTable(Effect.Add, null, player, item.Affect_2);
+					Affects.Effect.Call(Effect.Add, null, player, item.Affect_2);
 				}
 			}
 		}
@@ -1796,175 +1796,6 @@ namespace engine
 
 		internal static void empty(Effect arg_0, object param, Player player)
 		{
-		}
-
-		static System.Collections.Generic.Dictionary<Classes.Affects, affectDelegate> affect_table;
-
-		internal static void SetupAffectTables() // setup_spells2
-		{
-			affect_table = new System.Collections.Generic.Dictionary<Classes.Affects, affectDelegate>();
-
-			affect_table.Add(Classes.Affects.bless, ovr013.Bless);
-			affect_table.Add(Classes.Affects.cursed, ovr013.Curse);
-			affect_table.Add(Classes.Affects.sticks_to_snakes, ovr013.SticksToSnakes);
-			affect_table.Add(Classes.Affects.dispel_evil, ovr013.DispelEvil);
-			affect_table.Add(Classes.Affects.detect_magic, ovr013.empty);
-			affect_table.Add(Classes.Affects.weap_flame_tongue, ovr013.AffectFlameTongue);
-			affect_table.Add(Classes.Affects.faerie_fire, ovr013.FaerieFire);
-			affect_table.Add(Classes.Affects.protection_from_evil, ovr013.affect_protect_evil);
-			affect_table.Add(Classes.Affects.protection_from_good, ovr013.affect_protect_good);
-			affect_table.Add(Classes.Affects.spell_resist_cold, ovr013.affect_resist_cold);
-			affect_table.Add(Classes.Affects.charm_person, ovr013.affect_charm_person);
-			affect_table.Add(Classes.Affects.enlarge, ovr013.empty);
-			affect_table.Add(Classes.Affects.reduce, ovr013.Suffocates);
-			affect_table.Add(Classes.Affects.friends, ovr013.empty);
-			affect_table.Add(Classes.Affects.poison_damage, ovr013.AffectPoisonDamage);
-			affect_table.Add(Classes.Affects.read_magic, ovr013.empty);
-			affect_table.Add(Classes.Affects.shield, ovr013.Affectshield);
-			affect_table.Add(Classes.Affects.gnome_vs_goblin_kobold, ovr013.AffectGnomeVsGoblinKobold);
-			affect_table.Add(Classes.Affects.find_traps, ovr013.empty);
-			affect_table.Add(Classes.Affects.spell_resist_fire, ovr013.AffectResistFire);
-			affect_table.Add(Classes.Affects.silence_15_radius, ovr013.is_silenced1);
-			affect_table.Add(Classes.Affects.slow_poison, ovr013.AffectslowPoison);
-			affect_table.Add(Classes.Affects.spiritual_hammer, ovr013.affect_spiritual_hammer);
-			affect_table.Add(Classes.Affects.detect_invisibility, ovr013.empty);
-			affect_table.Add(Classes.Affects.invisibility, ovr013.sub_3A6C6);
-			affect_table.Add(Classes.Affects.dwarf_vs_orc_goblin, ovr013.AffectDwarfVsOrcGoblin);
-			affect_table.Add(Classes.Affects.fumbling, ovr013.sub_3A071);
-			affect_table.Add(Classes.Affects.mirror_image, ovr013.MirrorImage);
-			affect_table.Add(Classes.Affects.ray_of_enfeeblement, ovr013.three_quarters_damage);
-			affect_table.Add(Classes.Affects.stinking_cloud, ovr013.StinkingCloud);
-			affect_table.Add(Classes.Affects.helpless, ovr013.sub_3A071);
-			affect_table.Add(Classes.Affects.animate_dead, ovr013.sub_3A89E);
-			affect_table.Add(Classes.Affects.blinded, ovr013.AffectBlinded);
-			affect_table.Add(Classes.Affects.cause_disease_1, ovr013.AffectCauseDisease);
-			affect_table.Add(Classes.Affects.confuse, ovr013.AffectConfuse);
-			affect_table.Add(Classes.Affects.bestow_curse, ovr013.affect_curse);
-			affect_table.Add(Classes.Affects.blink, ovr013.AffectBlink);
-			affect_table.Add(Classes.Affects.strength, ovr013.empty);
-			affect_table.Add(Classes.Affects.haste, ovr013.AffectHaste);
-			affect_table.Add(Classes.Affects.affect_in_stinking_cloud, ovr013.StinkingCloudAffect);
-			affect_table.Add(Classes.Affects.prot_from_normal_missiles, ovr013.AffectProtNormalMissles);
-			affect_table.Add(Classes.Affects.slow, ovr013.Affectslow);
-			affect_table.Add(Classes.Affects.weaken, ovr013.weaken);
-			affect_table.Add(Classes.Affects.cause_disease_2, ovr013.sub_3B0C2);
-			affect_table.Add(Classes.Affects.prot_from_evil_10_radius, ovr013.affect_protect_evil);
-			affect_table.Add(Classes.Affects.prot_from_good_10_radius, ovr013.affect_protect_good);
-			affect_table.Add(Classes.Affects.giant_vs_dwarf_gnome, ovr013.AffectGiantVsDwarfGnome);
-			affect_table.Add(Classes.Affects.gnoll_bugbear_vs_gnome, ovr013.AffectGnollBugbearVsGnome);
-			affect_table.Add(Classes.Affects.prayer, ovr013.AffectPrayer);
-			affect_table.Add(Classes.Affects.hot_fire_shield, ovr013.HotFireShield);
-			affect_table.Add(Classes.Affects.snake_charm, ovr013.sub_3A071);
-			affect_table.Add(Classes.Affects.paralyze, ovr013.sub_3A071);
-			affect_table.Add(Classes.Affects.sleep, ovr013.sub_3A071);
-			affect_table.Add(Classes.Affects.cold_fire_shield, ovr013.ColdFireShield);
-			affect_table.Add(Classes.Affects.poisoned, ovr013.empty);
-			affect_table.Add(Classes.Affects.item_invisibility, ovr013.sub_3B27B);
-			affect_table.Add(Classes.Affects.engulf, ovr014.AffectEngulf);
-			affect_table.Add(Classes.Affects.clear_movement, ovr013.AffectClearMovement);
-			affect_table.Add(Classes.Affects.regenerate, ovr013.AffectRegenration);
-			affect_table.Add(Classes.Affects.resist_normal_weapons, ovr013.AffectResistWeapons);
-			affect_table.Add(Classes.Affects.item_fire_resist, ovr013.AffectFireResist);
-			affect_table.Add(Classes.Affects.highConRegen, ovr013.AffectHighConRegen);
-			affect_table.Add(Classes.Affects.minor_globe_of_invulnerability, ovr013.AffectMinorGlobeOfInvulnerability);
-			affect_table.Add(Classes.Affects.poison_plus_0, ovr013.AffectPoisonPlus0);
-			affect_table.Add(Classes.Affects.poison_plus_4, ovr013.AffectPoisonPlus4);
-			affect_table.Add(Classes.Affects.poison_plus_2, ovr013.AffectPoisonPlus2);
-			affect_table.Add(Classes.Affects.thri_kreen_paralyze, ovr013.ThriKreenParalyze);
-			affect_table.Add(Classes.Affects.feeblemind, ovr013.AffectFeebleMind);
-			affect_table.Add(Classes.Affects.invisible_to_animals, ovr013.AffectInvisToAnimals);
-			affect_table.Add(Classes.Affects.poison_neg_2, ovr013.AffectPoisonNeg2);
-			affect_table.Add(Classes.Affects.invisible, ovr013.AffectInvisible);
-			affect_table.Add(Classes.Affects.camouflage, ovr013.AffectCamouflage);
-			affect_table.Add(Classes.Affects.prot_drag_breath, ovr013.ProtDragonsBreath);
-			affect_table.Add(Classes.Affects.affect_4a, ovr013.empty);
-			affect_table.Add(Classes.Affects.weap_dragon_slayer, ovr013.AffectDragonSlayer);
-			affect_table.Add(Classes.Affects.weap_frost_brand, ovr013.AffectFrostBrand);
-			affect_table.Add(Classes.Affects.berserk, ovr013.AffectBerzerk);
-			affect_table.Add(Classes.Affects.affect_4e, ovr013.sub_3B8D9);
-			affect_table.Add(Classes.Affects.fireAttack_2d10, ovr013.MagicFireAttack_2d10);
-			affect_table.Add(Classes.Affects.ankheg_melee_acid_attack, ovr013.AnkhegMeleeAcidAttack);
-			affect_table.Add(Classes.Affects.half_damage, ovr013.half_damage);
-			affect_table.Add(Classes.Affects.resist_fire_and_cold, ovr013.AffectResistFireAndCold);
-			affect_table.Add(Classes.Affects.petrifying_gaze, ovr023.AffectPetrifyingGaze);
-			affect_table.Add(Classes.Affects.shambling_absorb_lightning, ovr013.AffectshamblerAbsorbLightning);
-			affect_table.Add(Classes.Affects.resist_piercing, ovr013.AffectResistPiercing);
-			affect_table.Add(Classes.Affects.spit_acid, ovr023.AffectSpitAcid);
-			affect_table.Add(Classes.Affects.beholder_eyestalk, ovr014.beholder_eyestalk);
-			affect_table.Add(Classes.Affects.breath_elec, ovr023.DragonBreathElec);
-			affect_table.Add(Classes.Affects.displace, ovr013.AffectDisplace);
-			affect_table.Add(Classes.Affects.breath_acid, ovr023.DragonBreathAcid);
-			affect_table.Add(Classes.Affects.affect_in_cloud_kill, ovr013.CloudKillAffect);
-			affect_table.Add(Classes.Affects.affect_5c, ovr013.empty);
-			affect_table.Add(Classes.Affects.half_fire, ovr013.half_fire_damage);
-			affect_table.Add(Classes.Affects.resist_blunt_pierce, ovr013.AffectResistBluntPierce);
-			affect_table.Add(Classes.Affects.delay_death, ovr013.AffectDelayDeath);
-			affect_table.Add(Classes.Affects.owlbear_hug_check, ovr014.AffectOwlbearHugAttackCheck);
-			affect_table.Add(Classes.Affects.con_saving_bonus, ovr013.con_saving_bonus);
-			affect_table.Add(Classes.Affects.regen_3_hp, ovr013.AffectRegen3Hp);
-			affect_table.Add(Classes.Affects.fight_unconscious, ovr013.AffectFightUnconscious);
-			affect_table.Add(Classes.Affects.troll_fire_or_acid, ovr013.AffectTrollFireOrAcid);
-			affect_table.Add(Classes.Affects.troll_regen, ovr013.AffectTrollRegenerate);
-			affect_table.Add(Classes.Affects.TrollRegen, ovr013.AffectTrollRegen);
-			affect_table.Add(Classes.Affects.salamander_heat_damage, ovr013.AffectsalamanderHeatDamage);
-			affect_table.Add(Classes.Affects.thri_kreen_dodge_missile, ovr013.sub_3C0DA);
-			affect_table.Add(Classes.Affects.resist_magic_50_percent, ovr013.ResistMagic50Percent);
-			affect_table.Add(Classes.Affects.resist_magic_15_percent, ovr013.ResistMagic15Percent);
-			affect_table.Add(Classes.Affects.elf_resist_sleep, ovr013.AffectElfRisistSleep);
-			affect_table.Add(Classes.Affects.protect_charm_sleep, ovr013.AffectProtCharmSleep);
-			affect_table.Add(Classes.Affects.resist_paralyze, ovr013.ResistParalyze);
-			affect_table.Add(Classes.Affects.immune_to_cold, ovr013.AffectImmuneToCold);
-			affect_table.Add(Classes.Affects.prot_paralysis_poison, ovr013.AffectProtParalysisPoison);
-			affect_table.Add(Classes.Affects.immune_to_fire, ovr013.AffectImmuneToFire);
-			affect_table.Add(Classes.Affects.efreeti_fire_resist, ovr013.AffectEfreetiFireResist);
-			affect_table.Add(Classes.Affects.half_elec, ovr013.AffectProtectionFromElectricity);
-			affect_table.Add(Classes.Affects.resist_pierce_slash, ovr013.AffectResistPierceSlash);
-			affect_table.Add(Classes.Affects.resist_magic_weapon, ovr013.half_damage_if_weap_magic);
-			affect_table.Add(Classes.Affects.vuln_holy_water, ovr013.AffectVulnHolyWater);
-			affect_table.Add(Classes.Affects.half_cold, ovr013.AffectProtCold);
-			affect_table.Add(Classes.Affects.protect_non_magic_weapons, ovr013.AffectProtNonMagicWeapons);
-			affect_table.Add(Classes.Affects.boulder_evasion, ovr013.AffectBoulderEvasion);
-			affect_table.Add(Classes.Affects.ankheg_ranged_acid_attack, ovr013.AffectAnkhedRangedAcidAttack);
-			affect_table.Add(Classes.Affects.dracolich_paralysis, ovr013.AffectDracolichParalysis);
-			affect_table.Add(Classes.Affects.dracolich_cold_damage, ovr013.AffectDracolichColdDamage);
-			affect_table.Add(Classes.Affects.halfelf_resistance, ovr013.AffectHalfElfResistance);
-			affect_table.Add(Classes.Affects.prot_sleep_charm_paralysis_poison, ovr013.AffectProtSleepCharmParalysisPoison);
-			affect_table.Add(Classes.Affects.dracolich_paralytic_gaze, ovr023.cast_gaze_paralyze);
-			affect_table.Add(Classes.Affects.reflectable_gaze, ovr013.empty);
-			affect_table.Add(Classes.Affects.breath_fire, ovr023.DragonBreathFire);
-			affect_table.Add(Classes.Affects.protect_magic, ovr013.AffectProtMagic);
-			affect_table.Add(Classes.Affects.vuln_blessed_quarrel, ovr013.AffectVulnBlessedQuarrel);
-			affect_table.Add(Classes.Affects.cast_breath_fire, ovr023.cast_breath_fire);
-			affect_table.Add(Classes.Affects.cast_throw_lightening, ovr023.cast_throw_lightening);
-			affect_table.Add(Classes.Affects.dracolich_protection, ovr013.AffectDracolichProtection);
-			affect_table.Add(Classes.Affects.ranger_vs_giant, ovr013.AffectRangerVsGiant);
-			affect_table.Add(Classes.Affects.protect_elec, ovr013.AffectProtElec);
-			affect_table.Add(Classes.Affects.entangle, ovr013.AffectEntangle);
-			affect_table.Add(Classes.Affects.confuse_berserk, ovr013.AffectConfuseBerserk);
-			affect_table.Add(Classes.Affects.add_invisibility, ovr013.AffectAddInvisibility);
-			affect_table.Add(Classes.Affects.affect_8b, ovr014.sub_425C6);
-			affect_table.Add(Classes.Affects.paladinDailyHealCast, ovr013.empty);
-			affect_table.Add(Classes.Affects.paladinDailyCureRefresh, ovr013.PaladinCastCureRefresh);
-			affect_table.Add(Classes.Affects.fear, ovr013.AffectFear);
-			affect_table.Add(Classes.Affects.fire_shield_damage, ovr013.AffectFireShieldDamage);
-			affect_table.Add(Classes.Affects.owlbear_hug_round_attack, ovr014.AffectOwlbearHugRoundAttack);
-			affect_table.Add(Classes.Affects.dispel_evil_banish, ovr013.AffectDispelEvilBanish);
-			affect_table.Add(Classes.Affects.strength_spell, ovr013.empty);
-			affect_table.Add(Classes.Affects.do_items_affect, ovr013.do_items_affect);
-		}
-
-		internal static void CallAffectTable(Effect add_remove, object parameter, Player player, Classes.Affects affect) /* sub_630C7 */
-		{
-			if (gbl.applyItemAffect == true)
-			{
-				affect = Classes.Affects.do_items_affect;
-			}
-
-			affectDelegate func;
-			if (affect_table.TryGetValue(affect, out func))
-			{
-				func(add_remove, parameter, player);
-			}
 		}
 	}
 }

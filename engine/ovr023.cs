@@ -1061,7 +1061,7 @@ namespace engine
 
 				if (affect != null)
 				{
-					ovr013.CallAffectTable(Effect.Add, affect, target, Classes.Affects.shield);
+					Affects.Effect.Call(Effect.Add, affect, target, Classes.Affects.shield);
 				}
 			}
 		}
@@ -1297,7 +1297,7 @@ namespace engine
 				}
 
 				DoSpellCastingWork("is affected", 0, 0, true, 0xff, gbl.spell_id);
-				ovr013.CallAffectTable(Effect.Remove, null, player, Classes.Affects.affect_4e);
+				Affects.Effect.Call(Effect.Remove, null, player, Classes.Affects.affect_4e);
 				ovr024.add_affect(true, 0xff, 10, Classes.Affects.poison_damage, player);
 			}
 		}
@@ -1329,7 +1329,7 @@ namespace engine
 		{
 			DoSpellCastingWork(string.Empty, 0, 0, true, 0, gbl.spell_id);
 
-			ovr013.CallAffectTable(Effect.Add, null, gbl.spellTargets[0], Classes.Affects.spiritual_hammer);
+			Affects.Effect.Call(Effect.Add, null, gbl.spellTargets[0], Classes.Affects.spiritual_hammer);
 		}
 
 
@@ -1839,7 +1839,7 @@ namespace engine
 					if ((int)item.affect_3 > 0x7F)
 					{
 						gbl.applyItemAffect = true;
-						ovr013.CallAffectTable(Effect.Remove, item, gbl.spellTargets[0], item.Affect_3);
+						Affects.Effect.Call(Effect.Remove, item, gbl.spellTargets[0], item.Affect_3);
 
 						var target = gbl.spellTargets[0];
 
@@ -2278,7 +2278,7 @@ namespace engine
 
 			if (gbl.current_affect == Classes.Affects.poison_plus_0)
 			{
-				ovr013.CallAffectTable(Effect.Add, null, gbl.SelectedPlayer, Classes.Affects.poison_plus_0);
+				Affects.Effect.Call(Effect.Add, null, gbl.SelectedPlayer, Classes.Affects.poison_plus_0);
 			}
 		}
 
@@ -2292,7 +2292,7 @@ namespace engine
 				Affect affect;
 				if (ovr025.FindAffect(out affect, Classes.Affects.sticks_to_snakes, gbl.spellTargets[0]) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, affect, gbl.spellTargets[0], Classes.Affects.sticks_to_snakes);
+					Affects.Effect.Call(Effect.Add, affect, gbl.spellTargets[0], Classes.Affects.sticks_to_snakes);
 				}
 			}
 			else
@@ -2420,7 +2420,7 @@ namespace engine
 
 				if (ovr025.FindAffect(out affect, Classes.Affects.charm_person, target) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, affect, target, Classes.Affects.charm_person);
+					Affects.Effect.Call(Effect.Add, affect, target, Classes.Affects.charm_person);
 				}
 			}
 		}
@@ -2571,7 +2571,7 @@ namespace engine
 
 				if (target.HasAffect(Classes.Affects.fumbling) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.fumbling);
+					Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.fumbling);
 				}
 			}
 			else
@@ -2580,7 +2580,7 @@ namespace engine
 
 				if (target.HasAffect(Classes.Affects.slow) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.slow);
+					Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.slow);
 				}
 			}
 			DoSpellCastingWork("is clumsy", 0, 0, true, 0, gbl.spell_id);
@@ -2766,7 +2766,7 @@ namespace engine
 
 			if (target.HasAffect(Classes.Affects.feeblemind) == true)
 			{
-				ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.feeblemind);
+				Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.feeblemind);
 			}
 
 			target.saveVerse[saveTypeSpell] = oldBonus;
