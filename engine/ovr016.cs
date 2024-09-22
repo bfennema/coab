@@ -457,9 +457,9 @@ namespace engine
                                         int var_6 = 1;
                                         do
                                         {
-                                            if (var_C.getAffect(var_6) == (Affects)var_4)
+                                            if (var_C.getAffect(var_6) == (Classes.Affects)var_4)
                                             {
-                                                var_C.setAffect(var_6, (Affects)((int)var_C.getAffect(var_6) | 0x80));
+                                                var_C.setAffect(var_6, (Classes.Affects)((int)var_C.getAffect(var_6) | 0x80));
                                                 var_D = true;
                                             }
 
@@ -498,20 +498,49 @@ namespace engine
             }
         }
 
-        static Dictionary<Affects, string> EffectNameMap = new Dictionary<Affects, string>();
+        static Dictionary<Classes.Affects, string> EffectNameMap = new Dictionary<Classes.Affects, string>();
 
         internal static void BuildEffectNameMap()
         {
-            Affects[] affects = { Affects.bless, Affects.cursed, Affects.detect_magic, Affects.protection_from_evil, 
-                                  Affects.protection_from_good, Affects.spell_resist_cold, Affects.charm_person, Affects.enlarge, 
-                                  Affects.friends, Affects.read_magic, Affects.shield, Affects.find_traps, Affects.spell_resist_fire, 
-                                  Affects.silence_15_radius, Affects.slow_poison, Affects.spiritual_hammer, Affects.detect_invisibility, 
-                                  Affects.invisibility, Affects.mirror_image, Affects.ray_of_enfeeblement, Affects.animate_dead, 
-                                  Affects.blinded, Affects.cause_disease_1, Affects.bestow_curse, Affects.blink, Affects.strength, 
-                                  Affects.haste, Affects.prot_from_normal_missiles, Affects.slow, Affects.prot_from_evil_10_radius, 
-                                  Affects.prot_from_good_10_radius, Affects.prayer, Affects.snake_charm, Affects.paralyze, Affects.sleep };
+            Classes.Affects[] affects = {
+                Classes.Affects.bless,
+                Classes.Affects.cursed,
+                Classes.Affects.detect_magic,
+                Classes.Affects.protection_from_evil,
+                Classes.Affects.protection_from_good,
+                Classes.Affects.spell_resist_cold,
+                Classes.Affects.charm_person,
+                Classes.Affects.enlarge,
+                Classes.Affects.friends,
+                Classes.Affects.read_magic,
+                Classes.Affects.shield,
+                Classes.Affects.find_traps,
+                Classes.Affects.spell_resist_fire,
+                Classes.Affects.silence_15_radius,
+                Classes.Affects.slow_poison,
+                Classes.Affects.spiritual_hammer,
+                Classes.Affects.detect_invisibility,
+                Classes.Affects.invisibility,
+                Classes.Affects.mirror_image,
+                Classes.Affects.ray_of_enfeeblement,
+                Classes.Affects.animate_dead,
+                Classes.Affects.blinded,
+                Classes.Affects.cause_disease_1,
+                Classes.Affects.bestow_curse,
+                Classes.Affects.blink,
+                Classes.Affects.strength,
+                Classes.Affects.haste,
+                Classes.Affects.prot_from_normal_missiles,
+                Classes.Affects.slow,
+                Classes.Affects.prot_from_evil_10_radius,
+                Classes.Affects.prot_from_good_10_radius,
+                Classes.Affects.prayer,
+                Classes.Affects.snake_charm,
+                Classes.Affects.paralyze,
+                Classes.Affects.sleep
+            };
 
-            foreach (Affects aff in affects)
+            foreach (Classes.Affects aff in affects)
             {
                 bool found = false;
 
@@ -530,26 +559,26 @@ namespace engine
                 }
             }
 
-            EffectNameMap.Add(Affects.dispel_evil, "Dispel Evil");
-            EffectNameMap.Add(Affects.faerie_fire, "Faerie Fire");
-            EffectNameMap.Add(Affects.fumbling, "Fumbling");
-            EffectNameMap.Add(Affects.helpless, "Helpless");
-            EffectNameMap.Add(Affects.confuse, "Confused");
-            EffectNameMap.Add(Affects.cause_disease_2, "Cause Disease");
-            EffectNameMap.Add(Affects.hot_fire_shield, "Hot Fire Shield");
-            EffectNameMap.Add(Affects.cold_fire_shield, "Cold Fire Shield");
-            EffectNameMap.Add(Affects.poisoned, "Poisoned");
-            EffectNameMap.Add(Affects.regenerate, "Regenerating");
-            EffectNameMap.Add(Affects.item_fire_resist, "Fire Resistance");
-            EffectNameMap.Add(Affects.weap_frost_brand, "Fire Resistance");
-            EffectNameMap.Add(Affects.minor_globe_of_invulnerability, "Minor Globe of Invulnerability");
-            EffectNameMap.Add(Affects.feeblemind, "enfeebled");
-            EffectNameMap.Add(Affects.invisible_to_animals, "invisible to animals");
-            EffectNameMap.Add(Affects.invisible, "Invisible");
-            EffectNameMap.Add(Affects.camouflage, "Camouflaged");
-            EffectNameMap.Add(Affects.prot_drag_breath, "protected from dragon breath");
-            EffectNameMap.Add(Affects.berserk, "berserk");
-            EffectNameMap.Add(Affects.displace, "Displaced");
+            EffectNameMap.Add(Classes.Affects.dispel_evil, "Dispel Evil");
+            EffectNameMap.Add(Classes.Affects.faerie_fire, "Faerie Fire");
+            EffectNameMap.Add(Classes.Affects.fumbling, "Fumbling");
+            EffectNameMap.Add(Classes.Affects.helpless, "Helpless");
+            EffectNameMap.Add(Classes.Affects.confuse, "Confused");
+            EffectNameMap.Add(Classes.Affects.cause_disease_2, "Cause Disease");
+            EffectNameMap.Add(Classes.Affects.hot_fire_shield, "Hot Fire Shield");
+            EffectNameMap.Add(Classes.Affects.cold_fire_shield, "Cold Fire Shield");
+            EffectNameMap.Add(Classes.Affects.poisoned, "Poisoned");
+            EffectNameMap.Add(Classes.Affects.regenerate, "Regenerating");
+            EffectNameMap.Add(Classes.Affects.item_fire_resist, "Fire Resistance");
+            EffectNameMap.Add(Classes.Affects.weap_frost_brand, "Fire Resistance");
+            EffectNameMap.Add(Classes.Affects.minor_globe_of_invulnerability, "Minor Globe of Invulnerability");
+            EffectNameMap.Add(Classes.Affects.feeblemind, "enfeebled");
+            EffectNameMap.Add(Classes.Affects.invisible_to_animals, "invisible to animals");
+            EffectNameMap.Add(Classes.Affects.invisible, "Invisible");
+            EffectNameMap.Add(Classes.Affects.camouflage, "Camouflaged");
+            EffectNameMap.Add(Classes.Affects.prot_drag_breath, "protected from dragon breath");
+            EffectNameMap.Add(Classes.Affects.berserk, "berserk");
+            EffectNameMap.Add(Classes.Affects.displace, "Displaced");
 
         }
 

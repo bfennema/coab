@@ -144,27 +144,27 @@ namespace engine
             }
         }
 
-        static Affects[] affects_array = new Affects[] {
-											Affects.sticks_to_snakes,
-											Affects.charm_person,
-											Affects.reduce,
-											Affects.silence_15_radius,
-											Affects.spiritual_hammer,
-											Affects.fumbling,
-											Affects.confuse,
-											Affects.affect_in_stinking_cloud,
-											Affects.snake_charm,
-											Affects.paralyze,
-											Affects.sleep,
-											Affects.clear_movement,
-											Affects.affect_in_cloud_kill,
-											Affects.entangle,
-											Affects.confuse_berserk,
-											Affects.affect_8b,
-											Affects.fear,
-											Affects.owlbear_hug_round_attack,
-											Affects.helpless
-										};
+        static Classes.Affects[] affects_array = {
+            Classes.Affects.sticks_to_snakes,
+            Classes.Affects.charm_person,
+            Classes.Affects.reduce,
+            Classes.Affects.silence_15_radius,
+            Classes.Affects.spiritual_hammer,
+            Classes.Affects.fumbling,
+            Classes.Affects.confuse,
+            Classes.Affects.affect_in_stinking_cloud,
+            Classes.Affects.snake_charm,
+            Classes.Affects.paralyze,
+            Classes.Affects.sleep,
+            Classes.Affects.clear_movement,
+            Classes.Affects.affect_in_cloud_kill,
+            Classes.Affects.entangle,
+            Classes.Affects.confuse_berserk,
+            Classes.Affects.affect_8b,
+            Classes.Affects.fear,
+            Classes.Affects.owlbear_hug_round_attack,
+            Classes.Affects.helpless
+        };
 
         internal static void CleanupPlayersStateAfterCombat() // sub_2D556
         {

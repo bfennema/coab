@@ -241,12 +241,12 @@ namespace engine
 
             int movement = player.movement;
 
-            if (player.HasAffect(Affects.slow) == true)
+            if (player.HasAffect(Classes.Affects.slow) == true)
             {
                 movement /= 2;
             }
 
-            if (player.HasAffect(Affects.haste) == true)
+            if (player.HasAffect(Classes.Affects.haste) == true)
             {
                 movement *= 2;
             }
@@ -870,7 +870,7 @@ namespace engine
                 case 9:
                     if (add_item == false)
                     {
-                        ovr024.remove_affect(null, Affects.spiritual_hammer, player);
+                        ovr024.remove_affect(null, Classes.Affects.spiritual_hammer, player);
                     }
                     break;
 
@@ -1569,7 +1569,7 @@ namespace engine
             return (player.SkillLevel(SkillType.Paladin) > 0 &&
                 gbl.game_state != GameState.Combat &&
                 player.health_status == Status.okey &&
-                player.HasAffect(Affects.paladinDailyHealCast) == false);
+                player.HasAffect(Classes.Affects.paladinDailyHealCast) == false);
         }
 
 
@@ -1606,17 +1606,17 @@ namespace engine
                 ovr025.string_print01(target.name + " is unaffected");
             }
 
-            ovr024.add_affect(false, 0, 1440, Affects.paladinDailyHealCast, player);
+            ovr024.add_affect(false, 0, 1440, Classes.Affects.paladinDailyHealCast, player);
             playerDisplayFull(gbl.SelectedPlayer);
         }
 
-        static Affects[] paladinCureableDiseases = { // unk_16B39
-            Affects.helpless,
-            Affects.cause_disease_1,
-            Affects.weaken,
-            Affects.cause_disease_2,
-            (Affects)0x32,
-            (Affects)0x39,
+        static Classes.Affects[] paladinCureableDiseases = { // unk_16B39
+            Classes.Affects.helpless,
+            Classes.Affects.cause_disease_1,
+            Classes.Affects.weaken,
+            Classes.Affects.cause_disease_2,
+            (Classes.Affects)0x32,
+            (Classes.Affects)0x39,
         };
 
         internal static void PaladinCureDisease(Player player) /* sub_577EC */
@@ -1657,9 +1657,9 @@ namespace engine
                         player.paladinCuresLeft--;
                     }
 
-                    if (player.HasAffect(Affects.paladinDailyCureRefresh) == false)
+                    if (player.HasAffect(Classes.Affects.paladinDailyCureRefresh) == false)
                     {
-                        ovr024.add_affect(true, 0, 0x2760, Affects.paladinDailyCureRefresh, player);
+                        ovr024.add_affect(true, 0, 0x2760, Classes.Affects.paladinDailyCureRefresh, player);
                     }
 
                     ovr025.string_print01(target.name + " is cured");

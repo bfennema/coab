@@ -331,12 +331,12 @@ namespace engine
                 if (playerIndex == 0 && move_cost < player.actions.move)
                 {
                     if (isNoxiousCloud == true &&
-                        player.HasAffect(Affects.animate_dead) == false &&
-                        player.HasAffect(Affects.stinking_cloud) == false &&
-                        player.HasAffect(Affects.prot_paralysis_poison) == false &&
-                        player.HasAffect(Affects.prot_sleep_charm_paralysis_poison) == false &&
-                        player.HasAffect(Affects.protect_magic) == false &&
-                        player.HasAffect(Affects.minor_globe_of_invulnerability) == false &&
+                        player.HasAffect(Classes.Affects.animate_dead) == false &&
+                        player.HasAffect(Classes.Affects.stinking_cloud) == false &&
+                        player.HasAffect(Classes.Affects.prot_paralysis_poison) == false &&
+                        player.HasAffect(Classes.Affects.prot_sleep_charm_paralysis_poison) == false &&
+                        player.HasAffect(Classes.Affects.protect_magic) == false &&
+                        player.HasAffect(Classes.Affects.minor_globe_of_invulnerability) == false &&
                         player.actions.fleeing == false)
                     {
                         if (ovr024.RollSavingThrow(0, 0, player) == false)
@@ -347,10 +347,10 @@ namespace engine
 
                     if (isPoisonousCloud == true &&
                         player.HitDice < 7 &&
-                        player.HasAffect(Affects.protect_magic) == false &&
-                        player.HasAffect(Affects.prot_paralysis_poison) == false &&
-                        player.HasAffect(Affects.prot_sleep_charm_paralysis_poison) == false &&
-                        player.HasAffect(Affects.dracolich_protection) == false &&
+                        player.HasAffect(Classes.Affects.protect_magic) == false &&
+                        player.HasAffect(Classes.Affects.prot_paralysis_poison) == false &&
+                        player.HasAffect(Classes.Affects.prot_sleep_charm_paralysis_poison) == false &&
+                        player.HasAffect(Classes.Affects.dracolich_protection) == false &&
                         player.actions.fleeing == false)
                     {
                         move_cost = player.actions.move + 1;
@@ -797,8 +797,8 @@ namespace engine
                         if (var_2 <= (ovr014.CalcMoves(player) / 2))
                         {
                             player.actions.moral_failure = true;
-                            ovr024.remove_affect(null, Affects.affect_4a, player);
-                            ovr024.remove_affect(null, Affects.weap_dragon_slayer, player);
+                            ovr024.remove_affect(null, Classes.Affects.affect_4a, player);
+                            ovr024.remove_affect(null, Classes.Affects.weap_dragon_slayer, player);
                         }
                         else if (player.stats2.Int.full > 5)
                         {
@@ -853,13 +853,13 @@ namespace engine
                 rating = 0;
             }
 
-            if (item.Affect_3 == Affects.cast_throw_lightening &&
+            if (item.Affect_3 == Classes.Affects.cast_throw_lightening &&
                 ((int)item.affect_2 & 0x0f) != player.alignment)
             {
                 rating = 0;
             }
 
-            if (item.Affect_2 == Affects.petrifying_gaze)
+            if (item.Affect_2 == Classes.Affects.petrifying_gaze)
             {
                 rating = 0;
             }

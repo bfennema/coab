@@ -1379,11 +1379,11 @@ namespace engine
             {
                 byte movement = player.movement;
 
-                if (player.HasAffect(Affects.haste) == true)
+                if (player.HasAffect(Classes.Affects.haste) == true)
                 {
                     movement *= 2;
                 }
-                else if (player.HasAffect(Affects.slow) == true)
+                else if (player.HasAffect(Classes.Affects.slow) == true)
                 {
                     movement /= 2;
                 }

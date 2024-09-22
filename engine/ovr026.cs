@@ -170,7 +170,7 @@ namespace engine
 
             foreach (Item item in player.items)
             {
-                if (item.Affect_3 == Affects.protect_magic && item.readied)
+                if (item.Affect_3 == Classes.Affects.protect_magic && item.readied)
                 {
                     for (int sp_lvl = 0; sp_lvl < 3; sp_lvl++)
                     {
@@ -333,7 +333,7 @@ namespace engine
 
         internal static void recalc_saving_throws(Player player) // sub_6A7FB
         {
-            Item item = player.items.Find(i => i.Affect_3 == Affects.girdle_of_dwarves && i.readied); // Girdle of the Dwarves
+            Item item = player.items.Find(i => i.Affect_3 == Classes.Affects.girdle_of_dwarves && i.readied); // Girdle of the Dwarves
             bool applyBonus = item != null;
 
             for (SaveVerseType save = SaveVerseType.Poison; save <= SaveVerseType.Spell; save++)

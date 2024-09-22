@@ -371,8 +371,8 @@ namespace engine
                 if (player.health_status == Status.okey && 
                     attacker.IsHeld() == false &&
                     CanSeeTargetA(player, attacker) == true &&
-                    attacker.HasAffect(Affects.weap_dragon_slayer) == false &&
-                    attacker.HasAffect(Affects.affect_4a) == false)
+                    attacker.HasAffect(Classes.Affects.weap_dragon_slayer) == false &&
+                    attacker.HasAffect(Classes.Affects.affect_4a) == false)
                 {
                     int end_dir = attacker.actions.direction + 10;
 
@@ -996,7 +996,7 @@ namespace engine
                     if (rangedWeapon.count == 0)
                     {
                         if (ovr025.is_weapon_ranged_melee(attacker) == true &&
-                            rangedWeapon.Affect_3 != Affects.confuse_berserk)
+                            rangedWeapon.Affect_3 != Classes.Affects.confuse_berserk)
                         {
                             Item new_item = rangedWeapon.ShallowClone();
                             new_item.readied = false;
@@ -1113,7 +1113,13 @@ namespace engine
             return target_found;
         }
 
-        static Affects[] unk_18ADB = { Affects.bless, Affects.snake_charm, Affects.paralyze, Affects.sleep, Affects.helpless }; // seg600:27CB first is filler (off by 1)
+        static Classes.Affects[] unk_18ADB = { // seg600:27CB first is filler (off by 1)
+            Classes.Affects.bless,
+            Classes.Affects.snake_charm,
+            Classes.Affects.paralyze,
+            Classes.Affects.sleep,
+            Classes.Affects.helpless
+        };
 
         internal static bool sub_4001C(DownedPlayerTile arg_0, bool canTargetEmptyGround, QuickFight quick_fight, int spellId)
         {
@@ -2331,16 +2337,16 @@ namespace engine
 
             if (gbl.attacksHit[1] == 2 &&
                 target.in_combat == true &&
-                target.HasAffect(Affects.clear_movement) == false &&
-                target.HasAffect(Affects.reduce) == false)
+                target.HasAffect(Classes.Affects.clear_movement) == false &&
+                target.HasAffect(Classes.Affects.reduce) == false)
             {
                 target = attacker.actions.target;
                 ovr025.DisplayPlayerStatusString(true, 12, "engulfs " + target.name, attacker);
-                ovr024.add_affect(false, ovr033.GetPlayerIndex(target), 0, Affects.clear_movement, target);
+                ovr024.add_affect(false, ovr033.GetPlayerIndex(target), 0, Classes.Affects.clear_movement, target);
 
-                ovr013.CallAffectTable(Effect.Add, null, target, Affects.clear_movement);
-                ovr024.add_affect(false, ovr024.roll_dice(4, 2), 0, Affects.reduce, target);
-                ovr024.add_affect(true, ovr033.GetPlayerIndex(target), 0, Affects.affect_8b, attacker);
+                ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.clear_movement);
+                ovr024.add_affect(false, ovr024.roll_dice(4, 2), 0, Classes.Affects.reduce, target);
+                ovr024.add_affect(true, ovr033.GetPlayerIndex(target), 0, Classes.Affects.affect_8b, attacker);
             }
         }
 
@@ -2472,14 +2478,14 @@ namespace engine
                 player.in_combat == false ||
                 gbl.spell_target.in_combat == false)
             {
-                ovr024.remove_affect(null, Affects.clear_movement, gbl.spell_target);
-                ovr024.remove_affect(null, Affects.reduce, gbl.spell_target);
+                ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
+                ovr024.remove_affect(null, Classes.Affects.reduce, gbl.spell_target);
 
                 if (add_remove == Effect.Add)
                 {
                     affect.callAffectTable = false;
 
-                    ovr024.remove_affect(affect, Affects.affect_8b, player);
+                    ovr024.remove_affect(affect, Classes.Affects.affect_8b, player);
                 }
             }
             else
@@ -2495,9 +2501,9 @@ namespace engine
 
                 if (gbl.spell_target.in_combat == false)
                 {
-                    ovr024.remove_affect(null, Affects.affect_8b, player);
-                    ovr024.remove_affect(null, Affects.clear_movement, gbl.spell_target);
-                    ovr024.remove_affect(null, Affects.reduce, gbl.spell_target);
+                    ovr024.remove_affect(null, Classes.Affects.affect_8b, player);
+                    ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
+                    ovr024.remove_affect(null, Classes.Affects.reduce, gbl.spell_target);
                 }
             }
         }
@@ -2513,11 +2519,11 @@ namespace engine
                 player.in_combat == false ||
                 gbl.spell_target.in_combat == false)
             {
-                ovr024.remove_affect(null, Affects.clear_movement, gbl.spell_target);
+                ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
                 if (arg_0 == Effect.Add)
                 {
                     affect.callAffectTable = false;
-                    ovr024.remove_affect(affect, Affects.owlbear_hug_round_attack, player);
+                    ovr024.remove_affect(affect, Classes.Affects.owlbear_hug_round_attack, player);
                 }
             }
             else
@@ -2534,8 +2540,8 @@ namespace engine
 
                 if (gbl.spell_target.in_combat == false)
                 {
-                    ovr024.remove_affect(null, Affects.owlbear_hug_round_attack, player);
-                    ovr024.remove_affect(null, Affects.clear_movement, gbl.spell_target);
+                    ovr024.remove_affect(null, Classes.Affects.owlbear_hug_round_attack, player);
+                    ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
                 }
             }
         }
@@ -2548,10 +2554,10 @@ namespace engine
                 gbl.spell_target = player.actions.target;
                 ovr025.DisplayPlayerStatusString(true, 12, "hugs " + gbl.spell_target.name, player);
 
-                ovr024.add_affect(false, ovr033.GetPlayerIndex(gbl.spell_target), 0, Affects.clear_movement, gbl.spell_target);
-                ovr013.CallAffectTable(Effect.Add, null, gbl.spell_target, Affects.clear_movement);
+                ovr024.add_affect(false, ovr033.GetPlayerIndex(gbl.spell_target), 0, Classes.Affects.clear_movement, gbl.spell_target);
+                ovr013.CallAffectTable(Effect.Add, null, gbl.spell_target, Classes.Affects.clear_movement);
 
-                ovr024.add_affect(true, ovr033.GetPlayerIndex(gbl.spell_target), 0, Affects.owlbear_hug_round_attack, player);
+                ovr024.add_affect(true, ovr033.GetPlayerIndex(gbl.spell_target), 0, Classes.Affects.owlbear_hug_round_attack, player);
             }
         }
 

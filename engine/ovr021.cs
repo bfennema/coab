@@ -422,7 +422,7 @@ namespace engine
                 {
                     for (int spellIdx = 1; spellIdx < 4 && next_scribe_lvl == 0; spellIdx++)
                     {
-                        if (item.getAffect(spellIdx) > (Affects)0x80)
+                        if (item.getAffect(spellIdx) > (Classes.Affects)0x80)
                         {
                             if (findNext == true)
                             {

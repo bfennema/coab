@@ -780,7 +780,7 @@ namespace engine
                         }
                     }
 
-                    item.setAffect(affect, (Affects)spell);
+                    item.setAffect(affect, (Classes.Affects)spell);
                     item._value += (short)(roll * 300);
                 }
             }
@@ -826,7 +826,7 @@ namespace engine
 
                 for (int affect = 1; affect <= 3; affect++)
                 {
-                    item.setAffect(affect, (Affects)(byte)preconfiguredItems[preconfig, 4 + affect]);
+                    item.setAffect(affect, (Classes.Affects)(byte)preconfiguredItems[preconfig, 4 + affect]);
                 }
             }
 

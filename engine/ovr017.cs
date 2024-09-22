@@ -499,7 +499,7 @@ namespace engine
 
                 if (hf_player.field_1D > 0)
                 {
-                    Item newItem = new Item(Affects.none, Affects.helpless, (Affects)hf_player.field_1D,
+                    Item newItem = new Item(Classes.Affects.none, Classes.Affects.helpless, (Classes.Affects)hf_player.field_1D,
                         (short)(hf_player.field_1D * 200), 0, 0,
                         false, 0, false, 0, 0, Item.Names.Chime, Item.Names.of, Item.Names.Vulnerability, Item.Type.GemsJewelry, true);
 
@@ -508,7 +508,7 @@ namespace engine
 
                 if (hf_player.field_23 > 0)
                 {
-                    Item newItem = new Item(Affects.none, Affects.poison_plus_4, (Affects)hf_player.field_23,
+                    Item newItem = new Item(Classes.Affects.none, Classes.Affects.poison_plus_4, (Classes.Affects)hf_player.field_23,
                         (short)(hf_player.field_23 * 0x15E), 0, 1,
                         false, 0, false, 0, 1, Item.Names.Wand, Item.Names.of, Item.Names.Magic_Missiles, Item.Type.WandB, true);
 
@@ -517,7 +517,7 @@ namespace engine
 
                 if (hf_player.field_86 > 0)
                 {
-                    Item newItem = new Item(Affects.none, Affects.helpless, (Affects)hf_player.field_86,
+                    Item newItem = new Item(Classes.Affects.none, Classes.Affects.helpless, (Classes.Affects)hf_player.field_86,
                         (short)(hf_player.field_86 * 0xc8), 0, 0,
                         false, 0, false, 0, 0, Item.Names.Ring, Item.Names.of, Item.Names.Vulnerability, Item.Type.Ring, true);
 
@@ -526,7 +526,7 @@ namespace engine
 
                 if (hf_player.field_87 > 0)
                 {
-                    Item newItem = new Item(Affects.none, Affects.highConRegen, (Affects)hf_player.field_87,
+                    Item newItem = new Item(Classes.Affects.none, Classes.Affects.highConRegen, (Classes.Affects)hf_player.field_87,
                         (short)(hf_player.field_87 * 0x190), 0, (short)(hf_player.field_87 * 10),
                         false, 0, false, 0, 0, Item.Names.Potion, Item.Names.of, Item.Names.Healing, Item.Type.GemsJewelry, true);
 
@@ -602,32 +602,32 @@ namespace engine
                     {
                         case Race.halfling:
                             player.icon_size = 1;
-                            ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.con_saving_bonus, player);
                             break;
 
                         case Race.dwarf:
                             player.icon_size = 1;
-                            ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.dwarf_vs_orc_goblin, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.con_saving_bonus, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.dwarf_vs_orc_goblin, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.giant_vs_dwarf_gnome, player);
                             break;
 
                         case Race.gnome:
                             player.icon_size = 1;
-                            ovr024.add_affect(false, 0xff, 0, Affects.con_saving_bonus, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.gnome_vs_goblin_kobold, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.giant_vs_dwarf_gnome, player);
-                            ovr024.add_affect(false, 0xff, 0, Affects.gnoll_bugbear_vs_gnome, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.con_saving_bonus, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.gnome_vs_goblin_kobold, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.giant_vs_dwarf_gnome, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.gnoll_bugbear_vs_gnome, player);
                             break;
 
                         case Race.elf:
                             player.icon_size = 2;
-                            ovr024.add_affect(false, 0xff, 0, Affects.elf_resist_sleep, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.elf_resist_sleep, player);
                             break;
 
                         case Race.half_elf:
                             player.icon_size = 2;
-                            ovr024.add_affect(false, 0xff, 0, Affects.halfelf_resistance, player);
+                            ovr024.add_affect(false, 0xff, 0, Classes.Affects.halfelf_resistance, player);
                             break;
 
                         default:

@@ -350,7 +350,7 @@ namespace engine
 
 		internal static void scroll_5C912(bool learning) /* sub_5C912 */
 		{
-			if (gbl.SelectedPlayer.HasAffect(Affects.read_magic) == true ||
+			if (gbl.SelectedPlayer.HasAffect(Classes.Affects.read_magic) == true ||
 				((gbl.SelectedPlayer.cleric_lvl > 0 || gbl.SelectedPlayer.cleric_old_lvl > gbl.SelectedPlayer.multiclassLevel) &&
 				  gbl.ItemDataTable[gbl.currentScroll.type].item_slot == ItemSlot.Quarrel))
 			{
@@ -713,7 +713,7 @@ namespace engine
 				stillCast = false;
 			}
 
-			if (caster.HasAffect(Affects.affect_4a) == true)
+			if (caster.HasAffect(Classes.Affects.affect_4a) == true)
 			{
 				byte dice_roll = ovr024.roll_dice(2, 1);
 
@@ -1060,11 +1060,11 @@ namespace engine
 			{
 				DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
 
-				Affect affect = target.GetAffect(Affects.charm_person);
+				Affect affect = target.GetAffect(Classes.Affects.charm_person);
 
 				if (affect != null)
 				{
-					ovr013.CallAffectTable(Effect.Add, affect, target, Affects.shield);
+					ovr013.CallAffectTable(Effect.Add, affect, target, Classes.Affects.shield);
 				}
 			}
 		}
@@ -1125,7 +1125,7 @@ namespace engine
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is stronger", target);
 
-				ovr024.add_affect(true, encoded_strength, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.enlarge, target);
+				ovr024.add_affect(true, encoded_strength, GetSpellAffectTimeout((Spells)gbl.spell_id), Classes.Affects.enlarge, target);
 
 				ovr024.CalcStatBonuses(Stat.STR, target);
 			}
@@ -1143,9 +1143,9 @@ namespace engine
 			if (target != null &&
 				gbl.spellTargets.Count > 0 &&
 				ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false &&
-				target.HasAffect(Affects.enlarge) == true)
+				target.HasAffect(Classes.Affects.enlarge) == true)
 			{
-				ovr024.remove_affect(null, Affects.enlarge, target);
+				ovr024.remove_affect(null, Classes.Affects.enlarge, target);
 				ovr024.CalcStatBonuses(Stat.STR, target);
 				ovr025.DisplayPlayerStatusString(true, 10, "has been reduced", target);
 			}
@@ -1190,7 +1190,7 @@ namespace engine
 				int spellCost = CalcSleepCost(target);
 
 				if (target.health_status != Status.animated &&
-					target.HasAffect(Affects.sleep) == false &&
+					target.HasAffect(Classes.Affects.sleep) == false &&
 					totalSpellPower >= spellCost)
 				{
 					totalSpellPower -= spellCost;
@@ -1292,7 +1292,7 @@ namespace engine
 			{
 				gbl.spellTargets.Clear();
 			}
-			else if (player.HasAffect(Affects.poisoned) == true)
+			else if (player.HasAffect(Classes.Affects.poisoned) == true)
 			{
 				if (player.hit_point_current == 0)
 				{
@@ -1300,8 +1300,8 @@ namespace engine
 				}
 
 				DoSpellCastingWork("is affected", 0, 0, true, 0xff, gbl.spell_id);
-				ovr013.CallAffectTable(Effect.Remove, null, player, Affects.affect_4e);
-				ovr024.add_affect(true, 0xff, 10, Affects.poison_damage, player);
+				ovr013.CallAffectTable(Effect.Remove, null, player, Classes.Affects.affect_4e);
+				ovr024.add_affect(true, 0xff, 10, Classes.Affects.poison_damage, player);
 			}
 		}
 
@@ -1332,7 +1332,7 @@ namespace engine
 		{
 			DoSpellCastingWork(string.Empty, 0, 0, true, 0, gbl.spell_id);
 
-			ovr013.CallAffectTable(Effect.Add, null, gbl.spellTargets[0], Affects.spiritual_hammer);
+			ovr013.CallAffectTable(Effect.Add, null, gbl.spellTargets[0], Classes.Affects.spiritual_hammer);
 		}
 
 
@@ -1379,7 +1379,7 @@ namespace engine
 			GasCloud var_8 = new GasCloud(gbl.SelectedPlayer, count, gbl.targetPos);
 			gbl.StinkingCloud.Add(var_8);
 
-			ovr024.add_affect(true, (byte)(var_10 + (count << 4)), var_10, Affects.affect_in_stinking_cloud, gbl.SelectedPlayer);
+			ovr024.add_affect(true, (byte)(var_10 + (count << 4)), var_10, Classes.Affects.affect_in_stinking_cloud, gbl.SelectedPlayer);
 
 			for (int var_11 = 0; var_11 < StinkingCloudMaxTargets; var_11++)
 			{
@@ -1518,7 +1518,7 @@ namespace engine
 			{
 				encoded_str = strIncrease + 100;
 
-				ovr024.add_affect(true, encoded_str, GetSpellAffectTimeout((Spells)gbl.spell_id), Affects.strength, target);
+				ovr024.add_affect(true, encoded_str, GetSpellAffectTimeout((Spells)gbl.spell_id), Classes.Affects.strength, target);
 				ovr024.CalcStatBonuses(Stat.STR, target);
 			}
 		}
@@ -1569,7 +1569,7 @@ namespace engine
 
 						if (ovr024.combat_heal(player.hit_point_max, player) == true)
 						{
-							ovr024.ApplyAttackSpellAffect("is animated", false, 0, true, var_2, 0, Affects.animate_dead, player);
+							ovr024.ApplyAttackSpellAffect("is animated", false, 0, true, var_2, 0, Classes.Affects.animate_dead, player);
 							player.health_status = Status.animated;
 						}
 					}
@@ -1582,7 +1582,7 @@ namespace engine
 
 		internal static void SpellCureBlindness() // can_see
 		{
-			if (ovr024.cure_affect(Affects.blinded, gbl.spellTargets[0]) == true)
+			if (ovr024.cure_affect(Classes.Affects.blinded, gbl.spellTargets[0]) == true)
 			{
 				ovr025.MagicAttackDisplay("can see", true, gbl.spellTargets[0]);
 			}
@@ -1601,24 +1601,24 @@ namespace engine
 
 			gbl.cureSpell = true;
 
-			if (ovr024.cure_affect(Affects.cause_disease_1, gbl.spellTargets[0]) == true)
+			if (ovr024.cure_affect(Classes.Affects.cause_disease_1, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
 			}
 
-			if (ovr024.cure_affect(Affects.weaken, gbl.spellTargets[0]) == true)
+			if (ovr024.cure_affect(Classes.Affects.weaken, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
 
-				ovr024.remove_affect(null, Affects.cause_disease_2, gbl.spellTargets[0]);
-				ovr024.remove_affect(null, Affects.helpless, gbl.spellTargets[0]);
+				ovr024.remove_affect(null, Classes.Affects.cause_disease_2, gbl.spellTargets[0]);
+				ovr024.remove_affect(null, Classes.Affects.helpless, gbl.spellTargets[0]);
 			}
 
 			// This is presumably mummy rot from pool of radiance
-			if (ovr024.cure_affect((Affects)0x32, gbl.spellTargets[0]) == true)
+			if (ovr024.cure_affect((Classes.Affects)0x32, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
-				ovr024.remove_affect(null, (Affects)0x39, gbl.spellTargets[0]);
+				ovr024.remove_affect(null, (Classes.Affects)0x39, gbl.spellTargets[0]);
 			}
 
 			gbl.cureSpell = false;
@@ -1782,8 +1782,8 @@ namespace engine
 
 									foreach (Affect tmpAffect in var_18.player.affects)
 									{
-										if (((affect.type == Affects.affect_in_cloud_kill && ground_tile == 0x1c) ||
-											 (affect.type == Affects.affect_in_stinking_cloud && ground_tile == 0x1E)) &&
+										if (((affect.type == Classes.Affects.affect_in_cloud_kill && ground_tile == 0x1c) ||
+											 (affect.type == Classes.Affects.affect_in_stinking_cloud && ground_tile == 0x1E)) &&
 											(affect.affect_data >> 4) == var_18.field_1C)
 										{
 											affect = tmpAffect;
@@ -1796,11 +1796,11 @@ namespace engine
 									{
 										if (ground_tile == 0x1C)
 										{
-											ovr024.remove_affect(affect, Affects.affect_in_cloud_kill, var_18.player);
+											ovr024.remove_affect(affect, Classes.Affects.affect_in_cloud_kill, var_18.player);
 										}
 										else
 										{
-											ovr024.remove_affect(affect, Affects.affect_in_stinking_cloud, var_18.player);
+											ovr024.remove_affect(affect, Classes.Affects.affect_in_stinking_cloud, var_18.player);
 										}
 									}
 								}
@@ -1827,7 +1827,7 @@ namespace engine
 
 		internal static void SpellRemoveCurse() // uncurse
 		{
-			if (ovr024.cure_affect(Affects.bestow_curse, gbl.spellTargets[0]) == true)
+			if (ovr024.cure_affect(Classes.Affects.bestow_curse, gbl.spellTargets[0]) == true)
 			{
 				ovr025.MagicAttackDisplay("is un-cursed", true, gbl.spellTargets[0]);
 			}
@@ -1904,7 +1904,7 @@ namespace engine
 		}
 
 
-		internal static void RemoveComplimentSpellFirst(string text, CombatTeam combatTeam, Affects affect) //sub_5F87B
+		internal static void RemoveComplimentSpellFirst(string text, CombatTeam combatTeam, Classes.Affects affect) //sub_5F87B
 		{
 			gbl.byte_1D2C7 = true;
 
@@ -1934,7 +1934,7 @@ namespace engine
 
 		internal static void cast_haste()
 		{
-			RemoveComplimentSpellFirst("is Hasted", gbl.SelectedPlayer.combat_team, Affects.slow);
+			RemoveComplimentSpellFirst("is Hasted", gbl.SelectedPlayer.combat_team, Classes.Affects.slow);
 		}
 
 
@@ -2108,7 +2108,7 @@ namespace engine
 
 		internal static void SpellSlow() // sub_5FD2E
 		{
-			RemoveComplimentSpellFirst("is Slowed", gbl.SelectedPlayer.OppositeTeam(), Affects.haste);
+			RemoveComplimentSpellFirst("is Slowed", gbl.SelectedPlayer.OppositeTeam(), Classes.Affects.haste);
 		}
 
 
@@ -2163,7 +2163,7 @@ namespace engine
 
 		internal static void cast_speed()
 		{
-			if (ovr024.cure_affect(Affects.slow, gbl.spellTargets[0]) == false)
+			if (ovr024.cure_affect(Classes.Affects.slow, gbl.spellTargets[0]) == false)
 			{
 				DoSpellCastingWork("is Speedy", 0, 0, false, 0, gbl.spell_id);
 			}
@@ -2190,7 +2190,7 @@ namespace engine
 				ovr025.DisplayPlayerStatusString(true, 10, "is stronger", target);
 			}
 
-			ovr024.add_affect(true, encodedStrength, (ushort)((ovr024.roll_dice(4, 1) * 10) + 0x28), Affects.strength_spell, target);
+			ovr024.add_affect(true, encodedStrength, (ushort)((ovr024.roll_dice(4, 1) * 10) + 0x28), Classes.Affects.strength_spell, target);
 			ovr024.CalcStatBonuses(Stat.STR, target);
 		}
 
@@ -2243,7 +2243,7 @@ namespace engine
 			{
 				gbl.spellTargets.Remove(target);
 			}
-			else if (target.HasAffect(Affects.poisoned) == true)
+			else if (target.HasAffect(Classes.Affects.poisoned) == true)
 			{
 				if (target.hit_point_current == 0)
 				{
@@ -2252,9 +2252,9 @@ namespace engine
 
 				gbl.cureSpell = true;
 
-				ovr024.remove_affect(null, Affects.poisoned, target);
-				ovr024.remove_affect(null, Affects.slow_poison, target);
-				ovr024.remove_affect(null, Affects.poison_damage, target);
+				ovr024.remove_affect(null, Classes.Affects.poisoned, target);
+				ovr024.remove_affect(null, Classes.Affects.slow_poison, target);
+				ovr024.remove_affect(null, Classes.Affects.poison_damage, target);
 
 				gbl.cureSpell = false;
 
@@ -2276,12 +2276,12 @@ namespace engine
 
 			Player target = gbl.SelectedPlayer.actions.target;
 
-			gbl.current_affect = Affects.poison_plus_0;
+			gbl.current_affect = Classes.Affects.poison_plus_0;
 			ovr024.CheckAffectsEffect(target, CheckType.MagicResistance);
 
-			if (gbl.current_affect == Affects.poison_plus_0)
+			if (gbl.current_affect == Classes.Affects.poison_plus_0)
 			{
-				ovr013.CallAffectTable(Effect.Add, null, gbl.SelectedPlayer, Affects.poison_plus_0);
+				ovr013.CallAffectTable(Effect.Add, null, gbl.SelectedPlayer, Classes.Affects.poison_plus_0);
 			}
 		}
 
@@ -2293,9 +2293,9 @@ namespace engine
 				DoSpellCastingWork("", DamageType.Magic, 0, false, ovr025.spellMaxTargetCount(gbl.spell_id), gbl.spell_id);
 
 				Affect affect;
-				if (ovr025.FindAffect(out affect, Affects.sticks_to_snakes, gbl.spellTargets[0]) == true)
+				if (ovr025.FindAffect(out affect, Classes.Affects.sticks_to_snakes, gbl.spellTargets[0]) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, affect, gbl.spellTargets[0], Affects.sticks_to_snakes);
+					ovr013.CallAffectTable(Effect.Add, affect, gbl.spellTargets[0], Classes.Affects.sticks_to_snakes);
 				}
 			}
 			else
@@ -2323,7 +2323,7 @@ namespace engine
 
 		internal static void SpellDispelEvil() // is_affected4
 		{
-			ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.dispel_evil), Affects.dispel_evil, gbl.SelectedPlayer);
+			ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.dispel_evil), Classes.Affects.dispel_evil, gbl.SelectedPlayer);
 			DoSpellCastingWork("is affected", 0, 0, false, 0, gbl.spell_id);
 		}
 
@@ -2344,8 +2344,8 @@ namespace engine
 			{
 				gbl.cureSpell = true;
 
-				ovr024.remove_affect(null, Affects.animate_dead, player);
-				ovr024.remove_affect(null, Affects.poisoned, player);
+				ovr024.remove_affect(null, Classes.Affects.animate_dead, player);
+				ovr024.remove_affect(null, Classes.Affects.poisoned, player);
 				gbl.cureSpell = false;
 
 				player.health_status = Status.okey;
@@ -2395,7 +2395,7 @@ namespace engine
 				{
 					bool saved = ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
 
-					ovr024.ApplyAttackSpellAffect("is entangled", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout((Spells)0x88), Affects.entangle, target);
+					ovr024.ApplyAttackSpellAffect("is entangled", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout((Spells)0x88), Classes.Affects.entangle, target);
 				}
 			}
 		}
@@ -2421,9 +2421,9 @@ namespace engine
 			{
 				Affect affect;
 
-				if (ovr025.FindAffect(out affect, Affects.charm_person, target) == true)
+				if (ovr025.FindAffect(out affect, Classes.Affects.charm_person, target) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, affect, target, Affects.charm_person);
+					ovr013.CallAffectTable(Effect.Add, affect, target, Classes.Affects.charm_person);
 				}
 			}
 		}
@@ -2442,7 +2442,7 @@ namespace engine
 			{
 				bool saved = ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
 
-				ovr024.ApplyAttackSpellAffect("is confused", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout(Spells.confusion), Affects.confuse, target);
+				ovr024.ApplyAttackSpellAffect("is confused", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout(Spells.confusion), Classes.Affects.confuse, target);
 			}
 		}
 
@@ -2452,7 +2452,7 @@ namespace engine
 			Affect affect;
 			Player player = gbl.SelectedPlayer;
 
-			if (ovr025.FindAffect(out affect, Affects.clear_movement, player) == true)
+			if (ovr025.FindAffect(out affect, Classes.Affects.clear_movement, player) == true)
 			{
 				var scl = ovr032.Rebuild_SortedCombatantList(1, 1, ovr033.PlayerMapPos(player), sc => true);
 
@@ -2460,13 +2460,13 @@ namespace engine
 				{
 					Player playerB = sc.player;
 
-					if (ovr025.FindAffect(out affect, Affects.owlbear_hug_round_attack, playerB) == true ||
-						ovr025.FindAffect(out affect, Affects.affect_8b, playerB) == true)
+					if (ovr025.FindAffect(out affect, Classes.Affects.owlbear_hug_round_attack, playerB) == true ||
+						ovr025.FindAffect(out affect, Classes.Affects.affect_8b, playerB) == true)
 					{
 						if (gbl.player_array[affect.affect_data] == player)
 						{
-							ovr024.remove_affect(null, Affects.owlbear_hug_round_attack, playerB);
-							ovr024.remove_affect(null, Affects.affect_8b, playerB);
+							ovr024.remove_affect(null, Classes.Affects.owlbear_hug_round_attack, playerB);
+							ovr024.remove_affect(null, Classes.Affects.affect_8b, playerB);
 						}
 					}
 				}
@@ -2494,7 +2494,7 @@ namespace engine
 
 				if (saves == false)
 				{
-					ovr024.ApplyAttackSpellAffect("runs in terror", saves, DamageOnSave.Zero, true, 0, GetSpellAffectTimeout(Spells.fear), Affects.fear, target);
+					ovr024.ApplyAttackSpellAffect("runs in terror", saves, DamageOnSave.Zero, true, 0, GetSpellAffectTimeout(Spells.fear), Classes.Affects.fear, target);
 					target.actions.fleeing = true;
 					target.quick_fight = QuickFight.True;
 
@@ -2539,14 +2539,14 @@ namespace engine
 
 				if (input_key == 'H')
 				{
-					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.hot_fire_shield, gbl.SelectedPlayer);
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.fire_shield_damage, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.hot_fire_shield, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.fire_shield_damage, gbl.SelectedPlayer);
 					var_3 = true;
 				}
 				else if (input_key == 'C')
 				{
-					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.cold_fire_shield, gbl.SelectedPlayer);
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Affects.fire_shield_damage, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.cold_fire_shield, gbl.SelectedPlayer);
+					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.fire_shield_damage, gbl.SelectedPlayer);
 					var_3 = true;
 				}
 				else
@@ -2570,20 +2570,20 @@ namespace engine
 
 			if (ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false)
 			{
-				ovr024.ApplyAttackSpellAffect("is clumsy", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Affects.fumbling, target);
+				ovr024.ApplyAttackSpellAffect("is clumsy", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Classes.Affects.fumbling, target);
 
-				if (target.HasAffect(Affects.fumbling) == true)
+				if (target.HasAffect(Classes.Affects.fumbling) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, null, target, Affects.fumbling);
+					ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.fumbling);
 				}
 			}
 			else
 			{
-				ovr024.ApplyAttackSpellAffect("is slowed", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Affects.slow, target);
+				ovr024.ApplyAttackSpellAffect("is slowed", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Classes.Affects.slow, target);
 
-				if (target.HasAffect(Affects.slow) == true)
+				if (target.HasAffect(Classes.Affects.slow) == true)
 				{
-					ovr013.CallAffectTable(Effect.Add, null, target, Affects.slow);
+					ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.slow);
 				}
 			}
 			DoSpellCastingWork("is clumsy", 0, 0, true, 0, gbl.spell_id);
@@ -2618,7 +2618,7 @@ namespace engine
 			GasCloud var_8 = new GasCloud(gbl.SelectedPlayer, count, gbl.targetPos);
 			gbl.CloudKillCloud.Add(var_8);
 
-			ovr024.add_affect(true, (byte)(var_15 + (count << 4)), var_15, Affects.affect_in_cloud_kill, gbl.SelectedPlayer);
+			ovr024.add_affect(true, (byte)(var_15 + (count << 4)), var_15, Classes.Affects.affect_in_cloud_kill, gbl.SelectedPlayer);
 
 			for (var_16 = 0; var_16 < max_targets; var_16++)
 			{
@@ -2767,9 +2767,9 @@ namespace engine
 
 			DoSpellCastingWork(string.Empty, 0, 0, false, 0, gbl.spell_id);
 
-			if (target.HasAffect(Affects.feeblemind) == true)
+			if (target.HasAffect(Classes.Affects.feeblemind) == true)
 			{
-				ovr013.CallAffectTable(Effect.Add, null, target, Affects.feeblemind);
+				ovr013.CallAffectTable(Effect.Add, null, target, Classes.Affects.feeblemind);
 			}
 
 			target.saveVerse[saveTypeSpell] = oldBonus;
@@ -2821,7 +2821,7 @@ namespace engine
 
 				ovr025.draw_missile_attack(0x2d, 4, ovr033.PlayerMapPos(gbl.spell_target), ovr033.PlayerMapPos(player));
 
-				if (player.HasAffect(Affects.reflectable_gaze) == true)
+				if (player.HasAffect(Classes.Affects.reflectable_gaze) == true)
 				{
 					Item item = gbl.spell_target.items.Find(i => i.readied && (i.namenum[0] == Classes.Item.Names.Mirror || i.namenum[1] == Classes.Item.Names.Mirror || i.namenum[2] == Classes.Item.Names.Mirror));
 
@@ -2883,7 +2883,7 @@ namespace engine
 				}
 				else
 				{
-					ovr024.remove_affect(affect, Affects.breath_elec, player);
+					ovr024.remove_affect(affect, Classes.Affects.breath_elec, player);
 				}
 
 				var_1 = true;
@@ -3077,7 +3077,7 @@ namespace engine
 
 				if (ovr024.RollSavingThrow(0, SaveVerseType.Petrification, gbl.spell_target) == false)
 				{
-					ovr024.add_affect(false, 0xff, 0x3c, Affects.paralyze, gbl.spell_target);
+					ovr024.add_affect(false, 0xff, 0x3c, Classes.Affects.paralyze, gbl.spell_target);
 					ovr025.DisplayPlayerStatusString(false, 10, "is paralyzed", gbl.spell_target);
 				}
 			}

@@ -189,7 +189,7 @@ namespace engine
 				}
 			}
 
-			bool detectMagic = gbl.TeamList.Exists(pla => pla.HasAffect(Affects.detect_magic));
+			bool detectMagic = gbl.TeamList.Exists(pla => pla.HasAffect(Classes.Affects.detect_magic));
 
 			if (detectMagic == true &&
 				(item.plus > 0 || item.plus_save > 0 || item.cursed == true))
@@ -1175,7 +1175,7 @@ namespace engine
 		}
 
 
-		internal static bool FindAffect(out Affect affectFound, Affects affect_type, Player player)
+		internal static bool FindAffect(out Affect affectFound, Classes.Affects affect_type, Player player)
 		{
 			affectFound = player.affects.Find(aff => aff.type == affect_type);
 

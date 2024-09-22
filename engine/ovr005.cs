@@ -6,9 +6,14 @@ namespace engine
 {
     class ovr005
     {
-        static Affects[] disease_types = {  Affects.helpless,  Affects.cause_disease_1,
-                                            Affects.weaken, Affects.cause_disease_2,
-                                            Affects.animate_dead, (Affects)0x39 };
+        static Classes.Affects[] disease_types = {
+            Classes.Affects.helpless,
+            Classes.Affects.cause_disease_1,
+            Classes.Affects.weaken,
+            Classes.Affects.cause_disease_2,
+            Classes.Affects.animate_dead,
+            (Classes.Affects)0x39
+        };
 
         static string[] temple_sl = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh", "Exit" };
 
@@ -65,7 +70,7 @@ namespace engine
         {
             bool cast = true;
 
-            if (gbl.SelectedPlayer.HasAffect(Affects.blinded) == false)
+            if (gbl.SelectedPlayer.HasAffect(Classes.Affects.blinded) == false)
             {
                 cast = CastCureAnyway("is not blind.");
             }
@@ -74,7 +79,7 @@ namespace engine
             {
                 if (buy_cure(1000, "Cure Blindness"))
                 {
-                    ovr024.remove_affect(null, Affects.blinded, gbl.SelectedPlayer);
+                    ovr024.remove_affect(null, Classes.Affects.blinded, gbl.SelectedPlayer);
                 }
             }
         }
@@ -142,14 +147,14 @@ namespace engine
                         heal_amount -= ovr024.roll_dice(4, 1);
 
                         ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
-                        ovr024.remove_affect(null, Affects.blinded, gbl.SelectedPlayer);
+                        ovr024.remove_affect(null, Classes.Affects.blinded, gbl.SelectedPlayer);
 
                         for (int i = 0; i < 6; i++)
                         {
                             ovr024.remove_affect(null, disease_types[i], gbl.SelectedPlayer);
                         }
 
-                        ovr024.remove_affect(null, Affects.feeblemind, gbl.SelectedPlayer);
+                        ovr024.remove_affect(null, Classes.Affects.feeblemind, gbl.SelectedPlayer);
 
                         ovr024.CalcStatBonuses(Stat.INT, gbl.SelectedPlayer);
                         ovr024.CalcStatBonuses(Stat.WIS, gbl.SelectedPlayer);
@@ -177,8 +182,8 @@ namespace engine
                 {
                     gbl.cureSpell = true;
 
-                    ovr024.remove_affect(null, Affects.animate_dead, player);
-                    ovr024.remove_affect(null, Affects.poisoned, player);
+                    ovr024.remove_affect(null, Classes.Affects.animate_dead, player);
+                    ovr024.remove_affect(null, Classes.Affects.poisoned, player);
 
                     gbl.cureSpell = false;
 
@@ -243,7 +248,7 @@ namespace engine
 
         internal static void cure_poison2()
         {
-            bool isPoisoned = gbl.SelectedPlayer.HasAffect(Affects.poisoned);
+            bool isPoisoned = gbl.SelectedPlayer.HasAffect(Classes.Affects.poisoned);
 
             if (isPoisoned == true ||
                 (isPoisoned == false && CastCureAnyway("is not poisoned.")))
@@ -252,9 +257,9 @@ namespace engine
                 {
                     gbl.cureSpell = true;
 
-                    ovr024.remove_affect(null, Affects.poisoned, gbl.SelectedPlayer);
-                    ovr024.remove_affect(null, Affects.slow_poison, gbl.SelectedPlayer);
-                    ovr024.remove_affect(null, Affects.poison_damage, gbl.SelectedPlayer);
+                    ovr024.remove_affect(null, Classes.Affects.poisoned, gbl.SelectedPlayer);
+                    ovr024.remove_affect(null, Classes.Affects.slow_poison, gbl.SelectedPlayer);
+                    ovr024.remove_affect(null, Classes.Affects.poison_damage, gbl.SelectedPlayer);
 
                     gbl.cureSpell = false;
                 }
@@ -268,7 +273,7 @@ namespace engine
             bool cast = true;
 
             if (has_curse_items == false &&
-                gbl.SelectedPlayer.HasAffect(Affects.bestow_curse) == false)
+                gbl.SelectedPlayer.HasAffect(Classes.Affects.bestow_curse) == false)
             {
                 cast = CastCureAnyway("is not cursed.");
             }

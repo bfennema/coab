@@ -835,7 +835,7 @@ namespace engine
                 var_2 = ovr008.vm_GetCmdValue(1);
             }
 
-            Affects affect_id = (Affects)ovr008.vm_GetCmdValue(2);
+            Classes.Affects affect_id = (Classes.Affects)ovr008.vm_GetCmdValue(2);
 
             var loc_a = gbl.cmd_ops[3].Word;
             var loc_b = gbl.cmd_ops[4].Word;
@@ -2023,7 +2023,7 @@ namespace engine
             }
 
             ovr008.vm_LoadCmdSets(1);
-            Affects affect_type = (Affects)ovr008.vm_GetCmdValue(1);
+            Classes.Affects affect_type = (Classes.Affects)ovr008.vm_GetCmdValue(1);
 
             if (gbl.SelectedPlayer.HasAffect(affect_type) == true)
             {
