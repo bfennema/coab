@@ -64,7 +64,6 @@ namespace Classes
     }
 
     public delegate bool spellDelegate(QuickFight quick_fight, int spellId);
-    public delegate void spellDelegate2();
     public delegate void affectDelegate(Effect arg_0, object affect, Player player);
     public delegate void DisplayString(string str, int bgColor, int fgColor, int yCol, int xCol);
     public delegate void Put8x8Symbol(byte arg_0, bool use_overlay, int symbol_id, int rowY, int colX);
@@ -457,8 +456,6 @@ namespace Classes
         public static int menuScreenIndex;
         public static int displayInputSecondsToWait; // word_1D5C0 & word_1D5C2 - was centiseconds
         public static char displayInputTimeoutValue; // byte_1D5C4
-
-        public static Dictionary<Spells, spellDelegate2> spellTable;
 
         public static Player lastSelectetSpellTarget; // dword_1D87F
 

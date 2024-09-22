@@ -774,13 +774,10 @@ namespace engine
 
 					if (gbl.spell_from_item == false)
 					{
-						caster.spellList.ClearSpell((Spells)spell_id);
+						caster.spellList.ClearSpell(spell_id);
 					}
 
-					gbl.spell_id = spell_id;
-
-					var func = gbl.spellTable[(Spells)spell_id];
-					func();
+					Affects.Spells.Call(spell_id);
 
 					gbl.spell_id = 0;
 					gbl.byte_1D2C7 = false;
@@ -3127,120 +3124,6 @@ namespace engine
 				seg041.GameDelay();
 				ovr025.ClearPlayerTextArea();
 			}
-		}
-
-
-		internal static void setup_spells()
-		{
-			gbl.cureSpell = false;
-			gbl.spell_from_item = false;
-			gbl.lastSelectetSpellTarget = null;
-			gbl.byte_1D2C8 = true;
-
-			gbl.SpellCastFunction = new spellDelegate(ovr023.NonCombatSpellCast);
-
-			gbl.spellTable = new Dictionary<Spells, spellDelegate2>();
-
-			gbl.spellTable.Add(Spells.bless, ovr023.cleric_bless);
-			gbl.spellTable.Add(Spells.curse, ovr023.cleric_curse);
-			gbl.spellTable.Add(Spells.cure_light_wounds_CL, ovr023.SpellCureLight);
-			gbl.spellTable.Add(Spells.cause_light_wounds_CL, ovr023.SpellCauseLight);
-			gbl.spellTable.Add(Spells.detect_magic_CL, ovr023.is_affected);
-			gbl.spellTable.Add(Spells.protect_from_evil_CL, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.protect_from_good_CL, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.resist_cold, ovr023.SpellResistCold);
-			gbl.spellTable.Add(Spells.burning_hands, ovr023.SpellBuringHands);
-			gbl.spellTable.Add(Spells.charm_person, ovr023.SpellCharm);
-			gbl.spellTable.Add(Spells.detect_magic_MU, ovr023.is_affected);
-			gbl.spellTable.Add(Spells.enlarge, ovr023.SpellEnlarge);
-			gbl.spellTable.Add(Spells.reduce, ovr023.SpellReduce);
-			gbl.spellTable.Add(Spells.friends, ovr023.SpellFriends);
-			gbl.spellTable.Add(Spells.magic_missile, ovr023.SpellMagicMissile);
-			gbl.spellTable.Add(Spells.protect_from_evil_MU, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.protect_from_good_MU, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.read_magic, ovr023.is_affected);
-			gbl.spellTable.Add(Spells.shield, ovr023.SpellShield);
-			gbl.spellTable.Add(Spells.shocking_grasp, ovr023.SpellShockingGrasp);
-			gbl.spellTable.Add(Spells.sleep, ovr023.SpellSleep);
-			gbl.spellTable.Add(Spells.find_traps, ovr023.is_affected);
-			gbl.spellTable.Add(Spells.hold_person_CL, ovr023.SpellHoldX);
-			gbl.spellTable.Add(Spells.resist_fire, ovr023.SpellFireResistant);
-			gbl.spellTable.Add(Spells.silence_15_radius, ovr023.SpellSilence15Radius);
-			gbl.spellTable.Add(Spells.slow_poison, ovr023.is_affected2);
-			gbl.spellTable.Add(Spells.snake_charm, ovr023.SpellSnakeCharm);
-			gbl.spellTable.Add(Spells.spiritual_hammer, ovr023.SpellSpiritualHammer);
-			gbl.spellTable.Add(Spells.detect_invisibility, ovr023.is_affected);
-			gbl.spellTable.Add(Spells.invisibility, ovr023.is_invisible);
-			gbl.spellTable.Add(Spells.knock, ovr023.SpellKnock);
-			gbl.spellTable.Add(Spells.mirror_image, ovr023.SpellMirrorImage);
-			gbl.spellTable.Add(Spells.ray_of_enfeeblement, ovr023.SpellRayOfEnfeeblement);
-			gbl.spellTable.Add(Spells.stinking_cloud, ovr023.SpellStinkingCloud);
-			gbl.spellTable.Add(Spells.strength, ovr023.SpellStrength);
-			gbl.spellTable.Add(Spells.animate_dead, ovr023.SpellAnimateDead);
-			gbl.spellTable.Add(Spells.cure_blindness, ovr023.SpellCureBlindness);
-			gbl.spellTable.Add(Spells.cause_blindness, ovr023.SpellCauseBlindness);
-			gbl.spellTable.Add(Spells.cure_disease, ovr023.SpellCureDisease);
-			gbl.spellTable.Add(Spells.cause_disease, ovr023.SpellCauseDisease);
-			gbl.spellTable.Add(Spells.dispel_magic_CL, ovr023.SpellDispelMagic);
-			gbl.spellTable.Add(Spells.prayer, ovr023.SpellPrayer);
-			gbl.spellTable.Add(Spells.remove_curse_CL, ovr023.SpellRemoveCurse);
-			gbl.spellTable.Add(Spells.bestow_curse_CL, ovr023.curse);
-			gbl.spellTable.Add(Spells.blink, ovr023.spell_blinking);
-			gbl.spellTable.Add(Spells.dispel_magic_MU, ovr023.SpellDispelMagic);
-			gbl.spellTable.Add(Spells.fireball, ovr023.SpellFireball);
-			gbl.spellTable.Add(Spells.haste, ovr023.cast_haste);
-			gbl.spellTable.Add(Spells.hold_person_MU, ovr023.SpellHoldX);
-			gbl.spellTable.Add(Spells.invisibility_10_radius, ovr023.is_invisible);
-			gbl.spellTable.Add(Spells.lightning_bolt, ovr023.SpellLightningBolt);
-			gbl.spellTable.Add(Spells.protect_from_evil_10_rad, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.protect_from_good_10_rad, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.protect_from_normal_missiles, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.slow, ovr023.SpellSlow);
-			gbl.spellTable.Add(Spells.restoration, ovr023.SpellRestoration);
-			gbl.spellTable.Add(Spells.potion_of_speed, ovr023.cast_speed);
-			gbl.spellTable.Add(Spells.cure_serious_wounds_CL, ovr023.SpellCureSeriousWounds);
-			gbl.spellTable.Add(Spells.potion_giant_strength, ovr023.cast_strength);
-			gbl.spellTable.Add(Spells.spell_3c, ovr023.sub_6003C);
-			gbl.spellTable.Add(Spells.wand_of_paralyzation, ovr023.cast_paralyzed);
-			gbl.spellTable.Add(Spells.spell_3e, ovr023.cast_heal);
-			gbl.spellTable.Add(Spells.dust_of_disappearance, ovr023.cast_invisible);
-			gbl.spellTable.Add(Spells.necklace_of_missiles, ovr023.SpellFireball);
-			gbl.spellTable.Add(Spells.wand_of_magic_missiles, ovr023.dam2d4plus2);
-			gbl.spellTable.Add(Spells.cause_serious_wounds_CL, ovr023.SpellCauseSeriousWounds);
-			gbl.spellTable.Add(Spells.neutralize_poison_CL, ovr023.SpellNeutralizePoison);
-			gbl.spellTable.Add(Spells.poison, ovr023.SpellPoison);
-			gbl.spellTable.Add(Spells.protect_evil_10_rad, ovr023.SpellProtectionFromX);
-			gbl.spellTable.Add(Spells.sticks_to_snakes_CL, ovr023.SpellSticksToSnakes);
-			gbl.spellTable.Add(Spells.cure_critical_wounds, ovr023.SpellCureCriticalWounds);
-			gbl.spellTable.Add(Spells.cause_critical_wounds, ovr023.SpellCauseCriticalWounds);
-			gbl.spellTable.Add(Spells.dispel_evil, ovr023.SpellDispelEvil);
-			gbl.spellTable.Add(Spells.flame_strike, ovr023.SpellFlameStrike);
-			gbl.spellTable.Add(Spells.raise_dead, ovr023.SpellRaiseDead);
-			gbl.spellTable.Add(Spells.slay_living, ovr023.SpellSlayLiving);
-			gbl.spellTable.Add(Spells.detect_magic_DR, ovr023.is_affected);
-			gbl.spellTable.Add(Spells.entangle, ovr023.SpellEntangle);
-			gbl.spellTable.Add(Spells.faerie_fire, ovr023.SpellFaerieFire);
-			gbl.spellTable.Add(Spells.invisibility_to_animals, ovr023.SpellInvisToAnimals);
-			gbl.spellTable.Add(Spells.charm_monsters, ovr023.SpellCharmMonsters);
-			gbl.spellTable.Add(Spells.confusion, ovr023.SpellConfusion);
-			gbl.spellTable.Add(Spells.dimension_door, ovr023.SpellDimensionDoor);
-			gbl.spellTable.Add(Spells.fear, ovr023.SpellFear);
-			gbl.spellTable.Add(Spells.fire_shield, ovr023.SpellFireProtection);
-			gbl.spellTable.Add(Spells.fumble, ovr023.SpellFumble);
-			gbl.spellTable.Add(Spells.ice_storm, ovr023.SpellIceStorm);
-			gbl.spellTable.Add(Spells.minor_globe_of_invuln, ovr023.SpellMinorGlobeOfInvulnerability);
-			gbl.spellTable.Add(Spells.remove_curse_MU, ovr023.SpellRemoveCurse);
-			gbl.spellTable.Add(Spells.spell_5a, ovr023.SpellAnimateDead);
-			gbl.spellTable.Add(Spells.cloud_kill, ovr023.SpellCloudKill);
-			gbl.spellTable.Add(Spells.cone_of_cold, ovr023.SpellConeOfCold);
-			gbl.spellTable.Add(Spells.feeblemind, ovr023.SpellFeeblemind);
-			gbl.spellTable.Add(Spells.hold_monsters, ovr023.SpellHoldX);
-			gbl.spellTable.Add(Spells.prot_dragon_breath, ovr023.SpellCastSpellIdAffect);
-			gbl.spellTable.Add(Spells.prot_paralyzation, ovr023.SpellCastSpellIdAffect);
-			gbl.spellTable.Add(Spells.potion_of_invisibility, ovr023.SpellCastSpellIdAffect);
-			gbl.spellTable.Add(Spells.wand_of_defoliation, ovr023.SpellDefoliation);
-			gbl.spellTable.Add(Spells.potion_extra_healing, ovr023.cast_heal2);
-			gbl.spellTable.Add(Spells.bestow_curse_MU, ovr023.curse);
 		}
 	}
 }

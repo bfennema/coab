@@ -344,7 +344,7 @@ namespace engine
 
             gbl.ItemDataTable = new ItemDataTable("ITEMS");
 
-            ovr023.setup_spells();
+            Affects.Spells.Setup();
             ovr013.SetupAffectTables();
         }
 
