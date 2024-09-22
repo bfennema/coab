@@ -599,7 +599,7 @@ namespace engine
 					{
 						ovr025.reclac_player_values(target);
 
-						ovr024.CheckAffectsEffect(target, CheckType.Type_11);
+						Affects.Effect.Check(target, CheckType.Type_11);
 
 						if (ovr024.PC_CanHitTarget(target.ac, target, gbl.SelectedPlayer) == false)
 						{
@@ -2277,7 +2277,7 @@ namespace engine
 			Player target = gbl.SelectedPlayer.actions.target;
 
 			gbl.current_affect = Classes.Affects.poison_plus_0;
-			ovr024.CheckAffectsEffect(target, CheckType.MagicResistance);
+			Affects.Effect.Check(target, CheckType.MagicResistance);
 
 			if (gbl.current_affect == Classes.Affects.poison_plus_0)
 			{
@@ -2365,7 +2365,7 @@ namespace engine
 			Player target = gbl.spellTargets[0];
 			gbl.damage_flags = DamageType.Unknown40;
 			gbl.damage = 67;
-			ovr024.CheckAffectsEffect(target, CheckType.MagicResistance);
+			Affects.Effect.Check(target, CheckType.MagicResistance);
 
 			if (gbl.damage != 0)
 			{

@@ -1211,8 +1211,8 @@ namespace engine
             ovr025.RedrawCombatScreen();
             foreach (Player player in gbl.TeamList)
             {
-                ovr024.CheckAffectsEffect(player, CheckType.BattleSetup1);
-                ovr024.CheckAffectsEffect(player, CheckType.BattleSetup2);
+                Affects.Effect.Check(player, CheckType.BattleSetup1);
+                Affects.Effect.Check(player, CheckType.BattleSetup2);
             }
 
             ovr014.calc_enemy_health_percentage();

@@ -1619,7 +1619,7 @@ namespace engine
 				player.in_combat = false;
 				player.hit_point_current = 0;
 				ovr024.RemoveCombatAffects(player);
-				ovr024.CheckAffectsEffect(player, CheckType.Death);
+				Affects.Effect.Check(player, CheckType.Death);
 
 				if (player.in_combat == true)
 				{

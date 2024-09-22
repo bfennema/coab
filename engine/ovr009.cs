@@ -105,7 +105,7 @@ namespace engine
             player.actions.AttacksReceived = 0;
             player.actions.directionChanges = 0;
             player.actions.guarding = false;
-            ovr024.CheckAffectsEffect(player, CheckType.PlayerRestrained);
+            Affects.Effect.Check(player, CheckType.PlayerRestrained);
 
             if (player.actions.delay > 0)
             {
@@ -122,11 +122,11 @@ namespace engine
                 ovr025.reclac_player_values(player);
                 gbl.display_hitpoints_ac = true;
                 ovr025.CombatDisplayPlayerSummary(player);
-                ovr024.CheckAffectsEffect(player, CheckType.Type_15);
+                Affects.Effect.Check(player, CheckType.Type_15);
 
                 if (player.actions.spell_id == 0)
                 {
-                    ovr024.CheckAffectsEffect(player, CheckType.Confusion);
+                    Affects.Effect.Check(player, CheckType.Confusion);
                 }
 
                 if (player.actions.delay > 0)
@@ -370,7 +370,7 @@ namespace engine
             foreach (Player player in gbl.TeamList)
             {
                 gbl.SelectedPlayer = player;
-                ovr024.CheckAffectsEffect(player, CheckType.BattleRound);
+                Affects.Effect.Check(player, CheckType.BattleRound);
                 ovr024.in_poison_cloud(0, player);
 
                 if (player.health_status == Status.dying)

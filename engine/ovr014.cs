@@ -20,7 +20,7 @@ namespace engine
 
             gbl.resetMovesLeft = false;
 
-            ovr024.CheckAffectsEffect(player, CheckType.Movement);
+            Affects.Effect.Check(player, CheckType.Movement);
 
             player.attack2_AttacksLeft = (byte)ThisRoundActionCount(gbl.halfActionsLeft);
 
@@ -73,7 +73,7 @@ namespace engine
 
             gbl.resetMovesLeft = true;
 
-            ovr024.CheckAffectsEffect(player, CheckType.Movement);
+            Affects.Effect.Check(player, CheckType.Movement);
 
             gbl.resetMovesLeft = false;
 
@@ -97,8 +97,8 @@ namespace engine
             }
 
             gbl.damage_flags = 0;
-            ovr024.CheckAffectsEffect(attacker, CheckType.SpecialAttacks);
-            ovr024.CheckAffectsEffect(target, CheckType.Type_5);
+            Affects.Effect.Check(attacker, CheckType.SpecialAttacks);
+            Affects.Effect.Check(target, CheckType.Type_5);
         }
 
 
@@ -209,7 +209,7 @@ namespace engine
 
                 ovr024.RemoveCombatAffects(target);
 
-                ovr024.CheckAffectsEffect(target, CheckType.Death);
+                Affects.Effect.Check(target, CheckType.Death);
 
                 if (target.in_combat == false)
                 {
@@ -490,7 +490,7 @@ namespace engine
             }
 
             gbl.resetMovesLeft = false;
-            ovr024.CheckAffectsEffect(player, CheckType.Movement);
+            Affects.Effect.Check(player, CheckType.Movement);
 
             int attacks = ThisRoundActionCount(gbl.halfActionsLeft);
 
@@ -589,7 +589,7 @@ namespace engine
 
                     gbl.SelectedPlayer = targetB;
 
-                    ovr024.CheckAffectsEffect(targetA, CheckType.Visibility);
+                    Affects.Effect.Check(targetA, CheckType.Visibility);
 
                     gbl.SelectedPlayer = player_bkup;
 
@@ -599,7 +599,7 @@ namespace engine
 
                         targetB.actions.target = targetA;
 
-                        ovr024.CheckAffectsEffect(targetB, CheckType.None);
+                        Affects.Effect.Check(targetB, CheckType.None);
 
                         targetB.actions.target = old_target;
                     }
@@ -791,7 +791,7 @@ namespace engine
                 }
 
                 ovr025.reclac_player_values(target);
-                ovr024.CheckAffectsEffect(target, CheckType.Type_11);
+                Affects.Effect.Check(target, CheckType.Type_11);
 
                 if (CanBackStabTarget(target, attacker) == true)
                 {
@@ -851,9 +851,9 @@ namespace engine
                             if (target.in_combat == true)
                             {
                                 if (attackIdx == 1)
-                                    ovr024.CheckAffectsEffect(attacker, CheckType.PostHit1_Damage);
+                                    Affects.Effect.Check(attacker, CheckType.PostHit1_Damage);
                                 else if (attackIdx == 2)
-                                    ovr024.CheckAffectsEffect(attacker, CheckType.PostHit2_Damage);
+                                    Affects.Effect.Check(attacker, CheckType.PostHit2_Damage);
                             }
 
                             if (target.in_combat == false)

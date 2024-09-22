@@ -514,7 +514,7 @@ namespace engine
             byte_1AB18 = 8;
             byte_1AB19 = 0;
 
-            ovr024.CheckAffectsEffect(player, CheckType.Type_14);
+            Affects.Effect.Check(player, CheckType.Type_14);
 
             if (player.combat_team == CombatTeam.Ours &&
                 ovr025.bandage(true) == true)
@@ -778,7 +778,7 @@ namespace engine
                 {
                     gbl.monster_morale = 0;
                 }
-                ovr024.CheckAffectsEffect(player, CheckType.Morale);
+                Affects.Effect.Check(player, CheckType.Morale);
 
                 if (gbl.monster_morale < (100 - ((player.hit_point_current * 100) / player.hit_point_max)) ||
                     gbl.monster_morale == 0)
@@ -786,7 +786,7 @@ namespace engine
                     //byte var_3 = gbl.byte_1D2CC;
                     gbl.monster_morale = gbl.enemyHealthPercentage;
 
-                    ovr024.CheckAffectsEffect(player, CheckType.Morale);
+                    Affects.Effect.Check(player, CheckType.Morale);
 
                     if (gbl.monster_morale < (100 - gbl.area2_ptr.field_58C) ||
                         gbl.monster_morale == 0 ||

@@ -46,7 +46,7 @@ namespace engine
                 player.hit_point_current = 0;
 
                 RemoveCombatAffects(player);
-                CheckAffectsEffect(player, CheckType.Death);
+                Affects.Effect.Check(player, CheckType.Death);
 
                 if (player.in_combat == false)
                 {
@@ -134,248 +134,6 @@ namespace engine
                 ovr013.CallAffectTable(Effect.Add, affect, player, affect_type);
             }
         }
-
-        static internal void CheckAffectsEffect(Player player, CheckType type) // work_on_00
-        {
-            switch (type)
-            {
-                case CheckType.None:
-                    break;
-
-                case CheckType.Visibility:
-                    calc_affect_effect(Classes.Affects.blink, player);
-                    calc_affect_effect(Classes.Affects.invisibility, player);
-                    calc_affect_effect(Classes.Affects.invisible, player);
-                    calc_affect_effect(Classes.Affects.invisible_to_animals, player);
-                    break;
-
-                case CheckType.PostHit1_Damage:
-                    calc_affect_effect(Classes.Affects.fireAttack_2d10, player);
-                    calc_affect_effect(Classes.Affects.ankheg_melee_acid_attack, player);
-                    calc_affect_effect(Classes.Affects.dispel_evil_banish, player);
-                    calc_affect_effect(Classes.Affects.engulf, player);
-                    calc_affect_effect(Classes.Affects.owlbear_hug_check, player);
-                    calc_affect_effect(Classes.Affects.dracolich_paralysis, player);
-                    calc_affect_effect(Classes.Affects.dracolich_cold_damage, player);
-                    break;
-
-                case CheckType.PostHit2_Damage:
-                    calc_affect_effect(Classes.Affects.poison_plus_0, player);
-                    calc_affect_effect(Classes.Affects.poison_plus_4, player);
-                    calc_affect_effect(Classes.Affects.poison_plus_2, player);
-                    calc_affect_effect(Classes.Affects.thri_kreen_paralyze, player);
-                    calc_affect_effect(Classes.Affects.poison_neg_2, player);
-                    calc_affect_effect(Classes.Affects.fireAttack_2d10, player);
-                    calc_affect_effect(Classes.Affects.beholder_eyestalk, player);
-                    break;
-
-                case CheckType.SpecialAttacks:
-                    calc_affect_effect(Classes.Affects.ray_of_enfeeblement, player);
-                    calc_affect_effect(Classes.Affects.weap_flame_tongue, player);
-                    calc_affect_effect(Classes.Affects.salamander_heat_damage, player);
-                    calc_affect_effect(Classes.Affects.weap_dragon_slayer, player);
-                    calc_affect_effect(Classes.Affects.weap_frost_brand, player);
-                    calc_affect_effect(Classes.Affects.ranger_vs_giant, player);
-                    break;
-
-                case CheckType.Type_5:
-                    calc_affect_effect(Classes.Affects.mirror_image, player);
-                    calc_affect_effect(Classes.Affects.prot_from_normal_missiles, player);
-                    calc_affect_effect(Classes.Affects.thri_kreen_dodge_missile, player);
-                    calc_affect_effect(Classes.Affects.boulder_evasion, player);
-                    calc_affect_effect(Classes.Affects.troll_regen, player);
-                    calc_affect_effect(Classes.Affects.resist_pierce_slash, player);
-                    calc_affect_effect(Classes.Affects.resist_magic_weapon, player);
-                    calc_affect_effect(Classes.Affects.protect_non_magic_weapons, player);
-                    calc_affect_effect(Classes.Affects.resist_blunt_pierce, player);
-                    calc_affect_effect(Classes.Affects.vuln_holy_water, player);
-                    calc_affect_effect(Classes.Affects.resist_normal_weapons, player);
-                    calc_affect_effect(Classes.Affects.half_damage, player);
-                    calc_affect_effect(Classes.Affects.resist_fire_and_cold, player);
-                    calc_affect_effect(Classes.Affects.resist_piercing, player);
-                    calc_affect_effect(Classes.Affects.vuln_blessed_quarrel, player);
-                    calc_affect_effect(Classes.Affects.fire_shield_damage, player);
-                    break;
-
-                case CheckType.PreDamage:
-                    calc_affect_effect(Classes.Affects.efreeti_fire_resist, player);
-                    calc_affect_effect(Classes.Affects.item_fire_resist, player);
-                    calc_affect_effect(Classes.Affects.weap_frost_brand, player);
-                    calc_affect_effect(Classes.Affects.spell_resist_cold, player);
-                    calc_affect_effect(Classes.Affects.spell_resist_fire, player);
-                    calc_affect_effect(Classes.Affects.resist_magic_50_percent, player);
-                    calc_affect_effect(Classes.Affects.resist_magic_15_percent, player);
-                    calc_affect_effect(Classes.Affects.immune_to_fire, player);
-                    calc_affect_effect(Classes.Affects.half_elec, player);
-                    calc_affect_effect(Classes.Affects.half_cold, player);
-                    calc_affect_effect(Classes.Affects.shield, player);
-                    calc_affect_effect(Classes.Affects.half_fire, player);
-                    calc_affect_effect(Classes.Affects.troll_regen, player);
-                    calc_affect_effect(Classes.Affects.mirror_image, player);
-                    calc_affect_effect(Classes.Affects.immune_to_cold, player);
-                    calc_affect_effect(Classes.Affects.prot_drag_breath, player);
-                    calc_affect_effect(Classes.Affects.resist_fire_and_cold, player);
-                    calc_affect_effect(Classes.Affects.shambling_absorb_lightning, player);
-                    calc_affect_effect(Classes.Affects.protect_magic, player);
-                    calc_affect_effect(Classes.Affects.dracolich_protection, player);
-                    calc_affect_effect(Classes.Affects.protect_elec, player);
-                    calc_affect_effect(Classes.Affects.minor_globe_of_invulnerability, player);
-                    break;
-
-                case CheckType.PlayerRestrained:
-                    calc_affect_effect(Classes.Affects.snake_charm, player);
-                    calc_affect_effect(Classes.Affects.paralyze, player);
-                    calc_affect_effect(Classes.Affects.sleep, player);
-                    calc_affect_effect(Classes.Affects.helpless, player);
-                    calc_affect_effect(Classes.Affects.sticks_to_snakes, player);
-                    calc_affect_effect(Classes.Affects.fumbling, player);
-                    calc_affect_effect(Classes.Affects.entangle, player);
-                    break;
-
-                case CheckType.BattleSetup1:
-                    calc_affect_effect(Classes.Affects.fight_unconscious, player);
-                    calc_affect_effect(Classes.Affects.resist_fire_and_cold, player);
-                    calc_affect_effect(Classes.Affects.displace, player);
-                    calc_affect_effect(Classes.Affects.camouflage, player);
-                    calc_affect_effect(Classes.Affects.item_invisibility, player);
-                    break;
-
-                case CheckType.MagicResistance:
-                    calc_affect_effect(Classes.Affects.resist_magic_50_percent, player);
-                    calc_affect_effect(Classes.Affects.resist_magic_15_percent, player);
-                    calc_affect_effect(Classes.Affects.elf_resist_sleep, player);
-                    calc_affect_effect(Classes.Affects.protect_charm_sleep, player);
-                    calc_affect_effect(Classes.Affects.resist_paralyze, player);
-                    calc_affect_effect(Classes.Affects.immune_to_cold, player);
-                    calc_affect_effect(Classes.Affects.prot_paralysis_poison, player);
-                    calc_affect_effect(Classes.Affects.immune_to_fire, player);
-                    calc_affect_effect(Classes.Affects.halfelf_resistance, player);
-                    calc_affect_effect(Classes.Affects.prot_sleep_charm_paralysis_poison, player);
-                    calc_affect_effect(Classes.Affects.minor_globe_of_invulnerability, player);
-                    calc_affect_effect(Classes.Affects.protect_magic, player);
-                    break;
-
-                case CheckType.CanHitAttacker:
-                    calc_affect_effect(Classes.Affects.bless, player);
-                    calc_affect_effect(Classes.Affects.cursed, player);
-                    calc_affect_effect(Classes.Affects.blinded, player);
-                    calc_affect_effect(Classes.Affects.bestow_curse, player);
-                    calc_affect_effect(Classes.Affects.prayer, player);
-                    calc_affect_effect(Classes.Affects.weap_flame_tongue, player);
-                    calc_affect_effect(Classes.Affects.gnome_vs_goblin_kobold, player);
-                    calc_affect_effect(Classes.Affects.dwarf_vs_orc_goblin, player);
-                    calc_affect_effect(Classes.Affects.weap_dragon_slayer, player);
-                    calc_affect_effect(Classes.Affects.weap_frost_brand, player);
-                    break;
-
-                case CheckType.Type_11:
-                    calc_affect_effect(Classes.Affects.blinded, player);
-                    calc_affect_effect(Classes.Affects.shield, player);
-                    calc_affect_effect(Classes.Affects.protection_from_evil, player);
-                    calc_affect_effect(Classes.Affects.protection_from_good, player);
-                    calc_affect_effect(Classes.Affects.prot_from_evil_10_radius, player);
-                    calc_affect_effect(Classes.Affects.prot_from_good_10_radius, player);
-                    calc_affect_effect(Classes.Affects.stinking_cloud, player);
-                    calc_affect_effect(Classes.Affects.faerie_fire, player);
-                    break;
-
-                case CheckType.SavingThrow:
-                    calc_affect_effect(Classes.Affects.protection_from_evil, player);
-                    calc_affect_effect(Classes.Affects.protection_from_good, player);
-                    calc_affect_effect(Classes.Affects.spell_resist_cold, player);
-                    calc_affect_effect(Classes.Affects.shield, player);
-                    calc_affect_effect(Classes.Affects.spell_resist_fire, player);
-                    calc_affect_effect(Classes.Affects.blinded, player);
-                    calc_affect_effect(Classes.Affects.bestow_curse, player);
-                    calc_affect_effect(Classes.Affects.prot_from_evil_10_radius, player);
-                    calc_affect_effect(Classes.Affects.prot_from_good_10_radius, player);
-                    calc_affect_effect(Classes.Affects.prayer, player);
-                    calc_affect_effect(Classes.Affects.item_fire_resist, player);
-                    calc_affect_effect(Classes.Affects.weap_frost_brand, player);
-                    calc_affect_effect(Classes.Affects.prot_paralysis_poison, player);
-                    calc_affect_effect(Classes.Affects.prot_sleep_charm_paralysis_poison, player);
-                    calc_affect_effect(Classes.Affects.con_saving_bonus, player);
-                    calc_affect_effect(Classes.Affects.hot_fire_shield, player);
-                    calc_affect_effect(Classes.Affects.cold_fire_shield, player);
-                    break;
-
-                case CheckType.Death:
-                    calc_affect_effect(Classes.Affects.fight_unconscious, player);
-                    calc_affect_effect(Classes.Affects.troll_fire_or_acid, player);
-                    calc_affect_effect(Classes.Affects.weap_dragon_slayer, player);
-                    break;
-
-                case CheckType.Type_14:
-                    calc_affect_effect(Classes.Affects.petrifying_gaze, player);
-                    calc_affect_effect(Classes.Affects.breath_elec, player);
-                    calc_affect_effect(Classes.Affects.ankheg_ranged_acid_attack, player);
-                    calc_affect_effect(Classes.Affects.spit_acid, player);
-                    calc_affect_effect(Classes.Affects.beholder_eyestalk, player);
-                    calc_affect_effect(Classes.Affects.breath_acid, player);
-                    calc_affect_effect(Classes.Affects.dracolich_paralytic_gaze, player);
-                    calc_affect_effect(Classes.Affects.breath_fire, player);
-                    calc_affect_effect(Classes.Affects.cast_breath_fire, player);
-                    calc_affect_effect(Classes.Affects.cast_throw_lightening, player);
-                    calc_affect_effect(Classes.Affects.affect_8b, player);
-                    break;
-
-                case CheckType.Type_15:
-                    calc_affect_effect(Classes.Affects.silence_15_radius, player);
-                    calc_affect_effect(Classes.Affects.stinking_cloud, player);
-                    calc_affect_effect(Classes.Affects.charm_person, player);
-                    calc_affect_effect(Classes.Affects.reduce, player);
-                    calc_affect_effect(Classes.Affects.berserk, player);
-                    break;
-
-                case CheckType.CanHitTarget:
-                    calc_affect_effect(Classes.Affects.invisibility, player);
-                    calc_affect_effect(Classes.Affects.invisible, player);
-                    calc_affect_effect(Classes.Affects.blink, player);
-                    calc_affect_effect(Classes.Affects.giant_vs_dwarf_gnome, player);
-                    calc_affect_effect(Classes.Affects.gnoll_bugbear_vs_gnome, player);
-                    calc_affect_effect(Classes.Affects.displace, player);
-                    calc_affect_effect(Classes.Affects.dispel_evil, player);
-                    break;
-
-                case CheckType.Morale:
-                    calc_affect_effect(Classes.Affects.bless, player);
-                    calc_affect_effect(Classes.Affects.cursed, player);
-                    calc_affect_effect(Classes.Affects.charm_person, player);
-                    break;
-
-                case CheckType.Movement:
-                    calc_affect_effect(Classes.Affects.haste, player);
-                    calc_affect_effect(Classes.Affects.slow, player);
-                    calc_affect_effect(Classes.Affects.clear_movement, player);
-                    break;
-
-                case CheckType.BattleRound:
-                    calc_affect_effect(Classes.Affects.regen_3_hp, player);
-                    calc_affect_effect(Classes.Affects.spiritual_hammer, player);
-                    calc_affect_effect(Classes.Affects.camouflage, player);
-                    calc_affect_effect(Classes.Affects.item_invisibility, player);
-                    calc_affect_effect(Classes.Affects.charm_person, player);
-                    break;
-
-                case CheckType.FireShield:
-                    calc_affect_effect(Classes.Affects.hot_fire_shield, player);
-                    calc_affect_effect(Classes.Affects.cold_fire_shield, player);
-                    break;
-
-                case CheckType.Confusion:
-                    calc_affect_effect(Classes.Affects.confuse, player);
-                    break;
-
-                case CheckType.BattleSetup2:
-                    calc_affect_effect(Classes.Affects.add_invisibility, player);
-                    break;
-
-                case CheckType.Type_23:
-                    calc_affect_effect(Classes.Affects.affect_4a, player);
-                    break;
-            }
-        }
-
 
         static Player sub_63D03(byte[] directions, int arraySize, List<GasCloud> list, Point mapPos) // sub_63D03
         {
@@ -499,7 +257,7 @@ namespace engine
                     gbl.attack_roll = 100;
                 }
 
-                CheckAffectsEffect(target, CheckType.CanHitTarget);
+                Affects.Effect.Check(target, CheckType.CanHitTarget);
 
                 if (gbl.attack_roll >= 0)
                 {
@@ -528,8 +286,8 @@ namespace engine
                     gbl.attack_roll = 100;
                 }
 
-                CheckAffectsEffect(attacker, CheckType.CanHitAttacker);
-                CheckAffectsEffect(target, CheckType.CanHitTarget);
+                Affects.Effect.Check(attacker, CheckType.CanHitAttacker);
+                Affects.Effect.Check(target, CheckType.CanHitTarget);
 
                 int team_bonus;
                 if (attacker.combat_team == CombatTeam.Ours)
@@ -576,7 +334,7 @@ namespace engine
                 gbl.savingThrowRoll += saveBonus + player.field_186;
                 gbl.saveVerseType = saveType;
 
-                CheckAffectsEffect(player, CheckType.SavingThrow);
+                Affects.Effect.Check(player, CheckType.SavingThrow);
 
                 gbl.savingThrowMade = gbl.savingThrowRoll >= player.saveVerse[(int)saveType];
             }
@@ -1179,7 +937,7 @@ namespace engine
 
             gbl.damage = damage;
 
-            CheckAffectsEffect(player, CheckType.PreDamage);
+            Affects.Effect.Check(player, CheckType.PreDamage);
 
             if (change_damage == true)
             {
@@ -1194,7 +952,7 @@ namespace engine
             }
             else
             {
-                CheckAffectsEffect(player, CheckType.FireShield);
+                Affects.Effect.Check(player, CheckType.FireShield);
             }
 
             if (gbl.damage > 0)
@@ -1265,7 +1023,7 @@ namespace engine
                     {
                         RemoveCombatAffects(player);
 
-                        CheckAffectsEffect(player, CheckType.Death);
+                        Affects.Effect.Check(player, CheckType.Death);
 
                         if (player.in_combat == false)
                         {
@@ -1300,7 +1058,7 @@ namespace engine
 		{
             gbl.current_affect = affect_id;
 
-            CheckAffectsEffect(target, CheckType.MagicResistance);
+            Affects.Effect.Check(target, CheckType.MagicResistance);
 
             if (gbl.current_affect == 0 ||
                 (saved == true && can_save == DamageOnSave.Zero))
