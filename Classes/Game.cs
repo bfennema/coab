@@ -1,14 +1,14 @@
-﻿using Classes.Curse;
-
-namespace Classes
+﻿namespace Classes
 {
     public abstract class Game
     {
+        public abstract void Load();
         public abstract Logging.Game Name { get; }
         public abstract ImportSource ImportFrom { get; }
         public abstract int InitialExp { get; }
         public abstract MoneySet InitialMoney { get; }
         public abstract string DemoString { get; }
+        public abstract string SavePlayerExt { get; }
         public abstract string SaveItemExt { get; }
         public abstract string SaveAffectExt { get; }
         public abstract byte DemoGameArea { get; }
@@ -47,6 +47,9 @@ namespace Classes
         public abstract byte[] PortraitBody { get; }
         public abstract byte[] PortraitHead { get; }
         public abstract string[] TempleSpells { get; }
+        public abstract Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream);
+        public abstract Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len);
+        public abstract void SavePlayer(Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream);
         public abstract void DrawProtection();
         public abstract (string, string) CheckProtection();
     }

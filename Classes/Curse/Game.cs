@@ -4,7 +4,30 @@ namespace Classes.Curse
 {
     public class Game : Classes.Game
     {
+        static Game()
+        {
+            gbl.import_func[(int)ImportSource.Curse] = Player.LoadPlayer;
+        }
         readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" };
+        public override void Load()
+        {
+            byte[]? pic_data;
+            pic_data = DaxFiles.DaxCache.LoadDax("SKY", 250);
+            if (pic_data != null && pic_data.Length > 0)
+            {
+                gbl.sky_dax_250 = new DaxBlock(pic_data, 1, 13);
+            }
+            pic_data = DaxFiles.DaxCache.LoadDax("SKY", 251);
+            if (pic_data != null && pic_data.Length > 0)
+            {
+                gbl.sky_dax_251 = new DaxBlock(pic_data, 1, 13);
+            }
+            pic_data = DaxFiles.DaxCache.LoadDax("SKY", 252);
+            if (pic_data != null && pic_data.Length > 0)
+            {
+                gbl.sky_dax_252 = new DaxBlock(pic_data, 1, 13);
+            }
+        }
         public override Logging.Game Name { get => Logging.Game.CurseOfTheAzureBonds; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Curse; }
         public override int InitialExp { get => 25000; }
@@ -18,6 +41,7 @@ namespace Classes.Curse
                 return "Curse of the Azure Bonds v1.3 ";
             }
         }
+        public override string SavePlayerExt { get => "GUY"; }
         public override string SaveItemExt { get => "SWG"; }
         public override string SaveAffectExt { get => "FX"; }
 
@@ -57,6 +81,9 @@ namespace Classes.Curse
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
         public override string[] TempleSpells { get => templeSpells; }
+        public override Classes.Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { return Player.LoadPlayer(player_stream, item_stream, affect_stream); }
+        public override Classes.Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len) { return Player.LoadPlayer(player_data, item_data, item_len, affect_data, affect_len); }
+        public override void SavePlayer(Classes.Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { Player.SavePlayer(player, player_stream, item_stream, affect_stream); }
         public override void DrawProtection() { CopyProtection.DrawProtection(); }
         public override (string, string) CheckProtection() { return CopyProtection.CheckProtection(); }
     }

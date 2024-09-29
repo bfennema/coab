@@ -21,8 +21,11 @@ namespace Classes
     {
         Curse = 0,
         Pool = 1,
-        Hillsfar = 2
+        Hillsfar = 2,
+        Max = 3
     }
+
+    public delegate System.Threading.Tasks.Task<Player> LoadPlayer(System.IO.Stream player_stream, string path, string file);
 
     public enum GameState
     {
@@ -547,6 +550,9 @@ namespace Classes
         public static File file;
 
         public static Game game;
+        public static Game[] games = new Game[(int)Logging.Game.MaxGames];
+        public static string? SavePath;
+        public static string? DataPath;
 
 
         /// <summary>
@@ -715,6 +721,7 @@ namespace Classes
         public readonly static sbyte[] MapDirectionYDelta = /*unk_189AF seg600:269F*/ { -1, -1, 0, 1, 1, 1, 0, -1, 0 };//TODO remove
 
         public static ImportSource import_from;
+        public static LoadPlayer[] import_func = new LoadPlayer[(int)ImportSource.Max];
         public static bool party_fled;
 
         public static int friends_count;

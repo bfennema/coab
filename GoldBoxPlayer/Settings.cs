@@ -114,6 +114,9 @@ namespace GoldBoxPlayer
         private void UpdateGameDataSave()
         {
             Logging.Config.Game = game;
+            Logging.Config.SavePathByGame[(int)Logging.Game.PoolOfRadiance] = poolOfRadianceSavePath;
+            Logging.Config.SavePathByGame[(int)Logging.Game.CurseOfTheAzureBonds] = curseOfTheAzureBondsSavePath;
+            Logging.Config.SavePathByGame[(int)Logging.Game.SecretOfTheSilverBlades] = secretOfTheSilverBladesDataPath;
             if (game == Logging.Game.PoolOfRadiance)
             {
                 Logging.Config.DataPath = poolOfRadianceDataPath;

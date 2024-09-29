@@ -11,17 +11,6 @@ namespace engine
             seg043.GetInputKey();
         }
 
-
-        internal static void delete_file(string fileString)
-        {
-            if (System.IO.File.Exists(fileString))
-            {
-                System.IO.File.Delete(fileString);
-            }
-        }
-
-
-
         internal static async System.Threading.Tasks.Task<System.IO.Stream> find_and_open_file(bool noError, string dir_path, string file_name)
         {
             System.IO.Stream file_ptr;
@@ -40,28 +29,6 @@ namespace engine
 
             return file_ptr;
         }
-
-
-        internal static bool file_find(string filePath)
-        {
-            return System.IO.File.Exists(filePath);
-        }
-
-
-        static char[] invalid_characters = { ' ', '.', '*', ',', '?', '/', '\\', ':', ';', '|' };
-
-        internal static string clean_string(string s)
-        {
-            string cleanStr = string.Join("", s.Split(invalid_characters)).ToUpper();
-
-            if (cleanStr.Length > 8)
-            {
-                cleanStr = cleanStr.Substring(0, 8);
-            }
-
-            return cleanStr;
-        }
-
 
         static bool setupDaxFiles(out System.IO.BinaryReader fileA, out System.IO.BinaryReader fileB, out short arg_8, string file_name)
         {

@@ -1,4 +1,3 @@
-using Classes.PoolRad;
 using Logging;
 
 namespace Classes.Curse
@@ -600,6 +599,112 @@ namespace Classes.Curse
             return player;
         }
 
+        public static async System.Threading.Tasks.Task<Classes.Player> LoadPlayer(System.IO.Stream player_stream, string path, string file)
+        {
+            byte[] data = new byte[StructSize];
+            gbl.file.BlockRead(StructSize, data, player_stream);
+            gbl.file.Close(player_stream);
+
+            var player = new Player(data, 0).Load();
+
+            var filename = string.Format("{0}.SWG", file);
+
+            if (await gbl.file.Find(path, filename) == true)
+            {
+                var item_stream = await gbl.file.Open(gbl.SavePath, filename);
+
+                LoadItems(player, item_stream);
+            }
+
+            filename = string.Format("{0}.FX", file);
+
+            if (await gbl.file.Find(path, filename) == true)
+            {
+                var affect_stream = await gbl.file.Open(gbl.SavePath, filename);
+
+                LoadAffects(player, affect_stream);
+            }
+
+            return player;
+        }
+        public static Classes.Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream)
+        {
+            byte[] data = new byte[StructSize];
+            gbl.file.BlockRead(StructSize, data, player_stream);
+            gbl.file.Close(player_stream);
+
+            var player = new Player(data, 0).Load();
+
+            if (item_stream != null)
+            {
+                LoadItems(player, item_stream);
+            }
+
+            if (affect_stream != null)
+            {
+                LoadAffects(player, affect_stream);
+            }
+
+            return player;
+        }
+        public static Classes.Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len)
+        {
+            var player = new Player(player_data, 0).Load();
+
+            if (item_len != 0)
+            {
+                ushort offset = 0;
+
+                do
+                {
+                    player.items.Add(new Item(item_data, offset).Load());
+
+                    offset += Item.StructSize;
+                } while (offset < item_len);
+            }
+
+            if (affect_len != 0)
+            {
+                ushort offset = 0;
+
+                do
+                {
+                    new Affect(affect_data, offset).Load(player);
+
+                    offset += Affect.StructSize;
+                } while (offset < affect_len);
+            }
+
+            return player;
+        }
+        public static void SavePlayer(Classes.Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream)
+        {
+            gbl.file.Rewrite(player_stream);
+
+            gbl.file.BlockWrite(Player.StructSize, new Player(player).Save(), player_stream);
+            gbl.file.Close(player_stream);
+
+            if (item_stream != null)
+            {
+                gbl.file.Rewrite(item_stream);
+
+                player.items.ForEach(item => gbl.file.BlockWrite(Item.StructSize, new Item(item).Save(), item_stream));
+
+                gbl.file.Close(item_stream);
+            }
+
+            if (affect_stream != null)
+            {
+                gbl.file.Rewrite(affect_stream);
+
+                foreach (Classes.Affect affect in player.affects)
+                {
+                    gbl.file.BlockWrite(Affect.StructSize, new Affect(affect, player).Save(), affect_stream);
+                }
+
+                gbl.file.Close(affect_stream);
+            }
+        }
         public static void LoadItems(Classes.Player player, System.IO.Stream file)
         {
             byte[] data = new byte[Item.StructSize];

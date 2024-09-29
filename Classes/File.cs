@@ -6,6 +6,7 @@ namespace Classes
 {
     public interface File
     {
+        static char[] invalid_characters = { ' ', '.', '*', ',', '?', '/', '\\', ':', ';', '|' };
         public IAsyncEnumerable<(string,Stream)> OpenAll(string path, string filter = "*");
         public Task<Stream?> Open(string path, string filename);
         public Task<Stream?> Create(string path, string filename);
@@ -35,6 +36,17 @@ namespace Classes
         public void BlockWrite(int count, byte[] data, Stream stream)
         {
             stream.Write(data, 0, count);
+        }
+
+        public static string CleanFilename(string filename)
+        {
+            string cleanFilename = string.Join("", filename.Split(invalid_characters)).ToUpper();
+
+            if (cleanFilename.Length > 8)
+            {
+                cleanFilename = cleanFilename.Substring(0, 8);
+            }
+            return cleanFilename;
         }
     }
 }

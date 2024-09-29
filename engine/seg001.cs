@@ -54,6 +54,10 @@ namespace engine
                 }
                 seg041.GameDelay();
             }
+            gbl.DataPath = Logging.Config.DataPath;
+            gbl.SavePath = Logging.Config.SavePath;
+
+            gbl.game = gbl.games[(int)Logging.Config.Game];
 
             InitFirst();
 
@@ -116,18 +120,7 @@ namespace engine
             //}
             //Logging.Logger.Debug("");
 
-            if (Logging.Config.Game == Logging.Game.PoolOfRadiance)
-            {
-                gbl.game = new Classes.PoolRad.Game();
-            }
-            else if (Logging.Config.Game == Logging.Game.CurseOfTheAzureBonds)
-            {
-                gbl.game = new Classes.Curse.Game();
-
-                gbl.sky_dax_250 = seg040.LoadDax(13, 1, 250, "SKY");
-                gbl.sky_dax_251 = seg040.LoadDax(13, 1, 251, "SKY");
-                gbl.sky_dax_252 = seg040.LoadDax(13, 1, 252, "SKY");
-            }
+            gbl.game.Load();
 
             if (Cheats.skip_title_screen == false)
             {

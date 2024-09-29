@@ -1,7 +1,5 @@
 ﻿using System;
 using System.IO;
-using System.Runtime.Serialization;
-using System.Xml.Serialization;
 
 namespace Logging
 {
@@ -30,6 +28,7 @@ namespace Logging
         static string logPath;
         static string saveBasePath;
         static string savePath;
+        static string[] savePathByGame = new string[(int)Game.MaxGames];
         static string dataPath;
         static Game game;
 
@@ -83,6 +82,10 @@ namespace Logging
         {
             get => savePath;
             set => savePath = value;
+        }
+        public static string[] SavePathByGame
+        {
+            get => savePathByGame;
         }
         public static string DataPath
         {

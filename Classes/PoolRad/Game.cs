@@ -4,10 +4,14 @@ namespace Classes.PoolRad
 {
     public class Game : Classes.Game
     {
+        static Game()
+        {
+            gbl.import_func[(int)ImportSource.Pool] = Player.LoadPlayer;
+        }
         readonly static internal byte[] portraitHead = { 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 };
         readonly static internal byte[] portraitBody = { 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 };
         readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh", "Exit" };
-
+        public override void Load() { }
         public override Logging.Game Name { get => Logging.Game.PoolOfRadiance; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Pool; }
         public override int InitialExp { get => 0; }
@@ -19,6 +23,7 @@ namespace Classes.PoolRad
             }
         }
         public override string DemoString { get => null; }
+        public override string SavePlayerExt { get => "CHA"; }
         public override string SaveItemExt { get => "ITM"; }
         public override string SaveAffectExt { get => "SPC"; }
         public override byte DemoGameArea { get => 0; }
@@ -57,6 +62,9 @@ namespace Classes.PoolRad
         public override byte[] PortraitBody { get => portraitBody; }
         public override byte[] PortraitHead { get => portraitHead; }
         public override string[] TempleSpells { get => templeSpells; }
+        public override Classes.Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { return Player.LoadPlayer(player_stream, item_stream, affect_stream); }
+        public override Classes.Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len) { return Player.LoadPlayer(player_data, item_data, item_len, affect_data, affect_len); }
+        public override void SavePlayer(Classes.Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { Player.SavePlayer(player, player_stream, item_stream, affect_stream); }
         public override void DrawProtection() { CopyProtection.DrawProtection(); }
         public override (string, string) CheckProtection() {  return CopyProtection.CheckProtection(); }
     }

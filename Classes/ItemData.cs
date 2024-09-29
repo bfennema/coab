@@ -47,7 +47,7 @@ namespace Classes
 
         public async void Read(string fileName)
         {
-            var stream = await gbl.file.Open(Logging.Config.DataPath, fileName);
+            var stream = await gbl.file.Open(gbl.DataPath, fileName);
 
             stream.Seek(2, SeekOrigin.Begin);
             byte[] data = new byte[0x810];

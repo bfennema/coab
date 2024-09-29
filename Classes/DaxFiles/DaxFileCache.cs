@@ -39,7 +39,7 @@ namespace Classes.DaxFiles
         private async void LoadFile(string filename, string filenum)
         {
             string name = string.Format("{0}{1}.DAX", filename, filenum);
-            var path = Logging.Config.DataPath;
+            var path = gbl.DataPath;
             System.IO.BinaryReader fileA;
 
             try

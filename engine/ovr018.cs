@@ -224,31 +224,10 @@ namespace engine
                             if (menuFlags[allow_load] == true)
                             {
                                 ovr017.loadGameMenu();
-                                if (gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.game_state != GameState.StartGameMenu)
+                                if (gbl.game_state != GameState.StartGameMenu)
                                 {
-                                    if (gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.area_ptr.field_3FA == 1)
+                                    if (gbl.area_ptr.field_3FA == 1)
                                     {
-                                        if (gbl.reload_ecl_and_pictures == false &&
-                                            gbl.lastDaxBlockId != 0x50)
-                                        {
-                                            if (gbl.game_state == GameState.WildernessMap)
-                                            {
-                                                gbl.game.DrawFrame_Wilderness();
-                                            }
-                                            else
-                                            {
-                                                gbl.game.DrawFrame_Dungeon();
-                                            }
-                                            ovr025.PartySummary(gbl.SelectedPlayer);
-                                        }
-                                        else
-                                        {
-                                            if (gbl.area_ptr.LastEclBlockId == 0)
-                                            {
-                                                gbl.game.DrawFrame_Dungeon();
-                                            }
-                                        }
-
                                         ovr027.ClearPromptArea();
                                         gbl.area2_ptr.training_class_mask = 0;
 
@@ -1450,12 +1429,14 @@ namespace engine
                     return;
             }
 
-            List<MenuItem> strList = new();
-            List<MenuItem> nameList = new();
-            await foreach((var a, var b) in ovr017.BuildLoadablePlayersLists())
+            List<string> pathList = [];
+            List<MenuItem> strList = [];
+            List<MenuItem> nameList = [];
+            await foreach((var a, var b, var c) in ovr017.BuildLoadablePlayersLists())
             {
-                strList.Add(new MenuItem(a));
-                nameList.Add(new MenuItem(b));
+                pathList.Add(a);
+                strList.Add(new MenuItem(b));
+                nameList.Add(new MenuItem(c));
             }
 
             if (nameList.Count > 0)
@@ -1479,7 +1460,7 @@ namespace engine
 
                         MenuItem var_10 = ovr027.getStringListEntry(strList, strList_index);
 
-                        Player new_player = await ovr017.import_char01(var_10.Text);
+                        Player? new_player = await ovr017.import_char01(pathList[strList_index], var_10.Text);
 
                         select_sl.Text = "* " + select_sl.Text;
                         pc_count = 0;
