@@ -336,7 +336,7 @@ namespace engine
         internal static void GameDelay()
         {
             Display.ForceUpdate();
-            seg049.SysDelay(System.Math.Max(gbl.game_speed_var * 100, 50));
+            seg049.SysDelay(System.Math.Max(gbl.game_speed_var * 100, 400));
         }
     }
 }
