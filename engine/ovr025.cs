@@ -1342,7 +1342,7 @@ namespace engine
 		}
 
 
-		internal static int spellMaxTargetCount(int spell_id) /* sub_6886F */
+		internal static int spellMaxTargetCount(Spells spell_id) /* sub_6886F */
 		{
 			int target_count = 0;
 
@@ -1360,7 +1360,7 @@ namespace engine
 			}
 			else
 			{
-				switch (gbl.spellCastingTable[spell_id].spellClass)
+				switch (gbl.spellCastingTable[(byte)spell_id].spellClass)
 				{
 					case SpellClass.Cleric:
 						int cleric_count = gbl.SelectedPlayer.SkillLevel(SkillType.Cleric);
@@ -1389,7 +1389,7 @@ namespace engine
 			}
 
 			if (gbl.spell_from_item == true &&
-				gbl.spellCastingTable[spell_id].spellClass != SpellClass.Monster)
+				gbl.spellCastingTable[(byte)spell_id].spellClass != SpellClass.Monster)
 			{
 				target_count = 6;
 			}

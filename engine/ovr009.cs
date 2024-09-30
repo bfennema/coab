@@ -148,7 +148,7 @@ namespace engine
 
         internal static void combat_menu(Player player) /* camp_menu */
         {
-            int spell_id;
+            Spells spell_id;
             DownedPlayerTile var_D = new DownedPlayerTile();
             char var_1;
 

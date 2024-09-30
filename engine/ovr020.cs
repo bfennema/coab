@@ -1119,7 +1119,7 @@ namespace engine
         internal static void UseMagicItem(ref bool arg_0, Item item) // sub_56478
         {
             gbl.spell_from_item = false;
-            int spellId = 0;
+            Spells spellId = 0;
 
             if (item.IsScroll() == true)
             {
@@ -1129,10 +1129,10 @@ namespace engine
                 int dummy_index = -1;
                 spellId = spell_menu2(out dummy_bool, ref dummy_index, SpellSource.Cast, SpellLoc.scroll);
             }
-            else if (item.affect_2 > 0 && (int)item.affect_3 < 0x80)
+            else if (item.Spell != 0)
             {
                 gbl.spell_from_item = true;
-                spellId = (int)item.affect_2 & 0x7F;
+                spellId = item.Spell;
             }
 
             if (spellId == 0)
@@ -1192,7 +1192,7 @@ namespace engine
                 gbl.spell_from_item = false;
 
                 if (gbl.game_state == GameState.Combat &&
-                    gbl.spellCastingTable[spellId].whenCast != SpellWhen.Camp)
+                    gbl.spellCastingTable[(byte)spellId].whenCast != SpellWhen.Camp)
                 {
                     arg_0 = true;
                     ovr025.clear_actions(gbl.SelectedPlayer);
@@ -1505,10 +1505,10 @@ namespace engine
             }
         }
 
-        internal static byte spell_menu2(out bool arg_0, ref int index, SpellSource arg_8, SpellLoc spl_location)
+        internal static Spells spell_menu2(out bool arg_0, ref int index, SpellSource arg_8, SpellLoc spl_location)
         {
             string text;
-            byte result;
+            Spells result;
 
             switch (spl_location)
             {

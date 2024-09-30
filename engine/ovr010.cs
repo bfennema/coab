@@ -115,10 +115,10 @@ namespace engine
         }
 
 
-        internal static bool ShouldCastSpellX_sub1(int spell_id, Point pos) // sub_352AF
+        internal static bool ShouldCastSpellX_sub1(Spells spell_id, Point pos) // sub_352AF
         {
             bool result = false;
-            var spell_entry = gbl.spellCastingTable[spell_id];
+            var spell_entry = gbl.spellCastingTable[(byte)spell_id];
 
             if (spell_entry.damageOnSave != DamageOnSave.Zero)
             {
@@ -141,14 +141,14 @@ namespace engine
         }
 
 
-        internal static bool ShouldCastSpellX(int minPriority, int spellId, Player attacker) // sub_353B1
+        internal static bool ShouldCastSpellX(int minPriority, Spells spellId, Player attacker) // sub_353B1
         {
-            var spell_entry = gbl.spellCastingTable[spellId];
+            var spell_entry = gbl.spellCastingTable[(byte)spellId];
             if (spell_entry.priority >= minPriority)
             {
                 Player dummy_target;
-                if ((spellId != 3 && spell_entry.targetsEnemy == 0) ||
-                    (spellId == 3 && ovr014.find_healing_target(out dummy_target, attacker)))
+                if ((spellId != Spells.cure_light_wounds_CL && spell_entry.targetsEnemy == 0) ||
+                    (spellId == Spells.cure_light_wounds_CL && ovr014.find_healing_target(out dummy_target, attacker)))
                 {
                     return true;
                 }
@@ -197,18 +197,12 @@ namespace engine
 
                     foreach (var item_ptr in player.items)
                     {
-                        byte spell_id = (byte)item_ptr.affect_2;
+                        Spells spell_id = item_ptr.Spell;
 
                         if (item_ptr.IsScroll() == false &&
-                            (int)item_ptr.affect_3 < 0x80 &&
                             item_ptr.readied &&
-                            spell_id > 0)
+                            spell_id != 0)
                         {
-                            if (spell_id > 0x38)
-                            {
-                                spell_id -= 0x17;
-                            }
-
                             if (ShouldCastSpellX(priority, spell_id, player))
                             {
                                 bestWand = item_ptr;
@@ -232,19 +226,19 @@ namespace engine
 
         internal static bool sub_3560B(Player player)
         {
-            byte[] spell_list = new byte[gbl.max_spells];
+            Spells[] spell_list = new Spells[gbl.max_spells];
 
             int spells_count = 0;
 
             if (player.actions.can_cast == true)
             {
-                foreach (int id in player.spellList.LearntList())
+                foreach (Spells id in player.spellList.LearntList())
                 {
-                    spell_list[spells_count++] = (byte)id;
+                    spell_list[spells_count++] = id;
                 }
             }
 
-            byte spell_id = 0;
+            Spells spell_id = 0;
             byte priority = 7;
             int var_5B = ovr024.roll_dice(7, 1);
             int var_5D = 1;
@@ -260,7 +254,7 @@ namespace engine
                         for (int var_5E = 1; var_5E < 4 && spell_id == 0; var_5E++)
                         {
                             int random_spell_index = ovr024.roll_dice(spells_count, 1) - 1;
-                            byte random_spell_id = spell_list[random_spell_index];
+                            Spells random_spell_id = spell_list[random_spell_index];
 
                             if (ShouldCastSpellX(priority, random_spell_id, player))
                             {

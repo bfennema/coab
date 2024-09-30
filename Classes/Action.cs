@@ -7,7 +7,7 @@ namespace Classes
     /// </summary>
     public class Action
     {
-        public int spell_id; // 0x00
+        public Spells spell_id; // 0x00
         public bool can_cast; // 0x01
         public bool can_use;  // 0x02
         public int delay;   // 0x03

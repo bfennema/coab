@@ -166,7 +166,7 @@ namespace engine
 
             if (sub_443A0(1) == true)
             {
-                byte spell_id;
+                Spells spell_id;
                 int index = -1;
 
                 do
@@ -308,7 +308,7 @@ namespace engine
                 int index = -1;
                 gbl.menuSelectedWord = 1;
 
-                byte spellId = ovr020.spell_menu2(out var_2, ref index, 0, SpellLoc.memorize);
+                Spells spellId = ovr020.spell_menu2(out var_2, ref index, 0, SpellLoc.memorize);
                 bool redraw = true;
 
                 if (var_2 == true)
@@ -346,7 +346,7 @@ namespace engine
                         {
                             var_1 = true;
                         }
-                        else if (HowManySpellsPlayerCanLearn(gbl.spellCastingTable[spellId].spellClass, gbl.spellCastingTable[spellId].spellLevel) > 0)
+                        else if (HowManySpellsPlayerCanLearn(gbl.spellCastingTable[(byte)spellId].spellClass, gbl.spellCastingTable[(byte)spellId].spellLevel) > 0)
                         {
                             gbl.SelectedPlayer.spellList.AddLearn(spellId);
                         }
@@ -408,9 +408,9 @@ namespace engine
 
                 while (var_1 == 0)
                 {
-                    byte var_4 = ovr020.spell_menu2(out var_2, ref var_8, SpellSource.Scribe, SpellLoc.scrolls);
+                    Spells spell = ovr020.spell_menu2(out var_2, ref var_8, SpellSource.Scribe, SpellLoc.scrolls);
 
-                    if (var_4 == 0)
+                    if (spell == 0)
                     {
                         var_1 = 1;
 
@@ -426,7 +426,7 @@ namespace engine
                     else
                     {
                         redraw = true;
-                        if (gbl.SelectedPlayer.spellBook.KnowsSpell((Spells)var_4))
+                        if (gbl.SelectedPlayer.spellBook.KnowsSpell(spell))
                         {
                             ovr025.string_print01("You already know that spell");
                         }
@@ -435,9 +435,9 @@ namespace engine
                             bool var_D = gbl.SelectedPlayer.items.Find(item =>
                             {
                                 return (item.IsScroll() == true &&
-                                    (item.CheckMaskedAffect(1, var_4) ||
-                                    item.CheckMaskedAffect(2, var_4) ||
-                                    item.CheckMaskedAffect(3, var_4)));
+                                    (item.CheckMaskedAffect(1, (byte)spell) ||
+                                    item.CheckMaskedAffect(2, (byte)spell) ||
+                                    item.CheckMaskedAffect(3, (byte)spell)));
                             }) != null;
 
 
@@ -447,8 +447,8 @@ namespace engine
                             }
                             else
                             {
-                                int spell_level = gbl.spellCastingTable[var_4].spellLevel;
-                                int spell_class = (int)gbl.spellCastingTable[var_4].spellClass;
+                                int spell_level = gbl.spellCastingTable[(byte)spell].spellLevel;
+                                int spell_class = (int)gbl.spellCastingTable[(byte)spell].spellClass;
 
                                 if (gbl.SelectedPlayer.spellCastCount[spell_class, spell_level - 1] > 0)
                                 {
@@ -457,7 +457,7 @@ namespace engine
                                         int var_6 = 1;
                                         do
                                         {
-                                            if (var_C.getAffect(var_6) == (Classes.Affects)var_4)
+                                            if (var_C.getSpell(var_6) == spell)
                                             {
                                                 var_C.setAffect(var_6, (Classes.Affects)((int)var_C.getAffect(var_6) | 0x80));
                                                 var_D = true;

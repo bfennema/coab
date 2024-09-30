@@ -66,7 +66,7 @@ namespace Classes
         sound_f = 0xf
     }
 
-    public delegate bool spellDelegate(QuickFight quick_fight, int spellId);
+    public delegate bool spellDelegate(QuickFight quick_fight, Spells spellId);
     public delegate void DisplayString(string str, int bgColor, int fgColor, int yCol, int xCol);
     public delegate void Put8x8Symbol(byte arg_0, bool use_overlay, int symbol_id, int rowY, int colX);
     public delegate void Draw8x8_clear_area(int yEnd, int xEnd, int yStart, int xStart);
@@ -351,7 +351,7 @@ namespace Classes
         public static DamageType damage_flags; // byte_1D2BF
         public static int halfActionsLeft; // byte_1D2C0
         public static bool resetMovesLeft; // byte_1D2C4, reset_byte_1D2C0
-        public static int spell_id; // byte_1D2C1
+        public static Spells spell_id; // byte_1D2C1
         public static int dice_count; // byte_1D2C2
         public static bool targetInvisible; // byte_1D2C5
         public static bool cureSpell; // byte_1D2C6

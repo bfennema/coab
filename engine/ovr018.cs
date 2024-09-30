@@ -2449,7 +2449,7 @@ namespace engine
                         player.ranger_lvl > 8)
                     {
                         int index = -1;
-                        byte newSpellId;
+                        Spells newSpellId;
                         bool var_1D;
 
                         do

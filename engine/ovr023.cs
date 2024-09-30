@@ -172,7 +172,7 @@ namespace engine
 		static Set asc_5C1D1 = new Set(0, 67, 69, 76, 77, 83);
 		static Set unk_5C1F1 = new Set(0, 69);
 
-		internal static byte spell_menu(ref int index, SpellSource spellSource)
+		internal static Spells spell_menu(ref int index, SpellSource spellSource)
 		{
 			string text;
 
@@ -228,7 +228,7 @@ namespace engine
 			} while (asc_5C1D1.MemberOf(input_key) == false);
 
 
-			byte spell_id;
+			Spells spell_id;
 			if (unk_5C1F1.MemberOf(input_key) == true)
 			{
 				spell_id = 0;
@@ -236,7 +236,7 @@ namespace engine
 			else
 			{
 				int selected_index = gbl.spell_string_list.GetRange(0, gbl.spell_string_list.IndexOf(selected)).FindAll(mi => mi.Heading == false).Count;
-				spell_id = gbl.memorize_spell_id[selected_index];
+				spell_id = (Spells)gbl.memorize_spell_id[selected_index];
 
 				if (spellSource == SpellSource.Scribe)
 				{
@@ -514,13 +514,13 @@ namespace engine
 		}
 
 
-		internal static int SpellRange(int spellId) // sub_5CDE5
+		internal static int SpellRange(Spells spellId) // sub_5CDE5
 		{
 			int castingLvl = (gbl.spell_from_item == true) ? 6 : ovr025.spellMaxTargetCount(spellId);
-			int range = gbl.spellCastingTable[spellId].fixedRange + (gbl.spellCastingTable[spellId].perLvlRange * castingLvl);
+			int range = gbl.spellCastingTable[(byte)spellId].fixedRange + (gbl.spellCastingTable[(byte)spellId].perLvlRange * castingLvl);
 
 			if (range == 0 &&
-				gbl.spellCastingTable[spellId].effectArea != 0)
+				gbl.spellCastingTable[(byte)spellId].effectArea != 0)
 			{
 				range = 1;
 			}
@@ -567,14 +567,14 @@ namespace engine
 			}
 			else
 			{
-				var_4 = gbl.spellCastingTable[(int)spellId].fixedDuration + (gbl.spellCastingTable[(int)spellId].perLvlDuration * ovr025.spellMaxTargetCount((int)spellId));
+				var_4 = gbl.spellCastingTable[(byte)spellId].fixedDuration + (gbl.spellCastingTable[(byte)spellId].perLvlDuration * ovr025.spellMaxTargetCount(spellId));
 			}
 
 			return (ushort)var_4;
 		}
 
 
-		internal static void DoSpellCastingWork(string text, DamageType damageFlags, int damage, bool call_affect_table, int TargetCount, int spell_id) // sub_5CF7F
+		internal static void DoSpellCastingWork(string text, DamageType damageFlags, int damage, bool call_affect_table, int TargetCount, Spells spell_id) // sub_5CF7F
 		{
 			gbl.damage_flags = (damage == 0) ? 0 : damageFlags;
 
@@ -586,16 +586,16 @@ namespace engine
 				{
 					bool saved;
 
-					if (gbl.spellCastingTable[spell_id].damageOnSave == 0)
+					if (gbl.spellCastingTable[(byte)spell_id].damageOnSave == 0)
 					{
 						saved = false;
 					}
 					else
 					{
-						saved = ovr024.RollSavingThrow(0, gbl.spellCastingTable[spell_id].saveVerse, target);
+						saved = ovr024.RollSavingThrow(0, gbl.spellCastingTable[(byte)spell_id].saveVerse, target);
 					}
 
-					if (gbl.spellCastingTable[spell_id].fixedRange == -1)
+					if (gbl.spellCastingTable[(byte)spell_id].fixedRange == -1)
 					{
 						ovr025.reclac_player_values(target);
 
@@ -610,13 +610,13 @@ namespace engine
 
 					if (damage > 0)
 					{
-						ovr024.damage_person(saved, gbl.spellCastingTable[spell_id].damageOnSave, damage, target);
+						ovr024.damage_person(saved, gbl.spellCastingTable[(byte)spell_id].damageOnSave, damage, target);
 					}
 
-					if (gbl.spellCastingTable[spell_id].affect_id > 0)
+					if (gbl.spellCastingTable[(byte)spell_id].affect_id > 0)
 					{
-						ovr024.ApplyAttackSpellAffect(text, saved, gbl.spellCastingTable[spell_id].damageOnSave,
-							call_affect_table, target_count, GetSpellAffectTimeout((Spells)spell_id), gbl.spellCastingTable[spell_id].affect_id,
+						ovr024.ApplyAttackSpellAffect(text, saved, gbl.spellCastingTable[(byte)spell_id].damageOnSave,
+							call_affect_table, target_count, GetSpellAffectTimeout(spell_id), gbl.spellCastingTable[(byte)spell_id].affect_id,
 							target);
 					}
 				}
@@ -626,7 +626,7 @@ namespace engine
 		}
 
 
-		internal static bool NonCombatSpellCast(QuickFight quick_fight, int spellId) // cast_spell_on
+		internal static bool NonCombatSpellCast(QuickFight quick_fight, Spells spellId) // cast_spell_on
 		{
 			if (gbl.lastSelectetSpellTarget == null)
 			{
@@ -638,7 +638,7 @@ namespace engine
 
 			bool castSpell = true;
 
-			switch (gbl.spellCastingTable[spellId].targetType)
+			switch (gbl.spellCastingTable[(byte)spellId].targetType)
 			{
 				case SpellTargets.Self:
 					break;
@@ -673,24 +673,24 @@ namespace engine
 		}
 
 
-		internal static void sub_5D2E1(bool showCastingText, QuickFight quick_fight, int spell_id) // sub_5D2E1
+		internal static void sub_5D2E1(bool showCastingText, QuickFight quick_fight, Spells spell_id) // sub_5D2E1
 		{
 			bool dummy = false;
 			sub_5D2E1(ref dummy, showCastingText, quick_fight, spell_id);
 		}
 
 
-		internal static void sub_5D2E1(ref bool arg_0, bool showCastingText, QuickFight quick_fight, int spell_id) // sub_5D2E1
+		internal static void sub_5D2E1(ref bool arg_0, bool showCastingText, QuickFight quick_fight, Spells spell_id) // sub_5D2E1
 		{
 			Player caster = gbl.SelectedPlayer;
 			bool stillCast = true;
 
 			if (gbl.game_state != GameState.Combat &&
-				gbl.spellCastingTable[spell_id].targetType == SpellTargets.Combat)
+				gbl.spellCastingTable[(byte)spell_id].targetType == SpellTargets.Combat)
 			{
 				if (gbl.spell_from_item == false)
 				{
-					seg041.displayString(SpellNames[spell_id], 0, 10, 0x13, 1);
+					seg041.displayString(SpellNames[(byte)spell_id], 0, 10, 0x13, 1);
 					seg041.displayString("can't be cast here...", 0, 10, 0x14, 1);
 
 					if (ovr027.yes_no(gbl.defaultMenuColors, "Lose it? ") == 'Y')
@@ -748,11 +748,11 @@ namespace engine
 						gbl.focusCombatAreaOnPlayer = true;
 						ovr033.draw_74B3F(false, Icon.Attack, direction, caster);
 
-						if (spell_id == (byte)Spells.fireball)
+						if (spell_id == Spells.fireball)
 						{
 							seg044.PlaySound(Sound.sound_b);
 						}
-						else if (spell_id == (byte)Spells.lightning_bolt)
+						else if (spell_id == Spells.lightning_bolt)
 						{
 							seg044.PlaySound(Sound.sound_8);
 						}
@@ -963,7 +963,7 @@ namespace engine
 				bool saved;
 				DamageOnSave can_save_flag;
 
-				if ((gbl.spell_id == (byte)Spells.hold_person_CL || gbl.spell_id == (byte)Spells.hold_person_MU) &&
+				if ((gbl.spell_id == Spells.hold_person_CL || gbl.spell_id == Spells.hold_person_MU) &&
 					!target.flags.HasFlag(Flags.HeldCharmed))
 				{
 					saved = true;
@@ -971,12 +971,12 @@ namespace engine
 				}
 				else
 				{
-					saved = ovr024.RollSavingThrow(save_bonus, gbl.spellCastingTable[gbl.spell_id].saveVerse, target);
-					can_save_flag = gbl.spellCastingTable[gbl.spell_id].damageOnSave;
+					saved = ovr024.RollSavingThrow(save_bonus, gbl.spellCastingTable[(byte)gbl.spell_id].saveVerse, target);
+					can_save_flag = gbl.spellCastingTable[(byte)gbl.spell_id].damageOnSave;
 				}
 
 				ovr024.ApplyAttackSpellAffect(text, saved, can_save_flag, false, ovr025.spellMaxTargetCount(gbl.spell_id), GetSpellAffectTimeout((Spells)gbl.spell_id),
-					gbl.spellCastingTable[gbl.spell_id].affect_id, target);
+					gbl.spellCastingTable[(byte)gbl.spell_id].affect_id, target);
 			}
 		}
 
@@ -986,7 +986,7 @@ namespace engine
 			gbl.byte_1D2C7 = true;
 
 			gbl.spellTargets.RemoveAll(target => target.combat_team != team ||
-				(gbl.spell_id == (int)Spells.bless && gbl.game_state == GameState.Combat && ovr025.BuildNearTargets(1, target).Count > 0));
+				(gbl.spell_id == Spells.bless && gbl.game_state == GameState.Combat && ovr025.BuildNearTargets(1, target).Count > 0));
 
 			DoSpellCastingWork(text, 0, 0, false, 0, gbl.spell_id);
 		}
@@ -1242,7 +1242,7 @@ namespace engine
 
 			if (gbl.spellTargets.Count == 1)
 			{
-				if (gbl.spell_id == (byte)Spells.hold_person_CL)
+				if (gbl.spell_id == Spells.hold_person_CL)
 				{
 					save_bonus = -2;
 				}
@@ -1874,7 +1874,7 @@ namespace engine
 
 			gbl.byte_1D2C7 = true;
 
-			if (gbl.spell_id == (byte)Spells.necklace_of_missiles)
+			if (gbl.spell_id == Spells.necklace_of_missiles)
 			{
 				dice_count = (ovr024.roll_dice(3, 1) * 2) + 1;
 			}
@@ -2806,7 +2806,7 @@ namespace engine
 		{
 			player.actions.target = null;
 
-			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.wand_of_magic_missiles);
+			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
 
 			if (player.actions.target != null)
 			{
@@ -2851,7 +2851,7 @@ namespace engine
 
 				ovr025.DisplayPlayerStatusString(true, 10, "Breathes!", player);
 
-                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.lightning_bolt);
+                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.lightning_bolt);
 
 				gbl.targetPos.x = var_2.x + Math.Sign(gbl.targetPos.x - var_2.x);
 				gbl.targetPos.y = var_2.y + Math.Sign(gbl.targetPos.y - var_2.y);
@@ -2890,7 +2890,7 @@ namespace engine
 
 		internal static void AffectSpitAcid(Effect arg_0, object param, Player player) // spell_spit_acid
 		{
-			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.wand_of_magic_missiles);
+			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
 
 			gbl.spell_target = player.actions.target;
 
@@ -2933,7 +2933,7 @@ namespace engine
 
 				var attackerPos = ovr033.PlayerMapPos(attacker);
 
-				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.wand_of_paralyzation);
+				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_paralyzation);
 
 				if (gbl.byte_1DA70 == true)
 				{
@@ -2981,7 +2981,7 @@ namespace engine
 				gbl.damage_flags = DamageType.DragonBreath | DamageType.Fire;
 				var attackPos = ovr033.PlayerMapPos(attacker);
 
-				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.wand_of_paralyzation);
+				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_paralyzation);
 
 				if (gbl.byte_1DA70 == true)
 				{
@@ -3011,7 +3011,7 @@ namespace engine
 
 		internal static void cast_breath_fire(Effect arg_0, object param, Player arg_6)
 		{
-            gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.wand_of_magic_missiles);
+            gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
 			gbl.spell_target = arg_6.actions.target;
 
 			if ((gbl.spell_target != null) &&
@@ -3041,7 +3041,7 @@ namespace engine
 				var pos = ovr033.PlayerMapPos(caster);
 
 				ovr025.DisplayPlayerStatusString(true, 10, "throws lightning", caster);
-                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.lightning_bolt);
+                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.lightning_bolt);
 
 				ovr024.remove_invisibility(caster);
 				ovr025.load_missile_icons(0x13);
@@ -3059,7 +3059,7 @@ namespace engine
 		{
 			arg_6.actions.target = null;
 
-            gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, (int)Spells.animate_dead);
+            gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.animate_dead);
 
 			gbl.spell_target = arg_6.actions.target;
 
@@ -3079,13 +3079,13 @@ namespace engine
 			}
 		}
 
-		internal static void remove_spell_from_scroll(int affect, Item item, Player player) /* sub_623FF */
+		internal static void remove_spell_from_scroll(Spells spell, Item item, Player player) /* sub_623FF */
 		{
 			int affect_index = 0;
 
 			for (int index = 1; index <= 3; index++)
 			{
-				if (((int)item.getAffect(index) & 0x7F) == affect)
+				if (item.getSpell(index) == spell)
 				{
 					affect_index = index;
 				}
@@ -3103,14 +3103,14 @@ namespace engine
 		}
 
 
-		internal static void DisplayCaseSpellText(int spellId, string arg_2, Player player) /* cast_a_spell */
+		internal static void DisplayCaseSpellText(Spells spellId, string arg_2, Player player) /* cast_a_spell */
 		{
 			if (gbl.game_state == GameState.Combat)
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "Casts a Spell", player);
 				seg037.draw8x8_clear_area(0x17, 0x27, 0x17, 0);
 
-				seg041.displayString("Spell:" + SpellNames[spellId], 0, 10, 0x17, 0);
+				seg041.displayString("Spell:" + SpellNames[(byte)spellId], 0, 10, 0x17, 0);
 			}
 			else
 			{
@@ -3119,7 +3119,7 @@ namespace engine
 				ovr025.displayPlayerName(false, 0x13, 1, player);
 
 				seg041.displayString(arg_2, 0, 10, 0x13, player.name.Length + 2);
-				seg041.displayString(SpellNames[spellId], 0, 10, 0x14, 1);
+				seg041.displayString(SpellNames[(byte)spellId], 0, 10, 0x14, 1);
 				seg041.GameDelay();
 				ovr025.ClearPlayerTextArea();
 			}

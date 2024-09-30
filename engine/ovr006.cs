@@ -563,7 +563,7 @@ namespace engine
 
         internal static void distributeCombatTreasure() /* sub_2E0C3 */
         {
-            byte spellId = 0; /* Simeon */
+            Spells spellId = 0;
 
             ovr025.LoadPic();
 
@@ -580,13 +580,13 @@ namespace engine
 
                 if (items_present == true)
                 {
-                    foreach (int id in gbl.SelectedPlayer.spellList.IdList())
+                    foreach (Spells id in gbl.SelectedPlayer.spellList.IdList())
                     {
-                        if ((id == 5 || id == 11 || id == 0x4d) &&
+                        if ((id == Spells.detect_magic_CL || id == Spells.detect_magic_MU || id == Spells.detect_magic_DR) &&
                             gbl.SelectedPlayer.in_combat == true)
                         {
                             can_detect_magic = true;
-                            spellId = (byte)id;
+                            spellId = id;
                             break;
                         }
                     }

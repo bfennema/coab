@@ -244,7 +244,7 @@ namespace engine
 
 			gbl.savingThrowRoll += 1;
 
-			if (gbl.spell_id == (byte)Spells.magic_missile || gbl.spell_id == (byte)Spells.wand_of_magic_missiles)
+			if (gbl.spell_id == Spells.magic_missile || gbl.spell_id == Spells.wand_of_magic_missiles)
 			{
 				gbl.damage = 0;
 			}
@@ -822,7 +822,7 @@ namespace engine
 		internal static void AffectMinorGlobeOfInvulnerability(Effect arg_0, object param, Player player) /* sub_3B3CA */
 		{
 			if (gbl.spell_id > 0 &&
-				gbl.spellCastingTable[gbl.spell_id].spellLevel < 4)
+				gbl.spellCastingTable[(byte)gbl.spell_id].spellLevel < 4)
 			{
 				Protected();
 			}
@@ -1069,7 +1069,7 @@ namespace engine
 			{
 				if (ovr024.RollSavingThrow(0, SaveVerseType.Spell, player) == true &&
                     gbl.spell_id > 0 &&
-					gbl.spellCastingTable[gbl.spell_id].damageOnSave != 0)
+					gbl.spellCastingTable[(byte)gbl.spell_id].damageOnSave != 0)
 				{
 					gbl.damage = 0;
 				}

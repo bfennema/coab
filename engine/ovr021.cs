@@ -404,7 +404,7 @@ namespace engine
 
                     display_resting_time(0);
 
-                    ovr023.DisplayCaseSpellText((int)id, "has memorized", player);
+                    ovr023.DisplayCaseSpellText(id, "has memorized", player);
                     findNext = true;
                 }
             }
@@ -430,8 +430,8 @@ namespace engine
                             }
                             else
                             {
-                                byte spellId = (byte)((int)item.getAffect(spellIdx) & 0x7F);
-                                player.spellBook.LearnSpell((Spells)spellId);
+                                Spells spellId = item.getSpell(spellIdx);
+                                player.spellBook.LearnSpell(spellId);
                                 ovr023.remove_spell_from_scroll(spellId, item, player);
 
                                 display_resting_time(0);

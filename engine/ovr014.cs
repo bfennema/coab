@@ -1121,21 +1121,21 @@ namespace engine
             Classes.Affects.helpless
         };
 
-        internal static bool sub_4001C(DownedPlayerTile arg_0, bool canTargetEmptyGround, QuickFight quick_fight, int spellId)
+        internal static bool sub_4001C(DownedPlayerTile arg_0, bool canTargetEmptyGround, QuickFight quick_fight, Spells spellId)
         {
             bool var_2 = false;
             if (quick_fight == QuickFight.False)
             {
-                bool allowTarget = spellId != 0x53;
+                bool allowTarget = spellId != Spells.dimension_door;
 
                 var_2 = aim_menu(arg_0, allowTarget, canTargetEmptyGround, false, ovr023.SpellRange(spellId), gbl.SelectedPlayer);
                 gbl.SelectedPlayer.actions.target = arg_0.target;
             }
-            else if (gbl.spellCastingTable[spellId].targetsEnemy == 0)
+            else if (gbl.spellCastingTable[(byte)spellId].targetsEnemy == 0)
             {
                 arg_0.target = gbl.SelectedPlayer;
 
-                if (spellId != 3 || find_healing_target(out arg_0.target, gbl.SelectedPlayer))
+                if (spellId != Spells.cure_light_wounds_CL || find_healing_target(out arg_0.target, gbl.SelectedPlayer))
                 {
                     arg_0.map = ovr033.PlayerMapPos(arg_0.target);
                     var_2 = true;
@@ -1158,7 +1158,7 @@ namespace engine
                         {
                             for (int i = 1; i <= 4; i++)
                             {
-                                if (gbl.spellCastingTable[spellId].affect_id == unk_18ADB[i])
+                                if (gbl.spellCastingTable[(byte)spellId].affect_id == unk_18ADB[i])
                                 {
                                     var_3 = false;
                                 }
@@ -1190,7 +1190,7 @@ namespace engine
             return var_2;
         }
 
-        internal static bool target(QuickFight quick_fight, int spellId)
+        internal static bool target(QuickFight quick_fight, Spells spellId)
         {
             DownedPlayerTile var_C = new DownedPlayerTile();
 
@@ -1200,7 +1200,7 @@ namespace engine
 
             gbl.targetPos = ovr033.PlayerMapPos(gbl.SelectedPlayer);
 
-            int area = gbl.spellCastingTable[spellId].effectArea & 0x0F;
+            int area = gbl.spellCastingTable[(byte)spellId].effectArea & 0x0F;
 
             if (area == 0)
             {
@@ -1214,9 +1214,9 @@ namespace engine
 
                 int var_4;
 
-                if (spellId == (byte)Spells.faerie_fire)
+                if (spellId == Spells.faerie_fire)
                 {
-                    var_4 = ovr025.spellMaxTargetCount((byte)Spells.faerie_fire);
+                    var_4 = ovr025.spellMaxTargetCount(Spells.faerie_fire);
                 }
                 else
                 {
@@ -1238,7 +1238,7 @@ namespace engine
 
                             gbl.targetPos = ovr033.PlayerMapPos(var_C.target);
 
-                            if (spellId != (byte)Spells.faerie_fire)
+                            if (spellId !=Spells.faerie_fire)
                             {
                                 byte hitDice = target.HitDice;
 
@@ -1315,7 +1315,7 @@ namespace engine
                     {
                         /* TODO it doesn't make sense to mask the low nibble then shift it out */
                         // Only silence 15" radius matches area == 0x0F with something in the upper byte
-                        var scl = ovr032.Rebuild_SortedCombatantList(1, (gbl.spellCastingTable[spellId].effectArea & 0x0f) >> 4, gbl.targetPos, sc => true);
+                        var scl = ovr032.Rebuild_SortedCombatantList(1, (gbl.spellCastingTable[(byte)spellId].effectArea & 0x0f) >> 4, gbl.targetPos, sc => true);
 
                         gbl.spellTargets.Clear();
                         foreach (var sc in scl)
@@ -1334,7 +1334,7 @@ namespace engine
             {
                 if (sub_4001C(var_C, true, quick_fight, spellId) == true)
                 {
-                    var scl = ovr032.Rebuild_SortedCombatantList(1, gbl.spellCastingTable[spellId].effectArea & 0x03, gbl.targetPos, sc => true);
+                    var scl = ovr032.Rebuild_SortedCombatantList(1, gbl.spellCastingTable[(byte)spellId].effectArea & 0x03, gbl.targetPos, sc => true);
 
                     gbl.spellTargets.Clear();
                     foreach (var sc in scl)
@@ -1351,7 +1351,7 @@ namespace engine
             }
             else // 1 - 4, 6 - 7 (1 - 3 makes sense [based on mask below], 4 & 6 - 7 does not)
             {
-                int max_targets = (gbl.spellCastingTable[spellId].effectArea & 0x03) + 1;
+                int max_targets = (gbl.spellCastingTable[(byte)spellId].effectArea & 0x03) + 1;
                 gbl.spellTargets.Clear();
 
                 while (max_targets > 0)
@@ -1400,7 +1400,7 @@ namespace engine
         }
 
 
-        internal static void spell_menu3(out bool casting_spell, QuickFight quick_fight, int spell_id)
+        internal static void spell_menu3(out bool casting_spell, QuickFight quick_fight, Spells spell_id)
         {
             Player player = gbl.SelectedPlayer;
             bool var_6 = true;
@@ -1413,7 +1413,7 @@ namespace engine
             }
 
             if (spell_id > 0 &&
-                gbl.spellCastingTable[spell_id].whenCast == SpellWhen.Camp)
+                gbl.spellCastingTable[(byte)spell_id].whenCast == SpellWhen.Camp)
             {
                 ovr025.string_print01("Camp Only Spell");
                 spell_id = 0;
@@ -1431,7 +1431,7 @@ namespace engine
 
             if (spell_id > 0)
             {
-                sbyte delay = (sbyte)(gbl.spellCastingTable[spell_id].castingDelay / 3);
+                sbyte delay = (sbyte)(gbl.spellCastingTable[(byte)spell_id].castingDelay / 3);
 
                 if (delay == 0)
                 {
@@ -2450,17 +2450,17 @@ namespace engine
                     }
                     else if ((attacksTired & 0x10) == 0)
                     {
-                        ovr023.sub_5D2E1(true, QuickFight.True, 0x54);
+                        ovr023.sub_5D2E1(true, QuickFight.True, Spells.fear);
                         attacksTired |= 0x10;
                     }
                     else if ((attacksTired & 0x20) == 0)
                     {
-                        ovr023.sub_5D2E1(true, QuickFight.True, 0x37);
+                        ovr023.sub_5D2E1(true, QuickFight.True, Spells.slow);
                         attacksTired |= 0x20;
                     }
                     else if ((attacksTired & 0x40) == 0)
                     {
-                        ovr023.sub_5D2E1(true, QuickFight.True, 0x15);
+                        ovr023.sub_5D2E1(true, QuickFight.True, Spells.sleep);
                         attacksTired |= 0x40;
                     }
                 }

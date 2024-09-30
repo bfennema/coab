@@ -66,6 +66,20 @@ namespace Classes
                     throw new System.ArgumentOutOfRangeException();
             }
         }
+        public Spells getSpell(int i)
+        {
+            switch (i)
+            {
+                case 1:
+                    return (Spells)affect_1;
+                case 2:
+                    return (Spells)affect_2;
+                case 3:
+                    return (Spells)affect_3;
+                default:
+                    throw new System.ArgumentOutOfRangeException();
+            }
+        }
         [XmlIgnore]
         public Affects Affect_1
         {
@@ -83,6 +97,24 @@ namespace Classes
         {
             get => (Affects)affect_3;
             set => affect_3 = (byte)value;
+        }
+        public Spells Spell
+        {
+            get
+            {
+                if (affect_2 > 0 && affect_3 < 0x80)
+                {
+                    return (Spells)(affect_2 & 0x7F);
+                }
+                else
+                {
+                    return 0;
+                }
+            }
+        }
+        public byte Charges
+        {
+            get => affect_1;
         }
         public void setAffect(int i, Affects value)
         {

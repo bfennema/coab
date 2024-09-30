@@ -119,11 +119,11 @@ namespace engine.Affects
 
             Classes.gbl.SpellCastFunction = new Classes.spellDelegate(ovr023.NonCombatSpellCast);
         }
-        internal static void Call(int spell_id)
+        internal static void Call(Classes.Spells spell_id)
         {
             Classes.gbl.spell_id = spell_id;
             spellDelegate func;
-            if (spellTable.TryGetValue((Classes.Spells)spell_id, out func))
+            if (spellTable.TryGetValue(spell_id, out func))
             {
                 func();
             }
