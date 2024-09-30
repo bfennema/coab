@@ -3,6 +3,9 @@
     public abstract class Game
     {
         public abstract void Load();
+        public abstract GameState GameState(byte data);
+        public abstract byte GameState(GameState data);
+        public abstract GameState LoadGameState { get; }
         public abstract Logging.Game Name { get; }
         public abstract ImportSource ImportFrom { get; }
         public abstract int InitialExp { get; }

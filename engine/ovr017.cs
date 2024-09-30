@@ -758,10 +758,10 @@ namespace engine
             gbl.mapWallRoof = data[4];
 
             gbl.file.BlockRead(1, data, file);
-            gbl.last_game_state = (GameState)data[0];
+            gbl.last_game_state = gbl.game.GameState(data[0]);
 
             gbl.file.BlockRead(1, data, file);
-            gbl.game_state = (GameState)data[0];
+            gbl.game_state = gbl.game.GameState(data[0]);
 
             if (gbl.game.Name != Logging.Game.PoolOfRadiance)
             {
@@ -849,11 +849,12 @@ namespace engine
             seg043.clear_keyboard();
             ovr027.ClearPromptArea();
 
-            if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
-            {
-                gbl.last_game_state = gbl.game_state;
+            var game_state = gbl.game_state;
+            gbl.game_state = gbl.game.LoadGameState;
 
-                gbl.game_state = GameState.StartGameMenu;
+            if (gbl.game_state != game_state)
+            {
+                gbl.last_game_state = game_state;
             }
         }
 
@@ -914,9 +915,9 @@ namespace engine
                 data[4] = gbl.mapWallRoof;
                 gbl.file.BlockWrite(5, data, save_file);
 
-                data[0] = (byte)gbl.last_game_state;
+                data[0] = gbl.game.GameState(gbl.last_game_state);
                 gbl.file.BlockWrite(1, data, save_file);
-                data[0] = (byte)gbl.game_state;
+                data[0] = gbl.game.GameState(gbl.game_state);
                 gbl.file.BlockWrite(1, data, save_file);
 
                 if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)

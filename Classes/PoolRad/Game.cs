@@ -12,6 +12,35 @@ namespace Classes.PoolRad
         readonly static internal byte[] portraitBody = { 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 };
         readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh", "Exit" };
         public override void Load() { }
+        public override GameState GameState(byte data)
+        {
+            switch (data)
+            {
+                case 0: return Classes.GameState.StartGameMenu;
+                case 2: return Classes.GameState.Camping;
+                case 3: return Classes.GameState.WildernessMap;
+                case 4: return Classes.GameState.Combat;
+                case 5: return Classes.GameState.AfterCombat;
+                case 6: return Classes.GameState.EndGame;
+                default: return Classes.GameState.DungeonMap;
+            }
+        }
+        public override byte GameState(GameState data)
+        {
+            switch (data)
+            {
+                case Classes.GameState.StartGameMenu: return 0;
+                case Classes.GameState.DungeonMap: return 1;
+                case Classes.GameState.Shop: return 1;
+                case Classes.GameState.Camping: return 2;
+                case Classes.GameState.WildernessMap: return 3;
+                case Classes.GameState.Combat: return 4;
+                case Classes.GameState.AfterCombat: return 5;
+                case Classes.GameState.EndGame: return 6;
+                default: return 1;
+            }
+        }
+        public override GameState LoadGameState { get => gbl.game_state; }
         public override Logging.Game Name { get => Logging.Game.PoolOfRadiance; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Pool; }
         public override int InitialExp { get => 0; }

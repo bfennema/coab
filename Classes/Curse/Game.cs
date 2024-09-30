@@ -28,6 +28,15 @@ namespace Classes.Curse
                 gbl.sky_dax_252 = new DaxBlock(pic_data, 1, 13);
             }
         }
+        public override GameState GameState(byte data)
+        {
+            return (GameState)data;
+        }
+        public override byte GameState(GameState data)
+        {
+            return (byte)data;
+        }
+        public override GameState LoadGameState { get => Classes.GameState.StartGameMenu; }
         public override Logging.Game Name { get => Logging.Game.CurseOfTheAzureBonds; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Curse; }
         public override int InitialExp { get => 25000; }
