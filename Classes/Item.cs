@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace Classes
 {
@@ -65,16 +66,19 @@ namespace Classes
                     throw new System.ArgumentOutOfRangeException();
             }
         }
+        [XmlIgnore]
         public Affects Affect_1
         {
             get => (Affects)affect_1;
             set => affect_1 = (byte)value;
         }
+        [XmlIgnore]
         public Affects Affect_2
         {
             get => (Affects)affect_2;
             set => affect_2 = (byte)value;
         }
+        [XmlIgnore]
         public Affects Affect_3
         {
             get => (Affects)affect_3;
