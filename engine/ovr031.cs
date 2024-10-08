@@ -647,7 +647,7 @@ namespace engine
             }
         }
 
-        internal static void LoadWalldef(int symbolSet, int block_id)
+        internal static void LoadWalldef(short symbolSet, short block_id)
         {
             if (symbolSet >= 1 && symbolSet < 4)
             {

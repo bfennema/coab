@@ -87,6 +87,7 @@ namespace Classes.Curse
         public override void DrawFrame_Temple() { Draw.Frame_Wilderness(); }
         public override int ShopBuy() { return 1; }
         public override bool Portrait { get => false; }
+        public override bool SetBlocksInArea1 { get => false; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
         public override string[] TempleSpells { get => templeSpells; }

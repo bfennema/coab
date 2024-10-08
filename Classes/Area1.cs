@@ -21,6 +21,16 @@ namespace Classes
             DataIO.ReadObject(this, data, offset);
 
             System.Array.Copy(data, offset, origData, 0, Area1Size);
+            if (gbl.game.SetBlocksInArea1)
+            {
+                gameOver = 0;
+                picture_fade = 0;
+            }
+            else
+            {
+                gameOver = (ushort)field_3FA;
+                picture_fade = field_3FE;
+            }
         }
 
         private void constructorInit()
@@ -37,6 +47,8 @@ namespace Classes
         }
 
         protected byte[] origData;
+        public short picture_fade;
+        public ushort gameOver;
 
         [DataOffset(0x186, DataType.Byte)]
         public byte field_186;
@@ -193,12 +205,18 @@ namespace Classes
         [DataOffset(0x3E8, DataType.Word)]
         public ushort field_3E8;
 
-        [DataOffset(0x3FA, DataType.Byte)]
-        public byte field_3FA;
-        [DataOffset(0x3FC, DataType.Word)]
-        public ushort field_3FC;
+        [DataOffset(0x3F4, DataType.SWord)]
+        public short field_3F4;
+        [DataOffset(0x3F6, DataType.SWord)]
+        public short field_3F6;
+        [DataOffset(0x3F8, DataType.SWord)]
+        public short field_3F8;
+        [DataOffset(0x3FA, DataType.SWord)]
+        public short field_3FA; // gameOver
+        [DataOffset(0x3FC, DataType.SWord)]
+        public short field_3FC;
         [DataOffset(0x3FE, DataType.SWord)]
-        public short picture_fade; //field_3FE
+        public short field_3FE; // picture_fade
 
         [DataOffset(0x596, DataType.Word)]
         public ushort field_596;
@@ -457,12 +475,9 @@ namespace Classes
 
 
                 case 0x3FA:
-                    field_3FA = (byte)value;
+                    gameOver = value;
                     break;
-                case 0x3FC:
-                    field_3FC = value;
-                    break;
-                case 0x3fe:
+                case 0x3FE:
                     picture_fade = (short)value;
                     break;
 
@@ -503,14 +518,14 @@ namespace Classes
                 case 0x198:
                     return field_198;
 
+                case 0x1CC:
+                    return (ushort)inDungeon;
+
                 case 0x1E0:
                     return (ushort)lastXPos;
 
                 case 0x1E2:
                     return (ushort)lastYPos;
-
-                case 0x1CC:
-                    return (ushort)inDungeon;
 
                 case 0x1E4:
                     return LastEclBlockId;
@@ -656,9 +671,9 @@ namespace Classes
                     return field_3E8;
 
                 case 0x3FA:
-                    return field_3FA;
+                    return gameOver;
                 case 0x3FC:
-                    return field_3FC;
+                    return (ushort)picture_fade;
 
                 case 0x596:
                     return field_596;
@@ -670,6 +685,20 @@ namespace Classes
 
         public byte[] ToByteArray()
         {
+            if (gbl.game.SetBlocksInArea1)
+            {
+                field_3F4 = gbl.setBlocks[0].blockId;
+                field_3F6 = gbl.setBlocks[1].blockId;
+                field_3F8 = gbl.setBlocks[2].blockId;
+                field_3FA = gbl.setBlocks[0].setId;
+                field_3FC = gbl.setBlocks[1].setId;
+                field_3FE = gbl.setBlocks[2].setId;
+            }
+            else
+            {
+                field_3FA = (short)gameOver;
+                field_3FE = picture_fade;
+            }
             DataIO.WriteObject(this, origData);
 
             return (byte[])origData.Clone();

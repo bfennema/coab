@@ -765,7 +765,16 @@ namespace engine
             gbl.file.BlockRead(1, data, file);
             gbl.game_state = gbl.game.GameState(data[0]);
 
-            if (gbl.game.Name != Logging.Game.PoolOfRadiance)
+            if (gbl.game.SetBlocksInArea1)
+            {
+                gbl.setBlocks[0].blockId = gbl.area_ptr.field_3F4;
+                gbl.setBlocks[0].setId = gbl.area_ptr.field_3FA;
+                gbl.setBlocks[1].blockId = gbl.area_ptr.field_3F6;
+                gbl.setBlocks[1].setId = gbl.area_ptr.field_3FC;
+                gbl.setBlocks[2].blockId = gbl.area_ptr.field_3F8;
+                gbl.setBlocks[2].setId = gbl.area_ptr.field_3FE;
+            }
+            else
             {
                 for (int i = 0; i < 3; i++)
                 {
@@ -922,7 +931,7 @@ namespace engine
                 data[0] = gbl.game.GameState(gbl.game_state);
                 gbl.file.BlockWrite(1, data, save_file);
 
-                if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                if (!gbl.game.SetBlocksInArea1)
                 {
                     for (int i = 0; i < 3; i++)
                     {
