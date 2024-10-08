@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace GoldBoxPlayer
@@ -35,6 +31,8 @@ namespace GoldBoxPlayer
         public string curseOfTheAzureBondsSavePath = "";
         public string secretOfTheSilverBladesDataPath = "";
         public string secretOfTheSilverBladesSavePath = "";
+        public string championsOfKrynnDataPath = "";
+        public string championsOfKrynnSavePath = "";
 
         static public Settings? LoadSettings(string appDataPath, string defaultDataPath, string defaultSavePath)
         {
@@ -89,6 +87,8 @@ namespace GoldBoxPlayer
             curseOfTheAzureBondsSavePath = Path.Combine(defaultSavePath, Enum.GetName<Logging.Game>(Logging.Game.CurseOfTheAzureBonds));
             //secretOfTheSilverBladesDataPath = Path.Combine(defaultDataPath, "SECRET");
             secretOfTheSilverBladesSavePath = Path.Combine(defaultSavePath, Enum.GetName<Logging.Game>(Logging.Game.SecretOfTheSilverBlades));
+            //championsOfKrynnDataPath = Path.Combine(defaultDataPath, "CHAMP");
+            championsOfKrynnSavePath = Path.Combine(defaultSavePath, Enum.GetName<Logging.Game>(Logging.Game.ChampionsOfKrynn));
         }
 
         private void Save()
@@ -117,6 +117,7 @@ namespace GoldBoxPlayer
             Logging.Config.SavePathByGame[(int)Logging.Game.PoolOfRadiance] = poolOfRadianceSavePath;
             Logging.Config.SavePathByGame[(int)Logging.Game.CurseOfTheAzureBonds] = curseOfTheAzureBondsSavePath;
             Logging.Config.SavePathByGame[(int)Logging.Game.SecretOfTheSilverBlades] = secretOfTheSilverBladesDataPath;
+            Logging.Config.SavePathByGame[(int)Logging.Game.ChampionsOfKrynn] = championsOfKrynnDataPath;
             if (game == Logging.Game.PoolOfRadiance)
             {
                 Logging.Config.DataPath = poolOfRadianceDataPath;
@@ -131,6 +132,11 @@ namespace GoldBoxPlayer
             {
                 Logging.Config.DataPath = secretOfTheSilverBladesDataPath;
                 Logging.Config.SavePath = secretOfTheSilverBladesSavePath;
+            }
+            else if (game == Logging.Game.ChampionsOfKrynn)
+            {
+                Logging.Config.DataPath = championsOfKrynnDataPath;
+                Logging.Config.SavePath = championsOfKrynnSavePath;
             }
             else
             {
@@ -428,6 +434,34 @@ namespace GoldBoxPlayer
                 if (game == Logging.Game.SecretOfTheSilverBlades)
                 {
                     Logging.Config.SavePath = secretOfTheSilverBladesSavePath;
+                }
+            }
+        }
+        [XmlIgnore]
+        public string ChampionsOfKrynnDataPath
+        {
+            get => championsOfKrynnDataPath;
+            set
+            {
+                championsOfKrynnDataPath = value;
+                Save();
+                if (game == Logging.Game.ChampionsOfKrynn)
+                {
+                    Logging.Config.DataPath = championsOfKrynnDataPath;
+                }
+            }
+        }
+        [XmlIgnore]
+        public string ChampionsOfKrynnSavePath
+        {
+            get => championsOfKrynnSavePath;
+            set
+            {
+                championsOfKrynnSavePath = value;
+                Save();
+                if (game == Logging.Game.ChampionsOfKrynn)
+                {
+                    Logging.Config.SavePath = championsOfKrynnSavePath;
                 }
             }
         }

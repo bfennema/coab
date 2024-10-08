@@ -17,15 +17,16 @@ namespace engine
     class ovr020
     {
         internal static string[] sexString = { "Male", "Female" };
-        internal static string[] raceString = { "Monster", "Dwarf", "Elf", "Gnome", 
-                                         "Half-Elf", "Halfling", "Half-Orc", "Human" };
+        internal static string[] raceString = { "Monster", "Dwarf", "Mountain Dwarf", "Hill Dwarf",
+                                         "Elf", "Silvanesti Elf", "Qualinesti Elf", "Gnome",
+                                         "Half-Elf", "Halfling", "Kender", "Half-Orc", "Human" };
 
         internal static string[] alignmentString = { "Lawful Good", "Lawful Neutral", "Lawful Evil",
                                               "Neutral Good", "True Neutral", "Neutral Evil",
                                               "Chaotic Good", "Chaotic Neutral", "Chaotic Evil" };
 
-        internal static string[] classString = { "Cleric", "Druid", "Fighter", "Paladin", "Ranger",
-                                          "Magic-User", "Thief", "Monk", "Cleric/Fighter", 
+        internal static string[] classString = { "Cleric", "Druid", "Fighter", "Paladin", "Knight",
+                                          "Ranger", "Magic-User", "Thief", "Monk", "Cleric/Fighter",
                                           "Cleric/Fighter/Magic-User", "Cleric/Ranger",
                                           "Cleric/Magic-User","Cleric/Thief", "Fighter/Magic-User", 
                                           "Fighter/Thief", "Fighter/Magic-User/Thief",
@@ -37,7 +38,7 @@ namespace engine
                                          "Unconscious", "Dying", "Dead", "Stoned",
                                          "Gone" };
 
-        static string[] moneyString = { "Copper", "Silver", "Electrum", "Gold", "Platinum",
+        static string[] moneyString = { "Copper", "Silver", "Bronze", "Electrum", "Steel", "Gold", "Platinum",
                                         "Gems", "Jewelry" };
 
 
@@ -1368,7 +1369,7 @@ namespace engine
 
                         List<MenuItem> list = new List<MenuItem>();
 
-                        for (int coin = 0; coin <= 6; coin++)
+                        for (int coin = Money.Copper; coin <= Money.Jewelry; coin++)
                         {
                             if (gbl.SelectedPlayer.Money.GetCoins(coin) > 0)
                             {

@@ -30,6 +30,10 @@ public partial class MainView : UserControl
         {
             SecretMenu.IsChecked = true;
         }
+        else if (settings.Game == Logging.Game.ChampionsOfKrynn)
+        {
+            ChampMenu.IsChecked = true;
+        }
 
         if (settings.PlayerAlwaysSaves)
         {

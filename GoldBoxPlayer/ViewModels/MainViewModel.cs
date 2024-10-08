@@ -22,6 +22,8 @@ public class MainViewModel : ViewModelBase
     IStorageFolder? _CurseSave;
     IStorageFolder? _SecretData;
     IStorageFolder? _SecretSave;
+    IStorageFolder? _ChampData;
+    IStorageFolder? _ChampSave;
     Settings _settings;
 
     public MainViewModel()
@@ -75,6 +77,18 @@ public class MainViewModel : ViewModelBase
             folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
             this.RaiseAndSetIfChanged(ref _SecretData, folder, nameof(SecretData));
         }
+        path = _settings.ChampionsOfKrynnSavePath;
+        if (path != "")
+        {
+            folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
+            this.RaiseAndSetIfChanged(ref _ChampSave, folder, nameof(ChampSave));
+        }
+        path = _settings.ChampionsOfKrynnDataPath;
+        if (path != "")
+        {
+            folder = await top.StorageProvider.OpenFolderBookmarkAsync(path);
+            this.RaiseAndSetIfChanged(ref _ChampData, folder, nameof(ChampData));
+        }
     }
 
     public async Task RunSelectDirectoryCommand(string parameter)
@@ -107,6 +121,14 @@ public class MainViewModel : ViewModelBase
         else if (parameter == "SecretData")
         {
             startLocation = _SecretData;
+        }
+        else if (parameter == "ChampSave")
+        {
+            startLocation = _ChampSave;
+        }
+        else if (parameter == "ChampData")
+        {
+            startLocation = _ChampData;
         }
 
         var folder = await filesService.OpenFolderAsync(parameter, startLocation);
@@ -143,6 +165,16 @@ public class MainViewModel : ViewModelBase
         {
             this.RaiseAndSetIfChanged(ref _SecretData, folder, nameof(SecretData));
             _settings.SecretOfTheSilverBladesDataPath = await folder.SaveBookmarkAsync();
+        }
+        else if (parameter == "ChampSave")
+        {
+            this.RaiseAndSetIfChanged(ref _ChampSave, folder, nameof(ChampSave));
+            _settings.ChampionsOfKrynnSavePath = await folder.SaveBookmarkAsync();
+        }
+        else if (parameter == "ChampData")
+        {
+            this.RaiseAndSetIfChanged(ref _ChampData, folder, nameof(ChampData));
+            _settings.ChampionsOfKrynnDataPath = await folder.SaveBookmarkAsync();
         }
     }
 
@@ -238,5 +270,13 @@ public class MainViewModel : ViewModelBase
     public string SecretSave
     {
         get => "Save - " + (_SecretSave != null ? _SecretSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+    }
+    public string ChampData
+    {
+        get => "Data - " + (_ChampData != null ? _ChampData.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
+    }
+    public string ChampSave
+    {
+        get => "Save - " + (_ChampSave != null ? _ChampSave.Path.GetComponents(UriComponents.Path, UriFormat.SafeUnescaped) : "");
     }
 }

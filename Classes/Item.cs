@@ -580,6 +580,25 @@ namespace Classes
 
             Cart = 0x11E,
             Bodily_Health = 0x11F,
+            WEAPONHoopak = 0x120,
+            ARMORSolamnic_Plate = 0x121,
+            WEAPONDragonlance = 0x122,
+
+            Cler = 0x123,
+            Belt = 0x124,
+            Ruby = 0x125,
+            Proof_vs_Poison = 0x126,
+            Disruption = 0x127,
+
+            vs_Reptiles = 0x128,
+            Opening = 0x129,
+            ONE_Spell = 0x12A,
+            TWO_Spells = 0x12B,
+            THREE_Spell = 0x12C,
+
+            FootmanAPOSs = 0x12D,
+            White = 0x12E,
+            Red = 0x12F,
         }
 
         public enum Type
@@ -695,13 +714,24 @@ namespace Classes
             Type_108 = 108,
             Type_109 = 109,
             Type_110 = 110,
+            Helm = 111,
+            Mirror = 112,
+            YellowCanary = 113,
+            CloakOfProt = 114,
+            MaceB = 115,
+            Hoopak = 116,
+            SolamnicPlate = 117,
+            FootmansDragonlance = 118,
+            VorpalLongSword = 119,
+            BlessedBolts = 120,
+            BeltOfProt = 121,
             Type_128 = 128,
         }
 
         static string GetName(Names item)
         {
             return new StringBuilder(item.ToString()).Replace("MINUS", "-").Replace("PLUS", "+").Replace("DOT", ".").Replace("_", " ").
-                Replace("APOS", "'").Replace("ONE", "1").Replace("FIVE", "5").Replace("AND", "&").
+                Replace("APOS", "'").Replace("ONE", "1").Replace("TWO", "2").Replace("THREE","3").Replace("FIVE", "5").Replace("AND", "&").
                 Replace("OP", "(").Replace("CP", ")").Replace("WEAPON", "").Replace("ARMOR", "").Replace("IGNORE", "").ToString();
         }
 

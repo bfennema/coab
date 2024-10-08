@@ -452,92 +452,102 @@ namespace Classes
 
         public MoneySet Money;
 
-        public byte[] ClassLevel = new byte[8]; /* Skill_A_lvl */
+        public byte[] ClassLevel = new byte[9]; /* Skill_A_lvl */
 
         public byte cleric_lvl // 0x109;
         {
-            get { return ClassLevel[0]; }
-            set { ClassLevel[0] = value; }
+            get { return ClassLevel[(int)ClassId.cleric]; }
+            set { ClassLevel[(int)ClassId.cleric] = value; }
         }
         public byte druid_lvl // 0x10a;
         {
-            get { return ClassLevel[1]; }
-            set { ClassLevel[1] = value; }
+            get { return ClassLevel[(int)ClassId.druid]; }
+            set { ClassLevel[(int)ClassId.druid] = value; }
         }
         public byte fighter_lvl // 0x10b;
         {
-            get { return ClassLevel[2]; }
-            set { ClassLevel[2] = value; }
+            get { return ClassLevel[(int)ClassId.fighter]; }
+            set { ClassLevel[(int)ClassId.fighter] = value; }
         }
         public byte paladin_lvl // 0x10c;
         {
-            get { return ClassLevel[3]; }
-            set { ClassLevel[3] = value; }
+            get { return ClassLevel[(int)ClassId.paladin]; }
+            set { ClassLevel[(int)ClassId.paladin] = value; }
+        }
+        public byte knight_lvl // 0x110;
+        {
+            get { return ClassLevel[(int)ClassId.knight]; }
+            set { ClassLevel[(int)ClassId.knight] = value; }
         }
         public byte ranger_lvl // 0x10d;
         {
-            get { return ClassLevel[4]; }
-            set { ClassLevel[4] = value; }
+            get { return ClassLevel[(int)ClassId.ranger]; }
+            set { ClassLevel[(int)ClassId.ranger] = value; }
         }
         public byte magic_user_lvl // 0x10e;
         {
-            get { return ClassLevel[5]; }
-            set { ClassLevel[5] = value; }
+            get { return ClassLevel[(int)ClassId.magic_user]; }
+            set { ClassLevel[(int)ClassId.magic_user] = value; }
         }
         public byte thief_lvl // 0x10f;
         {
-            get { return ClassLevel[6]; }
-            set { ClassLevel[6] = value; }
+            get { return ClassLevel[(int)ClassId.thief]; }
+            set { ClassLevel[(int)ClassId.thief] = value; }
         }
         public byte monk_lvl // 0x110;
         {
-            get { return ClassLevel[7]; }
-            set { ClassLevel[7] = value; }
+            get { return ClassLevel[(int)ClassId.monk]; }
+            set { ClassLevel[(int)ClassId.monk] = value; }
         }
 
-        public byte[] ClassLevelsOld = new byte[8];
+        public byte[] ClassLevelsOld = new byte[9];
 
 
         public byte cleric_old_lvl // 0x111;
         {
-            get { return ClassLevelsOld[0]; }
-            set { ClassLevelsOld[0] = value; }
+            get { return ClassLevelsOld[(int)ClassId.cleric]; }
+            set { ClassLevelsOld[(int)ClassId.cleric] = value; }
         }
-        //public byte druid_old_lvl // 0x112;
-        //{
-        //    get { return ClassLevelsOld[1]; }
-        //    set { ClassLevelsOld[1] = value; }
-        //}
+        public byte druid_old_lvl // 0x112;
+        {
+            get { return ClassLevelsOld[(int)ClassId.druid]; }
+            set { ClassLevelsOld[(int)ClassId.druid] = value; }
+        }
         public byte fighter_old_lvl // 0x113;
         {
-            get { return ClassLevelsOld[2]; }
-            set { ClassLevelsOld[2] = value; }
+            get { return ClassLevelsOld[(int)ClassId.fighter]; }
+            set { ClassLevelsOld[(int)ClassId.fighter] = value; }
         }
         public byte paladin_old_lvl // 0x114;
         {
-            get { return ClassLevelsOld[3]; }
-            set { ClassLevelsOld[3] = value; }
+            get { return ClassLevelsOld[(int)ClassId.paladin]; }
+            set { ClassLevelsOld[(int)ClassId.paladin] = value; }
+        }
+        public byte knight_old_lvl // 0x118;
+        {
+            get { return ClassLevelsOld[(int)ClassId.knight]; }
+            set { ClassLevelsOld[(int)ClassId.knight] = value; }
         }
         public byte ranger_old_lvl // 0x115;
         {
-            get { return ClassLevelsOld[4]; }
-            set { ClassLevelsOld[4] = value; }
+            get { return ClassLevelsOld[(int)ClassId.ranger]; }
+            set { ClassLevelsOld[(int)ClassId.ranger] = value; }
         }
         public byte magic_user_old_lvl // 0x116;
         {
-            get { return ClassLevelsOld[5]; }
-            set { ClassLevelsOld[5] = value; }
+            get { return ClassLevelsOld[(int)ClassId.magic_user]; }
+            set { ClassLevelsOld[(int)ClassId.magic_user] = value; }
         }
         public byte thief_old_lvl // 0x117;
         {
-            get { return ClassLevelsOld[6]; }
-            set { ClassLevelsOld[6] = value; }
+            get { return ClassLevelsOld[(int)ClassId.thief]; }
+            set { ClassLevelsOld[(int)ClassId.thief] = value; }
         }
-        //public byte monk_old_level // 0x118;
-        //{
-        //    get { return ClassLevelsOld[7]; }
-        //    set { ClassLevelsOld[7] = value; }
-        //}
+        public byte monk_old_lvl // 0x118;
+        {
+            get { return ClassLevelsOld[(int)ClassId.monk]; }
+            set { ClassLevelsOld[(int)ClassId.monk] = value; }
+        }
 
         public int SkillLevel(params SkillType[] skills)
         {

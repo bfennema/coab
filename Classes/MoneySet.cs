@@ -8,21 +8,23 @@ namespace Classes
     {
         public const int Copper = 0;
         public const int Silver = 1;
-        public const int Electrum = 2;
-        public const int Gold = 3;
-        public const int Platinum = 4;
-        public const int Gems = 5;
-        public const int Jewelry = 6;
+        public const int Bronze = 2;
+        public const int Electrum = 3;
+        public const int Steel = 4;
+        public const int Gold = 5;
+        public const int Platinum = 6;
+        public const int Gems = 7;
+        public const int Jewelry = 8;
 
-        public static string[] names = { "Copper", "Silver", "Electrum", "Gold", "Platinum", "Gems", "Jewelry" };
+        public static string[] names = { "Copper", "Silver", "Bronze", "Electrum", "Steel", "Gold", "Platinum", "Gems", "Jewelry" };
 
-        public static int[] per_copper = { 1, 10, 100, 200, 1000 };
+        public static int[] per_copper = { 1, 10, 10, 100, 100, 200, 1000 };
     }
 
 
-    public class MoneySet : IDataIO
+    public class MoneySet
     {
-        int[] money = new int[7];
+        int[] money = new int[9];
         public MoneySet() { }
         public MoneySet(int coinType, int count)
         {
@@ -169,6 +171,11 @@ namespace Classes
             get { return money[Money.Copper]; }
             //set { money[Money.copper] = value; }
         }
+        public int Bronze
+        {
+            get { return money[Money.Bronze]; }
+            //set { money[Money.copper] = value; }
+        }
         public int Electrum
         {
             get { return money[Money.Electrum]; }
@@ -177,6 +184,11 @@ namespace Classes
         public int Silver
         {
             get { return money[Money.Silver]; }
+            //set { money[Money.silver] = value; }
+        }
+        public int Steel
+        {
+            get { return money[Money.Steel]; }
             //set { money[Money.silver] = value; }
         }
         public int Gold
@@ -198,29 +210,6 @@ namespace Classes
         {
             get { return money[Money.Jewelry]; }
             //set { money[6] = value; }
-        }
-
-
-        void IDataIO.Write(byte[] data, int offset)
-        {
-            Sys.ShortToArray((short)money[0], data, offset + 0);
-            Sys.ShortToArray((short)money[1], data, offset + 2);
-            Sys.ShortToArray((short)money[2], data, offset + 4);
-            Sys.ShortToArray((short)money[3], data, offset + 6);
-            Sys.ShortToArray((short)money[4], data, offset + 8);
-            Sys.ShortToArray((short)money[5], data, offset + 10);
-            Sys.ShortToArray((short)money[6], data, offset + 12);
-        }
-
-        void IDataIO.Read(byte[] data, int offset)
-        {
-            money[0] = Sys.ArrayToShort(data, offset + 0);
-            money[1] = Sys.ArrayToShort(data, offset + 2);
-            money[2] = Sys.ArrayToShort(data, offset + 4);
-            money[3] = Sys.ArrayToShort(data, offset + 6);
-            money[4] = Sys.ArrayToShort(data, offset + 8);
-            money[5] = Sys.ArrayToShort(data, offset + 10);
-            money[6] = Sys.ArrayToShort(data, offset + 12);
         }
     }
 }

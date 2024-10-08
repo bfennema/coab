@@ -149,6 +149,20 @@
                     Command="{Binding SelectDirectoryCommand}"
                     CommandParameter="SecretSave"/>
         </MenuItem>
+        <MenuItem x:Name="ChampMenu"
+                  Header="Champions Of Krynn"
+                  GroupName="Games"
+                  ToggleType="Radio"
+                  PointerPressed="Menu_PointerPressed"
+                  Command="{Binding SelectGameCommand}"
+                  CommandParameter="{x:Static logging:Game.ChampionsOfKrynn}">
+          <MenuItem Header="{Binding ChampData}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="ChampData"/>
+          <MenuItem Header="{Binding ChampSave}"
+                    Command="{Binding SelectDirectoryCommand}"
+                    CommandParameter="ChampSave"/>
+        </MenuItem>
       </MenuItem>
     </ContextMenu>
   </UserControl.ContextMenu>

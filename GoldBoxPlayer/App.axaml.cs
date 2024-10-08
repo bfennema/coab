@@ -83,6 +83,7 @@ public partial class App : Application
         engine.seg001.__SystemInit(model.EngineStopped, "GoldBoxPlayer.Desktop.Properties.Resources");
         Classes.gbl.games[(int)Logging.Game.PoolOfRadiance] = new Classes.PoolRad.Game();
         Classes.gbl.games[(int)Logging.Game.CurseOfTheAzureBonds] = new Classes.Curse.Game();
+        Classes.gbl.games[(int)Logging.Game.ChampionsOfKrynn] = new Classes.Champ.Game();
         engine.seg001.PROGRAM();
 
         model.EngineStopped();

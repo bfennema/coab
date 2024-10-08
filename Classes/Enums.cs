@@ -31,12 +31,17 @@ namespace Classes
     {
         monster = 0,
         dwarf = 1,
-        elf = 2,
-        gnome = 3,
-        half_elf = 4,
-        halfling = 5,
-        half_orc = 6,
-        human = 7
+        mountain_dwarf = 2,
+        hill_dwarf = 3,
+        elf = 4,
+        silvanesti_elf = 5,
+        qualinesti_elf = 6,
+        gnome = 7,
+        half_elf = 8,
+        halfling = 9,
+        kender = 10,
+        half_orc = 11,
+        human = 12
     }
 
     public enum SkillType
@@ -45,10 +50,11 @@ namespace Classes
         Druid = 1,
         Fighter = 2,
         Paladin = 3,
-        Ranger = 4,
-        MagicUser = 5,
-        Thief = 6,
-        Monk = 7
+        Knight = 4,
+        Ranger = 5,
+        MagicUser = 6,
+        Thief = 7,
+        Monk = 8,
     }
 
     public enum ClassId
@@ -57,20 +63,21 @@ namespace Classes
         druid = 1,
         fighter = 2,
         paladin = 3,
-        ranger = 4,
-        magic_user = 5,
-        thief = 6,
-        monk = 7,
-        mc_c_f = 8,
-        mc_c_f_m = 9,
-        mc_c_r = 10,
-        mc_c_mu = 11,
-        mc_c_t = 12,
-        mc_f_mu = 13,
-        mc_f_t = 14,
-        mc_f_mu_t = 15,
-        mc_mu_t = 16,
-        unknown = 17
+        knight = 4,
+        ranger = 5,
+        magic_user = 6,
+        thief = 7,
+        monk = 8,
+        mc_c_f = 9,
+        mc_c_f_m = 10,
+        mc_c_r = 11,
+        mc_c_mu = 12,
+        mc_c_t = 13,
+        mc_f_mu = 14,
+        mc_f_t = 15,
+        mc_f_mu_t = 16,
+        mc_mu_t = 17,
+        unknown = 18,
     }
 
     public enum CombatTeam
