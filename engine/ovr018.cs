@@ -250,6 +250,7 @@ namespace engine
                             if (menuFlags[allow_begin] == true)
                             {
                                 if ((gbl.TeamList.Count > 0 && gbl.inDemo == true) ||
+                                    gbl.game.GameWonGameOver == false ||
                                     gbl.area_ptr.gameOver == 0 ||
                                     gbl.inDemo == true)
                                 {

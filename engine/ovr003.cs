@@ -1924,7 +1924,7 @@ namespace engine
         internal static void CMD_Program() //YourHaveWon
         {
             ovr008.vm_LoadCmdSets(1);
-            byte var_1 = (byte)ovr008.vm_GetCmdValue(1);
+            byte cmd = (byte)ovr008.vm_GetCmdValue(1);
 
             if (gbl.restore_player_ptr == true)
             {
@@ -1933,7 +1933,7 @@ namespace engine
             }
 
 
-            if (var_1 == 0)
+            if (cmd == 0)
             {
                 ovr018.startGameMenu();
                 if (gbl.lastDaxBlockId != 0x50 &&
@@ -1942,11 +1942,10 @@ namespace engine
                     ovr025.LoadPic();
                 }
             }
-            else if (var_1 == 8)
+            else if (cmd == 8)
             {
                 ovr019.end_game_text();
                 gbl.gameWon = true;
-                gbl.area_ptr.field_3FA = 0xff;
                 gbl.area2_ptr.training_class_mask = 0xff;
 
                 foreach (Player player in gbl.TeamList)
@@ -1957,24 +1956,29 @@ namespace engine
                     play_ptr.in_combat = true;
                 }
 
-                ovr018.startGameMenu();
-                char saveYes = ovr027.yes_no(gbl.defaultMenuColors, "You've won. Save before quitting? ");
-
-                if (saveYes == 'Y')
+                if (gbl.game.GameWonGameOver)
                 {
-                    ovr017.SaveGame();
-                }
+                    gbl.area_ptr.gameOver = 0xff;
 
-                seg043.print_and_exit();
+                    ovr018.startGameMenu();
+                    char saveYes = ovr027.yes_no(gbl.defaultMenuColors, "You've won. Save before quitting? ");
+
+                    if (saveYes == 'Y')
+                    {
+                        ovr017.SaveGame();
+                    }
+
+                    seg043.print_and_exit();
+                }
             }
-            else if (var_1 == 9)
+            else if (cmd == 9)
             {
                 ushort ecl_bkup = gbl.ecl_offset;
                 TryEncamp();
                 gbl.ecl_offset = ecl_bkup;
                 CMD_Exit();
             }
-            else if (var_1 == 3)
+            else if (cmd == 3)
             {
                 gbl.party_killed = true;
                 CMD_Exit();

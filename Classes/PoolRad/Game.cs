@@ -88,6 +88,7 @@ namespace Classes.PoolRad
         public override void DrawFrame_Temple() { Draw.Frame_Temple(); }
         public override int ShopBuy() { gbl.displayString("Shop", 0, 15, 1, 17); return 4; }
         public override bool Portrait { get => true; }
+        public override bool GameWonGameOver { get => false; }
         public override bool SetBlocksInArea1 { get => true; }
         public override byte[] PortraitBody { get => portraitBody; }
         public override byte[] PortraitHead { get => portraitHead; }
