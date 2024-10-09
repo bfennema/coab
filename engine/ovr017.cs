@@ -749,8 +749,11 @@ namespace engine
             gbl.file.BlockRead(0x400, data, file);
             gbl.stru_1B2CA = new Struct_1B2CA(data, 0);
 
+            if (gbl.game.StoreEclBlock)
+            {
             gbl.file.BlockRead(0x1E00, data, file);
             gbl.ecl_ptr = new EclBlock(data, 0);
+            }
 
             gbl.file.BlockRead(5, data, file);
             gbl.mapPosX = (sbyte)data[0];
@@ -917,7 +920,10 @@ namespace engine
                 gbl.file.BlockWrite(0x800, gbl.area_ptr.ToByteArray(), save_file);
                 gbl.file.BlockWrite(0x800, gbl.area2_ptr.ToByteArray(), save_file);
                 gbl.file.BlockWrite(0x400, gbl.stru_1B2CA.ToByteArray(), save_file);
+                if (gbl.game.StoreEclBlock)
+                {
                 gbl.file.BlockWrite(0x1E00, gbl.ecl_ptr.ToByteArray(), save_file);
+                }
 
                 data[0] = (byte)gbl.mapPosX;
                 data[1] = (byte)gbl.mapPosY;

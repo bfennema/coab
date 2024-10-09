@@ -90,6 +90,7 @@ namespace Classes.PoolRad
         public override bool Portrait { get => true; }
         public override bool GameWonGameOver { get => false; }
         public override bool SetBlocksInArea1 { get => true; }
+        public override bool StoreEclBlock { get => true; }
         public override byte[] PortraitBody { get => portraitBody; }
         public override byte[] PortraitHead { get => portraitHead; }
         public override string[] TempleSpells { get => templeSpells; }
