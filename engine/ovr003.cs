@@ -1716,9 +1716,14 @@ namespace engine
 
         internal static void CMD_EclClock() /* sub_28CDA */
         {
-            ovr008.vm_LoadCmdSets(2);
+            ovr008.vm_LoadCmdSets(gbl.game.EclClockArguments);
             int timeStep = ovr008.vm_GetCmdValue(1) & 0xff;
-            int timeSlot = ovr008.vm_GetCmdValue(2) & 0xff;
+            int timeSlot = 1;
+
+            if (gbl.game.EclClockArguments == 2)
+            {
+                timeSlot = ovr008.vm_GetCmdValue(2) & 0xff;
+            }
 
             ovr021.step_game_time(timeSlot, timeStep);
         }

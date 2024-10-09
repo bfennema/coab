@@ -49,6 +49,7 @@
         public abstract bool Portrait { get; }
         public abstract bool GameWonGameOver { get; }
         public abstract bool SetBlocksInArea1 { get; }
+        public abstract int EclClockArguments { get; }
         public abstract bool StoreEclBlock { get; }
         public abstract byte[] PortraitBody { get; }
         public abstract byte[] PortraitHead { get; }

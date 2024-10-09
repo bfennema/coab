@@ -89,6 +89,7 @@ namespace Classes.Curse
         public override bool Portrait { get => false; }
         public override bool GameWonGameOver { get => true; }
         public override bool SetBlocksInArea1 { get => false; }
+        public override int EclClockArguments { get => 2; }
         public override bool StoreEclBlock { get => true; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
