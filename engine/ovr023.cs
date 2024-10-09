@@ -133,7 +133,7 @@ namespace engine
 			switch (gbl.spellCastingTable[spell_id].spellClass)
 			{
 				case SpellClass.Cleric:
-                    if (player.stats2.Wis.full > 8 &&
+                    if (player.stats.Wis.full > 8 &&
 						(player.SkillLevel(SkillType.Cleric) > 0 ||
 						 player.SkillLevel(SkillType.Paladin) > 8))
 					{
@@ -142,14 +142,14 @@ namespace engine
 					break;
 
 				case SpellClass.Druid:
-                    if ((player.stats2.Wis.full > 8 && player.SkillLevel(SkillType.Ranger) > 6))
+                    if ((player.stats.Wis.full > 8 && player.SkillLevel(SkillType.Ranger) > 6))
 					{
 						can_learn = true;
 					}
 					break;
 
 				case SpellClass.MagicUser:
-					if (player.stats2.Int.full > 8 &&
+					if (player.stats.Int.full > 8 &&
 						((player.race != Race.human) ||
                          (player.activeItems.armor == null) ||
 						 (gbl.game_state != GameState.Combat) ||
@@ -1481,7 +1481,7 @@ namespace engine
 				strIncrease = ovr024.roll_dice(8, 1);
 			}
 
-            int str = target.stats2.Str.full + strIncrease;
+            int str = target.stats.Str.full + strIncrease;
 			int str_100 = 0;
 
 			if (str > 18)
@@ -1493,7 +1493,7 @@ namespace engine
 					target.ranger_lvl > 0 ||
 					target.ranger_old_lvl > target.multiclassLevel)
 				{
-                    str_100 = target.stats2.Str00.cur + ((str - 18) * 10);
+                    str_100 = target.stats.Str00.cur + ((str - 18) * 10);
 
 					if (str_100 > 100)
 					{
@@ -2335,7 +2335,7 @@ namespace engine
 			Player player = gbl.spellTargets[0];
 
 			if ((player.health_status == Status.dead || player.health_status == Status.animated) &&
-                player.stats2.Con.cur > 0 &&
+                player.stats.Con.cur > 0 &&
 				player.race != Race.elf)
 			{
 				gbl.cureSpell = true;
@@ -2346,7 +2346,7 @@ namespace engine
 
 				player.health_status = Status.okey;
 				player.in_combat = true;
-                player.stats2.Con.cur--;
+                player.stats.Con.cur--;
 
 				ovr024.CalcStatBonuses(Stat.CON, player);
 				player.hit_point_current = 1;

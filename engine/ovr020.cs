@@ -271,14 +271,14 @@ namespace engine
 
             if (cur)
             {
-                if (gbl.SelectedPlayer.stats2[(byte)stat].cur < 10)
+                if (gbl.SelectedPlayer.stats[(byte)stat].cur < 10)
                 {
                     col_x++;
                 }
             }
             else
             {
-                if (gbl.SelectedPlayer.stats2[(byte)stat].full < 10)
+                if (gbl.SelectedPlayer.stats[(byte)stat].full < 10)
                 {
                     col_x++;
                 }
@@ -287,28 +287,28 @@ namespace engine
             string s;
             if (cur)
             {
-                s = gbl.SelectedPlayer.stats2[(byte)stat].cur.ToString();
+                s = gbl.SelectedPlayer.stats[(byte)stat].cur.ToString();
             }
             else
             {
-                s = gbl.SelectedPlayer.stats2[(byte)stat].full.ToString();
+                s = gbl.SelectedPlayer.stats[(byte)stat].full.ToString();
             }
             seg041.displayString(s, 0, color, (byte)stat + 7, col_x);
 
             if (cur)
             {
                 if (stat == Stat.STR &&
-                    gbl.SelectedPlayer.stats2.Str.cur == 18 &&
-                    gbl.SelectedPlayer.stats2.Str00.cur > 0)
+                    gbl.SelectedPlayer.stats.Str.cur == 18 &&
+                    gbl.SelectedPlayer.stats.Str00.cur > 0)
                 {
-                    string text = gbl.SelectedPlayer.stats2.Str00.cur.ToString();
+                    string text = gbl.SelectedPlayer.stats.Str00.cur.ToString();
 
-                    if (gbl.SelectedPlayer.stats2.Str00.cur < 10)
+                    if (gbl.SelectedPlayer.stats.Str00.cur < 10)
                     {
                         text = "0" + text;
                     }
 
-                    if (gbl.SelectedPlayer.stats2.Str00.cur == 100)
+                    if (gbl.SelectedPlayer.stats.Str00.cur == 100)
                     {
                         text = "00";
                     }
@@ -319,17 +319,17 @@ namespace engine
             else
             {
                 if (stat == Stat.STR &&
-                    gbl.SelectedPlayer.stats2.Str.full == 18 &&
-                    gbl.SelectedPlayer.stats2.Str00.full > 0)
+                    gbl.SelectedPlayer.stats.Str.full == 18 &&
+                    gbl.SelectedPlayer.stats.Str00.full > 0)
                 {
-                    string text = gbl.SelectedPlayer.stats2.Str00.full.ToString();
+                    string text = gbl.SelectedPlayer.stats.Str00.full.ToString();
 
-                    if (gbl.SelectedPlayer.stats2.Str00.full < 10)
+                    if (gbl.SelectedPlayer.stats.Str00.full < 10)
                     {
                         text = "0" + text;
                     }
 
-                    if (gbl.SelectedPlayer.stats2.Str00.full == 100)
+                    if (gbl.SelectedPlayer.stats.Str00.full == 100)
                     {
                         text = "00";
                     }

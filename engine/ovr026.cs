@@ -288,32 +288,32 @@ namespace engine
                     }
                 }
 
-                if (player.stats2.Wis.full > 12 && player.spellCastCount[0, 0] > 0)
+                if (player.stats.Wis.full > 12 && player.spellCastCount[0, 0] > 0)
                 {
                     player.spellCastCount[0, 0] += 1;
                 }
 
-                if (player.stats2.Wis.full > 13 && player.spellCastCount[0, 0] > 0)
+                if (player.stats.Wis.full > 13 && player.spellCastCount[0, 0] > 0)
                 {
                     player.spellCastCount[0, 0] += 1;
                 }
 
-                if (player.stats2.Wis.full > 14 && player.spellCastCount[0, 1] > 0)
+                if (player.stats.Wis.full > 14 && player.spellCastCount[0, 1] > 0)
                 {
                     player.spellCastCount[0, 1] += 1;
                 }
 
-                if (player.stats2.Wis.full > 15 && player.spellCastCount[0, 1] > 0)
+                if (player.stats.Wis.full > 15 && player.spellCastCount[0, 1] > 0)
                 {
                     player.spellCastCount[0, 1] += 1;
                 }
 
-                if (player.stats2.Wis.full > 16 && player.spellCastCount[0, 2] > 0)
+                if (player.stats.Wis.full > 16 && player.spellCastCount[0, 2] > 0)
                 {
                     player.spellCastCount[0, 2] += 1;
                 }
 
-                if (player.stats2.Wis.full > 17 && player.spellCastCount[0, 3] > 0)
+                if (player.stats.Wis.full > 17 && player.spellCastCount[0, 3] > 0)
                 {
                     player.spellCastCount[0, 3] += 1;
                 }
@@ -373,31 +373,31 @@ namespace engine
                 (type == SaveVerseType.RodStaffWand && applyBonus == true) ||
                 (type == SaveVerseType.Spell && applyBonus == true))
             {
-                if (player.stats2.Con.full >= 4 && player.stats2.Con.full <= 6)
+                if (player.stats.Con.full >= 4 && player.stats.Con.full <= 6)
                 {
                     player.saveVerse[(byte)type] -= 1;
                 }
-                else if (player.stats2.Con.full >= 7 && player.stats2.Con.full <= 10)
+                else if (player.stats.Con.full >= 7 && player.stats.Con.full <= 10)
                 {
                     player.saveVerse[(byte)type] -= 2;
                 }
-                else if (player.stats2.Con.full >= 11 && player.stats2.Con.full <= 13)
+                else if (player.stats.Con.full >= 11 && player.stats.Con.full <= 13)
                 {
                     player.saveVerse[(byte)type] -= 3;
                 }
-                else if (player.stats2.Con.full >= 14 && player.stats2.Con.full <= 17)
+                else if (player.stats.Con.full >= 14 && player.stats.Con.full <= 17)
                 {
                     player.saveVerse[(byte)type] -= 4;
                 }
-                else if (player.stats2.Con.full >= 18 && player.stats2.Con.full <= 20)
+                else if (player.stats.Con.full >= 18 && player.stats.Con.full <= 20)
                 {
                     player.saveVerse[(byte)type] -= 5;
                 }
-                else if (player.stats2.Con.full >= 21 && player.stats2.Con.full <= 24)
+                else if (player.stats.Con.full >= 21 && player.stats.Con.full <= 24)
                 {
                     player.saveVerse[(byte)type] -= 6;
                 }
-                else if (player.stats2.Con.full == 25)
+                else if (player.stats.Con.full == 25)
                 {
                     player.saveVerse[(byte)type] -= 7;
                 }
@@ -405,19 +405,19 @@ namespace engine
 
             if (type == SaveVerseType.Poison)
             {
-                if (player.stats2.Con.full == 19 || player.stats2.Con.full == 20)
+                if (player.stats.Con.full == 19 || player.stats.Con.full == 20)
                 {
                     player.saveVerse[(byte)type] -= 1;
                 }
-                else if (player.stats2.Con.full == 21 || player.stats2.Con.full == 22)
+                else if (player.stats.Con.full == 21 || player.stats.Con.full == 22)
                 {
                     player.saveVerse[(byte)type] -= 2;
                 }
-                else if (player.stats2.Con.full == 23 || player.stats2.Con.full == 24)
+                else if (player.stats.Con.full == 23 || player.stats.Con.full == 24)
                 {
                     player.saveVerse[(byte)type] -= 3;
                 }
-                else if (player.stats2.Con.full == 25)
+                else if (player.stats.Con.full == 25)
                 {
                     player.saveVerse[(byte)type] -= 4;
                 }
@@ -549,7 +549,7 @@ namespace engine
 
                 if (skill <= ThiefSkills.HideInShadows)
                 {
-                    calc_skill += dex_adj[(int)player.stats2.Dex.full, (int)skill];
+                    calc_skill += dex_adj[(int)player.stats.Dex.full, (int)skill];
                 }
 
                 if ( calc_skill > 0)
@@ -571,7 +571,7 @@ namespace engine
             
             int var_3 = 0;
             while (var_3 <= 5 &&
-                (gbl.class_stats_min[(int)firstClass][var_3] < 9 || player.stats2[var_3].cur > 14))
+                (gbl.class_stats_min[(int)firstClass][var_3] < 9 || player.stats[var_3].cur > 14))
             {
                 var_3++;
             }
@@ -580,7 +580,7 @@ namespace engine
             var_3 = 0;
 
             while (var_3 <= 5 &&
-                (gbl.class_stats_min[(int)_class][var_3] < 9 || player.stats2[var_3].cur > 16))
+                (gbl.class_stats_min[(int)_class][var_3] < 9 || player.stats[var_3].cur > 16))
             {
                 var_3++;
             }

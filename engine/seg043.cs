@@ -129,9 +129,9 @@ namespace engine
 
         static void TxtDumpPlayer(Player p, int area, int id)
         {
-            string str100 = p.stats2.Str.full == 18 ? string.Format("({0})", p.stats2.Str00.full) : "";
+            string str100 = p.stats.Str.full == 18 ? string.Format("({0})", p.stats.Str00.full) : "";
             Logger.Debug("Area {0} Id {1} {2} exp: {3} hp: {4} ac: {5} thac0: {6}", area, id, p.name, p.exp, p.hit_point_max, p.DisplayAc, 0x3c - p.hitBonus);
-            Logger.Debug("   S: {0}{1} D: {2} C: {3} I: {4} W: {5} Ch: {6}", p.stats2.Str.full, str100, p.stats2.Dex.full, p.stats2.Con.full, p.stats2.Int.full, p.stats2.Wis.full, p.stats2.Cha.full);
+            Logger.Debug("   S: {0}{1} D: {2} C: {3} I: {4} W: {5} Ch: {6}", p.stats.Str.full, str100, p.stats.Dex.full, p.stats.Con.full, p.stats.Int.full, p.stats.Wis.full, p.stats.Cha.full);
             Logger.Debug("   Lvls: {0} {1} {2} {3} {4} {5} {6} {7}", p.ClassLevel[0], p.ClassLevel[1], p.ClassLevel[2], p.ClassLevel[3], p.ClassLevel[4], p.ClassLevel[5], p.ClassLevel[6], p.ClassLevel[7]);
             if (p.activeItems.primaryWeapon != null)
                 Logger.Debug("   Weapon: {0}", p.activeItems.primaryWeapon.GenerateName(0));
@@ -163,13 +163,13 @@ namespace engine
             dw.Write("<td>{0}</td>", p.hit_point_max);
             dw.Write("<td>{0}</td>", 0x3c - p.ac);
             dw.Write("<td>{0}</td>", 0x3c - p.hitBonus);
-            string str100 = p.stats2.Str.full == 18 ? string.Format("({0})", p.stats2.Str00.full) : "";
-            dw.Write("<td>{0}{1}</td>", p.stats2.Str.full, str100);
-            dw.Write("<td>{0}</td>", p.stats2.Dex.full);
-            dw.Write("<td>{0}</td>", p.stats2.Con.full);
-            dw.Write("<td>{0}</td>", p.stats2.Int.full);
-            dw.Write("<td>{0}</td>", p.stats2.Wis.full);
-            dw.Write("<td>{0}</td>", p.stats2.Cha.full);
+            string str100 = p.stats.Str.full == 18 ? string.Format("({0})", p.stats.Str00.full) : "";
+            dw.Write("<td>{0}{1}</td>", p.stats.Str.full, str100);
+            dw.Write("<td>{0}</td>", p.stats.Dex.full);
+            dw.Write("<td>{0}</td>", p.stats.Con.full);
+            dw.Write("<td>{0}</td>", p.stats.Int.full);
+            dw.Write("<td>{0}</td>", p.stats.Wis.full);
+            dw.Write("<td>{0}</td>", p.stats.Cha.full);
             dw.Write("<td>{0}</td>", p.ClassLevel[0]);
             dw.Write("<td>{0}</td>", p.ClassLevel[1]);
             dw.Write("<td>{0}</td>", p.ClassLevel[2]);

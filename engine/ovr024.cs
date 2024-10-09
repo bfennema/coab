@@ -527,8 +527,8 @@ namespace engine
         {
             bool encoded;
 
-            if (str > player.stats2.Str.cur ||
-                (str == 18 && str_100 > player.stats2.Str00.cur))
+            if (str > player.stats.Str.cur ||
+                (str == 18 && str_100 > player.stats.Str00.cur))
             {
                 encoded = true;
                 encoded_str = encode_strength(str_100, str);
@@ -612,8 +612,8 @@ namespace engine
             int str_00_b = 0;
             int var_11 = 0x0FF;
 
-            int stat_a = player.stats2[(int)stat_index].cur;
-            int str_00_a = player.stats2.Str00.cur;
+            int stat_a = player.stats[(int)stat_index].cur;
+            int str_00_a = player.stats.Str00.cur;
 
             foreach (Item item in player.items)
             {
@@ -670,10 +670,10 @@ namespace engine
                         }
                         else if (var_12 == 8) // pale blue ioun stone
                         {
-                            if (player.stats2.Str.cur < 18 &&
+                            if (player.stats.Str.cur < 18 &&
                                 item.affect_2 == 0)
                             {
-                                stat_b = (byte)(player.stats2.Str.cur + 1);
+                                stat_b = (byte)(player.stats.Str.cur + 1);
                                 str_00_b = 0;
                             }
                         }
@@ -691,7 +691,7 @@ namespace engine
                             stat_a++;
                         }
                         else if (var_12 == 8 &&
-                            player.stats2.Con.cur < 18 &&
+                            player.stats.Con.cur < 18 &&
                             (int)item.affect_2 == 4) // pink ioun stone
                         {
                             stat_a++;
@@ -701,7 +701,7 @@ namespace engine
                     {
                         if (var_12 == 8) // scarlet and blue ioun stone
                         {
-                            if (player.stats2.Int.cur < 18 &&
+                            if (player.stats.Int.cur < 18 &&
                                 (int)item.affect_2 == 1)
                             {
                                 stat_a++;
@@ -720,7 +720,7 @@ namespace engine
                     {
                         if (var_12 == 8 &&
                             (int)item.affect_2 == 2 &&
-                            player.stats2.Wis.cur < 18) // incandescent blue ioun stone
+                            player.stats.Wis.cur < 18) // incandescent blue ioun stone
                         {
                             stat_a++;
                         }
@@ -729,11 +729,11 @@ namespace engine
                     {
                         if (var_12 == 2)
                         {
-                            if (player.stats2.Dex.cur >= 0 && player.stats2.Dex.cur <= 6)
+                            if (player.stats.Dex.cur >= 0 && player.stats.Dex.cur <= 6)
                             {
                                 stat_a += 4;
                             }
-                            else if (player.stats2.Dex.cur >= 7 && player.stats2.Dex.cur <= 13)
+                            else if (player.stats.Dex.cur >= 7 && player.stats.Dex.cur <= 13)
                             {
                                 stat_a += 2;
                             }
@@ -744,7 +744,7 @@ namespace engine
                         }
                         else if (var_12 == 8) // deep red ioun stone
                         {
-                            if (player.stats2.Dex.cur < 18 &&
+                            if (player.stats.Dex.cur < 18 &&
                                 (int)item.affect_2 == 3)
                             {
                                 stat_a++;
@@ -762,7 +762,7 @@ namespace engine
                             stat_a -= 1;
                         }
                         else if (var_12 == 8 &&
-                            player.stats2.Cha.cur < 18 &&
+                            player.stats.Cha.cur < 18 &&
                             (int)item.affect_2 == 5) // ping and green ioun stone
                         {
                             stat_a += 1;
@@ -793,7 +793,7 @@ namespace engine
                                 player.ranger_lvl > 0 ||
                                 player.ranger_old_lvl > 0)
                             {
-                                str_00_b = (byte)(player.stats2.Str00.cur + ((stat_b - 18) * 10));
+                                str_00_b = (byte)(player.stats.Str00.cur + ((stat_b - 18) * 10));
 
                                 if (str_00_b > 100)
                                 {
@@ -828,13 +828,13 @@ namespace engine
 
                 if (var_11 != 0xff)
                 {
-                    player.stats2.Str.full = var_11;
-                    player.stats2.Str00.full = 0;
+                    player.stats.Str.full = var_11;
+                    player.stats.Str00.full = 0;
                 }
                 else
                 {
-                    player.stats2.Str.full = stat_a;
-                    player.stats2.Str00.full = str_00_a;
+                    player.stats.Str.full = stat_a;
+                    player.stats.Str00.full = str_00_a;
                 }
             }
             else if (stat_index == Stat.CON)
@@ -862,14 +862,14 @@ namespace engine
                     }
                 }
 
-                player.stats2.Con.full = stat_a;
+                player.stats.Con.full = stat_a;
 
-                if (player.stats2.Con.full >= 20)
+                if (player.stats.Con.full >= 20)
                 {
                     if (player.HasAffect(Classes.Affects.highConRegen) == false)
                     {
                         // Per 1e, healing is 1/6 turns at 20, 1/5 turns at 21, ... 1/1 turn at 25
-                        ushort rounds = (ushort)((26 - player.stats2.Con.full) * 10);
+                        ushort rounds = (ushort)((26 - player.stats.Con.full) * 10);
                         add_affect(true, 0xff, rounds, Classes.Affects.highConRegen, player);
                     }
                 }
@@ -888,11 +888,11 @@ namespace engine
 
                 if (var_11 != 0xff)
                 {
-                    player.stats2.Int.full = var_11;
+                    player.stats.Int.full = var_11;
                 }
                 else
                 {
-                    player.stats2.Int.full = stat_a;
+                    player.stats.Int.full = stat_a;
                 }
             }
             else if (stat_index == Stat.WIS)
@@ -905,22 +905,22 @@ namespace engine
 
                 if (var_11 != 0xff)
                 {
-                    player.stats2.Wis.full = var_11;
+                    player.stats.Wis.full = var_11;
                 }
                 else
                 {
-                    player.stats2.Wis.full = stat_a;
+                    player.stats.Wis.full = stat_a;
                 }
             }
             else if (stat_index == Stat.DEX)
             {
                 if (var_11 != 0xff)
                 {
-                    player.stats2.Dex.full = var_11;
+                    player.stats.Dex.full = var_11;
                 }
                 else
                 {
-                    player.stats2.Dex.full = stat_a;
+                    player.stats.Dex.full = stat_a;
                 }
                 ovr026.recalc_thief_skills(player);
             }
@@ -932,7 +932,7 @@ namespace engine
                     stat_a = affect.affect_data;
                 }
 
-                player.stats2.Cha.full = stat_a;
+                player.stats.Cha.full = stat_a;
             }
         }
 

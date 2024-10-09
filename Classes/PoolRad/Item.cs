@@ -521,13 +521,13 @@ namespace Classes.PoolRad
             if (readied > 0 && type == (byte)Classes.Item.Type.Gauntlets && affect_2 == (byte)Affects.strength && affect_3 == 131)
             {
                 byte affect_data;
-                if (player.stats2.Str.cur == 18)
+                if (player.stats.Str.cur == 18)
                 {
-                    affect_data = (byte)(player.stats2.Str00.cur + 1);
+                    affect_data = (byte)(player.stats.Str00.cur + 1);
                 }
                 else
                 {
-                    affect_data = (byte)(player.stats2.Str.cur + 100);
+                    affect_data = (byte)(player.stats.Str.cur + 100);
                 }
                 Affect affect = new Affect(Affect.Affects.strength, 0, affect_data, true);
                 affects.Add(affect);

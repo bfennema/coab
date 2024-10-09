@@ -175,18 +175,18 @@ namespace Classes.PoolRad
             minutes = affect.minutes;
             if (type == Affects.enlarge)
             {
-                if (player.stats2.Str.cur == 18)
+                if (player.stats.Str.cur == 18)
                 {
-                    affect_data = (byte)(player.stats2.Str00.cur + 1);
+                    affect_data = (byte)(player.stats.Str00.cur + 1);
                 }
                 else
                 {
-                    affect_data = (byte)(player.stats2.Str.cur + 100);
+                    affect_data = (byte)(player.stats.Str.cur + 100);
                 }
             }
             else if (type == Affects.friends)
             {
-                affect_data = (byte)player.stats2.Cha.cur;
+                affect_data = (byte)player.stats.Cha.cur;
             }
             affect_data = affect.affect_data;
             callAffectTable = affect.callAffectTable;
@@ -211,8 +211,8 @@ namespace Classes.PoolRad
                     str_00 = 0;
                 }
 
-                player.stats2.Str.cur = str;
-                player.stats2.Str00.cur = str_00;
+                player.stats.Str.cur = str;
+                player.stats.Str00.cur = str_00;
             }
             else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
             {
@@ -229,7 +229,7 @@ namespace Classes.PoolRad
                 }
                 else if (type == Affects.friends)
                 {
-                    player.stats2.Cha.cur = affect_data;
+                    player.stats.Cha.cur = affect_data;
                 }
                 else if (type == Affects.enlarge)
                 {
@@ -247,8 +247,8 @@ namespace Classes.PoolRad
                         str_00 = 0;
                     }
 
-                    player.stats2.Str.cur = str;
-                    player.stats2.Str00.cur = str_00;
+                    player.stats.Str.cur = str;
+                    player.stats.Str00.cur = str_00;
                 }
             }
             else if (mapping[type].Count == 1)

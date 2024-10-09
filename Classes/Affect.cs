@@ -162,7 +162,24 @@ namespace Classes
     /// </summary>
     public class Affect
     {
+        [DataOffset(0x00, DataType.IByte)]
+        public Affects type;
+        [DataOffset(0x01, DataType.Word)]
+        public ushort minutes;
+        [DataOffset(0x03, DataType.Byte)]
+        public byte affect_data;
+        [DataOffset(0x04, DataType.Bool)]
+        public bool callAffectTable;
+
         public const int StructSize = 9;
+
+        public Affect()
+        {
+            type = Affects.none;
+            minutes = 0;
+            affect_data = 0;
+            callAffectTable = false;
+        }
 
         public Affect(Affects _type, ushort _minutes, byte _affect_data, bool _call_spell_jump_list)
         {
@@ -185,15 +202,6 @@ namespace Classes
             Affect a = (Affect)this.MemberwiseClone();
             return a;
         }
-
-        [DataOffset(0x00, DataType.IByte)]
-        public Affects type;
-        [DataOffset(0x01, DataType.Word)]
-        public ushort minutes;
-        [DataOffset(0x03, DataType.Byte)]
-        public byte affect_data;
-        [DataOffset(0x04, DataType.Bool)]
-        public bool callAffectTable;
 
         public byte[] ToByteArray()
         {

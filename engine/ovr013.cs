@@ -635,10 +635,10 @@ namespace engine
 
 			if (addAffect(0x3c, affect.affect_data, Classes.Affects.weaken, player) == true)
 			{
-                if (player.stats2.Str.full > 3)
+                if (player.stats.Str.full > 3)
 				{
 					ovr025.DisplayPlayerStatusString(true, 10, "is weakened", player);
-                    player.stats2.Str.full--;
+                    player.stats.Str.full--;
 				}
 				else if (player.HasAffect(Classes.Affects.helpless) == true)
 				{
@@ -806,10 +806,10 @@ namespace engine
 			Affect affect = (Affect)param;
 
 			// BUGFIX: Only Regen when Con is high enough
-			if (player.stats2.Con.full >= 20)
+			if (player.stats.Con.full >= 20)
 			{
 				// Per 1e, healing is 1/6 turns at 20, 1/5 turns at 21, ... 1/1 turn at 25
-				ushort rounds = (ushort)((26 - player.stats2.Con.full) * 10);
+				ushort rounds = (ushort)((26 - player.stats.Con.full) * 10);
 				if (addAffect(rounds, affect.affect_data, Classes.Affects.highConRegen, player) == true && 
 					ovr024.heal_player(1, 1, player) == true)
 				{
@@ -878,8 +878,8 @@ namespace engine
 
 		internal static void AffectFeebleMind(Effect arg_0, object param, Player player) // spell_stupid
 		{
-            player.stats2.Int.full = 7;
-            player.stats2.Wis.full = 7;
+            player.stats.Int.full = 7;
+            player.stats.Wis.full = 7;
 
 			ovr025.DisplayPlayerStatusString(true, 10, "is stupid", player);
 
@@ -1214,31 +1214,31 @@ namespace engine
 			{
 				int save_bonus = 0;
 
-                if (player.stats2.Con.full >= 4 && player.stats2.Con.full <= 6)
+                if (player.stats.Con.full >= 4 && player.stats.Con.full <= 6)
 				{
 					save_bonus = 1;
 				}
-                else if (player.stats2.Con.full >= 7 && player.stats2.Con.full <= 10)
+                else if (player.stats.Con.full >= 7 && player.stats.Con.full <= 10)
 				{
 					save_bonus = 2;
 				}
-                else if (player.stats2.Con.full >= 11 && player.stats2.Con.full <= 13)
+                else if (player.stats.Con.full >= 11 && player.stats.Con.full <= 13)
 				{
 					save_bonus = 3;
 				}
-                else if (player.stats2.Con.full >= 14 && player.stats2.Con.full <= 17)
+                else if (player.stats.Con.full >= 14 && player.stats.Con.full <= 17)
 				{
 					save_bonus = 4;
 				}
-                else if (player.stats2.Con.full >= 18 && player.stats2.Con.full <= 20)
+                else if (player.stats.Con.full >= 18 && player.stats.Con.full <= 20)
 				{
 					save_bonus = 5;
 				}
-				else if (player.stats2.Con.full >= 21 && player.stats2.Con.full <= 24)
+				else if (player.stats.Con.full >= 21 && player.stats.Con.full <= 24)
 				{
 					save_bonus = 6;
 				}
-				else if (player.stats2.Con.full == 25)
+				else if (player.stats.Con.full == 25)
 				{
 					save_bonus = 7;
 				}

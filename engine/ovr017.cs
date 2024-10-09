@@ -200,6 +200,12 @@ namespace engine
             }
 
             gbl.game.SavePlayer(player, player_stream, item_stream, affect_stream);
+
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(player.GetType());
+            var stream = await gbl.file.Create(gbl.SavePath, string.Format("{0}.XML", file_text));
+            stream.SetLength(0);
+            x.Serialize(stream, player);
+            stream.Close();
         }
 
         internal static async System.Threading.Tasks.Task<bool> PlayerFileExists(string fileExt, string player_name) // sub_483AE
@@ -224,39 +230,39 @@ namespace engine
 
         internal static void TransferHillsFarCharacter(HillsFarPlayer hf_player, Player player, Player previousSelectPlayer) // sub_48F35
         {
-            if (player.stats2.Str.cur < hf_player.stat_str)
+            if (player.stats.Str.cur < hf_player.stat_str)
             {
-                player.stats2.Str.Load(hf_player.stat_str);
+                player.stats.Str.Load(hf_player.stat_str);
             }
 
-            if (player.stats2.Str00.cur < hf_player.stat_str00)
+            if (player.stats.Str00.cur < hf_player.stat_str00)
             {
-                player.stats2.Str00.Load(hf_player.stat_str00);
+                player.stats.Str00.Load(hf_player.stat_str00);
             }
 
-            if (player.stats2.Int.cur < hf_player.stat_int)
+            if (player.stats.Int.cur < hf_player.stat_int)
             {
-                player.stats2.Int.Load(hf_player.stat_int);
+                player.stats.Int.Load(hf_player.stat_int);
             }
 
-            if (player.stats2.Wis.cur < hf_player.stat_wis)
+            if (player.stats.Wis.cur < hf_player.stat_wis)
             {
-                player.stats2.Wis.Load(hf_player.stat_wis);
+                player.stats.Wis.Load(hf_player.stat_wis);
             }
 
-            if (player.stats2.Dex.cur < hf_player.stat_dex)
+            if (player.stats.Dex.cur < hf_player.stat_dex)
             {
-                player.stats2.Dex.Load(hf_player.stat_dex);
+                player.stats.Dex.Load(hf_player.stat_dex);
             }
 
-            if (player.stats2.Con.cur < hf_player.stat_con)
+            if (player.stats.Con.cur < hf_player.stat_con)
             {
-                player.stats2.Con.Load(hf_player.stat_con);
+                player.stats.Con.Load(hf_player.stat_con);
             }
 
-            if (player.stats2.Cha.cur < hf_player.stat_cha)
+            if (player.stats.Cha.cur < hf_player.stat_cha)
             {
-                player.stats2.Cha.Load(hf_player.stat_cha);
+                player.stats.Cha.Load(hf_player.stat_cha);
             }
 
             if (player.exp < hf_player.field_2E)
@@ -487,13 +493,13 @@ namespace engine
                     player.base_movement = 12;
 
                     player.name = hf_player.name;
-                    player.stats2.Str.Load(hf_player.stat_str);
-                    player.stats2.Str00.Load(hf_player.stat_str00);
-                    player.stats2.Int.Load(hf_player.stat_int);
-                    player.stats2.Wis.Load(hf_player.stat_wis);
-                    player.stats2.Dex.Load(hf_player.stat_dex);
-                    player.stats2.Con.Load(hf_player.stat_con);
-                    player.stats2.Cha.Load(hf_player.stat_cha);
+                    player.stats.Str.Load(hf_player.stat_str);
+                    player.stats.Str00.Load(hf_player.stat_str00);
+                    player.stats.Int.Load(hf_player.stat_int);
+                    player.stats.Wis.Load(hf_player.stat_wis);
+                    player.stats.Dex.Load(hf_player.stat_dex);
+                    player.stats.Con.Load(hf_player.stat_con);
+                    player.stats.Cha.Load(hf_player.stat_cha);
 
                     player.race = (Race)(hf_player.field_2D + 1);
 
@@ -802,11 +808,21 @@ namespace engine
             gbl.game_speed_var = gbl.area_ptr.game_speed;
             gbl.area2_ptr.party_size = 0;
 
+            System.Xml.Serialization.XmlSerializer x = new System.Xml.Serialization.XmlSerializer(typeof(Player));
+
             for (int index = 0; index < number_of_players; index++)
             {
-                string var_1F6 = File.CleanFilename(var_148[index]);
+                string var_1F6 = Classes.File.CleanFilename(var_148[index]);
 
-                if (await gbl.file.Find(gbl.SavePath, string.Format("{0}.SAV", var_1F6)) == true)
+                if (await gbl.file.Find(gbl.SavePath, string.Format("{0}.XML", var_1F6)) == true)
+                {
+                    var stream = await gbl.file.Open(gbl.SavePath, string.Format("{0}.XML", var_1F6));
+                    Player player = (Player)x.Deserialize(stream);
+                    stream.Close();
+                    player.stats.ReInit();
+                    AssignPlayerIconId(player);
+                }
+                else if (await gbl.file.Find(gbl.SavePath, string.Format("{0}.SAV", var_1F6)) == true)
                 {
                     Player player = await import_char01(gbl.SavePath, string.Format("{0}.SAV", var_1F6));
                     AssignPlayerIconId(player);

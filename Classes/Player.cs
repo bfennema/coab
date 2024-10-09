@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using System.Xml.Serialization;
 
 namespace Classes
 {
@@ -24,9 +24,16 @@ namespace Classes
             max = _max;
         }
 
+        public StatValue(StatValue old, int[,,] _raceSexMinMax, int[] _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
+            : this(_raceSexMinMax, _classMin, _ageEffects, _cur_offset, _full_offset, _min, _max)
+        {
+            cur = old.cur;
+            full = old.full;
+        }
+
         public int cur;
         public int full;
-        readonly int cur_offset ;
+        readonly int cur_offset;
         readonly int full_offset;
 
         public void Load(int val)
@@ -139,6 +146,17 @@ namespace Classes
         public PlayerStats(PlayerStats playerStats)
         {
             Assign(playerStats);
+        }
+
+        public void ReInit()
+        {
+            Str = new StatValue(Str, Limits.StrRaceSexMinMax, Limits.StrClassMin, Limits.StrAgeEffect);
+            Str00 = new StatValue(Str00, Limits.Str00RaceSexMinMax, Limits.Str00ClassMin, Limits.Str00AgeEffect, 1, 0, 0, 100);
+            Con = new StatValue(Con, Limits.ConRaceSexMinMax, Limits.ConClassMin, Limits.ConAgeEffect);
+            Dex = new StatValue(Dex, Limits.DexRaceSexMinMax, Limits.DexClassMin, Limits.DexAgeEffect);
+            Int = new StatValue(Int, Limits.IntRaceSexMinMax, Limits.IntClassMin, Limits.IntAgeEffect);
+            Wis = new StatValue(Wis, Limits.WisRaceSexMinMax, Limits.WisClassMin, Limits.WisAgeEffect);
+            Cha = new StatValue(Cha, Limits.ChaRaceSexMinMax, Limits.ChaClassMin, Limits.ChaAgeEffect);
         }
 
         void IDataIO.Write(byte[] data, int offset)
@@ -413,9 +431,7 @@ namespace Classes
     {
         public string name;
 
-        //public StatValue[] stats;
-
-        public PlayerStats stats2;
+        public PlayerStats stats;
 
         public SpellList spellList; // ox1e was spell_list
 
@@ -454,46 +470,55 @@ namespace Classes
 
         public byte[] ClassLevel = new byte[9]; /* Skill_A_lvl */
 
+        [XmlIgnore]
         public byte cleric_lvl // 0x109;
         {
             get { return ClassLevel[(int)ClassId.cleric]; }
             set { ClassLevel[(int)ClassId.cleric] = value; }
         }
+        [XmlIgnore]
         public byte druid_lvl // 0x10a;
         {
             get { return ClassLevel[(int)ClassId.druid]; }
             set { ClassLevel[(int)ClassId.druid] = value; }
         }
+        [XmlIgnore]
         public byte fighter_lvl // 0x10b;
         {
             get { return ClassLevel[(int)ClassId.fighter]; }
             set { ClassLevel[(int)ClassId.fighter] = value; }
         }
+        [XmlIgnore]
         public byte paladin_lvl // 0x10c;
         {
             get { return ClassLevel[(int)ClassId.paladin]; }
             set { ClassLevel[(int)ClassId.paladin] = value; }
         }
+        [XmlIgnore]
         public byte knight_lvl // 0x110;
         {
             get { return ClassLevel[(int)ClassId.knight]; }
             set { ClassLevel[(int)ClassId.knight] = value; }
         }
+        [XmlIgnore]
         public byte ranger_lvl // 0x10d;
         {
             get { return ClassLevel[(int)ClassId.ranger]; }
             set { ClassLevel[(int)ClassId.ranger] = value; }
         }
+        [XmlIgnore]
         public byte magic_user_lvl // 0x10e;
         {
             get { return ClassLevel[(int)ClassId.magic_user]; }
             set { ClassLevel[(int)ClassId.magic_user] = value; }
         }
+        [XmlIgnore]
         public byte thief_lvl // 0x10f;
         {
             get { return ClassLevel[(int)ClassId.thief]; }
             set { ClassLevel[(int)ClassId.thief] = value; }
         }
+        [XmlIgnore]
         public byte monk_lvl // 0x110;
         {
             get { return ClassLevel[(int)ClassId.monk]; }
@@ -502,47 +527,55 @@ namespace Classes
 
         public byte[] ClassLevelsOld = new byte[9];
 
-
+        [XmlIgnore]
         public byte cleric_old_lvl // 0x111;
         {
             get { return ClassLevelsOld[(int)ClassId.cleric]; }
             set { ClassLevelsOld[(int)ClassId.cleric] = value; }
         }
+        [XmlIgnore]
         public byte druid_old_lvl // 0x112;
         {
             get { return ClassLevelsOld[(int)ClassId.druid]; }
             set { ClassLevelsOld[(int)ClassId.druid] = value; }
         }
+        [XmlIgnore]
         public byte fighter_old_lvl // 0x113;
         {
             get { return ClassLevelsOld[(int)ClassId.fighter]; }
             set { ClassLevelsOld[(int)ClassId.fighter] = value; }
         }
+        [XmlIgnore]
         public byte paladin_old_lvl // 0x114;
         {
             get { return ClassLevelsOld[(int)ClassId.paladin]; }
             set { ClassLevelsOld[(int)ClassId.paladin] = value; }
         }
+        [XmlIgnore]
         public byte knight_old_lvl // 0x118;
         {
             get { return ClassLevelsOld[(int)ClassId.knight]; }
             set { ClassLevelsOld[(int)ClassId.knight] = value; }
         }
+        [XmlIgnore]
         public byte ranger_old_lvl // 0x115;
         {
             get { return ClassLevelsOld[(int)ClassId.ranger]; }
             set { ClassLevelsOld[(int)ClassId.ranger] = value; }
         }
+        [XmlIgnore]
         public byte magic_user_old_lvl // 0x116;
         {
             get { return ClassLevelsOld[(int)ClassId.magic_user]; }
             set { ClassLevelsOld[(int)ClassId.magic_user] = value; }
         }
+        [XmlIgnore]
         public byte thief_old_lvl // 0x117;
         {
             get { return ClassLevelsOld[(int)ClassId.thief]; }
             set { ClassLevelsOld[(int)ClassId.thief] = value; }
         }
+        [XmlIgnore]
         public byte monk_old_lvl // 0x118;
         {
             get { return ClassLevelsOld[(int)ClassId.monk]; }
@@ -731,7 +764,7 @@ namespace Classes
         {
             spellCastCount = new byte[3, 5];
 
-            stats2 = new PlayerStats();
+            stats = new PlayerStats();
 
             spellBook = new SpellBook();
 
@@ -749,7 +782,7 @@ namespace Classes
         public Player ShallowClone()
         {
             Player p = (Player)this.MemberwiseClone();
-            p.stats2 = new PlayerStats(this.stats2);
+            p.stats = new PlayerStats(this.stats);
             p.spellList = new SpellList(this.spellList);
             return p;
         }

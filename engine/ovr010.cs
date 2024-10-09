@@ -794,7 +794,7 @@ namespace engine
                             ovr024.remove_affect(null, Classes.Affects.affect_4a, player);
                             ovr024.remove_affect(null, Classes.Affects.weap_dragon_slayer, player);
                         }
-                        else if (player.stats2.Int.full > 5)
+                        else if (player.stats.Int.full > 5)
                         {
                             ovr024.RemoveFromCombat("Surrenders", Status.unconscious, player);
 

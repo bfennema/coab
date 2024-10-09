@@ -340,11 +340,11 @@ namespace engine
 
             if (arg_4 == 0x15)
             {
-                return_val = (byte)gbl.SelectedPlayer.stats2.Int.full;
+                return_val = (byte)gbl.SelectedPlayer.stats.Int.full;
             }
             else if (arg_4 == 0x18)
             {
-                return_val = (byte)gbl.SelectedPlayer.stats2.Con.full;
+                return_val = (byte)gbl.SelectedPlayer.stats.Con.full;
             }
             else if (arg_4 == 0x72)
             {
@@ -470,7 +470,7 @@ namespace engine
             }
             else if (arg_4 == 0x2CF)
             {
-                switch (gbl.SelectedPlayer.stats2.Cha.full)
+                switch (gbl.SelectedPlayer.stats.Cha.full)
                 {
                     case 3:
                         return_val = 0;

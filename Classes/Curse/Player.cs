@@ -249,7 +249,7 @@ namespace Classes.Curse
         {
             name = player.name;
 
-            player.stats2.Save(stats);
+            player.stats.Save(stats);
 
             Spell.Save(player.spellList, memorizedSpells, memorizedSpells.Length);
             spell_to_learn_count = player.spell_to_learn_count;
@@ -387,7 +387,7 @@ namespace Classes.Curse
 
             player.name = name;
 
-            player.stats2.Load(stats);
+            player.stats.Load(stats);
 
             Spell.Load(player.spellList, memorizedSpells, memorizedSpells.Length);
             player.spell_to_learn_count = spell_to_learn_count;

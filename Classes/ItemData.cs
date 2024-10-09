@@ -33,7 +33,16 @@ namespace Classes
         Ring2 = 10,
         Arrow = 11,
         Quarrel = 12,
-        slot_13 = 13
+        slot_13 = 13,
+        slot_74 = 74,
+        slot_75 = 75,
+        slot_77 = 77,
+        slot_78 = 78,
+        slot_80 = 80,
+        slot_81 = 81,
+        slot_82 = 82,
+        slot_83 = 83,
+        slot_91 = 91,
     }
 
     public class ItemDataTable

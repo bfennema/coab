@@ -507,7 +507,7 @@ namespace engine
 		{
 			sbyte bonus;
 
-            int stat_val = player.stats2.Dex.full;
+            int stat_val = player.stats.Dex.full;
 
 			if (stat_val >= 1 && stat_val <= 3)
 			{
@@ -546,7 +546,7 @@ namespace engine
 		{
 			int bonus;
 
-            int stat_val = player.stats2.Dex.full;
+            int stat_val = player.stats.Dex.full;
 
 			if (stat_val >= 0 && stat_val <= 2)
 			{
@@ -585,33 +585,33 @@ namespace engine
 		{
 			int ret_val;
 
-            if (player.stats2.Str.full >= 0 && player.stats2.Str.full <= 17)
+            if (player.stats.Str.full >= 0 && player.stats.Str.full <= 17)
 			{
-                ret_val = player.stats2.Str.full;
+                ret_val = player.stats.Str.full;
 			}
-            else if (player.stats2.Str.full == 18)
+            else if (player.stats.Str.full == 18)
 			{
-                if (player.stats2.Str00.full == 0)
+                if (player.stats.Str00.full == 0)
 				{
 					ret_val = 18;
 				}
-                else if (player.stats2.Str00.full >= 1 && player.stats2.Str00.full <= 50)
+                else if (player.stats.Str00.full >= 1 && player.stats.Str00.full <= 50)
 				{
 					ret_val = 19;
 				}
-                else if (player.stats2.Str00.full >= 51 && player.stats2.Str00.full <= 75)
+                else if (player.stats.Str00.full >= 51 && player.stats.Str00.full <= 75)
 				{
 					ret_val = 20;
 				}
-                else if (player.stats2.Str00.full >= 76 && player.stats2.Str00.full <= 90)
+                else if (player.stats.Str00.full >= 76 && player.stats.Str00.full <= 90)
 				{
 					ret_val = 21;
 				}
-                else if (player.stats2.Str00.full >= 91 && player.stats2.Str00.full <= 99)
+                else if (player.stats.Str00.full >= 91 && player.stats.Str00.full <= 99)
 				{
 					ret_val = 22;
 				}
-                else if (player.stats2.Str00.full >= 100)
+                else if (player.stats.Str00.full >= 100)
 				{
 					ret_val = 23;
 				}
@@ -620,9 +620,9 @@ namespace engine
 					throw new System.NotSupportedException();
 				}
 			}
-            else if (player.stats2.Str.full >= 19 && player.stats2.Str.full <= 25)
+            else if (player.stats.Str.full >= 19 && player.stats.Str.full <= 25)
 			{
-                ret_val = player.stats2.Str.full + 5;
+                ret_val = player.stats.Str.full + 5;
 			}
 			else
 			{

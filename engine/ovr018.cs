@@ -679,22 +679,22 @@ namespace engine
                     }
                 }
 
-                player.stats2.Str.Load(0);
-                player.stats2.Str00.Load(0);
-                player.stats2.Int.Load(0);
-                player.stats2.Wis.Load(0);
-                player.stats2.Dex.Load(0);
-                player.stats2.Con.Load(0);
-                player.stats2.Cha.Load(0);
+                player.stats.Str.Load(0);
+                player.stats.Str00.Load(0);
+                player.stats.Int.Load(0);
+                player.stats.Wis.Load(0);
+                player.stats.Dex.Load(0);
+                player.stats.Con.Load(0);
+                player.stats.Cha.Load(0);
 
                 for (int i = 0; i < 6; i++)
                 {
-                    player.stats2.Str.Load(Math.Max(player.stats2.Str.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Int.Load(Math.Max(player.stats2.Int.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Wis.Load(Math.Max(player.stats2.Wis.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Dex.Load(Math.Max(player.stats2.Dex.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Con.Load(Math.Max(player.stats2.Con.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats2.Cha.Load(Math.Max(player.stats2.Cha.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Str.Load(Math.Max(player.stats.Str.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Int.Load(Math.Max(player.stats.Int.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Wis.Load(Math.Max(player.stats.Wis.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Dex.Load(Math.Max(player.stats.Dex.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Con.Load(Math.Max(player.stats.Con.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Cha.Load(Math.Max(player.stats.Cha.cur, ovr024.roll_dice(6, 3)+1));
                 }
 
                 Race race = player.race;
@@ -705,57 +705,57 @@ namespace engine
                     switch (stat)
                     {
                         case Stat.STR:
-                            player.stats2.Str.AgeEffects(race, player.age);
-                            player.stats2.Str.EnforceRaceSexLimits(race, sex);
-                            player.stats2.Str.EnforceClassLimits(player._class);
+                            player.stats.Str.AgeEffects(race, player.age);
+                            player.stats.Str.EnforceRaceSexLimits(race, sex);
+                            player.stats.Str.EnforceClassLimits(player._class);
 
-                            if (player.stats2.Str.cur == 18)
+                            if (player.stats.Str.cur == 18)
                             {
                                 if (player.fighter_lvl > 0 ||
                                     player.ranger_lvl > 0 ||
                                     player.paladin_lvl > 0)
                                 {
-                                    player.stats2.Str00.Load(seg051.Random(100) + 1);
-                                    player.stats2.Str00.EnforceRaceSexLimits(race, sex);
+                                    player.stats.Str00.Load(seg051.Random(100) + 1);
+                                    player.stats.Str00.EnforceRaceSexLimits(race, sex);
                                 }
                             }
                             break;
 
                         case Stat.INT:
-                            player.stats2.Int.AgeEffects(race, player.age);
-                            player.stats2.Int.EnforceRaceSexLimits(race, sex);
-                            player.stats2.Int.EnforceClassLimits(player._class);
+                            player.stats.Int.AgeEffects(race, player.age);
+                            player.stats.Int.EnforceRaceSexLimits(race, sex);
+                            player.stats.Int.EnforceClassLimits(player._class);
                             break;
 
                         case Stat.WIS:
-                            player.stats2.Wis.AgeEffects(race, player.age);
-                            player.stats2.Wis.EnforceRaceSexLimits(race, sex);
-                            player.stats2.Wis.EnforceClassLimits(player._class);
+                            player.stats.Wis.AgeEffects(race, player.age);
+                            player.stats.Wis.EnforceRaceSexLimits(race, sex);
+                            player.stats.Wis.EnforceClassLimits(player._class);
 
-                            if (player.stats2.Wis.cur < 13 &&
+                            if (player.stats.Wis.cur < 13 &&
                                 player._class >= ClassId.mc_c_f && player._class <= ClassId.mc_c_t)
                             {
                                 // Multi-Class Cleric
-                                player.stats2.Wis.cur = 13;
+                                player.stats.Wis.cur = 13;
                             }
                             break;
 
                         case Stat.DEX:
-                            player.stats2.Dex.AgeEffects(race, player.age);
-                            player.stats2.Dex.EnforceRaceSexLimits(race, sex);
-                            player.stats2.Dex.EnforceClassLimits(player._class);
+                            player.stats.Dex.AgeEffects(race, player.age);
+                            player.stats.Dex.EnforceRaceSexLimits(race, sex);
+                            player.stats.Dex.EnforceClassLimits(player._class);
                             break;
 
                         case Stat.CON:
-                            player.stats2.Con.AgeEffects(race, player.age);
-                            player.stats2.Con.EnforceRaceSexLimits(race, sex);
-                            player.stats2.Con.EnforceClassLimits(player._class);
+                            player.stats.Con.AgeEffects(race, player.age);
+                            player.stats.Con.EnforceRaceSexLimits(race, sex);
+                            player.stats.Con.EnforceClassLimits(player._class);
                             break;
 
                         case Stat.CHA:
-                            player.stats2.Cha.AgeEffects(race, player.age);
-                            player.stats2.Cha.EnforceRaceSexLimits(race, sex);
-                            player.stats2.Cha.EnforceClassLimits(player._class);
+                            player.stats.Cha.AgeEffects(race, player.age);
+                            player.stats.Cha.EnforceRaceSexLimits(race, sex);
+                            player.stats.Cha.EnforceClassLimits(player._class);
                             break;
                     }
 
@@ -896,10 +896,10 @@ namespace engine
 
             //for (var_1B = 0; var_1B <= 5; var_1B++)
             //{
-            //    player.stats2[var_1B].cur = player.stats2[var_1B].full;
+            //    player.stats[var_1B].cur = player.stats[var_1B].full;
             //}
 
-            player.stats2.Str00.full = player.stats2.Str00.cur;
+            player.stats.Str00.full = player.stats.Str00.cur;
 
             input_key = ovr027.yes_no(gbl.defaultMenuColors, "Save " + player.name + "? ");
 
@@ -936,7 +936,7 @@ namespace engine
 
         internal static int con_bonus(SkillType skill)
         {
-            return con_bonus(skill, gbl.SelectedPlayer.stats2.Con.full);
+            return con_bonus(skill, gbl.SelectedPlayer.stats.Con.full);
         }
 
 
@@ -1025,7 +1025,7 @@ namespace engine
 
             ovr020.playerDisplayFull(gbl.SelectedPlayer, true);
 
-            PlayerStats stats_bkup = new PlayerStats(gbl.SelectedPlayer.stats2);
+            PlayerStats stats_bkup = new PlayerStats(gbl.SelectedPlayer.stats);
 
             byte orig_hp_max = gbl.SelectedPlayer.hit_point_max;
 
@@ -1117,31 +1117,31 @@ namespace engine
                                 Race race = player.race;
                                 int sex = player.sex;
 
-                                player.stats2.Dec(stat_var);
+                                player.stats.Dec(stat_var);
 
                                 switch ((Stat)stat_var)
                                 {
                                     case Stat.STR:
-                                        if (player.stats2.Str00.cur > 0)
+                                        if (player.stats.Str00.cur > 0)
                                         {
-                                            player.stats2.Str00.Dec();
-                                            player.stats2.Str.Inc();
+                                            player.stats.Str00.Dec();
+                                            player.stats.Str.Inc();
                                         }
                                         else
                                         {
-                                            player.stats2.Str.EnforceRaceSexLimits(race, sex);
+                                            player.stats.Str.EnforceRaceSexLimits(race, sex);
                                         }
-                                        player.stats2.Str.EnforceClassLimits(player._class);
+                                        player.stats.Str.EnforceClassLimits(player._class);
                                         break;
 
                                     case Stat.INT:
-                                        player.stats2.Int.EnforceRaceSexLimits(race, sex);
-                                        player.stats2.Int.EnforceClassLimits(player._class);
+                                        player.stats.Int.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Int.EnforceClassLimits(player._class);
                                         break;
 
                                     case Stat.WIS:
-                                        player.stats2.Wis.EnforceRaceSexLimits(race, sex);
-                                        player.stats2.Wis.EnforceClassLimits(player._class);
+                                        player.stats.Wis.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Wis.EnforceClassLimits(player._class);
 
                                         if (player.spellCastCount[0, 0] > 0)
                                         {
@@ -1150,13 +1150,13 @@ namespace engine
                                         break;
 
                                     case Stat.DEX:
-                                        player.stats2.Dex.EnforceRaceSexLimits(race, sex);
-                                        player.stats2.Dex.EnforceClassLimits(player._class);
+                                        player.stats.Dex.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Dex.EnforceClassLimits(player._class);
                                         break;
 
                                     case Stat.CON:
-                                        player.stats2.Con.EnforceRaceSexLimits(race, sex);
-                                        player.stats2.Con.EnforceClassLimits(player._class);
+                                        player.stats.Con.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Con.EnforceClassLimits(player._class);
 
                                         int max_hp = calc_max_hp(gbl.SelectedPlayer);
                                         if (max_hp < player.hit_point_max)
@@ -1171,8 +1171,8 @@ namespace engine
                                         break;
 
                                     case Stat.CHA:
-                                        player.stats2.Cha.EnforceRaceSexLimits(race, sex);
-                                        player.stats2.Cha.EnforceClassLimits(player._class);
+                                        player.stats.Cha.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Cha.EnforceClassLimits(player._class);
                                         break;
                                 }
                                 ovr024.CalcStatBonuses((Stat)stat_var, player);
@@ -1208,33 +1208,33 @@ namespace engine
                                 Race race = player.race;
                                 int sex = player.sex;
 
-                                player.stats2.Inc(stat_var);
+                                player.stats.Inc(stat_var);
                                 switch ((Stat)stat_var)
                                 {
                                     case Stat.STR:
-                                        player.stats2.Str.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Str.EnforceRaceSexLimits(race, sex);
 
-                                        if( player.stats2.Str.cur == 18 &&
+                                        if( player.stats.Str.cur == 18 &&
                                             ((player.multiclassLevel == 0 &&
                                               (player.fighter_lvl > 0 || player.ranger_lvl > 0 || player.paladin_lvl > 0)) ||
                                              (player.multiclassLevel > 0 &&
                                               (player.fighter_old_lvl > 0 || player.ranger_old_lvl > 0 || player.paladin_old_lvl > 0))))
                                         {
-                                            player.stats2.Str00.Inc();
-                                            player.stats2.Str00.EnforceRaceSexLimits(race, sex);
+                                            player.stats.Str00.Inc();
+                                            player.stats.Str00.EnforceRaceSexLimits(race, sex);
                                         }
                                         else
                                         {
-                                            player.stats2.Str00.Load(0);
+                                            player.stats.Str00.Load(0);
                                         }
                                         break;
 
                                     case Stat.INT:
-                                        player.stats2.Int.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Int.EnforceRaceSexLimits(race, sex);
                                         break;
 
                                     case Stat.WIS:
-                                        player.stats2.Wis.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Wis.EnforceRaceSexLimits(race, sex);
 
                                         if (player.spellCastCount[0, 0] > 0)
                                         {
@@ -1243,11 +1243,11 @@ namespace engine
                                         break;
 
                                     case Stat.DEX:
-                                        player.stats2.Dex.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Dex.EnforceRaceSexLimits(race, sex);
                                         break;
 
                                     case Stat.CON:
-                                        player.stats2.Con.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Con.EnforceRaceSexLimits(race, sex);
 
                                         if (calc_min_hp(gbl.SelectedPlayer) > player.hit_point_max)
                                         {
@@ -1261,7 +1261,7 @@ namespace engine
                                         break;
 
                                     case Stat.CHA:
-                                        player.stats2.Cha.EnforceRaceSexLimits(race, sex);
+                                        player.stats.Cha.EnforceRaceSexLimits(race, sex);
                                         break;
                                 }
                                 ovr024.CalcStatBonuses((Stat)stat_var, player);
@@ -1366,7 +1366,7 @@ namespace engine
                         }
                         else if (inputkey == 0x45)
                         {
-                            gbl.SelectedPlayer.stats2.Assign(stats_bkup);
+                            gbl.SelectedPlayer.stats.Assign(stats_bkup);
 
                             gbl.SelectedPlayer.hit_point_max = orig_hp_max;
                             gbl.SelectedPlayer.hit_point_current = gbl.SelectedPlayer.hit_point_max;
@@ -1379,7 +1379,7 @@ namespace engine
                     }
                     else if (inputkey == 0)
                     {
-                        gbl.SelectedPlayer.stats2.Assign(stats_bkup);
+                        gbl.SelectedPlayer.stats.Assign(stats_bkup);
 
                         gbl.SelectedPlayer.hit_point_max = orig_hp_max;
                         gbl.SelectedPlayer.name = nameBackup;
@@ -1402,7 +1402,7 @@ namespace engine
 
             player = gbl.SelectedPlayer;
 
-            player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats2.Con.cur));
+            player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats.Con.cur));
         }
 
 
@@ -2026,7 +2026,7 @@ namespace engine
 
                 if (classLvl > 0 && classLvl < gbl.max_class_hit_dice[(byte)skill])
                 {
-                    hp_adj += (sbyte)con_bonus(skill, player.stats2.Con.full);
+                    hp_adj += (sbyte)con_bonus(skill, player.stats.Con.full);
 
                     if (player.ClassLevel[(int)skill] == 1 && hp_calc_table[(byte)skill].lvl_bonus == 1)
                     {
@@ -2105,7 +2105,7 @@ namespace engine
 
         internal static int calc_min_hp(Player player) /* sub_50793 */
         {
-            return calc_hp(player, player.stats2.Con.full, 1);
+            return calc_hp(player, player.stats.Con.full, 1);
         }
 
         public static int calc_fixed_hp_bonus(Player player, int con)
@@ -2126,7 +2126,7 @@ namespace engine
                 {
                     hp_calc hpt = hp_calc_table[(byte)skill];
 
-                    int con_hp_bonus = con_bonus(skill, player.stats2.Con.full);
+                    int con_hp_bonus = con_bonus(skill, player.stats.Con.full);
 
                     if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
                     {
@@ -2147,7 +2147,7 @@ namespace engine
                 {
                     hp_calc hpt = hp_calc_table[(byte)skill];
 
-                    int con_hp_bonus = con_bonus(skill, player.stats2.Con.full);
+                    int con_hp_bonus = con_bonus(skill, player.stats.Con.full);
 
                     if (classLvl > player.multiclassLevel)
                     {
@@ -2201,15 +2201,15 @@ namespace engine
                         }
 
                         // high con disallows low HD rolls
-                        if (player.stats2.Con.full == 20)
+                        if (player.stats.Con.full == 20)
                         {
                             min_roll = 2;
                         }
-                        else if (player.stats2.Con.full == 21 || player.stats2.Con.full == 22)
+                        else if (player.stats.Con.full == 21 || player.stats.Con.full == 22)
                         {
                             min_roll = 3;
                         }
-                        else if (player.stats2.Con.full >= 23 && player.stats2.Con.full <= 25)
+                        else if (player.stats.Con.full >= 23 && player.stats.Con.full <= 25)
                         {
                             min_roll = 4;
                         }

@@ -203,7 +203,7 @@ namespace Classes.PoolRad
 
             name = player.name;
 
-            player.stats2.Save(stats);
+            player.stats.Save(stats);
 
             Spell.Save(player.spellList, memorizedSpells, memorizedSpells.Length);
 
@@ -321,7 +321,7 @@ namespace Classes.PoolRad
 
             player.name = name;
 
-            player.stats2.Load(stats);
+            player.stats.Load(stats);
 
             Spell.Load(player.spellList, memorizedSpells, memorizedSpells.Length);
 
@@ -663,13 +663,13 @@ namespace Classes.PoolRad
                     new Affect(data, 0).Load(player);
                     gbl.CalcStatBonuses(Stat.STR, player);
                     gbl.CalcStatBonuses(Stat.CHA, player);
-                    player.stats2.Str.EnforceRaceSexLimits(player.race, player.sex);
-                    player.stats2.Int.EnforceRaceSexLimits(player.race, player.sex);
-                    player.stats2.Wis.EnforceRaceSexLimits(player.race, player.sex);
-                    player.stats2.Dex.EnforceRaceSexLimits(player.race, player.sex);
-                    player.stats2.Con.EnforceRaceSexLimits(player.race, player.sex);
-                    player.stats2.Cha.EnforceRaceSexLimits(player.race, player.sex);
-                    player.stats2.Str00.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Str.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Int.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Wis.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Dex.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Con.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Cha.EnforceRaceSexLimits(player.race, player.sex);
+                    player.stats.Str00.EnforceRaceSexLimits(player.race, player.sex);
                 }
                 else
                 {
