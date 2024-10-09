@@ -17,6 +17,38 @@ namespace Classes.PoolRad
             snake = 14,
             animal = 15,
         }
+        public enum Race
+        {
+            monster = 0,
+            dwarf = 1,
+            elf = 2,
+            gnome = 3,
+            half_elf = 4,
+            halfling = 5,
+            half_orc = 6,
+            human = 7
+        }
+        public enum ClassId
+        {
+            cleric = 0,
+            druid = 1,
+            fighter = 2,
+            paladin = 3,
+            ranger = 4,
+            magic_user = 5,
+            thief = 6,
+            monk = 7,
+            mc_c_f = 8,
+            mc_c_f_m = 9,
+            mc_c_r = 10,
+            mc_c_mu = 11,
+            mc_c_t = 12,
+            mc_f_mu = 13,
+            mc_f_t = 14,
+            mc_f_mu_t = 15,
+            mc_mu_t = 16,
+            unknown = 17,
+        }
 
         [DataOffset(0x00, DataType.PString, 15)]
         public string name; // 0x0 - 0x0F
@@ -198,7 +230,40 @@ namespace Classes.PoolRad
 
         public Player(Classes.Player player)
         {
-            race = (byte)player.race;
+            switch (player.race)
+            {
+                case Classes.Race.monster: race = (byte)Race.monster; break;
+                case Classes.Race.dwarf: race = (byte)Race.dwarf; break;
+                case Classes.Race.elf: race = (byte)Race.elf; break;
+                case Classes.Race.gnome: race = (byte)Race.gnome; break;
+                case Classes.Race.half_elf: race = (byte)Race.half_elf; break;
+                case Classes.Race.halfling: race = (byte)Race.halfling; break;
+                case Classes.Race.half_orc: race = (byte)Race.half_orc; break;
+                case Classes.Race.human: race = (byte)Race.human; break;
+            }
+
+            switch (player._class)
+            {
+                case Classes.ClassId.cleric: _class = (byte)ClassId.cleric; break;
+                case Classes.ClassId.druid: _class = (byte)ClassId.druid; break;
+                case Classes.ClassId.fighter: _class = (byte)ClassId.fighter; break;
+                case Classes.ClassId.paladin: _class = (byte)ClassId.paladin; break;
+                case Classes.ClassId.ranger: _class = (byte)ClassId.ranger; break;
+                case Classes.ClassId.magic_user: _class = (byte)ClassId.magic_user; break;
+                case Classes.ClassId.thief: _class = (byte)ClassId.thief; break;
+                case Classes.ClassId.monk: _class = (byte)ClassId.monk; break;
+                case Classes.ClassId.mc_c_f: _class = (byte)ClassId.mc_c_f; break;
+                case Classes.ClassId.mc_c_f_m: _class = (byte)ClassId.mc_c_f_m; break;
+                case Classes.ClassId.mc_c_r: _class = (byte)ClassId.mc_c_r; break;
+                case Classes.ClassId.mc_c_mu: _class = (byte)ClassId.mc_c_mu; break;
+                case Classes.ClassId.mc_c_t: _class = (byte)ClassId.mc_c_t; break;
+                case Classes.ClassId.mc_f_mu: _class = (byte)ClassId.mc_f_mu; break;
+                case Classes.ClassId.mc_f_t: _class = (byte)ClassId.mc_f_t; break;
+                case Classes.ClassId.mc_f_mu_t: _class = (byte)ClassId.mc_f_mu_t; break;
+                case Classes.ClassId.mc_mu_t: _class = (byte)ClassId.mc_mu_t; break;
+                case Classes.ClassId.unknown: _class = (byte)ClassId.unknown; break;
+            }
+
             sex = player.sex;
 
             name = player.name;
@@ -208,7 +273,6 @@ namespace Classes.PoolRad
             Spell.Save(player.spellList, memorizedSpells, memorizedSpells.Length);
 
             thac0 = player.thac0;
-            _class = (byte)player._class;
             age = player.age;
             hp_max = player.hit_point_max;
 
@@ -241,7 +305,14 @@ namespace Classes.PoolRad
             Gems = (ushort)player.Money.GetCoins(Money.Gems);
             Jewelry = (ushort)player.Money.GetCoins(Money.Jewelry);
 
-            System.Array.Copy(player.ClassLevel, ClassLevel, 8);
+            ClassLevel[(int)ClassId.cleric] = player.cleric_lvl;
+            ClassLevel[(int)ClassId.druid] = player.druid_lvl;
+            ClassLevel[(int)ClassId.fighter] = player.fighter_lvl;
+            ClassLevel[(int)ClassId.paladin] = player.paladin_lvl;
+            ClassLevel[(int)ClassId.ranger] = player.ranger_lvl;
+            ClassLevel[(int)ClassId.magic_user] = player.magic_user_lvl;
+            ClassLevel[(int)ClassId.thief] = player.thief_lvl;
+            ClassLevel[(int)ClassId.monk] = player.monk_lvl;
 
             alignment = player.alignment;
 
@@ -316,7 +387,40 @@ namespace Classes.PoolRad
         {
             Classes.Player player = new();
 
-            player.race = (Race)race;
+            switch ((Race)race)
+            {
+                case Race.monster: player.race = Classes.Race.monster; break;
+                case Race.dwarf: player.race = Classes.Race.dwarf; break;
+                case Race.elf: player.race = Classes.Race.elf; break;
+                case Race.gnome: player.race = Classes.Race.gnome; break;
+                case Race.half_elf: player.race = Classes.Race.half_elf; break;
+                case Race.halfling: player.race = Classes.Race.halfling; break;
+                case Race.half_orc: player.race = Classes.Race.half_orc; break;
+                case Race.human: player.race = Classes.Race.human; break;
+            }
+
+            switch ((ClassId)_class)
+            {
+                case ClassId.cleric: player._class = Classes.ClassId.cleric; break;
+                case ClassId.druid: player._class = Classes.ClassId.druid; break;
+                case ClassId.fighter: player._class = Classes.ClassId.fighter; break;
+                case ClassId.paladin: player._class = Classes.ClassId.paladin; break;
+                case ClassId.ranger: player._class = Classes.ClassId.ranger; break;
+                case ClassId.magic_user: player._class = Classes.ClassId.magic_user; break;
+                case ClassId.thief: player._class = Classes.ClassId.thief; break;
+                case ClassId.monk: player._class = Classes.ClassId.monk; break;
+                case ClassId.mc_c_f: player._class = Classes.ClassId.mc_c_f; break;
+                case ClassId.mc_c_f_m: player._class = Classes.ClassId.mc_c_f_m; break;
+                case ClassId.mc_c_r: player._class = Classes.ClassId.mc_c_r; break;
+                case ClassId.mc_c_mu: player._class = Classes.ClassId.mc_c_mu; break;
+                case ClassId.mc_c_t: player._class = Classes.ClassId.mc_c_t; break;
+                case ClassId.mc_f_mu: player._class = Classes.ClassId.mc_f_mu; break;
+                case ClassId.mc_f_t: player._class = Classes.ClassId.mc_f_t; break;
+                case ClassId.mc_f_mu_t: player._class = Classes.ClassId.mc_f_mu_t; break;
+                case ClassId.mc_mu_t: player._class = Classes.ClassId.mc_mu_t; break;
+                case ClassId.unknown: player._class = Classes.ClassId.unknown; break;
+            }
+
             player.sex = sex;
 
             player.name = name;
@@ -326,7 +430,6 @@ namespace Classes.PoolRad
             Spell.Load(player.spellList, memorizedSpells, memorizedSpells.Length);
 
             player.thac0 = thac0;
-            player._class = (ClassId)_class;
             player.age = age;
             player.hit_point_max = hp_max;
 
@@ -360,7 +463,25 @@ namespace Classes.PoolRad
             player.Money.SetCoins(Money.Gems, Gems);
             player.Money.SetCoins(Money.Jewelry, Jewelry);
 
-            System.Array.Copy(ClassLevel, player.ClassLevel, 8);
+            player.cleric_lvl = ClassLevel[(int)ClassId.cleric];
+            player.druid_lvl = ClassLevel[(int)ClassId.druid];
+            player.fighter_lvl = ClassLevel[(int)ClassId.fighter];
+            player.paladin_lvl = ClassLevel[(int)ClassId.paladin];
+            player.ranger_lvl = ClassLevel[(int)ClassId.ranger];
+            player.magic_user_lvl = ClassLevel[(int)ClassId.magic_user];
+            player.thief_lvl = ClassLevel[(int)ClassId.thief];
+            player.monk_lvl = ClassLevel[(int)ClassId.monk];
+            player.knight_lvl = 0;
+
+            player.cleric_old_lvl = 0;
+            player.druid_old_lvl = 0;
+            player.fighter_old_lvl = 0;
+            player.paladin_old_lvl = 0;
+            player.ranger_old_lvl = 0;
+            player.magic_user_old_lvl = 0;
+            player.thief_old_lvl = 0;
+            player.monk_lvl = 0;
+            player.knight_old_lvl = 0;
 
             if (monsterType == 0)
             {
