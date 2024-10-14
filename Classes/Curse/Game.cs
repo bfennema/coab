@@ -69,6 +69,9 @@ namespace Classes.Curse
         public override SpellBook InitialMUSpells { get => new SpellBook(new List<Spells>() { Spells.detect_magic_MU, Spells.read_magic, Spells.enlarge, Spells.sleep }); }
         public override byte CampingImage { get => 29; }
         public override byte TreasureImage { get => 1; }
+        public override byte WildernessImage { get => 121; }
+        public override byte EndGameImage { get => 122; }
+        public override byte BigpicImage { get => 120; }
         public override ushort CallRedraw { get => 0x2E10; }
         public override ushort CallDuelPlayer { get => 0x8000; }
         public override ushort CallDuelMonster { get => 0x8001; }

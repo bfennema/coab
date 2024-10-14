@@ -29,6 +29,9 @@
         public abstract SpellBook InitialMUSpells { get; }
         public abstract byte CampingImage { get; }
         public abstract byte TreasureImage { get; }
+        public abstract byte WildernessImage { get; }
+        public abstract byte EndGameImage { get; }
+        public abstract byte BigpicImage { get; }
         public abstract ushort CallRedraw { get; }
         public abstract ushort CallDuelPlayer { get; }
         public abstract ushort CallDuelMonster { get; }

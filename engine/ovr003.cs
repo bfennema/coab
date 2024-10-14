@@ -324,7 +324,7 @@ namespace engine
                 {
                     gbl.byte_1EE8D = true;
 
-                    if (blockId >= 0x78)
+                    if (blockId >= gbl.game.BigpicImage)
                     {
                         ovr030.load_bigpic(blockId);
                         ovr030.draw_bigpic();
@@ -527,9 +527,10 @@ namespace engine
 
                 if (var_1 != 0xff &&
                     gbl.area_ptr.inDungeon == 0 &&
-                    gbl.lastDaxBlockId != 0x50)
+                    gbl.lastDaxBlockId != 0x50 &&
+                    gbl.game.WildernessImage != 0xFF)
                 {
-                    ovr030.load_bigpic(0x79);
+                    ovr030.load_bigpic(gbl.game.WildernessImage);
                 }
             }
             else
@@ -1003,9 +1004,10 @@ namespace engine
 
                 ovr006.AfterCombatExpAndTreasure();
 
-                if (gbl.area_ptr.inDungeon == 0)
+                if (gbl.area_ptr.inDungeon == 0 &&
+                    gbl.game.WildernessImage != 0xFF)
                 {
-                    ovr030.load_bigpic(0x79);
+                    ovr030.load_bigpic(gbl.game.WildernessImage);
                 }
             }
 

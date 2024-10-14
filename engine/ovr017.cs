@@ -871,9 +871,9 @@ namespace engine
                     }
                 }
             }
-            else
+            else if (gbl.game.WildernessImage != 0xFF)
             {
-                ovr030.load_bigpic(0x79);
+                ovr030.load_bigpic(gbl.game.WildernessImage);
             }
 
             seg043.clear_keyboard();

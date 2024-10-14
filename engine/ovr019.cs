@@ -523,7 +523,7 @@ namespace engine
 
             seg041.DisplayAndPause("Press any key to continue.", 13);
             ovr027.ClearPromptArea();
-            ovr030.load_bigpic(0x7A);
+            ovr030.load_bigpic(gbl.game.EndGameImage);
 
             ovr030.draw_bigpic();
 

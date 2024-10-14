@@ -232,20 +232,26 @@ namespace engine
 
         internal static void load_bigpic(byte block_id) /* bigpic */
         {
-            DaxArrayFreeDaxBlocks(gbl.byte_1D556);
-
-            if (gbl.bigpic_block_id != block_id)
+            if (gbl.game.BigpicImage != 0xFF)
             {
-                gbl.bigpic_dax = seg040.LoadDax(0, 0, block_id, "BIGPIC", gbl.game_area);
-                gbl.bigpic_block_id = block_id;
+                DaxArrayFreeDaxBlocks(gbl.byte_1D556);
+
+                if (gbl.bigpic_block_id != block_id)
+                {
+                    gbl.bigpic_dax = seg040.LoadDax(0, 0, block_id, "BIGPIC", gbl.game_area);
+                    gbl.bigpic_block_id = block_id;
+                }
             }
         }
 
 
         internal static void draw_bigpic() /* sub_7087A */
         {
-            gbl.game.DrawFrame_Wilderness();
-            seg040.draw_picture(gbl.bigpic_dax, 1, 1, 0);
+            if (gbl.game.BigpicImage != 0xFF)
+            {
+                gbl.game.DrawFrame_Wilderness();
+                seg040.draw_picture(gbl.bigpic_dax, 1, 1, 0);
+            }
         }
     }
 }
