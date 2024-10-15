@@ -575,6 +575,8 @@ namespace Classes
             FootmanAPOSs = 0x12D,
             White = 0x12E,
             Red = 0x12F,
+            Good_Luck = 0x130,
+            Health = 0x131,
         }
 
         public enum Type
