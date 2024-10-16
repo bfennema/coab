@@ -26,7 +26,7 @@ namespace engine
             byte[] block_ptr;
             ushort block_size;
 
-            seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8D1");
+            seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8D", gbl.game.Tile8x8D201);
 
             if (block_size != 0)
             {
