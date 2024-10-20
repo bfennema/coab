@@ -64,7 +64,7 @@ namespace engine
                     if (posX >= 0 && posX <= 0x31 &&
                         posY >= 0 && posY <= 0x18)
                     {
-                        if (gbl.BackGroundTiles[gbl.mapToBackGroundTile[posX, posY]].tile_index == 0x16 &&
+                        if (gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[posX, posY]].tile_index == 0x16 &&
                             gbl.byte_1AD3D != 0 &&
                             byte_1AD3E &&
                             ovr024.roll_dice(10, 1) <= 5)
@@ -79,7 +79,7 @@ namespace engine
                                 if (tmpX >= 0 && tmpX <= 0x31 &&
                                     tmpY >= 0 && tmpY <= 0x18)
                                 {
-                                    if (gbl.BackGroundTiles[gbl.mapToBackGroundTile[tmpX, tmpY]].tile_index == 0x16 &&
+                                    if (gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[tmpX, tmpY]].tile_index == 0x16 &&
                                         ovr024.roll_dice(10, 1) <= 9)
                                     {
                                         gbl.mapToBackGroundTile[posX, posY] = gbl.Tile_Chair; // Chair
@@ -538,12 +538,12 @@ namespace engine
         {
             if (map_x < 0x31)
             {
-                gbl.mapToBackGroundTile[map_x + 1, map_y] = 0x40;
+                gbl.mapToBackGroundTile[map_x + 1, map_y] = 64; // (river)
             }
 
             if (map_y < 0x18 && map_x < 0x31)
             {
-                gbl.mapToBackGroundTile[map_x + 1, map_y + 1] = 0x41;
+                gbl.mapToBackGroundTile[map_x + 1, map_y + 1] = 65; // (river)
             }
         }
 
@@ -575,11 +575,11 @@ namespace engine
                 {
                     if (map_x <= 0x31)
                     {
-                        gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(2, 1) + 0x3B;
+                        gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(2, 1) + 59; // 60-61 (river)
 
                         if (map_x < 0x31)
                         {
-                            gbl.mapToBackGroundTile[map_x + 1, map_y] = ovr024.roll_dice(2, 1) + 0x3D;
+                            gbl.mapToBackGroundTile[map_x + 1, map_y] = ovr024.roll_dice(2, 1) + 61; // 62-63 (river)
                         }
 
                         if (ovr024.roll_dice(20, 1) == 1)
@@ -630,18 +630,18 @@ namespace engine
                 {
                     for (int mapY = 1; mapY <= 0x18; mapY++)
                     {
-                        if (gbl.BackGroundTiles[gbl.mapToBackGroundTile[mapX, mapY]].tile_index == 22 &&
-                            gbl.BackGroundTiles[gbl.mapToBackGroundTile[mapX, mapY - 1]].tile_index == 22 &&
+                        if (gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[mapX, mapY]].tile_index == 22 &&
+                            gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[mapX, mapY - 1]].tile_index == 22 &&
                             neededRoll >= ovr024.roll_dice(100, 1))
                         {
                             if (neededRoll >= ovr024.roll_dice(100, 1))
                             {
-                                gbl.mapToBackGroundTile[mapX, mapY] = ovr024.roll_dice(2, 1) + 0x29;
+                                gbl.mapToBackGroundTile[mapX, mapY] = ovr024.roll_dice(2, 1) + 41; // 42-43 (WILDCOM: 10-11, logs)
                             }
                             else
                             {
-                                gbl.mapToBackGroundTile[mapX, mapY - 1] = ovr024.roll_dice(5, 1) + 0x1F;
-                                gbl.mapToBackGroundTile[mapX, mapY] = ovr024.roll_dice(5, 1) + 0x24;
+                                gbl.mapToBackGroundTile[mapX, mapY - 1] = ovr024.roll_dice(5, 1) + 31; // 32-36 (WILDCOM: 0-4, tree top)
+                                gbl.mapToBackGroundTile[mapX, mapY] = ovr024.roll_dice(5, 1) + 36; // 37-41 (WILDCOM: 5-9, tree bottom)
                             }
                         }
                     }
@@ -656,23 +656,23 @@ namespace engine
 
             if (roll <= stepA)
             {
-                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(2, 1) + 0x39;
+                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(2, 1) + 57; // 58-59
             }
             else if (roll <= stepA + stepB)
             {
-                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(2, 1) + 0x2f;
+                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(2, 1) + 47; // 48-49
             }
             else if (roll <= stepA + stepB + stepC)
             {
-                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(4, 1) + 0x2B;
+                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(4, 1) + 43; // 44-47
             }
             else if (roll <= stepA + stepB + stepC + stepD)
             {
-                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(3, 1) + 0x36;
+                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(3, 1) + 54; // 55-57
             }
             else if (roll <= stepA + stepB + stepC + stepD + stepE)
             {
-                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(4, 1) + 0x31;
+                gbl.mapToBackGroundTile[map_x, map_y] = ovr024.roll_dice(4, 1) + 49; // 50-53
             }
         }
 
@@ -715,7 +715,7 @@ namespace engine
             {
                 for (int map_y = 0; map_y <= 24; map_y++)
                 {
-                    if (gbl.BackGroundTiles[gbl.mapToBackGroundTile[map_x, map_y]].tile_index == 22)
+                    if (gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[map_x, map_y]].tile_index == 22)
                     {
                         if (var_4 >= -30 && var_4 <= 9)
                         {
@@ -754,24 +754,9 @@ namespace engine
         }
 
 
-        static void SetupGroundTiles() // sub_38030
+        static void SetupBackgroundTiles() // sub_38030
         {
-            if (gbl.area_ptr.inDungeon != 0)
-            {
-                ovr034.Load24x24Set(25, 0, 1, "DungCom");
-            }
-            else
-            {
-                 ovr034.Load24x24Set(34, 0, 1, "WildCom");
-            }
-
-            ovr034.Load24x24Set(6, 34, 1, "RandCom");
-
-            gbl.mapToBackGroundTile = new Struct_1D1BC();
-
-            gbl.mapToBackGroundTile.drawTargetCursor = false;
-            gbl.mapToBackGroundTile.size = 1;
-            gbl.mapToBackGroundTile.ignoreWalls = false;
+            gbl.game.SetupBackgroundTiles();
 
             if (gbl.area_ptr.inDungeon != 0)
             {
@@ -862,14 +847,14 @@ namespace engine
 
                 if (tmp_player_index == 0 &&
                     groundTile > 0 &&
-                    gbl.BackGroundTiles[groundTile].move_cost < 0xFF)
+                    !gbl.game.BackgroundTiles[groundTile].blocked)
                 {
                     unk_1AB1C[gbl.currentTeam, arg_0, arg_6, arg_8] = 0;
-					return true;
+                    return true;
                 }
                 else
                 {
-					return false;
+                    return false;
                 }
             }
         }
@@ -1196,7 +1181,7 @@ namespace engine
 
             gbl.area2_ptr.field_666 = 0;
 
-            SetupGroundTiles();
+            SetupBackgroundTiles();
 
             SetupCombatActions();
             PlaceCombatants();

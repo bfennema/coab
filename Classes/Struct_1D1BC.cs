@@ -50,7 +50,7 @@ namespace Classes
             }
             set
             {
-                int index = x + (y * 0x32);
+                int index = x + (y * 50);
                 field_7[index] = value;
             }
         }

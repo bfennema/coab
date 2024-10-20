@@ -67,7 +67,7 @@ namespace engine
                 {
                     int i = gbl.mapToBackGroundTile[p + pos];
 
-                    ovr034.DrawIsoTile(gbl.BackGroundTiles[i].tile_index, (screenPos.y + p.y) * 3, (screenPos.x + p.x) * 3);
+                    ovr034.DrawIsoTile(gbl.game.BackgroundTiles[i].tile_index, (screenPos.y + p.y) * 3, (screenPos.x + p.x) * 3);
 
                     if (gbl.mapToBackGroundTile.drawTargetCursor == true)
                     {
@@ -182,7 +182,7 @@ namespace engine
             else if (CoordOnScreen(screen) == true)
             {
                 var tileIdx = gbl.mapToBackGroundTile[map];
-                ovr034.DrawIsoTile(gbl.BackGroundTiles[tileIdx].tile_index, screen.y * 3, screen.x * 3);
+                ovr034.DrawIsoTile(gbl.game.BackgroundTiles[tileIdx].tile_index, screen.y * 3, screen.x * 3);
             }
         }
 
@@ -203,7 +203,7 @@ namespace engine
                     {
                         int tileIdx = gbl.mapToBackGroundTile[map + delta];
                         //THIS DRAWS BACKGROUND MAP.
-                        ovr034.DrawIsoTile(gbl.BackGroundTiles[tileIdx].tile_index, (screen.y + delta.y) * 3, (screen.x + delta.x) * 3);
+                        ovr034.DrawIsoTile(gbl.game.BackgroundTiles[tileIdx].tile_index, (screen.y + delta.y) * 3, (screen.x + delta.x) * 3);
                     }
                 }
             }
@@ -324,7 +324,7 @@ namespace engine
 
                     for (int j = 0; j <= 6; j++)
                     {
-                        ovr034.DrawIsoTile(gbl.BackGroundTiles[gbl.mapToBackGroundTile[mapX, mapY]].tile_index, screenRowY, screenColX);
+                        ovr034.DrawIsoTile(gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[mapX, mapY]].tile_index, screenRowY, screenColX);
 
                         screenColX += IconColumnSize;
                         mapX++;
@@ -470,9 +470,9 @@ namespace engine
                 }
                 else if (groundTile != 0)
                 {
-                    if (gbl.BackGroundTiles[atGroundTile].move_cost >= maxMoveCost)
+                    if (gbl.game.BackgroundTiles[atGroundTile].move_cost >= maxMoveCost)
                     {
-                        maxMoveCost = gbl.BackGroundTiles[atGroundTile].move_cost;
+                        maxMoveCost = gbl.game.BackgroundTiles[atGroundTile].move_cost;
                         groundTile = atGroundTile;
                     }
                 }
@@ -525,9 +525,9 @@ namespace engine
                     {
                         isPoisonousCloud = true;
                     }
-                    else if (gbl.BackGroundTiles[atGroundTile].move_cost >= maxMoveCost)
+                    else if (gbl.game.BackgroundTiles[atGroundTile].move_cost >= maxMoveCost)
                     {
-                        maxMoveCost = gbl.BackGroundTiles[atGroundTile].move_cost;
+                        maxMoveCost = gbl.game.BackgroundTiles[atGroundTile].move_cost;
                         groundTile = atGroundTile;
                     }
                 }
@@ -634,7 +634,7 @@ namespace engine
 
                 if (playerIdx != 0 ||
                     ground_tile == 0 ||
-                    gbl.BackGroundTiles[ground_tile].move_cost == 0xff)
+                    gbl.game.BackgroundTiles[ground_tile].blocked)
                 {
                     gbl.CombatMap[player_index].size = 0;
                 }

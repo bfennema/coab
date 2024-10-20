@@ -101,7 +101,7 @@ namespace engine
             var_19.CalculateDeltas();
 
             var_31.attacker.x = 0;
-            var_31.attacker.y = gbl.BackGroundTiles[groundTilesMap[attacker]].field_1;
+            var_31.attacker.y = gbl.game.BackgroundTiles[groundTilesMap[attacker]].y1;
 
             if (var_19.diff_x > var_19.diff_y)
             {
@@ -112,16 +112,16 @@ namespace engine
                 var_31.target.x = var_19.diff_y;
             }
 
-            var_31.target.y = gbl.BackGroundTiles[groundTilesMap[attacker]].field_1;
+            var_31.target.y = gbl.game.BackgroundTiles[groundTilesMap[attacker]].y1;
             var_31.CalculateDeltas();
             bool finished = false;
 
             do
             {
                 int gt = groundTilesMap[var_19.current];
-                Struct_189B4 s189 = gbl.BackGroundTiles[gt];
+                Tile s189 = gbl.game.BackgroundTiles[gt];
 
-                if (groundTilesMap.ignoreWalls == false && s189.field_2 > var_31.current.y)
+                if (groundTilesMap.ignoreWalls == false && s189.y2 > var_31.current.y)
                 {
                     return new MapReach(false, var_19.steps, var_19.current);
                 }

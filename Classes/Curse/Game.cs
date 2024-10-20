@@ -59,6 +59,8 @@ namespace Classes.Curse
         public override byte DemoEclBlockId { get => 82; }
         public override byte InitialGameArea { get => 2; }
         public override byte Tile8x8D201 { get => 1; }
+        public override void SetupBackgroundTiles() { Tiles.SetupBackground(); }
+        public override Tile[] BackgroundTiles { get => Tiles.Background; }
         public override ushort InitialVmMem0Offset { get => 0x4B00; }
         public override ushort InitialVmMem0Size { get => 0x0400; }
         public override ushort InitialVmMem1Offset { get => 0x7C00; }

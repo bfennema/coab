@@ -1383,7 +1383,7 @@ namespace engine
 
 				ovr033.AtMapXY(out groundTile, out var_C[var_11], gbl.targetPos + gbl.MapDirectionDelta[var_12]);
 
-				if (groundTile > 0 && gbl.BackGroundTiles[groundTile].move_cost < 0xFF)
+				if (groundTile > 0 && !gbl.game.BackgroundTiles[groundTile].blocked)
 				{
 					var_8.present[var_11] = true;
 				}
@@ -1964,7 +1964,7 @@ namespace engine
 			ovr033.AtMapXY(out groundTile, out playerIndex, pos);
 
 			if (groundTile > 0 &&
-				gbl.BackGroundTiles[groundTile].move_cost == 0xff &&
+				gbl.game.BackgroundTiles[groundTile].blocked &&
 				gbl.area_ptr.inDungeon == 1 &&
 				arg_0 == false)
 			{
@@ -2025,7 +2025,7 @@ namespace engine
 
 								ovr033.AtMapXY(out groundTile, out var_3A, path_a.current);
 
-								if (gbl.BackGroundTiles[groundTile].move_cost == 1)
+								if (gbl.game.BackgroundTiles[groundTile].move_cost == 1)
 								{
 									var_36 = false;
 								}
@@ -2033,7 +2033,7 @@ namespace engine
 							} while (stepping == true &&
 								(var_3A <= 0 || var_3A == var_39) &&
 								groundTile != 0 &&
-								gbl.BackGroundTiles[groundTile].move_cost <= 1 &&
+								gbl.game.BackgroundTiles[groundTile].move_cost <= 1 &&
 								path_a.steps < var_3C);
 						}
 
@@ -2623,7 +2623,7 @@ namespace engine
 				ovr033.AtMapXY(out ground_tile, out targets[var_16], gbl.targetPos + gbl.MapDirectionDelta[dir]);
 
 				if (ground_tile > 0 &&
-					gbl.BackGroundTiles[ground_tile].move_cost < 0xff)
+					!gbl.game.BackgroundTiles[ground_tile].blocked)
 				{
 					var_8.present[var_16] = true;
 				}

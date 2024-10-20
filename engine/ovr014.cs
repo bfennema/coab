@@ -270,11 +270,11 @@ namespace engine
             if ((direction & 0x01) != 0)
             {
                 // Diagonal walking...
-                costToMove = gbl.BackGroundTiles[gbl.mapToBackGroundTile[newPos]].move_cost * 3;
+                costToMove = gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[newPos]].move_cost * 3;
             }
             else
             {
-                costToMove = gbl.BackGroundTiles[gbl.mapToBackGroundTile[newPos]].move_cost * 2;
+                costToMove = gbl.game.BackgroundTiles[gbl.mapToBackGroundTile[newPos]].move_cost * 2;
             }
 
             if (costToMove > player.actions.move)
@@ -1965,7 +1965,7 @@ namespace engine
                 }
 
                 if (range > maxRange ||
-                    gbl.BackGroundTiles[groundTile].move_cost == 0xff)
+                    gbl.game.BackgroundTiles[groundTile].blocked)
                 {
                     can_target = false;
                 }

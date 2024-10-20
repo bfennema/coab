@@ -525,18 +525,20 @@ namespace engine
                     {
                         int cost;
 
-                        if ((dir / 2) < 1)
+                        if (gbl.game.BackgroundTiles[ground_tile].blocked)
                         {
-                            cost = gbl.BackGroundTiles[ground_tile].move_cost * 3;
+                            cost = 0xFFFF;
                         }
                         else
                         {
-                            cost = gbl.BackGroundTiles[ground_tile].move_cost * 2;
-                        }
-
-                        if (gbl.BackGroundTiles[ground_tile].move_cost == 0xFF)
-                        {
-                            cost = 0xFFFF;
+                            if ((dir / 2) < 1)
+                            {
+                                cost = gbl.game.BackgroundTiles[ground_tile].move_cost * 3;
+                            }
+                            else
+                            {
+                                cost = gbl.game.BackgroundTiles[ground_tile].move_cost * 2;
+                            }
                         }
 
                         if (cost > player.actions.move)

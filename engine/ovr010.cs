@@ -307,12 +307,12 @@ namespace engine
             }
             else
             {
-                if (gbl.BackGroundTiles[groundTile].move_cost == 0xff)
+                if (gbl.game.BackgroundTiles[groundTile].blocked)
                 {
                     return false;
                 }
 
-                int move_cost = gbl.BackGroundTiles[groundTile].move_cost;
+                int move_cost = gbl.game.BackgroundTiles[groundTile].move_cost;
                 if ((playerDirection & 1) != 0)
                 {
                     move_cost *= 3;

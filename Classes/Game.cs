@@ -19,6 +19,8 @@
         public abstract byte DemoEclBlockId { get; }
         public abstract byte InitialGameArea { get; }
         public abstract byte Tile8x8D201 { get; }
+        public abstract void SetupBackgroundTiles();
+        public abstract Tile[] BackgroundTiles { get; }
         public abstract ushort InitialVmMem0Offset { get; }
         public abstract ushort InitialVmMem0Size { get; }
         public abstract ushort InitialVmMem1Offset { get; }
