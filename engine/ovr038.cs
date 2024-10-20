@@ -41,11 +41,11 @@ namespace engine
             {
                 symbol_set = 3;
             }
-            else if (symbol_id >= 0x100 && symbol_id <= 0x127)
+            else if (symbol_id >= 0x100 && symbol_id <= 0x164)
             {
                 symbol_set = 4;
             }
-            else if (symbol_id == 0 || (symbol_id >= 0x128 && symbol_id <= 0x7FFF))
+            else if (symbol_id == 0 || (symbol_id >= 0x165 && symbol_id <= 0x7FFF))
             {
                 throw new System.ApplicationException("Bad symbol number in Put8x8Symbol." + symbol_id);
             }
