@@ -516,8 +516,7 @@ namespace engine
             {
                 gbl.filesLoaded = true;
 
-                if (var_3 != 0xff &&
-                    var_3 != 0x7f &&
+                if ((var_3 & 0x7f) != 0x7f &&
                     gbl.area_ptr.inDungeon != 0)
                 {
                     gbl.area_ptr.current_3DMap_block_id = var_3;
@@ -525,7 +524,7 @@ namespace engine
                     gbl.area2_ptr.field_592 = 0;
                 }
 
-                if (var_1 != 0xff &&
+                if ((var_1 & 0x7f) != 0x7f &&
                     gbl.area_ptr.inDungeon == 0 &&
                     gbl.lastDaxBlockId != 0x50 &&
                     gbl.game.WildernessImage != 0xFF)
@@ -546,19 +545,19 @@ namespace engine
                     if (gbl.area_ptr.field_1CE != 0 &&
                         gbl.area_ptr.field_1D0 != 0)
                     {
-                        if (var_3 != 0xff)
+                        if ((var_3 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(1, var_3);
                         }
 
-                        if (var_1 != 0xff)
+                        if ((var_1 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(3, var_1);
                         }
                     }
                     else
                     {
-                        if (var_3 != 0xff)
+                        if ((var_3 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(1, var_3);
                         }
@@ -567,7 +566,7 @@ namespace engine
                             gbl.setBlocks[0].Reset();
                         }
 
-                        if (var_2 != 0xff)
+                        if ((var_2 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(2, var_2);
                         }
@@ -576,7 +575,7 @@ namespace engine
                             gbl.setBlocks[1].Reset();
                         }
 
-                        if (var_1 != 0xff)
+                        if ((var_1 & 0x7f) != 0x7f)
                         {
                             ovr031.LoadWalldef(3, var_1);
                         }
