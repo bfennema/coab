@@ -1569,7 +1569,8 @@ namespace engine
 
 		internal static void RedrawCombatScreen() // sub_68DC0
 		{
-			ovr033.Color_0_8_inverse();
+			seg040.SetPaletteColor(gbl.game.CombatTransparentColor, 0);
+			seg040.SetPaletteColor(0, gbl.game.CombatTransparentColor);
 			gbl.game.DrawFrame_Combat();
 
 			ovr033.redrawCombatArea(8, 0xff, gbl.mapToBackGroundTile.mapScreenTopLeft + Point.ScreenCenter);

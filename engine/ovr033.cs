@@ -88,7 +88,7 @@ namespace engine
                 PlayerOnScreen(false, player_index) == true)
             {
                 // draws the player icon over focus box
-                ovr034.draw_combat_icon(gbl.player_array[player_index].icon_id, 
+                ovr034.draw_combat_icon(gbl.player_array[player_index],
                     Icon.Normal,
                     gbl.player_array[player_index].actions.direction,
                     gbl.CombatMap[player_index].screenPos.y,
@@ -358,7 +358,7 @@ namespace engine
                         PlayerOnScreen(false, player) == true)
                     {
                         var pos = gbl.CombatMap[index].screenPos;
-                        ovr034.draw_combat_icon(player.icon_id, 0, player.actions.direction, pos.y, pos.x);
+                        ovr034.draw_combat_icon(player, 0, player.actions.direction, pos.y, pos.x);
                     }
                 }
             }
@@ -404,7 +404,7 @@ namespace engine
                 gbl.focusCombatAreaOnPlayer == true)
             {
                 var pos = gbl.CombatMap[player_index].screenPos;
-                ovr034.draw_combat_icon(player.icon_id, iconState, direction, pos.y, pos.x);
+                ovr034.draw_combat_icon(player, iconState, direction, pos.y, pos.x);
                 seg040.DrawOverlay();
             }
         }

@@ -96,5 +96,11 @@ namespace engine
                 seg040.draw_combat_picture(icon, (tileY * 3) + 1, (tileX * 3) + 1, 0);
             }
         }
+        internal static void draw_combat_icon(Player player, Icon iconState, int direction, int tileY, int tileX)
+        {
+            seg040.draw_clipped_recolor(8, gbl.game.CombatTransparentColor);
+            draw_combat_icon(player.icon_id, iconState, direction, tileY, tileX);
+            seg040.draw_clipped_recolor(17, 17);
+        }
     }
 }

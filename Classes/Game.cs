@@ -53,6 +53,7 @@
         public abstract void DrawFrame_Temple();
         public abstract int ShopBuy();
         public abstract bool Portrait { get; }
+        public abstract byte CombatTransparentColor { get; }
         public abstract bool GameWonGameOver { get; }
         public abstract bool SetBlocksInArea1 { get; }
         public abstract int EclClockArguments { get; }

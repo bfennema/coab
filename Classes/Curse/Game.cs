@@ -93,6 +93,7 @@ namespace Classes.Curse
         public override void DrawFrame_Temple() { Draw.Frame_Wilderness(); }
         public override int ShopBuy() { return 1; }
         public override bool Portrait { get => false; }
+        public override byte CombatTransparentColor { get => 8; }
         public override bool GameWonGameOver { get => true; }
         public override bool SetBlocksInArea1 { get => false; }
         public override int EclClockArguments { get => 2; }

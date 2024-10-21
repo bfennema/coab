@@ -57,22 +57,22 @@ namespace Classes.Curse
             new(1, 1, 0,  9 ), // [41] TREE BOTTOM 4
             new(   1, 2, 10 ), // [42] LOG 0
             new(   1, 2, 11 ), // [43] LOG 1
-            new(1, 1, 0, 12 ), // [44] SWAMP 0
-            new(1, 1, 0, 13 ), // [45] SWAMP 1
-            new(1, 1, 0, 14 ), // [46] SWAMP 2
-            new(1, 1, 0, 15 ), // [47] SWAMP 3
+            new(1, 1, 0, 12 ), // [44] GRASS 0
+            new(1, 1, 0, 13 ), // [45] GRASS 1
+            new(1, 1, 0, 14 ), // [46] GRASS 2
+            new(1, 1, 0, 15 ), // [47] GRASS 3
             new(2, 1, 0, 16 ), // [48] BUSH 0
             new(2, 1, 0, 17 ), // [49] BUSH 1
-            new(2, 1, 0, 18 ), // [50] SHELL 0
-            new(2, 1, 0, 19 ), // [51] SHELL 1
-            new(2, 1, 0, 20 ), // [52] SHELL 2
-            new(2, 1, 0, 21 ), // [53] SHELL 3
+            new(2, 1, 0, 18 ), // [50] ROCK 0
+            new(2, 1, 0, 19 ), // [51] ROCK 1
+            new(2, 1, 0, 20 ), // [52] ROCK 2
+            new(2, 1, 0, 21 ), // [53] ROCK 3
             new(1, 1, 0, 22 ), // [54] (empty)
             new(1, 1, 0, 23 ), // [55] GROUND 0
             new(1, 1, 0, 24 ), // [56] GROUND 1
             new(1, 1, 0, 25 ), // [57] GROUND 2
-            new(2, 1, 0, 26 ), // [58] BOG 0
-            new(2, 1, 0, 27 ), // [59] BOG 1
+            new(2, 1, 0, 26 ), // [58] SWAMP 0
+            new(2, 1, 0, 27 ), // [59] SWAMP 1
             new(4, 0, 0, 28 ), // [60] RIVER WEST BANK 0
             new(4, 0, 0, 29 ), // [61] RIVER WEST BANK 1
             new(4, 0, 0, 30 ), // [62] RIVER EAST BANK 0
@@ -89,10 +89,10 @@ namespace Classes.Curse
             }
             else
             {
-                gbl.Load24x24Set(34, 0, 1, "WildCom");
+                gbl.Load24x24Set(33, 0, 1, "WildCom");
             }
 
-            gbl.Load24x24Set(6, 25, 1, "RandCom");
+            gbl.Load24x24Set(6, 34, 1, "RandCom");
 
             gbl.mapToBackGroundTile = new Struct_1D1BC();
 

@@ -106,15 +106,16 @@ namespace engine
                         {
                             byte color = dax_block.data[offset];
 
-                            if (color == color_no_draw)
-                            { }
-                            else if (color == color_re_color_from)
+                            if (color != color_no_draw)
                             {
-                                Display.SetPixel3(pixX, pixY, color_re_color_to);
-                            }
-                            else
-                            {
-                                Display.SetPixel3(pixX, pixY, color);
+                                if (color == color_re_color_from)
+                                {
+                                    Display.SetPixel3(pixX, pixY, color_re_color_to);
+                                }
+                                else
+                                {
+                                    Display.SetPixel3(pixX, pixY, color);
+                                }
                             }
                         }
 
