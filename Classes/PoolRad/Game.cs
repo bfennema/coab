@@ -59,6 +59,9 @@ namespace Classes.PoolRad
         public override int DemoGameSpeed { get => 0; }
         public override byte DemoEclBlockId { get => 0; }
         public override byte InitialGameArea { get => 3; }
+        public override byte Tile8x8D201 { get => 1; }
+        public override void SetupBackgroundTiles() { Tiles.SetupBackground(); }
+        public override Tile[] BackgroundTiles { get => Tiles.Background; }
         public override ushort InitialVmMem0Offset { get => 0x4900; }
         public override ushort InitialVmMem0Size { get => 0x0400; }
         public override ushort InitialVmMem1Offset { get => 0x6B00; }
@@ -70,6 +73,9 @@ namespace Classes.PoolRad
         public override SpellBook InitialMUSpells { get => new SpellBook(new List<Spells>() { Spells.detect_magic_MU, Spells.read_magic, Spells.shield, Spells.sleep }); }
         public override byte CampingImage { get => 29; }
         public override byte TreasureImage { get => 1; }
+        public override byte WildernessImage { get => 255; }
+        public override byte EndGameImage { get => 255; }
+        public override byte BigpicImage { get => 255; }
         public override ushort CallRedraw { get => 0x2C90; }
         public override ushort CallDuelPlayer { get => 0x8000; }
         public override ushort CallDuelMonster { get => 0x8001; }
@@ -88,6 +94,7 @@ namespace Classes.PoolRad
         public override void DrawFrame_Temple() { Draw.Frame_Temple(); }
         public override int ShopBuy() { gbl.displayString("Shop", 0, 15, 1, 17); return 4; }
         public override bool Portrait { get => true; }
+        public override byte CombatTransparentColor { get => 8; }
         public override bool GameWonGameOver { get => false; }
         public override bool SetBlocksInArea1 { get => true; }
         public override int EclClockArguments { get => 1; }
