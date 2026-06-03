@@ -44,6 +44,8 @@ namespace Classes
             System.Array.Clear(origData, 0, Area1Size);
 
             DataIO.ReadObject(this, origData, 0);
+            inDungeon = 1;
+            LastEclBlockId = 0;
         }
 
         protected byte[] origData;

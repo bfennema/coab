@@ -57,6 +57,18 @@ namespace Classes
             no_race_class_restrictions = value;
         }
 
+        public static bool allow_pool_paladin_ranger = false;
+        public static void AllowPoolPaladinRanger(bool value)
+        {
+            allow_pool_paladin_ranger = value;
+        }
+
+        public static bool allow_champions_paladin = false;
+        public static void AllowChampionsPaladin(bool value)
+        {
+            allow_champions_paladin = value;
+        }
+
         public static bool player_always_saves = false;
         public static void PlayerAlwaysSavesSet(bool value)
         {

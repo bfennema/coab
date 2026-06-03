@@ -1,4 +1,5 @@
 using Classes;
+using System;
 using System.Collections.Generic;
 
 namespace engine
@@ -7,13 +8,13 @@ namespace engine
     {
         static byte[,] /*seg600:42BC*/ ClericSpellLevels = { // unk_1A5CC
 			{1, 0, 0, 0, 0},
-			{0, 1, 0, 0, 0},
-			{1, 1, 0, 0, 0},
-			{0, 1, 1, 0, 0},
-			{0, 0, 1, 0, 0}, 
-			{0, 0, 0, 1, 0},    
-			{0, 0, 1, 1, 0}, 
-			{1, 1, 0, 0, 1},  //seg600:42EE
+            {0, 1, 0, 0, 0},
+            {1, 1, 0, 0, 0},
+            {0, 1, 1, 0, 0},
+            {0, 0, 1, 0, 0},
+            {0, 0, 0, 1, 0},
+            {0, 0, 1, 1, 0},
+            {1, 1, 0, 0, 1},  //seg600:42EE
 			{0, 0, 0, 1, 1},  //seg600:42F3
 			{1, 0, 1, 0, 0},  //seg600:42F8
 			{1, 1, 1, 0, 0},  //seg600:42FD
@@ -21,34 +22,34 @@ namespace engine
 
         static byte[,] /*seg600:43E5*/ PaladinSpellLevels = { // unk_1A6F5
 			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0}, 
-			{0, 0, 0, 0, 0},  
-			{0, 0, 0, 0, 0}, 
-			{1, 0, 0, 0, 0}, 
-			{1, 0, 0, 0, 0}, 
-			{0, 1, 0, 0, 0}, 
-			{0, 1, 0, 0, 0}
-		};
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {1, 0, 0, 0, 0},
+            {1, 0, 0, 0, 0},
+            {0, 1, 0, 0, 0},
+            {0, 1, 0, 0, 0}
+        };
 
-        static byte[,] /*seg600:4448*/ unk_1A758 = { 
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{0, 0, 0, 0, 0},
-			{1, 0, 0, 0, 0},
-			{0, 0, 0, 1, 0},
-			{1, 0, 0, 0, 0},
-			{0, 0, 0, 1, 0},
-			{0, 1, 0, 0, 0} 
-		};
+        static byte[,] /*seg600:4448*/ unk_1A758 = {
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0},
+            {1, 0, 0, 0, 0},
+            {0, 0, 0, 1, 0},
+            {1, 0, 0, 0, 0},
+            {0, 0, 0, 1, 0},
+            {0, 1, 0, 0, 0}
+        };
 
 
 
@@ -188,12 +189,17 @@ namespace engine
             for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
             {
                 byte class_lvl = player.ClassLevel[(byte)skill];
+                sbyte new_thac0 = ovr018.Thac0Table[skill][^1];
 
-                player.thac0 = System.Math.Max(ovr018.thac0_table[(byte)skill, class_lvl], player.thac0);
-                player.HitDice = System.Math.Max(class_lvl, player.HitDice);
+                if (class_lvl < ovr018.Thac0Table[skill].Length)
+                {
+                    new_thac0 = ovr018.Thac0Table[skill][class_lvl];
+                }
+                player.thac0 = Math.Max(new_thac0, player.thac0);
+                player.HitDice = Math.Max(class_lvl, player.HitDice);
             }
 
-            if (player.fighter_lvl >= 7 || 
+            if (player.fighter_lvl >= 7 ||
                 player.paladin_lvl >= 7 ||
                 player.ranger_lvl >= 8)
             {
@@ -243,10 +249,12 @@ namespace engine
                         }
                     }
 
-                    if (ovr018.thac0_table[(byte)skill, skill_lvl] > player.thac0)
+                    sbyte new_thac0 = ovr018.Thac0Table[skill][^1];
+                    if (skill_lvl < ovr018.Thac0Table[skill].Length)
                     {
-                        player.thac0 = ovr018.thac0_table[(byte)skill, skill_lvl];
+                        new_thac0 = ovr018.Thac0Table[skill][skill_lvl];
                     }
+                    player.thac0 = Math.Max(new_thac0, player.thac0);
                 }
 
                 if (player.fighter_old_lvl > 6 ||
@@ -320,16 +328,18 @@ namespace engine
             }
         }
 
-        static byte[, ,] SaveThrowValues = { // [8,13,5] class, level, save_type      
-			{{20, 20, 20, 20, 20}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11}}, // cleric
-			{{20, 20, 20, 20, 20}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11}}, // druid
-			{{20, 20, 20, 20, 20}, {14, 15, 16, 17, 17}, {14, 15, 16, 17, 17}, {13, 14, 15, 16, 16}, {13, 14, 15, 16, 16}, {11, 12, 13, 13, 14}, {11, 12, 13,13, 14}, {10, 11, 12, 12, 13}, {10, 11, 12, 12, 13}, {8, 9, 10, 9, 11}, {8, 9, 10, 9, 11}, {7, 8, 9, 8, 10}, {7, 8, 9, 8, 10}}, // fighter
-			{{20, 20, 20, 20, 20}, {12, 13, 14, 15, 15}, {12, 13, 14, 15, 15}, {11, 12, 13, 14, 14}, {11, 12, 13, 14, 14}, {9, 9, 11, 11, 12}, {9, 9, 11, 11, 12}, {8, 9, 10, 10, 11}, {9, 9, 10, 10, 11}, {6, 7, 8, 7, 9}, {6, 7, 8, 7, 9}, {5, 6, 7, 6, 8}, {5, 6, 7, 6, 8}}, // paladin
-			{{20, 20, 20, 20, 20}, {12, 13, 14, 15, 15}, {12, 13, 14, 15, 15}, {11, 12, 13, 14, 14}, {11, 12, 13, 14, 14}, {9, 9, 11, 11, 12}, {9, 9, 11, 11, 12}, {8, 9, 10, 10, 11}, {9, 9, 10, 10, 11}, {6, 7, 8, 7, 9}, {6, 7, 8, 7, 9}, {5, 6, 7, 6, 8}, {5, 6, 7, 6, 8}}, // knight
-			{{20, 20, 20, 20, 20}, {14, 15, 16, 17, 17}, {14, 15, 16, 17, 17}, {13, 14, 15, 16, 16}, {13, 14, 15, 16, 16}, {11, 12, 13, 13, 14}, {11, 12, 13, 13, 14}, {10, 11, 12, 12, 13}, {10, 11, 12, 12, 13}, {8, 9, 10, 9, 11}, {8, 9, 10, 9, 11}, {7, 8, 9, 8, 10}, {7, 8, 9, 8, 10}}, // ranger
-			{{20, 20, 20, 20, 20}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {11, 9, 7, 11, 8}, {11, 9, 7, 11, 8}}, // magic-user
-			{{20, 20, 20, 20, 20}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {11, 10, 10, 14, 11}, {11, 10, 10, 14, 11}, {11, 10, 10, 14, 11}, {11, 10, 10, 14, 11}}, // thief
-			{{20, 20, 20, 20, 20}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {11, 10, 10, 14, 11}, {13, 11, 9, 13, 10}, {11, 9, 7, 11, 8}, {11, 9, 7, 11, 8}}}; // monk
+        internal static readonly Dictionary<SkillType, byte[,]> SaveThrowValues = new Dictionary<SkillType, byte[,]>()
+        {
+            [SkillType.Cleric] = new byte[,] { {20, 20, 20, 20, 20}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11} },
+            [SkillType.Druid] = new byte[,] { {20, 20, 20, 20, 20}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {10, 13, 14, 16, 15}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {9, 12, 13, 15, 14}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {7, 10, 11, 13, 12}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11}, {6, 9, 10, 12, 11} },
+            [SkillType.Fighter] = new byte[,] { {20, 20, 20, 20, 20}, {14, 15, 16, 17, 17}, {14, 15, 16, 17, 17}, {13, 14, 15, 16, 16}, {13, 14, 15, 16, 16}, {11, 12, 13, 13, 14}, {11, 12, 13, 13, 14}, {10, 11, 12, 12, 13}, {10, 11, 12, 12, 13}, {8, 9, 10, 9, 11}, {8, 9, 10, 9, 11}, {7, 8, 9, 8, 10}, {7, 8, 9, 8, 10} },
+            [SkillType.Knight] = new byte[,] { {20, 20, 20, 20, 20}, {14, 15, 16, 17, 17}, {14, 15, 16, 17, 17}, {13, 14, 15, 16, 16}, {13, 14, 15, 16, 16}, {11, 12, 13, 13, 14}, {11, 12, 13, 13, 14}, {10, 11, 12, 12, 13}, {10, 11, 12, 12, 13}, {8, 9, 10, 9, 11}, {8, 9, 10, 9, 11}, {7, 8, 9, 8, 10}, {7, 8, 9, 8, 10} },
+            [SkillType.Paladin] = new byte[,] { {20, 20, 20, 20, 20}, {12, 13, 14, 15, 15}, {12, 13, 14, 15, 15}, {11, 12, 13, 14, 14}, {11, 12, 13, 14, 14}, { 9,  9, 11, 11, 12}, { 9, 10, 11, 11, 12}, { 8,  9, 10, 10, 11}, { 8,  9, 10, 10, 11}, {6, 7,  8, 7,  9}, {6, 7, 8, 7, 9}, {5, 6, 7, 6, 8}, {5, 6, 7, 6, 8} },
+            [SkillType.Ranger] = new byte[,] { {20, 20, 20, 20, 20}, {14, 15, 16, 17, 17}, {14, 15, 16, 17, 17}, {13, 14, 15, 16, 16}, {13, 14, 15, 16, 16}, {11, 12, 13, 13, 14}, {11, 12, 13, 13, 14}, {10, 11, 12, 12, 13}, {10, 11, 12, 12, 13}, {8, 9, 10, 9, 11}, {8, 9, 10, 9, 11}, {7, 8, 9, 8, 10}, {7, 8, 9, 8, 10} },
+            [SkillType.MagicUser] = new byte[,] { {20, 20, 20, 20, 20}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {14, 13, 11, 15, 12}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {13, 11, 9, 13, 10}, {11, 9, 7, 11, 8}, {11, 9, 7, 11, 8} },
+            [SkillType.Monk] = new byte[,] { {20, 20, 20, 20, 20}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {11, 10, 10, 14, 11}, {11, 10, 10, 14, 11}, {11, 10, 10, 14, 11}, {11, 10, 10, 14, 11} },
+            [SkillType.Thief] = new byte[,] { {20, 20, 20, 20, 20}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {13, 12, 14, 16, 15}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {12, 11, 12, 15, 13}, {11, 10, 10, 14, 11}, {13, 11, 9, 13, 10}, {11, 9, 7, 11, 8}, {11, 9, 7, 11, 8} },
+        };
 
 
         internal static void recalc_saving_throws(Player player) // sub_6A7FB
@@ -342,24 +352,23 @@ namespace engine
                 player.saveVerse[(byte)save] = 20;
                 for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
                 {
-                    if (player.ClassLevel[(byte)skill] > 0)
+                    int width = SaveThrowValues[skill].GetLength(0) - 1;
+                    if (width > player.ClassLevel[(byte)skill])
                     {
-                        byte dl = SaveThrowValues[(byte)skill, player.ClassLevel[(byte)skill], (byte)save];
-
-                        if (player.saveVerse[(byte)save] > dl)
-                        {
-                            player.saveVerse[(byte)save] = dl;
-                        }
+                        width = player.ClassLevel[(byte)skill];
                     }
+                    byte dl = SaveThrowValues[skill][width, (byte)save];
+                    player.saveVerse[(byte)save] = Math.Min(dl, player.saveVerse[(byte)save]);
 
                     if (DualClassExceedLastLevel(player) == true && player.ClassLevelsOld[(byte)skill] > 0)
                     {
-                        byte dl = SaveThrowValues[(byte)skill, player.ClassLevelsOld[(byte)skill], (byte)save];
-
-                        if (player.saveVerse[(byte)save] > dl)
+                        width = SaveThrowValues[skill].GetLength(0) - 1;
+                        if (width > player.ClassLevelsOld[(byte)skill])
                         {
-                            player.saveVerse[(byte)save] = dl;
+                            width = player.ClassLevelsOld[(byte)skill];
                         }
+                        dl = SaveThrowValues[skill][width, (byte)save];
+                        player.saveVerse[(byte)save] = Math.Min(dl, player.saveVerse[(byte)save]);
                     }
                 }
 
@@ -589,14 +598,14 @@ namespace engine
 
             byte var_4 = 1;
 
-            while (gbl.class_alignments[(int)_class, 0] >= var_4 &&
-                gbl.class_alignments[(int)_class, var_4] != player.alignment)
+            while (Limits.ClassAlignments[_class].Length >= var_4 &&
+                Limits.ClassAlignments[_class][var_4] != player.alignment)
             {
                 var_4++;
             }
 
             if (var_2 == false ||
-                gbl.class_alignments[(int)_class, 0] < var_4)
+                Limits.ClassAlignments[_class].Length < var_4)
             {
                 var_2 = false;
             }
@@ -615,11 +624,11 @@ namespace engine
 
             list.Add(new MenuItem("Pick New Class", true));
 
-            foreach (var _class in gbl.RaceClasses[(int)player.race])
+            foreach (var _class in gbl.RaceClasses[player.race])
             {
                 if (SecondClassAllowed(_class, player) == true)
                 {
-                    list.Add(new MenuItem(ovr020.classString[(int)_class]));
+                    list.Add(new MenuItem(ovr020.classString[_class]));
                 }
             }
 
@@ -652,7 +661,7 @@ namespace engine
             player.attacksCount = 2;
             SkillType newClass = SkillType.Cleric;
 
-            while (newClass <= SkillType.Monk && ovr020.classString[(byte)newClass] != list_ptr.Text)
+            while (newClass <= SkillType.Monk && ovr020.classString[(ClassId)newClass] != list_ptr.Text)
             {
                 newClass++;
             }
@@ -688,7 +697,7 @@ namespace engine
 
             player._class = (ClassId)newClass;
 
-            seg041.DisplayStatusText(0, 10, player.name + " is now a 1st level " + ovr020.classString[(byte)newClass] + ".");
+            seg041.DisplayStatusText(0, 10, player.name + " is now a 1st level " + ovr020.classString[(ClassId)newClass] + ".");
 
             player.spellList.Clear();
 

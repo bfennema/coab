@@ -1,3 +1,5 @@
+using System;
+
 namespace Classes.PoolRad
 {
     /// <summary>
@@ -171,26 +173,32 @@ namespace Classes.PoolRad
 
         public Affect(Classes.Affect affect, Classes.Player player)
         {
-            type = mapping[affect.type][0];
-            minutes = affect.minutes;
-            if (type == Affects.enlarge)
+            if (mapping[affect.type].Count == 0)
             {
-                if (player.stats.Str.cur == 18)
-                {
-                    affect_data = (byte)(player.stats.Str00.cur + 1);
-                }
-                else
-                {
-                    affect_data = (byte)(player.stats.Str.cur + 100);
-                }
+                throw new ArgumentException("Unable to map affect.type", "affect");
             }
-            else if (type == Affects.friends)
+            else
             {
-                affect_data = (byte)player.stats.Cha.cur;
+                type = mapping[affect.type][0];
+                minutes = affect.minutes;
+                if (type == Affects.enlarge)
+                {
+                    if (player.stats.Str.cur == 18)
+                    {
+                        affect_data = (byte)(player.stats.Str00.cur + 1);
+                    }
+                    else
+                    {
+                        affect_data = (byte)(player.stats.Str.cur + 100);
+                    }
+                }
+                else if (type == Affects.friends)
+                {
+                    affect_data = (byte)player.stats.Cha.cur;
+                }
+                affect_data = affect.affect_data;
+                callAffectTable = affect.callAffectTable;
             }
-            affect_data = affect.affect_data;
-            callAffectTable = affect.callAffectTable;
-
         }
 
         public void Load(Classes.Player player)

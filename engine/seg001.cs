@@ -120,6 +120,10 @@ namespace engine
             //}
             //Logging.Logger.Debug("");
 
+            Classes.Debug.AddBreakpoint(0x9A18);
+            Classes.Debug.AddBreakpoint(0x9A36);
+            Classes.Debug.AddBreakpoint(0x9964);
+
             gbl.game.Load();
 
             if (Cheats.skip_title_screen == false)
@@ -228,10 +232,11 @@ namespace engine
             gbl._load24x24Set = ovr034.Load24x24Set;
             gbl._calcStatBonuses = ovr024.CalcStatBonuses;
 
-            gbl.area_ptr = new Area1();
-            gbl.area2_ptr = new Area2();
-            gbl.stru_1B2CA = new Struct_1B2CA();
-            gbl.ecl_ptr = new EclBlock();
+            gbl.saveData = new SaveData();
+            //gbl.saveData.area_ptr = new Area1();
+            //gbl.saveData.area2_ptr = new Area2();
+            //gbl.saveData.stru_1B2CA = new Struct_1B2CA();
+            //gbl.saveData.ecl_ptr = new EclBlock();
             gbl.dax_8x8d1_201 = new byte[177, 8];
             gbl.geo_ptr.LoadData(new byte[0x402]);
 
@@ -256,15 +261,15 @@ namespace engine
 
             gbl.dax24x24Set = new DaxBlock(0, 0x80, 3, 24);
 
-            gbl.area_ptr.Clear();
+            //gbl.area_ptr.Clear();
 
-            gbl.area_ptr.inDungeon = 1;
-            gbl.area_ptr.LastEclBlockId = 0;
+            //gbl.area_ptr.inDungeon = 1;
+            //gbl.area_ptr.LastEclBlockId = 0;
 
-            gbl.area2_ptr.Clear();
+            //gbl.area2_ptr.Clear();
 
-            gbl.stru_1B2CA.Clear();
-            gbl.ecl_ptr.Clear();
+            //gbl.stru_1B2CA.Clear();
+            //gbl.ecl_ptr.Clear();
 
 
             gbl.combat_icons = new CombatIcon[29];
@@ -284,15 +289,15 @@ namespace engine
             gbl.bigpic_dax = null;
             gbl.items_pointer = new System.Collections.Generic.List<Item>();
 
-            gbl.mapPosX = 0;
-            gbl.mapPosY = 0;
-            gbl.mapDirection = 0;
-            gbl.mapWallType = 0;
-            gbl.mapWallRoof = 0;
+            //gbl.mapPosX = 0;
+            //gbl.mapPosY = 0;
+            //gbl.mapDirection = 0;
+            //gbl.mapWallType = 0;
+            //gbl.mapWallRoof = 0;
 
-            gbl.mapPosX = 7;
-            gbl.mapPosY = 0x0D;
-            gbl.mapDirection = 0;
+            //gbl.mapPosX = 7;
+            //gbl.mapPosY = 0x0D;
+            //gbl.mapDirection = 0;
 
             gbl.can_bash_door = true;
             gbl.can_pick_door = true;
@@ -300,9 +305,9 @@ namespace engine
 
             gbl.byte_1AD44 = 3;
 
-            gbl.setBlocks[0] = new gbl.SetBlock(1, 0);
-            gbl.setBlocks[1] = new gbl.SetBlock();
-            gbl.setBlocks[2] = new gbl.SetBlock();
+            //gbl.saveData.setBlocks[0] = new SetBlock(1, 0);
+            //gbl.saveData.setBlocks[1] = new SetBlock();
+            //gbl.saveData.setBlocks[2] = new SetBlock();
 
             //gbl.AnimationsOn = true;
             //gbl.PicsOn = true;
@@ -323,10 +328,10 @@ namespace engine
             gbl.initial_ecl_offset = 0x8000;
             gbl.game_speed_var = 4;
             gbl.inDemo = false;
-            gbl.game_area = 1;
+            //gbl.game_area = 1;
             gbl.game_area_backup = 1;
             gbl.mapAreaDisplay = false;
-            gbl.area2_ptr.party_size = 0;
+            //gbl.area2_ptr.party_size = 0;
             gbl.menuScreenIndex = 1;
             gbl.combat_type = CombatType.normal;
             gbl.displayPlayerStatusLine18 = false;
@@ -346,8 +351,8 @@ namespace engine
             gbl.bigpic_block_id = 0x0FF;
             gbl.silent_training = false;
             gbl.menuSelectedWord = 0;
-            gbl.game_state = GameState.DungeonMap;
-            gbl.last_game_state = 0;
+            //gbl.game_state = GameState.DungeonMap;
+            //gbl.last_game_state = 0;
             gbl.applyItemAffect = false;
             gbl.sky_dax_250 = null;
             gbl.sky_dax_251 = null;

@@ -129,6 +129,40 @@ namespace Classes
                 }
                 else throw new InvalidOperationException();
             }
+
+            public string PrintCmd()
+            {
+                if (codeSet)
+                {
+
+                    switch (code)
+                    {
+                        case 0x00:
+                            if (lowSet)
+                                return String.Format("{0}", low);
+                            else throw new InvalidOperationException();
+
+                        case 0x01:
+                        case 0x03:
+                        case 0x80:
+                            if (highSet)
+                                return String.Format("<${0,4:X4}>", word);
+                            else
+                                return String.Format("\"{0}\"", gbl.unk_1D972[1]);
+
+                        case 0x02:
+                        case 0x81:
+                            if (highSet)
+                                return String.Format("{0}", word);
+                            else throw new InvalidOperationException();
+
+                        default:
+                            throw new InvalidOperationException();
+                            //return 0;
+                    }
+                }
+                else throw new InvalidOperationException();
+            }
         }
         private readonly Operation[] cmd_ops;
 

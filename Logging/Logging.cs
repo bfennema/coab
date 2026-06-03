@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.Tracing;
 using System.IO;
 using System.Text;
 
@@ -48,13 +49,15 @@ namespace Logging
 
         static public void Debug(string fmt, params object[] args)
         {
-            System.Console.WriteLine(fmt, args);
+            System.Diagnostics.Debug.WriteLine(fmt, args);
+            //System.Console.WriteLine(fmt, args);
             debug.WriteLine(fmt, args);
         }
 
         static public void DebugWrite(string fmt, params object[] args)
         {
-            System.Console.Write(fmt, args);
+            System.Diagnostics.Debug.WriteLine(fmt, args);
+            //System.Console.Write(fmt, args);
             debug.Write(fmt, args);
         }
     }

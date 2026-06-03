@@ -8,8 +8,9 @@
         public abstract GameState LoadGameState { get; }
         public abstract Logging.Game Name { get; }
         public abstract ImportSource ImportFrom { get; }
+        public abstract string[]? ImportSources { get; }
         public abstract int InitialExp { get; }
-        public abstract MoneySet InitialMoney { get; }
+        public abstract MoneySet? InitialMoney { get; }
         public abstract string DemoString { get; }
         public abstract string SavePlayerExt { get; }
         public abstract string SaveItemExt { get; }
@@ -29,6 +30,7 @@
         public abstract ushort InitialVmMem2Size { get; }
         public abstract ushort InitialEclOffset { get; }
         public abstract byte InitialEclBlockId { get; }
+        public abstract byte InvalidEclBlockId { get; }
         public abstract SpellBook InitialMUSpells { get; }
         public abstract byte CampingImage { get; }
         public abstract byte TreasureImage { get; }
@@ -61,6 +63,8 @@
         public abstract byte[] PortraitBody { get; }
         public abstract byte[] PortraitHead { get; }
         public abstract string[] TempleSpells { get; }
+        public abstract Race[] AllowedRaces { get; }
+        public abstract ClassId[] AllowedClasses { get; }
         public abstract Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream);
         public abstract Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len);
         public abstract void SavePlayer(Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream);

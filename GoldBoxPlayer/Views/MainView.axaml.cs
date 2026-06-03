@@ -83,6 +83,14 @@ public partial class MainView : UserControl
         {
             NoRaceClassRestrictions.IsChecked = true;
         }
+        if (settings.AllowPoolPaladinRanger)
+        {
+            AllowPoolPaladinRanger.IsChecked = true;
+        }
+        if (settings.AllowChampionsPaladin)
+        {
+            AllowChampionsPaladin.IsChecked = true;
+        }
         if (settings.SortTreasure)
         {
             SortTreasure.IsChecked = true;
@@ -117,9 +125,10 @@ public partial class MainView : UserControl
         MainViewUserControl.Focus();
     }
 
-    private void Debugging_PointerPressed(object? sender, PointerPressedEventArgs e)
+    private async void Debugging_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         MenuItem menu = (MenuItem)sender;
+        string? file_name = null;
 
         if (CommandDebugging == menu)
         {
@@ -136,6 +145,50 @@ public partial class MainView : UserControl
         else if (DumpTreasureItems == menu)
         {
             engine.seg043.DumpTreasureItems();
+        }
+        else if (CompareSaveA == menu)
+        {
+            file_name = "SAVGAMA.DAT";
+        }
+        else if (CompareSaveB == menu)
+        {
+            file_name = "SAVGAMB.DAT";
+        }
+        else if (CompareSaveC == menu)
+        {
+            file_name = "SAVGAMC.DAT";
+        }
+        else if (CompareSaveD == menu)
+        {
+            file_name = "SAVGAMD.DAT";
+        }
+        else if (CompareSaveE == menu)
+        {
+            file_name = "SAVGAME.DAT";
+        }
+        else if (CompareSaveF == menu)
+        {
+            file_name = "SAVGAMF.DAT";
+        }
+        else if (CompareSaveG == menu)
+        {
+            file_name = "SAVGAMG.DAT";
+        }
+        else if (CompareSaveH == menu)
+        {
+            file_name = "SAVGAMH.DAT";
+        }
+        else if (CompareSaveI == menu)
+        {
+            file_name = "SAVGAMI.DAT";
+        }
+        else if (CompareSaveJ == menu)
+        {
+            file_name = "SAVGAMJ.DAT";
+        }
+        if (file_name != null)
+        {
+            engine.seg043.CompareSave(file_name);
         }
     }
 
@@ -191,6 +244,14 @@ public partial class MainView : UserControl
         else if (NoRaceClassRestrictions == menu)
         {
             settings.NoRaceClassLimits = toggle;
+        }
+        else if (AllowPoolPaladinRanger == menu)
+        {
+            settings.AllowPoolPaladinRanger = toggle;
+        }
+        else if (AllowChampionsPaladin == menu)
+        {
+            settings.AllowChampionsPaladin = toggle;
         }
         else if (SortTreasure == menu)
         {

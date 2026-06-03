@@ -8,7 +8,6 @@ namespace Classes.Curse
         {
             gbl.import_func[(int)ImportSource.Curse] = Player.LoadPlayer;
         }
-        readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" };
         public override void Load()
         {
             byte[]? pic_data;
@@ -39,8 +38,9 @@ namespace Classes.Curse
         public override GameState LoadGameState { get => Classes.GameState.StartGameMenu; }
         public override Logging.Game Name { get => Logging.Game.CurseOfTheAzureBonds; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Curse; }
+        public override string[]? ImportSources {  get => ["Curse", "Pool", "Hillsfar" ]; }
         public override int InitialExp { get => 25000; }
-        public override MoneySet InitialMoney { get => new MoneySet(Money.Platinum, 300); }
+        public override MoneySet? InitialMoney { get => new MoneySet(Money.Platinum, 300); }
         public override string DemoString
         {
             get
@@ -69,6 +69,7 @@ namespace Classes.Curse
         public override ushort InitialVmMem2Size { get => 0x0200; }
         public override ushort InitialEclOffset { get => 0x8000; }
         public override byte InitialEclBlockId { get => 1; }
+        public override byte InvalidEclBlockId { get => 0; }
         public override SpellBook InitialMUSpells { get => new SpellBook(new List<Spells>() { Spells.detect_magic_MU, Spells.read_magic, Spells.enlarge, Spells.sleep }); }
         public override byte CampingImage { get => 29; }
         public override byte TreasureImage { get => 1; }
@@ -100,7 +101,9 @@ namespace Classes.Curse
         public override bool StoreEclBlock { get => true; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
-        public override string[] TempleSpells { get => templeSpells; }
+        public override string[] TempleSpells { get => [ "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" ]; }
+        public override Race[] AllowedRaces { get => [Race.dwarf, Race.elf, Race.gnome, Race.half_elf, Race.halfling, Race.human]; }
+        public override ClassId[] AllowedClasses { get => [ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.paladin, ClassId.ranger, ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t]; }
         public override Classes.Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { return Player.LoadPlayer(player_stream, item_stream, affect_stream); }
         public override Classes.Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len) { return Player.LoadPlayer(player_data, item_data, item_len, affect_data, affect_len); }
         public override void SavePlayer(Classes.Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { Player.SavePlayer(player, player_stream, item_stream, affect_stream); }

@@ -19,6 +19,8 @@ namespace GoldBoxPlayer
         public bool skipTitleScreen = false;
         public bool improvedAreaMap = false;
         public bool noRaceClassLimits = false;
+        public bool allowPoolPaladinRanger = false;
+        public bool allowChampionsPaladin = false;
         public bool soundOn = true;
         public bool noRaceLevelLimits = false;
         public bool sortTreasure = false;
@@ -164,6 +166,8 @@ namespace GoldBoxPlayer
             Classes.Cheats.ImprovedAreaMapSet(improvedAreaMap);
             Classes.Cheats.NoRaceLevelLimits(noRaceClassLimits);
             Classes.Cheats.NoRaceClassRestrictions(noRaceClassLimits);
+            Classes.Cheats.AllowPoolPaladinRanger(allowPoolPaladinRanger);
+            Classes.Cheats.AllowChampionsPaladin(allowChampionsPaladin);
             Classes.Cheats.SortTreasureSet(sortTreasure);
         }
         [XmlIgnore]
@@ -307,6 +311,28 @@ namespace GoldBoxPlayer
                 noRaceLevelLimits = value;
                 Save();
                 Classes.Cheats.NoRaceLevelLimits(value);
+            }
+        }
+        [XmlIgnore]
+        public bool AllowPoolPaladinRanger
+        {
+            get => allowPoolPaladinRanger;
+            set
+            {
+                allowPoolPaladinRanger = value;
+                Save();
+                Classes.Cheats.AllowPoolPaladinRanger(value);
+            }
+        }
+        [XmlIgnore]
+        public bool AllowChampionsPaladin
+        {
+            get => allowChampionsPaladin;
+            set
+            {
+                allowChampionsPaladin = value;
+                Save();
+                Classes.Cheats.AllowChampionsPaladin(value);
             }
         }
         [XmlIgnore]

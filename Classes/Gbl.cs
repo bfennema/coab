@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using Classes.Combat;
 
 
@@ -22,7 +23,14 @@ namespace Classes
         Curse = 0,
         Pool = 1,
         Hillsfar = 2,
-        Max = 3
+        Secret = 3,
+        Pools = 4,
+        Champions = 5,
+        Death = 6,
+        TDQK = 7,
+        Gateway = 8,
+        Treasures = 9,
+        Max = 10
     }
 
     public delegate System.Threading.Tasks.Task<Player> LoadPlayer(System.IO.Stream player_stream, string path, string file);
@@ -185,6 +193,119 @@ namespace Classes
         }
     }
 
+    public class SetBlock
+    {
+        public SetBlock() { Reset(); }
+        public SetBlock(short _setId, short _blockId) { setId = _setId; blockId = _blockId; }
+        public void Reset() { setId = -1; blockId = -1; }
+        public short blockId; // byte_1D53A[di] 1*4
+        public short setId; // byte_1D53C[di] 1*4
+    }
+
+    public class SaveData
+    {
+        public SaveData()
+        {
+            area_ptr = new Area1();
+            area2_ptr = new Area2();
+            stru_1B2CA = new Struct_1B2CA();
+            ecl_ptr = new EclBlock();
+
+            area_ptr.Clear();
+            area2_ptr.Clear();
+            stru_1B2CA.Clear();
+            ecl_ptr.Clear();
+
+            mapPosX = 7;
+            mapPosY = 13;
+            mapDirection = 0;
+            mapWallType = 0;
+            mapWallRoof = 0;
+
+            setBlocks[0] = new SetBlock(1, 0);
+            setBlocks[1] = new SetBlock();
+            setBlocks[2] = new SetBlock();
+
+            game_area = 1;
+            game_state = GameState.DungeonMap;
+            last_game_state = GameState.StartGameMenu;
+        }
+        public SaveData(System.IO.Stream file)
+        {
+            byte[] data = new byte[0x2000];
+
+            gbl.file.BlockRead(1, data, file);
+            game_area = data[0];
+
+            gbl.file.BlockRead(0x800, data, file);
+            area_ptr = new Area1(data, 0);
+
+            gbl.file.BlockRead(0x800, data, file);
+            area2_ptr = new Area2(data, 0);
+
+            gbl.file.BlockRead(0x400, data, file);
+            stru_1B2CA = new Struct_1B2CA(data, 0);
+
+            if (gbl.game.StoreEclBlock)
+            {
+                gbl.file.BlockRead(0x1E00, data, file);
+                ecl_ptr = new EclBlock(data, 0);
+            }
+            else
+            {
+                ecl_ptr = new EclBlock();
+            }
+
+            gbl.file.BlockRead(5, data, file);
+            mapPosX = (sbyte)data[0];
+            mapPosY = (sbyte)data[1];
+            mapDirection = data[2];
+            mapWallType = data[3];
+            mapWallRoof = data[4];
+
+            gbl.file.BlockRead(1, data, file);
+            last_game_state = gbl.game.GameState(data[0]);
+
+            gbl.file.BlockRead(1, data, file);
+            game_state = gbl.game.GameState(data[0]);
+
+            if (gbl.game.SetBlocksInArea1)
+            {
+                setBlocks[0] = new SetBlock(area_ptr.field_3FA, area_ptr.field_3F4);
+                setBlocks[1] = new SetBlock(area_ptr.field_3FC, area_ptr.field_3F6);
+                setBlocks[2] = new SetBlock(area_ptr.field_3FE, area_ptr.field_3F8);
+            }
+            else
+            {
+                for (int i = 0; i < 3; i++)
+                {
+                    gbl.file.BlockRead(2, data, file);
+                    var blockId = Sys.ArrayToShort(data, 0);
+
+                    gbl.file.BlockRead(2, data, file);
+                    var setId = Sys.ArrayToShort(data, 0);
+
+                    setBlocks[i] = new SetBlock(setId, blockId);
+                }
+            }
+        }
+
+        public byte game_area;
+        public Area1 area_ptr;
+        public Area2 area2_ptr;
+        public Struct_1B2CA stru_1B2CA;
+        public EclBlock ecl_ptr;
+        public int mapPosX; // byte_1D539, 0 map left, + map right
+        public int mapPosY; // byte_1D53A, 0 map top, +map bottom
+        public byte mapDirection; // byte_1D53B , 0 N, 2 E, 4 S, 6 W
+        public byte mapWallType; // byte_1D53C
+        public byte mapWallRoof; // byte_1D53D
+        public GameState game_state; // 1- shop, 5 - combat
+        public GameState last_game_state; // byte_1B2E4
+
+        public SetBlock[] setBlocks = new SetBlock[3];
+    }
+
     public class gbl
     {
         public static DisplayString? _displayString;
@@ -204,20 +325,26 @@ namespace Classes
         public static MenuColorSet defaultMenuColors = new MenuColorSet(15, 10, 13);
         public static MenuColorSet alertMenuColors = new MenuColorSet(15, 10, 14);
 
-        public readonly static byte[] max_class_hit_dice = { 10, 15, 10, 10, 11, 12, 11, 13 }; // byte_1A1CB seg600:3EBB
         public readonly static byte[] default_icon_colours = { 1, 2, 3, 4, 6, 7 }; // unk_1A1D3[0] == unk_1A1D2[1];
 
-        public readonly static ClassId[][] RaceClasses = { 
-        new ClassId[] /*MonsterType*/{ },
-        new ClassId[] /*Dwarf*/{ ClassId.fighter, ClassId.thief, ClassId.mc_f_t},
-        new ClassId[] /*Elf*/{ ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t},
-        new ClassId[] /*Gnome*/{ ClassId.fighter, ClassId.thief, ClassId.mc_f_t},
-        new ClassId[] /*Half-Elf*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t},
-        new ClassId[] /*Halfling*/{ ClassId.fighter, ClassId.thief, ClassId.mc_f_t},
-        new ClassId[] /*Half-Orc*/{ ClassId.cleric, ClassId.fighter, ClassId.thief, ClassId.mc_c_f, ClassId.mc_c_t,ClassId.mc_f_t},
-        new ClassId[] /*Human*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.paladin, ClassId.ranger},
-        new ClassId[] /*Cheaters*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t}};
+        public readonly static Dictionary<Race, ClassId[]> RaceClasses = new Dictionary<Race, ClassId[]>()
+        {
+            [Race.dwarf] = [ClassId.fighter, ClassId.thief, ClassId.mc_f_t],
+            [Race.mountain_dwarf] = [ClassId.fighter, ClassId.paladin, ClassId.thief, ClassId.cleric, ClassId.mc_c_f, ClassId.mc_c_t, ClassId.mc_f_t],
+            [Race.hill_dwarf] = [ClassId.fighter, ClassId.ranger, ClassId.thief, ClassId.cleric, ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_t, ClassId.mc_f_t],
+            [Race.elf] = [ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t],
+            [Race.silvanesti_elf] = [ClassId.paladin, ClassId.fighter, ClassId.ranger, ClassId.magic_user, ClassId.cleric, ClassId.mc_c_f_m, ClassId.mc_c_f, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_c_r],
+            [Race.qualinesti_elf] = [ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.cleric, ClassId.ranger, ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_mu, ClassId.mc_c_f_m, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t],
+            [Race.gnome] = [ClassId.fighter, ClassId.thief, ClassId.mc_f_t],
+            [Race.half_elf] = [ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger, ClassId.knight, ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t],
+            [Race.halfling] = [ClassId.fighter, ClassId.thief, ClassId.mc_f_t],
+            [Race.kender] = [ClassId.fighter, ClassId.thief, ClassId.cleric, ClassId.ranger, ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_t, ClassId.mc_f_t],
+            [Race.half_orc] = [ClassId.cleric, ClassId.fighter, ClassId.thief, ClassId.mc_c_f, ClassId.mc_c_t, ClassId.mc_f_t],
+            [Race.human] = [ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.paladin, ClassId.ranger, ClassId.knight],
+        };
+        //new ClassId[] /*Cheaters*/{ ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.ranger,ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t}};
 
+        public static SaveData? saveData;
 
         public static bool stopVM = false; //byte_1AB08
         public static bool vmFlag01; // byte_1AB09 
@@ -283,22 +410,13 @@ namespace Classes
         public static int sky_colour; // byte_1D534
 
         public static bool mapAreaDisplay; //byte_1D538, Show Area Map
-        public static int mapPosX; // byte_1D539, 0 map left, + map right
-        public static int mapPosY; // byte_1D53A, 0 map top, +map bottom
-        public static byte mapDirection; // byte_1D53B , 0 N, 2 E, 4 S, 6 W
-        public static byte mapWallType; // byte_1D53C
-        public static byte mapWallRoof; // byte_1D53D
+        public static int mapPosX { get => saveData.mapPosX; set => saveData.mapPosX = value; }
+        public static int mapPosY { get => saveData.mapPosY; set => saveData.mapPosY = value; }
+        public static byte mapDirection { get => saveData.mapDirection; set => saveData.mapDirection = value; }
+        public static byte mapWallType { get => saveData.mapWallType; set => saveData.mapWallType = value; }
+        public static byte mapWallRoof { get => saveData.mapWallRoof; set => saveData.mapWallRoof = value; }
 
-        public class SetBlock
-        {
-            public SetBlock() { Reset(); }
-            public SetBlock(short _setId, short _blockId) { setId = _setId; blockId = _blockId; }
-            public void Reset() { setId = -1; blockId = -1; }
-            public short blockId; // byte_1D53A[di] 1*4
-            public short setId; // byte_1D53C[di] 1*4
-        }
-
-        public static SetBlock[] setBlocks = new SetBlock[3];
+        public static SetBlock[] setBlocks { get => saveData.setBlocks; }
 
         public static DaxArray byte_1D556;
         public static string lastDaxFile;
@@ -415,9 +533,8 @@ namespace Classes
         public static Player LastSelectedPlayer; // player_ptr2
         public static Player SelectedPlayer; // player_ptr
 
-        public static GameState game_state; // 1- shop, 5 - combat
-        public static GameState last_game_state; // byte_1B2E4
-
+        public static GameState game_state { get => saveData.game_state; set => saveData.game_state = value; }
+        public static GameState last_game_state { get => saveData.last_game_state; set => saveData.last_game_state = value; }
 
         public static CombatType combat_type;
         public static ushort ecl_offset;
@@ -446,14 +563,15 @@ namespace Classes
 
         public static Player tradeWith; //player_ptr01
 
-        public static byte game_area;
+        public static byte game_area { get => saveData.game_area; set => saveData.game_area = value;  }
         public static byte game_area_backup;
 
-        public static Area1 area_ptr;
-        public static Area2 area2_ptr;
+        public static Area1 area_ptr { get => saveData.area_ptr; }
+        public static Area2 area2_ptr { get => saveData.area2_ptr; }
 
-        public static Struct_1B2CA stru_1B2CA;
-        public static EclBlock ecl_ptr;
+        public static Struct_1B2CA stru_1B2CA { get => saveData.stru_1B2CA; }
+        public static EclBlock ecl_ptr { get => saveData.ecl_ptr; }
+
         public static byte[,] dax_8x8d1_201;
         public static WallDefs wallDef = new WallDefs();
         public static GeoBlock geo_ptr = new GeoBlock();
@@ -743,29 +861,22 @@ namespace Classes
 			new SubStruct_1A35E( 0x18, 2, 4),
 			new SubStruct_1A35E( 18 , 1, 4)});
 
-        public static Struct_1A35E[] race_ages = new Struct_1A35E[] { monster_ages, dwarf_ages, elf_ages, gnome_ages, halfelf_ages, halfling_ages, halforc_ages, human_ages }; // unk_1A35E
+        public static Dictionary<Race, Struct_1A35E> race_ages = new Dictionary<Race, Struct_1A35E>() // unk_1A35E
+        {
+            [Race.monster] = monster_ages,
+            [Race.mountain_dwarf] = dwarf_ages,
+            [Race.hill_dwarf] = dwarf_ages,
+            [Race.silvanesti_elf] = elf_ages,
+            [Race.qualinesti_elf] = elf_ages,
+            [Race.elf] = elf_ages,
+            [Race.gnome] = gnome_ages,
+            [Race.half_elf] = halfelf_ages,
+            [Race.halfling] = halfling_ages,
+            [Race.kender] = halfling_ages,
+            [Race.half_orc] = halforc_ages,
+            [Race.human] = human_ages,
+        };
 
         public static byte[] unk_1AE0B = new byte[3];
-
-
-        public readonly static byte[,] class_alignments = { // unk_1A4EA
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 5,1,3,4,5,7,0,0,0,0},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 1,0,0,0,0,0,0,0,0,0},
-			{ 3,0,3,6,0,0,0,0,0,0},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 7,1,2,3,4,5,7,8,0,0},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 3,0,3,6,0,0,0,0,0,0},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 9,0,1,2,3,4,5,6,7,8},
-			{ 7,1,2,3,4,5,7,8,0,0},
-			{ 7,1,2,3,4,5,7,8,0,0},
-			{ 7,1,2,3,4,5,7,8,0,0} };
-
     }
 }

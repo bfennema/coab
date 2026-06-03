@@ -2133,13 +2133,13 @@ namespace engine
 					if (lvl > 0 &&
 						lvl <= max_lvl)
 					{
-						if (ovr018.exp_table[(byte)skill, lvl] > 0 &&
-							ovr018.exp_table[(byte)skill, lvl] < max_exp &&
+						if (Exp.Cost(player, skill, lvl) > 0 &&
+							Exp.Cost(player, skill, lvl) < max_exp &&
 							Limits.RaceStatLevelRestricted(skill, player) == false)
 						{
 							max_lvl = lvl;
 							restored_skill = skill;
-							max_exp = ovr018.exp_table[(byte)skill, lvl];
+							max_exp = Exp.Cost(player, skill, lvl);
 						}
 					}
 				}
@@ -2336,7 +2336,9 @@ namespace engine
 
 			if ((player.health_status == Status.dead || player.health_status == Status.animated) &&
                 player.stats.Con.cur > 0 &&
-				player.race != Race.elf)
+				player.race != Race.elf &&
+                player.race != Race.silvanesti_elf &&
+                player.race != Race.qualinesti_elf)
 			{
 				gbl.cureSpell = true;
 

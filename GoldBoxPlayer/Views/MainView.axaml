@@ -36,6 +36,18 @@
         <MenuItem x:Name="DumpTreasureItems"
                   Header="Dump Treasure Items"
                   PointerPressed="Debugging_PointerPressed"/>
+        <MenuItem Header="Compare Save">
+          <MenuItem x:Name="CompareSaveA" Header="A" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveB" Header="B" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveC" Header="C" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveD" Header="D" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveE" Header="E" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveF" Header="F" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveG" Header="G" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveH" Header="H" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveI" Header="I" PointerPressed="Debugging_PointerPressed"/>
+          <MenuItem x:Name="CompareSaveJ" Header="J" PointerPressed="Debugging_PointerPressed"/>
+        </MenuItem>
       </MenuItem>
       <MenuItem Header="Screen Capture"></MenuItem>
       <MenuItem Header="Cheats">
@@ -81,6 +93,14 @@
                   PointerPressed="Cheats_PointerPressed"/>
         <MenuItem x:Name="NoRaceClassRestrictions"
                   Header="No Race Class Restrictions"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="AllowPoolPaladinRanger"
+                  Header="Allow Paladin and Rangers in Pool Of Radiance"
+                  ToggleType="CheckBox"
+                  PointerPressed="Cheats_PointerPressed"/>
+        <MenuItem x:Name="AllowChampionsPaladin"
+                  Header="Allow Paladins in Champions of Krynn"
                   ToggleType="CheckBox"
                   PointerPressed="Cheats_PointerPressed"/>
         <MenuItem x:Name="NoRaceLevelLimits"

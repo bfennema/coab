@@ -2,6 +2,7 @@ using Classes;
 using System.Collections.Generic;
 using System;
 using Classes.Combat;
+using System.Linq;
 
 namespace engine
 {
@@ -319,19 +320,37 @@ namespace engine
 
         internal static byte[] /*seg600:3EA2 */ unk_1A1B2 = { 0x02, 0x10, 0x08, 0x40, 0x40, 0x40, 0x01, 0x04, 0x20 };
 
-        static byte[] /*seg600:45B3 unk_1A8C3 */ gold_count = { 3, 3, 5, 5, 5, 2, 2, 5 };
-        static byte[] /*seg600:45B4 unk_1A8C4 */ gold_size = { 6, 6, 4, 4, 4, 4, 6, 4 };
+        internal class gold_calc
+        {
+            public gold_calc(int _count, int _size, int _mult) { size = _size; count = _count; mult = _mult; }
+            public int count;
+            public int size;
+            public int mult;
+        }
 
-        internal static sbyte[,] /* seg600:3E3A unk_1A14A */ thac0_table = {
-            {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 }, // cleric
-            {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 }, // druid
-            {39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // fighter
-            {40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // paladin
-            {40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // knight
-            {40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51 }, // ranger
-            {39, 39, 39, 39, 39, 39, 41, 41, 41, 41, 41, 43, 43 }, // magic-user
-            {40, 40, 40, 40, 40, 41, 41, 41, 41, 44, 44, 44, 44 }, // thief
-            {40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46 }, // monk
+        internal static readonly Dictionary<SkillType, gold_calc> gold_table = new Dictionary<SkillType, gold_calc>() // seg600:45B3 unk_1A8C3, seg600:45B4 unk_1A8C4
+        {
+            [SkillType.Cleric] = new gold_calc(3, 6, 10),
+            [SkillType.Druid] = new gold_calc(3, 6, 10),
+            [SkillType.Fighter] = new gold_calc(5, 4, 10),
+            [SkillType.Paladin] = new gold_calc(5, 4, 10),
+            [SkillType.Ranger] = new gold_calc(5, 4, 10),
+            [SkillType.MagicUser] = new gold_calc(2, 4, 10),
+            [SkillType.Thief] = new gold_calc(2, 6, 10),
+            [SkillType.Monk] = new gold_calc(5, 4, 1),
+        };
+
+        internal static readonly Dictionary<SkillType, sbyte[]> Thac0Table = new Dictionary<SkillType, sbyte[]>() // seg600:3E3A unk_1A14A
+        {
+            [SkillType.Cleric]    = [40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46],
+            [SkillType.Druid]     = [40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46],
+            [SkillType.Fighter]   = [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51],
+            [SkillType.Paladin]   = [40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51],
+            [SkillType.Knight]    = [40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51],
+            [SkillType.Ranger]    = [40, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51],
+            [SkillType.MagicUser] = [39, 39, 39, 39, 39, 39, 41, 41, 41, 41, 41, 43, 43],
+            [SkillType.Thief]     = [40, 40, 40, 40, 40, 41, 41, 41, 41, 44, 44, 44, 44],
+            [SkillType.Monk]      = [40, 40, 40, 40, 42, 42, 42, 44, 44, 44, 46, 46, 46],
         };
 
 
@@ -366,13 +385,10 @@ namespace engine
 
             List<MenuItem> var_C = new List<MenuItem>();
             var_C.Add(new MenuItem("Pick Race", true));
-
-            var_C.Add(new MenuItem("  " + ovr020.raceString[1]));
-            var_C.Add(new MenuItem("  " + ovr020.raceString[2]));
-            var_C.Add(new MenuItem("  " + ovr020.raceString[3]));
-            var_C.Add(new MenuItem("  " + ovr020.raceString[4]));
-            var_C.Add(new MenuItem("  " + ovr020.raceString[5]));
-            var_C.Add(new MenuItem("  " + ovr020.raceString[7]));
+            foreach (var item in gbl.game.AllowedRaces)
+            {
+                var_C.Add(new MenuItem("  " + ovr020.raceString[item]));
+            }
 
             index = 1;
             menuRedraw = true;
@@ -390,21 +406,27 @@ namespace engine
                 }
             } while (input_key != 'S');
 
-            if (index == 6)
-            {
-                index++;
-            }
+            //if (index == 6)
+            //{
+            //    index++;
+            //}
 
-            player.race = (Race)index;
+            player.race = gbl.game.AllowedRaces[index-1];
 
             switch (player.race)
             {
+                case Race.kender:
+                    player.icon_size = 1;
+                    break;
+
                 case Race.halfling:
                     player.icon_size = 1;
                     ovr024.add_affect(false, 0xff, 0, Classes.Affects.con_saving_bonus, player);
                     break;
 
                 case Race.dwarf:
+                case Race.mountain_dwarf:
+                case Race.hill_dwarf:
                     player.icon_size = 1;
                     ovr024.add_affect(false, 0xff, 0, Classes.Affects.con_saving_bonus, player);
                     ovr024.add_affect(false, 0xff, 0, Classes.Affects.dwarf_vs_orc_goblin, player);
@@ -420,6 +442,8 @@ namespace engine
                     break;
 
                 case Race.elf:
+                case Race.qualinesti_elf:
+                case Race.silvanesti_elf:
                     player.icon_size = 2;
                     ovr024.add_affect(false, 0xff, 0, Classes.Affects.elf_resist_sleep, player);
 
@@ -467,15 +491,22 @@ namespace engine
 
             var_C.Add(new MenuItem("Pick Class", true));
 
-            var ClassList = gbl.RaceClasses[(int)player.race];
-            if (player.race != Race.human && Cheats.no_race_class_restrictions)
+            List<ClassId> ClassList = gbl.game.AllowedClasses.ToList();
+            if (player.race == Race.human || !Cheats.no_race_class_restrictions)
             {
-                ClassList = gbl.RaceClasses[(int)Race.human + 1];
+                for (int i = 0; i<ClassList.Count; i++)
+                {
+                    if (!gbl.RaceClasses[player.race].Contains(ClassList[i]))
+                    {
+                        ClassList.RemoveAt(i);
+                        i--;
+                    }
+                }
             }
 
             foreach (var _class in ClassList)
             {
-                var_C.Add(new MenuItem("  " + ovr020.classString[(int)_class]));
+                var_C.Add(new MenuItem("  " + ovr020.classString[_class]));
             }
 
             index = 1;
@@ -499,26 +530,7 @@ namespace engine
             player._class = ClassList[index - 1];
             player.HitDice = 1;
 
-            if (player._class >= ClassId.cleric && player._class <= ClassId.fighter)
-            {
-                player.ClassLevel[(int)player._class] = 1;
-            }
-            else if (player._class >= ClassId.magic_user && player._class <= ClassId.monk)
-            {
-                player.ClassLevel[(int)player._class] = 1;
-            }
-            else if (player._class == ClassId.paladin)
-            {
-                player.paladinCuresLeft = 1;
-                player.paladin_lvl = 1;
-                ovr024.add_affect(false, 0xff, 0, Classes.Affects.protection_from_evil, player);
-            }
-            else if (player._class == ClassId.ranger)
-            {
-                player.ranger_lvl = 1;
-                ovr024.add_affect(false, 0xff, 0, Classes.Affects.ranger_vs_giant, player);
-            }
-            else if (player._class == ClassId.mc_c_f)
+            if (player._class == ClassId.mc_c_f)
             {
                 player.cleric_lvl = 1;
                 player.fighter_lvl = 1;
@@ -535,7 +547,6 @@ namespace engine
             {
                 player.cleric_lvl = 1;
                 player.ranger_lvl = 1;
-                ovr024.add_affect(false, 0xff, 0, Classes.Affects.ranger_vs_giant, player);
                 player.exp /= 2;
             }
             else if (player._class == ClassId.mc_c_mu)
@@ -575,10 +586,23 @@ namespace engine
                 player.thief_lvl = 1;
                 player.exp /= 2;
             }
+            else
+            {
+                player.ClassLevel[(int)player._class] = 1;
+            }
 
             if (player.thief_lvl > 0)
             {
                 ovr026.recalc_thief_skills(player);
+            }
+            if (player.paladin_lvl > 0)
+            {
+                player.paladinCuresLeft = 1;
+                ovr024.add_affect(false, 0xff, 0, Classes.Affects.protection_from_evil, player);
+            }
+            if (player.ranger_lvl > 0)
+            {
+                ovr024.add_affect(false, 0xff, 0, Classes.Affects.ranger_vs_giant, player);
             }
 
             player.classFlags = 0;
@@ -589,11 +613,13 @@ namespace engine
                 if (player.ClassLevel[(byte)skill] > 0)
                 {
                     int skill_lvl = player.ClassLevel[(byte)skill];
+                    sbyte new_thac0 = Thac0Table[skill][^1];
 
-                    if (thac0_table[(byte)skill, skill_lvl] > player.thac0)
+                    if (skill_lvl < Thac0Table[skill].Length)
                     {
-                        player.thac0 = thac0_table[(byte)skill, skill_lvl];
+                        new_thac0 = Thac0Table[skill][skill_lvl];
                     }
+                    player.thac0 = (sbyte)Math.Max(player.thac0, new_thac0);
 
                     player.classFlags += unk_1A1B2[(byte)skill];
                 }
@@ -602,13 +628,13 @@ namespace engine
             ovr026.recalc_saving_throws(player);
             var_C.Clear();
 
-            int alignments = gbl.class_alignments[(int)player._class, 0];
+            int alignments = Limits.ClassAlignments[player._class].Length;
 
             var_C.Add(new MenuItem("Pick Alignment", true));
 
-            for (int i = 1; i <= alignments; i++)
+            for (int i = 0; i < alignments; i++)
             {
-                var_C.Add(new MenuItem("  " + ovr020.alignmentString[gbl.class_alignments[(int)player._class, i]]));
+                var_C.Add(new MenuItem("  " + ovr020.alignmentString[Limits.ClassAlignments[player._class][i]]));
             }
 
             index = 1;
@@ -630,37 +656,35 @@ namespace engine
                 }
             } while (input_key != 'S');
 
-            player.alignment = gbl.class_alignments[(int)player._class, index];
+            player.alignment = Limits.ClassAlignments[player._class][index-1];
 
             var_C.Clear();
 
             if (player._class <= ClassId.monk)
             {
-                SubStruct_1A35E v5 = gbl.race_ages[(int)player.race][player._class];
+                SubStruct_1A35E v5 = gbl.race_ages[player.race][player._class];
 
                 player.age = (short)(ovr024.roll_dice(v5.dice_size, v5.dice_count) + v5.base_age);
             }
             else
             {
-                int race = (int)player.race;
-
                 switch (player._class)
                 {
                     case ClassId.mc_c_f:
                     case ClassId.mc_c_f_m:
                     case ClassId.mc_c_t:
                     case ClassId.mc_c_r:
-                        player.age = (short)(gbl.race_ages[race][0].base_age + (gbl.race_ages[race][0].dice_count * gbl.race_ages[race][0].dice_size));
+                        player.age = (short)(gbl.race_ages[player.race][0].base_age + (gbl.race_ages[player.race][0].dice_count * gbl.race_ages[player.race][0].dice_size));
                         break;
 
                     case ClassId.mc_f_mu:
                     case ClassId.mc_f_mu_t:
                     case ClassId.mc_mu_t:
-                        player.age = (short)(gbl.race_ages[race][6].base_age + (gbl.race_ages[race][6].dice_count * gbl.race_ages[race][6].dice_size));
+                        player.age = (short)(gbl.race_ages[player.race][6].base_age + (gbl.race_ages[player.race][6].dice_count * gbl.race_ages[player.race][6].dice_size));
                         break;
 
                     case ClassId.mc_f_t:
-                        player.age = (short)(gbl.race_ages[race][2].base_age + (gbl.race_ages[race][2].dice_count * gbl.race_ages[race][2].dice_size));
+                        player.age = (short)(gbl.race_ages[player.race][2].base_age + (gbl.race_ages[player.race][2].dice_count * gbl.race_ages[player.race][2].dice_size));
                         break;
                 }
             }
@@ -712,6 +736,7 @@ namespace engine
                             if (player.stats.Str.cur == 18)
                             {
                                 if (player.fighter_lvl > 0 ||
+                                    player.knight_lvl > 0 ||
                                     player.ranger_lvl > 0 ||
                                     player.paladin_lvl > 0)
                                 {
@@ -790,12 +815,7 @@ namespace engine
                             player.spellCastCount[2][0] = 1;
                         }
 
-                        int gold_roll = ovr024.roll_dice(gold_size[(byte)skill], gold_count[(byte)skill]);
-                        if (skill != SkillType.Monk)
-                        {
-                            gold_roll *= 10;
-                        }
-                        gold += gold_roll;
+                        gold += ovr024.roll_dice(gold_table[skill].size, gold_table[skill].count) * gold_table[skill].mult;
 
                         if (skill == SkillType.Cleric)
                         {
@@ -820,7 +840,14 @@ namespace engine
                     }
                 }
 
-                player.Money = gbl.game.InitialMoney;
+                if (gbl.game.InitialMoney != null)
+                {
+                    player.Money = gbl.game.InitialMoney;
+                }
+                else
+                {
+                    player.Money = new MoneySet(Money.Gold, gold);
+                }
                 player.hit_point_rolled = roll_hp(0xff, player);
                 player.hit_point_max = player.hit_point_rolled;
 
@@ -912,18 +939,15 @@ namespace engine
         }
 
         /// <summary> seg600:4281 </summary>
-        static sbyte[] con_hp_adj = { 0, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2 };
-        static sbyte[] con_hp_adj_warrior = { 0, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 6, 6, 6, 7, 7 };
+        static sbyte[] con_hp_adj = { 0, -3, -2, -2, -1, -1, -1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 6, 6, 6, 7, 7 };
 
         internal static int con_bonus(SkillType skill, int stat)
         {
-            int bonus = 0;
+            int bonus;
 
-            if (skill == SkillType.Fighter ||
-                skill == SkillType.Ranger ||
-                skill == SkillType.Paladin)
+            if (con_hp_adj[stat] > hp_calc_table[skill].max_con)
             {
-                bonus = con_hp_adj_warrior[stat];
+                bonus = hp_calc_table[skill].max_con;
             }
             else
             {
@@ -1408,27 +1432,72 @@ namespace engine
 
         internal static async void AddPlayer()
         {
+            char input_key;
             seg037.draw8x8_clear_area(0x16, 0x26, 1, 1);
 
-            char input_key = ovr027.displayInput(false, 0, gbl.defaultMenuColors, "Curse Pool Hillsfar Exit", "Add from where? ");
-
-            switch (input_key)
+            if (gbl.game.ImportSources != null)
             {
-                case 'C':
-                    gbl.import_from = ImportSource.Curse;
-                    break;
+                input_key = ovr027.displayInput(false, 0, gbl.defaultMenuColors, gbl.game.ImportSources + " Exit", "Add from where? ");
 
-                case 'P':
-                    gbl.import_from = ImportSource.Pool;
-                    break;
+                switch (input_key)
+                {
+                    case 'C':
+                        if (gbl.game.ImportSources.Contains("Curse"))
+                        {
+                            gbl.import_from = ImportSource.Curse;
+                        }
+                        else if (gbl.game.ImportSources.Contains("Champions"))
+                        {
+                            gbl.import_from = ImportSource.Champions;
+                        }
+                        break;
 
-                case 'H':
-                    gbl.import_from = ImportSource.Hillsfar;
-                    break;
+                    case 'P':
+                        if (gbl.game.ImportSources.Contains("Pool"))
+                        {
+                            gbl.import_from = ImportSource.Pool;
+                        }
+                        else if (gbl.game.ImportSources.Contains("Pools"))
+                        {
+                            gbl.import_from = ImportSource.Pools;
+                        }
+                        break;
 
-                case 'E':
-                case '\0':
-                    return;
+                    case 'H':
+                        gbl.import_from = ImportSource.Hillsfar;
+                        break;
+
+                    case 'S':
+                        gbl.import_from = ImportSource.Secret;
+                        break;
+
+                    case 'D':
+                        gbl.import_from = ImportSource.Death;
+                        break;
+
+                    case 'T':
+                        if (gbl.game.ImportSources.Contains("TDQK"))
+                        {
+                            gbl.import_from = ImportSource.TDQK;
+                        }
+                        else if (gbl.game.ImportSources.Contains("Treasures"))
+                        {
+                            gbl.import_from = ImportSource.Treasures;
+                        }
+                        break;
+
+                    case 'G':
+                        gbl.import_from = ImportSource.Gateway;
+                        break;
+
+                    case 'E':
+                    case '\0':
+                        return;
+                }
+            }
+            else
+            {
+                gbl.import_from = gbl.game.ImportFrom;
             }
 
             List<string> pathList = [];
@@ -1995,25 +2064,28 @@ namespace engine
         }
 
 
-        class hp_calc
+        internal class hp_calc
         {
-            public hp_calc(int _size, int _lvl, int _hit_die, int _mult) { size = _size; lvl_bonus = _lvl; max_hit_die = _hit_die; max_mult = _mult; }
+            public hp_calc(int _size, int _lvl, int _hit_die, int _mult, int _con) { size = _size; lvl_bonus = _lvl; max_hit_die = _hit_die; max_mult = _mult; max_con = _con; }
 
             public int size;
             public int lvl_bonus;
             public int max_hit_die;
             public int max_mult;
+            public int max_con;
         }
 
-        static hp_calc[] hp_calc_table = {
-            new hp_calc(8, 0, 9, 2),   // Cleric
-            new hp_calc(8, 0, 14, 1),  // Druid
-            new hp_calc(10, 0, 9, 3),  // Fighter
-            new hp_calc(10, 0, 9, 3),  // Paladin
-            new hp_calc(8, 1, 11, 2),  // Ranger
-            new hp_calc(4, 0, 11, 1),  // Magic User
-            new hp_calc(6, 0, 10, 2),  // Thief
-            new hp_calc(4, 1, 18, 0),  // Monk
+        internal readonly static Dictionary<SkillType, hp_calc> hp_calc_table = new Dictionary<SkillType, hp_calc>()
+        {
+            [SkillType.Cleric] = new hp_calc(8, 0, 9, 2, 2),
+            [SkillType.Druid] = new hp_calc(8, 0, 14, 1, 2),
+            [SkillType.Fighter] = new hp_calc(10, 0, 9, 3, 7),
+            [SkillType.Knight] = new hp_calc(10, 1, 10, 2, 7),
+            [SkillType.Paladin] = new hp_calc(10, 0, 9, 3, 7),
+            [SkillType.Ranger] = new hp_calc(8, 1, 11, 2, 7),
+            [SkillType.MagicUser] = new hp_calc(4, 0, 11, 1, 2),
+            [SkillType.Thief] = new hp_calc(6, 0, 10, 2, 2),
+            [SkillType.Monk] = new hp_calc(4, 1, 18, 0, 2),
         };
 
         internal static sbyte get_con_hp_adj(Player player)
@@ -2024,11 +2096,11 @@ namespace engine
             {
                 byte classLvl = player.ClassLevel[(byte)skill];
 
-                if (classLvl > 0 && classLvl < gbl.max_class_hit_dice[(byte)skill])
+                if (classLvl > 0 && classLvl <= hp_calc_table[skill].max_hit_die)
                 {
                     hp_adj += (sbyte)con_bonus(skill, player.stats.Con.full);
 
-                    if (player.ClassLevel[(int)skill] == 1 && hp_calc_table[(byte)skill].lvl_bonus == 1)
+                    if (player.ClassLevel[(int)skill] == 1 && hp_calc_table[skill].lvl_bonus == 1)
                     {
                         hp_adj *= 2;
                     }
@@ -2049,7 +2121,7 @@ namespace engine
 
                 if (classLvl > 0)
                 {
-                    hp_calc hpt = hp_calc_table[(byte)skill];
+                    hp_calc hpt = hp_calc_table[skill];
 
                     int con_hp_bonus = con_bonus(skill, con);
 
@@ -2070,7 +2142,7 @@ namespace engine
 
                 if (classLvl > 0)
                 {
-                    hp_calc hpt = hp_calc_table[(byte)skill];
+                    hp_calc hpt = hp_calc_table[skill];
 
                     int con_hp_bonus = con_bonus(skill, con);
 
@@ -2124,7 +2196,7 @@ namespace engine
 
                 if (classLvl > 0)
                 {
-                    hp_calc hpt = hp_calc_table[(byte)skill];
+                    hp_calc hpt = hp_calc_table[skill];
 
                     int con_hp_bonus = con_bonus(skill, player.stats.Con.full);
 
@@ -2145,7 +2217,7 @@ namespace engine
 
                 if (classLvl > 0)
                 {
-                    hp_calc hpt = hp_calc_table[(byte)skill];
+                    hp_calc hpt = hp_calc_table[skill];
 
                     int con_hp_bonus = con_bonus(skill, player.stats.Con.full);
 
@@ -2178,7 +2250,18 @@ namespace engine
             return max_hp;
         }
 
-        static byte[] /* seg600:3EAA unk_1A1BA */ classMasks = { 0x02, 0x02, 0x08, 0x10, 0x20, 0x01, 0x04, 0x04 };
+        readonly static Dictionary<SkillType, byte> classMasks = new Dictionary<SkillType, byte>() /* seg600:3EAA unk_1A1BA */
+        {
+            [SkillType.Cleric] = 0x02,
+            [SkillType.Druid] = 0x02,
+            [SkillType.Fighter] = 0x08,
+            [SkillType.Knight] = 0x40,
+            [SkillType.Paladin] = 0x10,
+            [SkillType.Ranger] = 0x20,
+            [SkillType.MagicUser] = 0x01,
+            [SkillType.Thief] = 0x04,
+            [SkillType.Monk] = 0x04,
+        };
 
 
         internal static byte roll_hp(byte classMask, Player player) /* sub_509E0 */
@@ -2188,11 +2271,11 @@ namespace engine
             for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
             {
                 if (player.ClassLevel[(byte)skill] > 0 &&
-                    (classMasks[(byte)skill] & classMask) != 0)
+                    (classMasks[skill] & classMask) != 0)
                 {
-                    if (player.ClassLevel[(byte)skill] < gbl.max_class_hit_dice[(byte)skill])
+                    if (player.ClassLevel[(byte)skill] <= hp_calc_table[skill].max_hit_die)
                     {
-                        int dice = hp_calc_table[(byte)skill].lvl_bonus + 1;
+                        int dice = hp_calc_table[skill].lvl_bonus + 1;
                         int min_roll = 1;
 
                         if (player.ClassLevel[(byte)skill] > 1)
@@ -2215,8 +2298,8 @@ namespace engine
                         }
 
                         // game is nice - rolls twice for hp and gives the highest value
-                        byte roll1 = ovr024.roll_dice(hp_calc_table[(byte)skill].size, dice, min_roll);
-                        byte roll2 = ovr024.roll_dice(hp_calc_table[(byte)skill].size, dice, min_roll);
+                        byte roll1 = ovr024.roll_dice(hp_calc_table[skill].size, dice, min_roll);
+                        byte roll2 = ovr024.roll_dice(hp_calc_table[skill].size, dice, min_roll);
 
                         if (roll2 > roll1)
                         {
@@ -2227,26 +2310,13 @@ namespace engine
                     }
                     else
                     {
-                        hp_increase += (byte)hp_calc_table[(byte)skill].max_mult;
+                        hp_increase += (byte)hp_calc_table[skill].max_mult;
                     }
                 }
             }
 
             return hp_increase;
         }
-
-
-
-
-        internal static int[,] exp_table = { /* seg600:4293 unk_1A5A3 */
-            /* Cleric */    { 0, 1501, 3001,  6001, 13001, 27501, 55001, 110001, 225001, 450001, -1, -1, -1 },
-            /* Druid */     { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 },
-            /* Fighter */   { 0, 2001, 4001,  8001, 18001, 35001, 70001, 125001, 250001, 500001,  750001, 1000001, -1  },
-            /* Paladin */   { 0, 2751, 5501, 12001, 24001, 45001, 95001, 175001, 350001, 700001, 1050001, -1, -1 },
-            /* Ranger */    { 0, 2251, 4501, 10001, 20001, 40001, 90001, 150001, 225001, 325001,  650001, -1, -1 },
-            /* MU */        { 0, 2501, 5001, 10001, 22501, 40001, 60001,  90001, 135001, 250001,  375001, -1, -1 },
-            /* Thief */     { 0, 1251, 2501,  5001, 10001, 20001, 42501,  70001, 110001, 160001,  220001, 440001, -1},
-            /* Monk */      { 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1 }};
 
         internal static void train_player()
         {
@@ -2288,10 +2358,10 @@ namespace engine
 
                         if (Limits.RaceClassLimit(class_lvl, player, skill) == false)
                         {
-                            int next_exp = exp_table[(byte)skill, class_lvl];
+                            int next_exp = Exp.Cost(gbl.SelectedPlayer, skill, class_lvl);
                             if (next_exp > 0 && next_exp < min_exp)
                             {
-                                min_exp = exp_table[(byte)skill, class_lvl];
+                                min_exp = Exp.Cost(gbl.SelectedPlayer, skill, class_lvl);
                             }
                         }
                     }
@@ -2306,17 +2376,17 @@ namespace engine
             {
                 if (player.ClassLevel[(byte)skill] > 0)
                 {
-                    classesToTrainMask |= classMasks[(byte)skill];
+                    classesToTrainMask |= classMasks[skill];
                     byte class_lvl = player.ClassLevel[(byte)skill];
 
                     if (Limits.RaceClassLimit(class_lvl, player, skill) == false)
                     {
-                        int next_exp = exp_table[(byte)skill, class_lvl];
+                        int next_exp = Exp.Cost(gbl.SelectedPlayer, skill, class_lvl);
                         if (next_exp > 0 && next_exp <= player.exp)
                         {
-                            classesExpTrainMask |= classMasks[(byte)skill];
+                            classesExpTrainMask |= classMasks[skill];
 
-                            int next_lvl_exp = exp_table[(byte)skill, class_lvl + 1];
+                            int next_lvl_exp = Exp.Cost(gbl.SelectedPlayer, skill, class_lvl+1);
 
                             if (next_lvl_exp > 0 && player.exp >= next_lvl_exp && next_lvl_exp > exp_limit)
                             {
@@ -2351,8 +2421,8 @@ namespace engine
                 if (gbl.silent_training == false)
                 {
                     seg041.DisplayStatusText(0, 14, "Not Enough Experience");
-                    return;
                 }
+                return;
             }
 
 
@@ -2385,21 +2455,21 @@ namespace engine
                 for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
                 {
                     if (player.ClassLevel[(byte)skill] > 0 &&
-                        (classMasks[(byte)skill] & actualTrainingClassesMask) != 0)
+                        (classMasks[skill] & actualTrainingClassesMask) != 0)
                     {
                         y_offset++;
 
                         if (y_offset == 5)
                         {
                             string text = System.String.Format("    a level {0} {1}",
-                                player.ClassLevel[(byte)skill] + 1, ovr020.classString[(byte)skill]);
+                                player.ClassLevel[(byte)skill] + 1, ovr020.classString[(ClassId)skill]);
 
                             seg041.displayString(text, 0, 10, y_offset, 6);
                         }
                         else
                         {
                             string text = System.String.Format("and a level {0} {1}",
-                                player.ClassLevel[(byte)skill] + 1, ovr020.classString[(byte)skill]);
+                                player.ClassLevel[(byte)skill] + 1, ovr020.classString[(ClassId)skill]);
 
                             seg041.displayString(text, 0, 10, y_offset, 6);
                         }
@@ -2431,7 +2501,7 @@ namespace engine
                     {
                         class_count++;
 
-                        if ((classMasks[(byte)skill] & actualTrainingClassesMask) != 0)
+                        if ((classMasks[skill] & actualTrainingClassesMask) != 0)
                         {
                             player.ClassLevel[(byte)skill] += 1;
                             if (player.lost_lvls > 0)

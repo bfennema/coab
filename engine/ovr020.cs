@@ -17,20 +17,29 @@ namespace engine
     class ovr020
     {
         internal static string[] sexString = { "Male", "Female" };
-        internal static string[] raceString = { "Monster", "Dwarf", "Mountain Dwarf", "Hill Dwarf",
-                                         "Elf", "Silvanesti Elf", "Qualinesti Elf", "Gnome",
-                                         "Half-Elf", "Halfling", "Kender", "Half-Orc", "Human" };
-
+        internal static Dictionary<Race, string> raceString = new Dictionary<Race, string>()
+        {
+            [Race.monster] = "Monster", [Race.dwarf] = "Dwarf", [Race.mountain_dwarf] = "Mountain Dwarf",
+            [Race.hill_dwarf] = "Hill Dwarf", [Race.elf] = "Elf", [Race.silvanesti_elf] = "Silvanesti Elf",
+            [Race.qualinesti_elf] = "Qualinesti Elf", [Race.gnome] = "Gnome", [Race.half_elf] = "Half-Elf",
+            [Race.halfling] = "Halfling", [Race.kender] = "Kender", [Race.half_orc] = "Half-Orc",
+            [Race.human] = "Human"
+        };
         internal static string[] alignmentString = { "Lawful Good", "Lawful Neutral", "Lawful Evil",
                                               "Neutral Good", "True Neutral", "Neutral Evil",
                                               "Chaotic Good", "Chaotic Neutral", "Chaotic Evil" };
 
-        internal static string[] classString = { "Cleric", "Druid", "Fighter", "Paladin", "Knight",
-                                          "Ranger", "Magic-User", "Thief", "Monk", "Cleric/Fighter",
-                                          "Cleric/Fighter/Magic-User", "Cleric/Ranger",
-                                          "Cleric/Magic-User","Cleric/Thief", "Fighter/Magic-User", 
-                                          "Fighter/Thief", "Fighter/Magic-User/Thief",
-                                          "Magic-User/Thief" };
+        internal static Dictionary<ClassId, string> classString = new Dictionary<ClassId, string>()
+        {
+            [ClassId.cleric] = "Cleric", [ClassId.druid] = "Druid", [ClassId.fighter] = "Fighter",
+            [ClassId.knight] = "Knight", [ClassId.paladin] = "Paladin", [ClassId.ranger] = "Ranger",
+            [ClassId.magic_user] = "Magic-User", [ClassId.thief] = "Thief", [ClassId.monk] = "Monk",
+            [ClassId.mc_c_f] = "Cleric/Fighter", [ClassId.mc_c_f_m] = "Cleric/Fighter/Magic-User",
+            [ClassId.mc_c_r] = "Cleric/Ranger", [ClassId.mc_c_mu] = "Cleric/Magic-User",
+            [ClassId.mc_c_t] = "Cleric/Thief", [ClassId.mc_f_mu] = "Fighter/Magic-User",
+            [ClassId.mc_f_t] = "Fighter/Thief", [ClassId.mc_f_mu_t] = "Fighter/Magic-User/Thief",
+            [ClassId.mc_mu_t] = "Magic-User/Thief"
+        };
 
         static string[] statShortString = { "STR ", "INT ", "WIS ", "DEX ", "CON ", "CHA " };
 
@@ -64,7 +73,7 @@ namespace engine
             seg041.displayString(sexString[player.sex], 0, 15, 3, xCol);
 
             xCol += (byte)(text2.Length + 1);
-            text2 = raceString[(int)player.race];
+            text2 = raceString[player.race];
             seg041.displayString(text2, 0, 15, 3, xCol);
 
             xCol += (byte)(text2.Length + 1);
@@ -90,11 +99,11 @@ namespace engine
                     }
                     if (classLvl < ovr026.HumanCurrentClassLevel_Zero(player))
                     {
-                        text2 += classString[(byte)skill];
+                        text2 += classString[(ClassId)skill];
                     }
                     else
                     {
-                        text2 += "(" + classString[(byte)skill] + ")";
+                        text2 += "(" + classString[(ClassId)skill] + ")";
                     }
 
                     displaySlash = true;
@@ -110,7 +119,7 @@ namespace engine
                     {
                         text2 += "/";
                     }
-                    text2 += classString[(byte)skill];
+                    text2 += classString[(ClassId)skill];
 
                     displaySlash = true;
                 }

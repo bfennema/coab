@@ -184,7 +184,7 @@ namespace engine
                     timeCursorOn = timeCursorOff.AddMilliseconds(300);
                 }
 
-                if ((gbl.area_ptr.picture_fade != 0 || useOverlay == true) &&
+                if (((gbl.saveData != null && gbl.area_ptr.picture_fade != 0) || useOverlay == true) &&
                     gbl.byte_1D556.curFrame > 0)
                 {
                     ovr030.DrawMaybeOverlayed(gbl.byte_1D556.CurrentPicture(), useOverlay, 3, 3);

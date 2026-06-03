@@ -359,5 +359,106 @@ namespace engine
 
             gbl.game_area = bkupArea;
         }
+        public static async void CompareSave(string file_name)
+        {
+            System.IO.Stream file = await seg042.find_and_open_file(true, gbl.SavePath, file_name);
+
+            var saveData = new SaveData(file);
+
+            if (gbl.saveData != saveData)
+            {
+                string filename = System.IO.Path.Combine(Logger.GetPath(), "CompareSave.txt");
+                if (System.IO.File.Exists(filename))
+                {
+                    System.IO.File.Delete(filename);
+                }
+                DebugWriter dw = new DebugWriter(filename);
+
+                dw.WriteLine("                      {0,-15} Loaded", file_name);
+
+                if (saveData.game_area != gbl.saveData.game_area)
+                {
+                    dw.WriteLine("game_area             {0,-15} {1}", saveData.game_area, gbl.saveData.game_area);
+                }
+                if (saveData.mapPosX != gbl.saveData.mapPosX)
+                {
+                    dw.WriteLine("mapPosX               {0,-15} {1}", saveData.mapPosX, gbl.saveData.mapPosX);
+                }
+                if (saveData.mapPosY != gbl.saveData.mapPosY)
+                {
+                    dw.WriteLine("mapPosY               {0,-15} {1}", saveData.mapPosY, gbl.saveData.mapPosY);
+                }
+                if (saveData.mapDirection != gbl.saveData.mapDirection)
+                {
+                    dw.WriteLine("mapDirection          {0,-15} {1}", saveData.mapDirection, gbl.saveData.mapDirection);
+                }
+                if (saveData.mapWallType != gbl.saveData.mapWallType)
+                {
+                    dw.WriteLine("mapWallType           {0,-15} {1}", saveData.mapWallType, gbl.saveData.mapWallType);
+                }
+                if (saveData.mapWallRoof != gbl.saveData.mapWallRoof)
+                {
+                    dw.WriteLine("mapWallRoof           {0,-15} {1}", saveData.mapWallRoof, gbl.saveData.mapWallRoof);
+                }
+                if (saveData.game_state != gbl.saveData.game_state)
+                {
+                    dw.WriteLine("game_state            {0,-15} {1}", saveData.game_state, gbl.saveData.game_state);
+                }
+                if (saveData.last_game_state != gbl.saveData.last_game_state)
+                {
+                    dw.WriteLine("last_game_state       {0,-15} {1}", saveData.last_game_state, gbl.saveData.last_game_state);
+                }
+                if (saveData.area_ptr != gbl.saveData.area_ptr)
+                {
+                    var fileByteArray = saveData.area_ptr.ToByteArray();
+                    var byteArray = gbl.saveData.area_ptr.ToByteArray();
+                    for (int i = 0; i < fileByteArray.Length; i+=2)
+                    {
+                        if (fileByteArray[i] != byteArray[i] || fileByteArray[i+1] != byteArray[i+1])
+                        {
+                            dw.WriteLine("  area_ptr.field_{0:X4} 0x{1:X4} ({1})      0x{2:X4} ({2})", gbl.vm_mem0_offset + (i/2), fileByteArray[i+1] << 8 | fileByteArray[i], byteArray[i+1] << 8 | byteArray[i]);
+                        }
+                    }
+                }
+                if (saveData.stru_1B2CA != gbl.saveData.stru_1B2CA)
+                {
+                    var fileByteArray = saveData.stru_1B2CA.ToByteArray();
+                    var byteArray = gbl.saveData.stru_1B2CA.ToByteArray();
+                    for (int i = 0; i < fileByteArray.Length; i += 2)
+                    {
+                        if (fileByteArray[i] != byteArray[i] || fileByteArray[i + 1] != byteArray[i + 1])
+                        {
+                            dw.WriteLine("stru_1B2CA.field_{0:X4} 0x{1:X4} ({1})      0x{2:X4} ({2})", gbl.vm_mem2_offset + (i / 2), fileByteArray[i + 1] << 8 | fileByteArray[i], byteArray[i + 1] << 8 | byteArray[i]);
+                        }
+                    }
+                }
+                if (saveData.area2_ptr != gbl.saveData.area2_ptr)
+                {
+                    var fileByteArray = saveData.area2_ptr.ToByteArray();
+                    var byteArray = gbl.saveData.area2_ptr.ToByteArray();
+                    for (int i = 0; i < fileByteArray.Length; i += 2)
+                    {
+                        if (fileByteArray[i] != byteArray[i] || fileByteArray[i + 1] != byteArray[i + 1])
+                        {
+                            dw.WriteLine(" area2_ptr.field_{0:X4} 0x{1:X4} ({1})      0x{2:X4} ({2})", gbl.vm_mem1_offset + (i / 2), fileByteArray[i + 1] << 8 | fileByteArray[i], byteArray[i + 1] << 8 | byteArray[i]);
+                        }
+                    }
+                }
+                //if (saveData.ecl_ptr != gbl.saveData.ecl_ptr)
+                //{
+                //    var fileByteArray = saveData.ecl_ptr.ToByteArray();
+                //    var byteArray = gbl.saveData.ecl_ptr.ToByteArray();
+                //    for (int i = 0; i < fileByteArray.Length; i ++)
+                //    {
+                //        if (fileByteArray[i] != byteArray[i])
+                //        {
+                //            dw.WriteLine("       ecl_ptr 0x{0:X4} 0x{1:X4} ({1})      0x{2:X4} ({2})", gbl.initial_ecl_offset + i, fileByteArray[i], byteArray[i]);
+                //        }
+                //    }
+                //}
+
+                dw.Close();
+            }
+        }
     }
 }

@@ -172,8 +172,8 @@ namespace engine
 
         internal static void share_pooled()
         {
-            int[] money_remander = new int[7];
-            int[] money_each = new int[7];
+            int[] money_remander = new int[9];
+            int[] money_each = new int[9];
 
             int partySize = GetPartyCount();
 
@@ -223,7 +223,7 @@ namespace engine
                 }
             }
 
-            for (int coin = 6; coin >= 0; coin--)
+            for (int coin = 8; coin >= 0; coin--)
             {
                 if (money_remander[coin] > 0)
                 {

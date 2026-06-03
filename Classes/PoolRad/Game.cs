@@ -8,9 +8,6 @@ namespace Classes.PoolRad
         {
             gbl.import_func[(int)ImportSource.Pool] = Player.LoadPlayer;
         }
-        readonly static internal byte[] portraitHead = { 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 };
-        readonly static internal byte[] portraitBody = { 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 };
-        readonly static string[] templeSpells = { "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh", "Exit" };
         public override void Load() { }
         public override GameState GameState(byte data)
         {
@@ -43,14 +40,9 @@ namespace Classes.PoolRad
         public override GameState LoadGameState { get => gbl.game_state; }
         public override Logging.Game Name { get => Logging.Game.PoolOfRadiance; }
         public override ImportSource ImportFrom { get => Classes.ImportSource.Pool; }
+        public override string[]? ImportSources { get => null; }
         public override int InitialExp { get => 0; }
-        public override MoneySet InitialMoney
-        {
-            get
-            {
-                return new MoneySet();
-            }
-        }
+        public override MoneySet? InitialMoney { get => null; }
         public override string DemoString { get => null; }
         public override string SavePlayerExt { get => "CHA"; }
         public override string SaveItemExt { get => "ITM"; }
@@ -66,10 +58,11 @@ namespace Classes.PoolRad
         public override ushort InitialVmMem0Size { get => 0x0400; }
         public override ushort InitialVmMem1Offset { get => 0x6B00; }
         public override ushort InitialVmMem1Size { get => 0x0400; }
-        public override ushort InitialVmMem2Offset { get => 0x9800; }
-        public override ushort InitialVmMem2Size { get => 0x0100; }
+        public override ushort InitialVmMem2Offset { get => 0x9700; }
+        public override ushort InitialVmMem2Size { get => 0x0200; }
         public override ushort InitialEclOffset { get => 0x9900; }
         public override byte InitialEclBlockId { get => 0; }
+        public override byte InvalidEclBlockId { get => 0xFF; }
         public override SpellBook InitialMUSpells { get => new SpellBook(new List<Spells>() { Spells.detect_magic_MU, Spells.read_magic, Spells.shield, Spells.sleep }); }
         public override byte CampingImage { get => 29; }
         public override byte TreasureImage { get => 1; }
@@ -99,9 +92,24 @@ namespace Classes.PoolRad
         public override bool SetBlocksInArea1 { get => true; }
         public override int EclClockArguments { get => 1; }
         public override bool StoreEclBlock { get => true; }
-        public override byte[] PortraitBody { get => portraitBody; }
-        public override byte[] PortraitHead { get => portraitHead; }
-        public override string[] TempleSpells { get => templeSpells; }
+        public override byte[] PortraitBody { get => [ 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 ]; }
+        public override byte[] PortraitHead { get => [ 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 ]; }
+        public override string[] TempleSpells { get => ["Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" ]; }
+        public override Race[] AllowedRaces { get => [Race.dwarf, Race.elf, Race.gnome, Race.half_elf, Race.halfling, Race.human]; }
+        public override ClassId[] AllowedClasses
+        {
+            get
+            {
+                if (Cheats.allow_pool_paladin_ranger)
+                {
+                    return [ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.paladin, ClassId.ranger, ClassId.mc_c_f, ClassId.mc_c_r, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t];
+                }
+                else
+                {
+                    return [ClassId.cleric, ClassId.fighter, ClassId.magic_user, ClassId.thief, ClassId.mc_c_f, ClassId.mc_c_f_m, ClassId.mc_c_mu, ClassId.mc_f_mu, ClassId.mc_f_t, ClassId.mc_f_mu_t, ClassId.mc_mu_t];
+                }
+            }
+        }
         public override Classes.Player LoadPlayer(System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { return Player.LoadPlayer(player_stream, item_stream, affect_stream); }
         public override Classes.Player LoadPlayer(byte[] player_data, byte[] item_data, ushort item_len, byte[] affect_data, ushort affect_len) { return Player.LoadPlayer(player_data, item_data, item_len, affect_data, affect_len); }
         public override void SavePlayer(Classes.Player player, System.IO.Stream player_stream, System.IO.Stream? item_stream, System.IO.Stream? affect_stream) { Player.SavePlayer(player, player_stream, item_stream, affect_stream); }

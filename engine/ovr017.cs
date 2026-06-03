@@ -588,7 +588,7 @@ namespace engine
         {
             byte[] player_data, item_data, affect_data;
             ushort player_len, item_len, affect_len;
-            seg042.load_decode_dax(out player_data, out player_len, monster_id, string.Format("MON{0}CHA", gbl.game_area));
+            seg042.load_decode_dax(out player_data, out player_len, monster_id, string.Format("MON{0}CHA", gbl.saveData.game_area));
 
             if (player_len == 0)
             {
@@ -741,59 +741,9 @@ namespace engine
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
             gbl.reload_ecl_and_pictures = true;
 
-            byte[] data = new byte[0x2000];
+            byte[] data = new byte[0x148];
 
-            gbl.file.BlockRead(1, data, file);
-            gbl.game_area = data[0];
-
-            gbl.file.BlockRead(0x800, data, file);
-            gbl.area_ptr = new Area1(data, 0);
-
-            gbl.file.BlockRead(0x800, data, file);
-            gbl.area2_ptr = new Area2(data, 0);
-
-            gbl.file.BlockRead(0x400, data, file);
-            gbl.stru_1B2CA = new Struct_1B2CA(data, 0);
-
-            if (gbl.game.StoreEclBlock)
-            {
-            gbl.file.BlockRead(0x1E00, data, file);
-            gbl.ecl_ptr = new EclBlock(data, 0);
-            }
-
-            gbl.file.BlockRead(5, data, file);
-            gbl.mapPosX = (sbyte)data[0];
-            gbl.mapPosY = (sbyte)data[1];
-            gbl.mapDirection = data[2];
-            gbl.mapWallType = data[3];
-            gbl.mapWallRoof = data[4];
-
-            gbl.file.BlockRead(1, data, file);
-            gbl.last_game_state = gbl.game.GameState(data[0]);
-
-            gbl.file.BlockRead(1, data, file);
-            gbl.game_state = gbl.game.GameState(data[0]);
-
-            if (gbl.game.SetBlocksInArea1)
-            {
-                gbl.setBlocks[0].blockId = gbl.area_ptr.field_3F4;
-                gbl.setBlocks[0].setId = gbl.area_ptr.field_3FA;
-                gbl.setBlocks[1].blockId = gbl.area_ptr.field_3F6;
-                gbl.setBlocks[1].setId = gbl.area_ptr.field_3FC;
-                gbl.setBlocks[2].blockId = gbl.area_ptr.field_3F8;
-                gbl.setBlocks[2].setId = gbl.area_ptr.field_3FE;
-            }
-            else
-            {
-                for (int i = 0; i < 3; i++)
-                {
-                    gbl.file.BlockRead(2, data, file);
-                    gbl.setBlocks[i].blockId = Sys.ArrayToShort(data, 0);
-
-                    gbl.file.BlockRead(2, data, file);
-                    gbl.setBlocks[i].setId = Sys.ArrayToShort(data, 0);
-                }
-            }
+            gbl.saveData = new SaveData(file);
 
             gbl.file.BlockRead(1, data, file);
             int number_of_players = data[0];
@@ -938,7 +888,7 @@ namespace engine
                 gbl.file.BlockWrite(0x400, gbl.stru_1B2CA.ToByteArray(), save_file);
                 if (gbl.game.StoreEclBlock)
                 {
-                gbl.file.BlockWrite(0x1E00, gbl.ecl_ptr.ToByteArray(), save_file);
+                    gbl.file.BlockWrite(0x1E00, gbl.ecl_ptr.ToByteArray(), save_file);
                 }
 
                 data[0] = (byte)gbl.mapPosX;

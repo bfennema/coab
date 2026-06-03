@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Classes.Combat
+﻿namespace Classes.Combat
 {
     public enum Icon
     {
@@ -30,7 +26,7 @@ namespace Classes.Combat
 
         private static DaxBlock LoadIconHelper(int maskColor, int masked, int block_id, string filename)
         {
-            var data = Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
+            var data = DaxFiles.DaxCache.LoadDax(filename, block_id);
             return new DaxBlock(data, masked, maskColor);
         }
 

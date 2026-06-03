@@ -558,9 +558,9 @@ namespace engine
         {
             int returnVal = 0;
 
-            if (gbl.max_class_hit_dice[(int)class_index] <= classLvl)
+            if (ovr018.hp_calc_table[class_index].max_hit_die < classLvl)
             {
-                classLvl = gbl.max_class_hit_dice[(int)class_index] - 1;
+                classLvl = ovr018.hp_calc_table[class_index].max_hit_die;
             }
 
             if (class_index == SkillType.Ranger &&
@@ -570,7 +570,8 @@ namespace engine
             }
 
             if (class_index == SkillType.Fighter || 
-                class_index == SkillType.Paladin || 
+                class_index == SkillType.Paladin ||
+                class_index == SkillType.Knight ||
                 class_index == SkillType.Ranger)
             {
                 if (cons >= 15 && cons <= 19)

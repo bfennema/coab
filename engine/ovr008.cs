@@ -81,6 +81,10 @@ namespace engine
             return gbl.cmd_ops[arg_0].GetCmdValue();
             //TODO replace calls to vm_GetCmdValue function with gbl.cmd_opps[arg_0].GetCmdValue();
         }
+        internal static string vm_PrintCmd(int arg_0)
+        {
+            return gbl.cmd_ops[arg_0].PrintCmd();
+        }
 
 
         internal static void vm_init_ecl() // sub_301E8

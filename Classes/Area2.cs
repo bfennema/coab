@@ -33,6 +33,7 @@ namespace Classes
             System.Array.Clear(origData, 0, Area2Size);
 
             DataIO.ReadObject(this, origData, 0);
+            party_size = 0;
         }
 
         protected byte[] origData;

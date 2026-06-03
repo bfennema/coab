@@ -6,13 +6,13 @@ namespace Classes
 {
     public struct StatValue
     {
-        readonly int[, ,] raceSexMinMax;
-        readonly int[] classMin;
+        readonly Dictionary<Race, int[,]> raceSexMinMax;
+        readonly Dictionary<ClassId, int> classMin;
         readonly int[] ageEffects;
         readonly int min;
         readonly int max;
 
-        public StatValue(int[, ,] _raceSexMinMax, int[] _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
+        public StatValue(Dictionary<Race, int[,]> _raceSexMinMax, Dictionary<ClassId, int> _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
         {
             raceSexMinMax = _raceSexMinMax;
             classMin = _classMin;
@@ -24,7 +24,7 @@ namespace Classes
             max = _max;
         }
 
-        public StatValue(StatValue old, int[,,] _raceSexMinMax, int[] _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
+        public StatValue(StatValue old, Dictionary<Race, int[,]> _raceSexMinMax, Dictionary<ClassId, int> _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
             : this(_raceSexMinMax, _classMin, _ageEffects, _cur_offset, _full_offset, _min, _max)
         {
             cur = old.cur;
@@ -70,8 +70,8 @@ namespace Classes
             int delta = full - cur;
             if( raceSexMinMax != null )
             {
-                cur = Math.Min(raceSexMinMax[(int)race, 1, sex], cur);
-                cur = Math.Max(raceSexMinMax[(int)race, 0, sex], cur);
+                cur = Math.Min(raceSexMinMax[race][1, sex], cur);
+                cur = Math.Max(raceSexMinMax[race][0, sex], cur);
             }
             full = cur + delta;
         }
@@ -81,7 +81,11 @@ namespace Classes
             int delta = full - cur;
             if (classMin != null)
             {
-                cur = Math.Max(classMin[(int)_class], cur);
+                if (!classMin.TryGetValue(_class, out int min))
+                {
+                    min = 0;
+                }
+                cur = Math.Max(min, cur);
             }
             full = cur + delta;
         }
@@ -91,7 +95,7 @@ namespace Classes
             int delta = full - cur;
             for (int i = 0; i < 5; i++)
             {
-                if (Limits.RaceAgeBrackets[(int)race, i] < age)
+                if (Limits.RaceAgeBrackets[race][i] < age)
                 {
                     cur += ageEffects[i];
                 }

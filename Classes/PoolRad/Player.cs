@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace Classes.PoolRad
@@ -441,7 +442,7 @@ namespace Classes.PoolRad
 
             player.base_movement = base_movement;
             player.HitDice = HitDice;
-            player.multiclassLevel = player.HitDice;
+            player.multiclassLevel = 0;
             player.lost_lvls = lost_lvls;
             player.lost_hp = lost_hp;
             player.level_undead = level_undead;
@@ -744,7 +745,11 @@ namespace Classes.PoolRad
 
                 foreach (var affect in player.affects)
                 {
-                    gbl.file.BlockWrite(Affect.StructSize, new Affect(affect, player).Save(), affect_stream);
+                    try
+                    {
+                        gbl.file.BlockWrite(Affect.StructSize, new Affect(affect, player).Save(), affect_stream);
+                    }
+                    catch (ArgumentException) { }
                 }
 
                 foreach (var affect in affects)
