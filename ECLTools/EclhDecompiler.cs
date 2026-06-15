@@ -199,7 +199,7 @@ namespace Eclh
             [0x12] = new() { Mnemonic = "PRINTCLEAR",      FixedOperands = 1  },
             [0x13] = new() { Mnemonic = "RETURN",          FixedOperands = 0  },
             [0x14] = new() { Mnemonic = "COMPARE AND",     FixedOperands = 4  },
-            [0x15] = new() { Mnemonic = "VERTICAL MENU",   FixedOperands = -1 }, // var
+            [0x15] = new() { Mnemonic = "VERTICAL MENU",   FixedOperands = 3  }, // 3 fixed + count from op3
             [0x16] = new() { Mnemonic = "IF =",            FixedOperands = 0  },
             [0x17] = new() { Mnemonic = "IF <>",           FixedOperands = 0  },
             [0x18] = new() { Mnemonic = "IF <",            FixedOperands = 0  },
@@ -215,13 +215,13 @@ namespace Eclh
             [0x22] = new() { Mnemonic = "PARTY SURPRISE",  FixedOperands = 2  },
             [0x23] = new() { Mnemonic = "SURPRISE",        FixedOperands = 4  },
             [0x24] = new() { Mnemonic = "COMBAT",          FixedOperands = 0  },
-            [0x25] = new() { Mnemonic = "ON GOTO",         FixedOperands = -1 }, // var
-            [0x26] = new() { Mnemonic = "ON GOSUB",        FixedOperands = -1 }, // var
+            [0x25] = new() { Mnemonic = "ON GOTO",         FixedOperands = 2  }, // 2 fixed + count from op2
+            [0x26] = new() { Mnemonic = "ON GOSUB",        FixedOperands = 2  }, // 2 fixed + count from op2
             [0x27] = new() { Mnemonic = "TREASURE",        FixedOperands = 8  },
             [0x28] = new() { Mnemonic = "ROB",             FixedOperands = 3  },
             [0x29] = new() { Mnemonic = "ENCOUNTER MENU",  FixedOperands = 14 },
             [0x2A] = new() { Mnemonic = "GETTABLE",        FixedOperands = 3  },
-            [0x2B] = new() { Mnemonic = "HORIZONTAL MENU", FixedOperands = -1 }, // var
+            [0x2B] = new() { Mnemonic = "HORIZONTAL MENU", FixedOperands = 2  }, // 2 fixed + count from op2
             [0x2C] = new() { Mnemonic = "PARLAY",          FixedOperands = 6  },
             [0x2D] = new() { Mnemonic = "CALL",            FixedOperands = 1  },
             [0x2E] = new() { Mnemonic = "DAMAGE",          FixedOperands = 5  },
@@ -315,6 +315,9 @@ namespace Eclh
 
         // ── Pass 1: CFG traversal ─────────────────────────────────────────────
 
+        // Entry-point address → slot name, populated during TraverseCfg
+        private readonly Dictionary<ushort, string> _entryPointNames = new();
+
         private void TraverseCfg(
             (ushort onMove, ushort onSearch, ushort onPreCamp,
              ushort onCampInterrupted, ushort onEnter) entryPoints)
@@ -327,11 +330,19 @@ namespace Eclh
                     worklist.Enqueue(addr);
             }
 
-            Enqueue(entryPoints.onMove);
-            Enqueue(entryPoints.onSearch);
-            Enqueue(entryPoints.onPreCamp);
-            Enqueue(entryPoints.onCampInterrupted);
-            Enqueue(entryPoints.onEnter);
+            // Record entry-point addresses as named labels before seeding the worklist.
+            // Multiple slots may point to the same address — first wins for the name.
+            void RecordEntry(ushort addr, string name)
+            {
+                _entryPointNames.TryAdd(addr, name);
+                Enqueue(addr);
+            }
+
+            RecordEntry(entryPoints.onMove,            "on_move");
+            RecordEntry(entryPoints.onSearch,          "on_search");
+            RecordEntry(entryPoints.onPreCamp,         "on_pre_camp");
+            RecordEntry(entryPoints.onCampInterrupted, "on_camp_interrupted");
+            RecordEntry(entryPoints.onEnter,           "on_enter");
 
             while (worklist.Count > 0)
             {
@@ -446,11 +457,16 @@ namespace Eclh
 
         private void AssignNames()
         {
-            // Labels
+            // Entry-point labels take priority over everything else
+            foreach (var (addr, name) in _entryPointNames)
+                _labelNames[addr] = name;
+
+            // GOSUB targets — skip if already named as an entry point
             foreach (ushort addr in _gosubTargets)
                 if (!_labelNames.ContainsKey(addr))
                     _labelNames[addr] = $"sub_{addr:X4}";
 
+            // GOTO targets — skip if already named
             foreach (ushort addr in _gotoTargets)
                 if (!_labelNames.ContainsKey(addr))
                     _labelNames[addr] = $"loc_{addr:X4}";
@@ -589,8 +605,22 @@ namespace Eclh
                     continue;
                 }
 
-                // ── do/while: back-edge GOTO with fresh COMPARE just before ──
-                // (handled by the while detector above looking backward from GOTO)
+                // ── Single-action if: COMPARE + IF<op> + one instruction ──────
+                // Condition is used directly (no negation) — the action runs when
+                // the flag is true.
+                if (TryEmitSingleIf(sb, allAddrs, i, end, indent, out int singleConsumed))
+                {
+                    i += singleConsumed;
+                    continue;
+                }
+
+                // ── Flag-reuse single-action if: IF<op> + one instruction ─────
+                // No COMPARE emitted — tests the current compare flags directly.
+                if (TryEmitFlagReuseIf(sb, allAddrs, i, end, indent, out int frConsumed))
+                {
+                    i += frConsumed;
+                    continue;
+                }
 
                 // ── Plain instruction ─────────────────────────────────────────
                 sb.AppendLine($"{indent}    {FormatInstruction(instr)}");
@@ -614,6 +644,74 @@ namespace Eclh
         ///          where the guard GOTO target is a label reachable only from inside
         ///          the if structure (i.e. not targeted from outside).
         /// </summary>
+        /// <summary>
+        /// Fuse COMPARE + IF&lt;op&gt; + single_action into:
+        ///     if (lhs op rhs) action
+        ///
+        /// The operator is used directly — no negation — because for single-action
+        /// if, the action executes when the flag is true.
+        ///
+        /// Does NOT fuse when:
+        ///   - the IF is a flag-reuse IF (no COMPARE immediately before it)
+        ///   - the action is a GOTO (block-if handles those)
+        ///   - the action is itself a COMPARE (would hide a chained compare)
+        /// </summary>
+        private bool TryEmitSingleIf(StringBuilder sb, List<ushort> allAddrs,
+                                     int i, int end, string indent, out int consumed)
+        {
+            consumed = 0;
+            if (i + 2 >= end) return false;
+
+            var cmpInstr    = _instructions[allAddrs[i]];
+            var ifInstr     = _instructions[allAddrs[i + 1]];
+            var actionInstr = _instructions[allAddrs[i + 2]];
+
+            if (!cmpInstr.IsCompare)  return false;
+            if (!ifInstr.IsIf)        return false;
+            if (_flagReuseIfs.Contains(ifInstr.Address)) return false;
+
+            // GOTO is handled by TryEmitBlockIf/TryEmitWhile
+            if (actionInstr.IsGoto)   return false;
+
+            // Don't fuse if the action is itself a COMPARE — it would be confusing
+            if (actionInstr.IsCompare) return false;
+
+            // Use the IF operator directly (no negation for single-action form)
+            string condition = FormatCondition(cmpInstr, ifInstr.IfOp);
+            string action    = FormatInstruction(actionInstr);
+
+            sb.AppendLine($"{indent}    if ({condition}) {action}");
+            consumed = 3;
+            return true;
+        }
+
+        /// <summary>
+        /// Fuse a flag-reuse IF + single_action into:
+        ///     if (op) action    // bare operator — no COMPARE emitted
+        ///
+        /// Used when the IF has no COMPARE immediately before it and instead
+        /// relies on flags set by an earlier COMPARE.
+        /// </summary>
+        private bool TryEmitFlagReuseIf(StringBuilder sb, List<ushort> allAddrs,
+                                        int i, int end, string indent, out int consumed)
+        {
+            consumed = 0;
+            if (i + 1 >= end) return false;
+
+            var ifInstr     = _instructions[allAddrs[i]];
+            var actionInstr = _instructions[allAddrs[i + 1]];
+
+            if (!ifInstr.IsIf)                              return false;
+            if (!_flagReuseIfs.Contains(ifInstr.Address))   return false;
+            if (actionInstr.IsGoto)                         return false;
+            if (actionInstr.IsCompare)                      return false;
+
+            string action = FormatInstruction(actionInstr);
+            sb.AppendLine($"{indent}    if ({ifInstr.IfOp}) {action}   // flag-reuse");
+            consumed = 2;
+            return true;
+        }
+
         private bool TryEmitBlockIf(StringBuilder sb, List<ushort> allAddrs,
                                     int i, int end, string indent, out int consumed)
         {
@@ -800,14 +898,16 @@ namespace Eclh
 
             if (cmpInstr.Opcode == 0x14 && cmpInstr.Operands.Count >= 4)
             {
-                // COMPARE AND tests flag[0]=both-equal or flag[1]=either-differs.
-                // The op passed here is already un-negated back to the source condition.
-                // op=="==" means both pairs must be equal (COMPARE AND + IF<> guard)
-                // op=="!=" means either pair differs
-                string pairA = $"{FormatOp(cmpInstr.Operands[0])} == {FormatOp(cmpInstr.Operands[1])}";
-                string pairB = $"{FormatOp(cmpInstr.Operands[2])} == {FormatOp(cmpInstr.Operands[3])}";
-                return op == "==" ? $"{pairA} && {pairB}"
-                                  : $"!({pairA} && {pairB})";
+                // COMPARE AND sets flag[0] when both pairs equal, flag[1] when either differs.
+                // op is the un-negated source condition:
+                //   "==" → both pairs must be equal  → emit (a == b && c == d)
+                //   "!=" → either pair must differ   → emit (a != b || c != d)
+                string a = FormatOp(cmpInstr.Operands[0]);
+                string b = FormatOp(cmpInstr.Operands[1]);
+                string c = FormatOp(cmpInstr.Operands[2]);
+                string d = FormatOp(cmpInstr.Operands[3]);
+                return op == "==" ? $"{a} == {b} && {c} == {d}"
+                                  : $"{a} != {b} || {c} != {d}";
             }
             return "?";
         }
@@ -982,31 +1082,21 @@ namespace Eclh
                     instr.Operands.Add(op);
                 }
 
-                // Variable-arity: ON GOTO (0x25), ON GOSUB (0x26), HORIZONTAL MENU (0x2B)
-                // After 2 fixed operands, read count-more operands where count = op2 value.
-                if (opcode is 0x25 or 0x26 or 0x2B)
+                // Variable-arity extras: ON GOTO/GOSUB/HORIZONTAL MENU use op2 as count;
+                // VERTICAL MENU uses op3 as count.
+                int extraCount = 0;
+                if (opcode is 0x25 or 0x26 or 0x2B)          // count in op2 (index 1)
                 {
                     if (instr.Operands.Count < 2) return null;
-                    int count = GetOperandValue(instr.Operands[1]);
-                    for (int i = 0; i < count; i++)
-                    {
-                        Operand? op = TryReadOperand(ref cursor);
-                        if (op == null) return null;
-                        instr.Operands.Add(op);
-                    }
+                    extraCount = GetOperandValue(instr.Operands[1]);
                 }
-            }
-            else
-            {
-                // VERTICAL MENU (0x15): 3 fixed ops, then count (= op3 value) extra ops.
-                for (int i = 0; i < 3; i++)
+                else if (opcode == 0x15)                       // count in op3 (index 2)
                 {
-                    Operand? op = TryReadOperand(ref cursor);
-                    if (op == null) return null;
-                    instr.Operands.Add(op);
+                    if (instr.Operands.Count < 3) return null;
+                    extraCount = GetOperandValue(instr.Operands[2]);
                 }
-                int count = GetOperandValue(instr.Operands[2]);
-                for (int i = 0; i < count; i++)
+
+                for (int i = 0; i < extraCount; i++)
                 {
                     Operand? op = TryReadOperand(ref cursor);
                     if (op == null) return null;
@@ -1160,27 +1250,28 @@ namespace Eclh
         }
     }
 
-    // ── Entry point for standalone use ────────────────────────────────────────
+    // ── Entry point helpers ───────────────────────────────────────────────────
 
     public static class EclhDecompilerProgram
     {
         /// <summary>
-        /// Decompile a raw ECL file and print the ECLH source to stdout.
-        /// Usage: EclhDecompilerProgram.Run(rawBytes, baseAddress)
+        /// Decompile a raw ECL block (including 2-byte DAX prefix) and return
+        /// the ECLH source text.
         /// </summary>
         public static string Run(byte[] rawBytes, ushort baseAddress = 0x9900)
         {
-            var decompiler = new EclhDecompiler(rawBytes, baseAddress);
-            return decompiler.Decompile();
+            var d = new EclhDecompiler(rawBytes, baseAddress);
+            return d.Decompile();
         }
 
         /// <summary>
-        /// Dump a raw instruction listing (no ECLH formatting) for analysis.
+        /// Dump a flat instruction listing to stdout for quick analysis.
+        /// Runs all CFG and analysis passes but skips structured emission.
         /// </summary>
         public static void DumpRaw(byte[] rawBytes, ushort baseAddress = 0x9900)
         {
             var d = new EclhDecompiler(rawBytes, baseAddress);
-            d.Decompile();   // run passes to populate Instructions
+            d.Decompile();
 
             Console.WriteLine($"Base: 0x{baseAddress:X4}   Instructions: {d.Instructions.Count}");
             Console.WriteLine(new string('-', 80));
