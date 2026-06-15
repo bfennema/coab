@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using Classes.Combat;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -67,7 +68,7 @@ namespace engine
             true
         };
 
-        internal static void startGameMenu()
+        internal static async Task<bool> startGameMenu()
         {
             var gameStateBackup = gbl.game_state;
             gbl.game_state = GameState.StartGameMenu;
@@ -162,20 +163,20 @@ namespace engine
                         case 'C':
                             if (menuFlags[allow_create] == true)
                             {
-                                createPlayer();
+                                await createPlayer();
                             }
                             break;
 
                         case 'D':
                             if (menuFlags[allow_drop] == true)
                             {
-                                dropPlayer();
+                                await dropPlayer();
                             }
                             break;
                         case 'M':
                             if (menuFlags[allow_modify] == true)
                             {
-                                modifyPlayer();
+                                await modifyPlayer();
                             }
                             break;
                         case 'T':
@@ -194,7 +195,7 @@ namespace engine
                         case 'V':
                             if (menuFlags[allow_view] == true)
                             {
-                                ovr020.viewPlayer();
+                                await ovr020.viewPlayer();
                             }
                             break;
 
@@ -216,7 +217,7 @@ namespace engine
                                 }
                                 else
                                 {
-                                    dropPlayer();
+                                    await dropPlayer();
                                 }
                             }
                             break;
@@ -224,7 +225,7 @@ namespace engine
                         case 'L':
                             if (menuFlags[allow_load] == true)
                             {
-                                ovr017.loadGameMenu();
+                                await ovr017.loadGameMenu();
                                 if (gbl.game_state != GameState.StartGameMenu)
                                 {
                                     if (gbl.area_ptr.field_3FA == 1)
@@ -232,7 +233,7 @@ namespace engine
                                         ovr027.ClearPromptArea();
                                         gbl.area2_ptr.training_class_mask = 0;
 
-                                        return;
+                                        return true;
                                     }
                                 }
                             }
@@ -242,7 +243,7 @@ namespace engine
                             if (menuFlags[allow_save] == true &&
                                 gbl.TeamList.Count > 0)
                             {
-                                ovr017.SaveGame();
+                                await ovr017.SaveGame();
                             }
 
                             break;
@@ -281,7 +282,7 @@ namespace engine
                                     ovr027.ClearPromptArea();
                                     gbl.area2_ptr.training_class_mask = 0;
 
-                                    return;
+                                    return true;
                                 }
                             }
                             break;
@@ -300,7 +301,7 @@ namespace engine
                                         inputkey = ovr027.yes_no(gbl.alertMenuColors, "Game not saved.  Quit anyway? ");
                                         if (inputkey == 'N')
                                         {
-                                            ovr017.SaveGame();
+                                            await ovr017.SaveGame();
                                         }
                                     }
 
@@ -316,6 +317,8 @@ namespace engine
                     reclac_menus = true;
                 }
             }
+
+            return true;
         }
 
         internal static byte[] /*seg600:3EA2 */ unk_1A1B2 = { 0x02, 0x10, 0x08, 0x40, 0x40, 0x40, 0x01, 0x04, 0x20 };
@@ -355,7 +358,7 @@ namespace engine
 
 
 
-        internal static void createPlayer()
+        internal static async Task<bool> createPlayer()
         {
             bool menuRedraw;
             bool showExit;
@@ -402,7 +405,7 @@ namespace engine
                 if (input_key == '\0')
                 {
                     var_C.Clear();
-                    return;
+                    return false;
                 }
             } while (input_key != 'S');
 
@@ -480,7 +483,7 @@ namespace engine
                 {
                     var_C.Clear();
                     player = null;
-                    return;
+                    return false;
                 }
 
             } while (input_key != 'S');
@@ -522,7 +525,7 @@ namespace engine
                 {
                     var_C.Clear();
                     player = null;
-                    return;
+                    return false;
                 }
             } while (input_key != 'S');
 
@@ -652,7 +655,7 @@ namespace engine
                     var_C.Clear();
 
                     player = null;
-                    return;
+                    return false;
                 }
             } while (input_key != 'S');
 
@@ -691,7 +694,7 @@ namespace engine
 
             Player gblPlayerPtrBkup = gbl.SelectedPlayer;
             gbl.SelectedPlayer = player;
-            ovr020.playerDisplayFull(player);
+            await ovr020.playerDisplayFull(player);
 
             do
             {
@@ -907,7 +910,7 @@ namespace engine
 
             } while (input_key != 'N');
 
-            ovr020.playerDisplayFull(player);
+            await ovr020.playerDisplayFull(player);
 
             do
             {
@@ -916,7 +919,7 @@ namespace engine
 
             if (gbl.game.Portrait)
             {
-                portrait_builder();
+                await portrait_builder();
             }
 
             icon_builder();
@@ -936,6 +939,8 @@ namespace engine
             }
 
             gbl.SelectedPlayer = gblPlayerPtrBkup;
+
+            return true;
         }
 
         /// <summary> seg600:4281 </summary>
@@ -964,7 +969,7 @@ namespace engine
         }
 
 
-        internal static void dropPlayer()
+        internal static async Task<bool> dropPlayer()
         {
             if (gbl.SelectedPlayer != null)
             {
@@ -982,7 +987,7 @@ namespace engine
                         ovr025.string_print01(player.name + " bids you farewell.");
                     }
 
-                    ovr017.remove_player_file(player);
+                    await ovr017.remove_player_file(player);
                     gbl.SelectedPlayer = FreeCurrentPlayer(gbl.SelectedPlayer, true, false);
                 }
                 else
@@ -992,6 +997,8 @@ namespace engine
             }
 
             ovr025.PartySummary(gbl.SelectedPlayer);
+
+            return true;
         }
 
         /// <summary>
@@ -1031,7 +1038,7 @@ namespace engine
         }
 
 
-        internal static void modifyPlayer()
+        internal static async Task<bool> modifyPlayer()
         {
             bool controlkey;
             char inputkey;
@@ -1044,10 +1051,10 @@ namespace engine
                 gbl.SelectedPlayer.multiclassLevel != 0))
             {
                 seg041.DisplayStatusText(0, 14, gbl.SelectedPlayer.name + " can't be modified.");
-                return;
+                return false;
             }
 
-            ovr020.playerDisplayFull(gbl.SelectedPlayer, true);
+            await ovr020.playerDisplayFull(gbl.SelectedPlayer, true);
 
             PlayerStats stats_bkup = new PlayerStats(gbl.SelectedPlayer.stats);
 
@@ -1199,7 +1206,7 @@ namespace engine
                                         player.stats.Cha.EnforceClassLimits(player._class);
                                         break;
                                 }
-                                ovr024.CalcStatBonuses((Stat)stat_var, player);
+                                await ovr024.CalcStatBonuses((Stat)stat_var, player);
                             }
                             else if (edited_stat == 6)
                             {
@@ -1288,7 +1295,7 @@ namespace engine
                                         player.stats.Cha.EnforceRaceSexLimits(race, sex);
                                         break;
                                 }
-                                ovr024.CalcStatBonuses((Stat)stat_var, player);
+                                await ovr024.CalcStatBonuses((Stat)stat_var, player);
                             }
                             else if (edited_stat == 6)
                             {
@@ -1398,7 +1405,7 @@ namespace engine
                             gbl.SelectedPlayer.name = nameBackup;
 
                             ovr025.reclac_player_values(gbl.SelectedPlayer);
-                            return;
+                            return false;
                         }
                     }
                     else if (inputkey == 0)
@@ -1410,7 +1417,7 @@ namespace engine
 
                         gbl.SelectedPlayer.hit_point_current = gbl.SelectedPlayer.hit_point_max;
                         ovr025.reclac_player_values(gbl.SelectedPlayer);
-                        return;
+                        return false;
                     }
                 }
 
@@ -1427,6 +1434,8 @@ namespace engine
             player = gbl.SelectedPlayer;
 
             player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats.Con.cur));
+
+            return true;
         }
 
 
@@ -1678,7 +1687,7 @@ namespace engine
             gbl.combat_icons[destIndex].DuplicateIcon(recolour, gbl.combat_icons[sourceIndex], gbl.SelectedPlayer);
         }
 
-        internal static void portrait_builder()
+        internal static async Task<bool> portrait_builder()
         {
             Player player = gbl.SelectedPlayer;
             byte body_portrait = player.body_portrait;
@@ -1710,8 +1719,10 @@ namespace engine
                         }
                         break;
                 }
-                ovr008.set_and_draw_head_body(3, gbl.game.PortraitBody[player.body_portrait - 1], gbl.game.PortraitHead[player.head_portrait - 1], 1, 28);
+                await ovr008.set_and_draw_head_body(3, gbl.game.PortraitBody[player.body_portrait - 1], gbl.game.PortraitHead[player.head_portrait - 1], 1, 28);
             } while (input_key != 'K');
+
+            return true;
         }
 
         static Set unk_4FE94 = new Set(0, 69);

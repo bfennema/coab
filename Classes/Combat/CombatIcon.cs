@@ -1,4 +1,7 @@
-﻿namespace Classes.Combat
+﻿using System;
+using System.Threading.Tasks;
+
+namespace Classes.Combat
 {
     public enum Icon
     {
@@ -9,12 +12,12 @@
 
     public class CombatIcon
     {
-        DaxBlock normal = null;
-        DaxBlock attack = null;
+        DaxBlock? normal = null;
+        DaxBlock? attack = null;
 
         // cheat and cache the flipped copy, so we don't damage the original, then we present this one later.
-        DaxBlock normal_f = null;
-        DaxBlock attack_f = null;
+        DaxBlock? normal_f = null;
+        DaxBlock? attack_f = null;
 
         public void Release()
         {
@@ -24,32 +27,41 @@
             attack_f = null;
         }
 
-        private static DaxBlock LoadIconHelper(int maskColor, int masked, int block_id, string filename)
+        private static async Task<DaxBlock?> LoadIconHelper(int maskColor, int masked, int block_id, string filename)
         {
-            var data = DaxFiles.DaxCache.LoadDax(filename, block_id);
-            return new DaxBlock(data, masked, maskColor);
+            var data = await DaxFiles.DaxCache.LoadDax(filename, block_id);
+            if (data != null)
+            {
+                return new DaxBlock(data, masked, maskColor);
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
-        public void LoadIcons(int maskColor, int masked, string filename, int normal_id, int attack_id)
+        public async Task<bool> LoadIcons(int maskColor, int masked, string filename, int normal_id, int attack_id)
         {
-            normal = LoadIconHelper(maskColor, masked, normal_id, filename);
-            normal_f = LoadIconHelper(maskColor, masked, normal_id, filename);
-            normal_f.FlipIconLeftToRight();
-            attack = LoadIconHelper(maskColor, masked, attack_id, filename);
-            attack_f = LoadIconHelper(maskColor, masked, attack_id, filename);
-            attack_f.FlipIconLeftToRight();
+            normal = await LoadIconHelper(maskColor, masked, normal_id, filename);
+            normal_f = await LoadIconHelper(maskColor, masked, normal_id, filename);
+            normal_f?.FlipIconLeftToRight();
+            attack = await LoadIconHelper(maskColor, masked, attack_id, filename);
+            attack_f = await LoadIconHelper(maskColor, masked, attack_id, filename);
+            attack_f?.FlipIconLeftToRight();
+
+            return true;
         }
 
         public void Recolor(bool p, byte[] newColors, byte[] oldColors)
         {
-            normal.Recolor(p, newColors, oldColors);
-            normal_f.Recolor(p, newColors, oldColors);
-            attack.Recolor(p, newColors, oldColors);
-            attack_f.Recolor(p, newColors, oldColors);
+            normal?.Recolor(p, newColors, oldColors);
+            normal_f?.Recolor(p, newColors, oldColors);
+            attack?.Recolor(p, newColors, oldColors);
+            attack_f?.Recolor(p, newColors, oldColors);
         }
 
-        public DaxBlock GetIcon(Icon iconState, int direction)
+        public DaxBlock? GetIcon(Icon iconState, int direction)
         {
             if (iconState == Icon.Normal)
             {
@@ -63,14 +75,17 @@
 
         public void MergeIcon(CombatIcon combatIcon) // used to blend head ad body icons.
         {
-            normal.MergeIcons(combatIcon.normal);
-            normal_f.MergeIcons(combatIcon.normal_f);
-            attack.MergeIcons(combatIcon.attack);
-            attack_f.MergeIcons(combatIcon.attack_f);
+            normal?.MergeIcons(combatIcon.normal);
+            normal_f?.MergeIcons(combatIcon.normal_f);
+            attack?.MergeIcons(combatIcon.attack);
+            attack_f?.MergeIcons(combatIcon.attack_f);
         }
 
         public void DuplicateIcon(bool Recolour, CombatIcon combatIcon, Player player)
         {
+            ArgumentNullException.ThrowIfNull(normal);
+            ArgumentNullException.ThrowIfNull(combatIcon.normal);
+
             int bitPerPixel = normal.bpp;
 
             System.Array.Copy(combatIcon.normal.data, normal.data, combatIcon.normal.data.Length);

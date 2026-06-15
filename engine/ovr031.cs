@@ -2,6 +2,7 @@ using Classes;
 using Logging;
 using System.Linq;
 using System.Runtime.ExceptionServices;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -647,14 +648,11 @@ namespace engine
             }
         }
 
-        internal static void LoadWalldef(short symbolSet, short block_id)
+        internal static async Task<bool> LoadWalldef(short symbolSet, short block_id)
         {
             if (symbolSet >= 1 && symbolSet < 4)
             {
-                byte[] data;
-
-                ushort decode_size;
-                seg042.load_decode_dax(out data, out decode_size, block_id, "WALLDEF", gbl.game_area);
+                (var data, var decode_size) = await seg042.load_decode_dax(block_id, "WALLDEF", gbl.game_area);
 
                 if (decode_size == 0 ||
                     ((decode_size / 0x30C) + symbolSet) > 4)
@@ -681,32 +679,35 @@ namespace engine
                         {
                             if (block_id == 0)
                             {
-                                ovr038.Load8x8D(idx, (10 * 10) + block + 1);
+                                await ovr038.Load8x8D(idx, (10 * 10) + block + 1);
                             }
                             else
                             {
-                                ovr038.Load8x8D(idx, (block_id * 10) + block + 1);
+                                await ovr038.Load8x8D(idx, (block_id * 10) + block + 1);
                             }
                         }
                         else
                         {
-                            ovr038.Load8x8D(idx, block_id);
+                            await ovr038.Load8x8D(idx, block_id);
                         }
                     }
                 }
 
                 gbl.setBlocks[symbolSet - 1].blockId = block_id;
                 gbl.setBlocks[symbolSet - 1].setId = symbolSet;
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
 
-        internal static void Load3DMap(int blockId)
+        internal static async Task<bool> Load3DMap(int blockId)
         {
-            byte[] data;
-            ushort bytesRead;
-
-            seg042.load_decode_dax(out data, out bytesRead, blockId, "GEO", gbl.game_area);
+            (var data, var bytesRead) = await seg042.load_decode_dax(blockId, "GEO", gbl.game_area);
 
             if (bytesRead == 0 || bytesRead != 0x402)
             {
@@ -716,6 +717,8 @@ namespace engine
             gbl.geo_ptr.LoadData(data);
 
             gbl.area_ptr.current_3DMap_block_id = (byte)blockId;
+
+            return true;
         }
 
         internal static byte[,] wilderness =
@@ -802,7 +805,7 @@ namespace engine
             }
         }
 
-        internal static void DrawWildernessMap()
+        internal static async Task<bool> DrawWildernessMap()
         {
             byte x = gbl.area_ptr.field_186;
             byte y = gbl.area_ptr.field_188;
@@ -812,19 +815,19 @@ namespace engine
             ovr025.PartySummary(gbl.SelectedPlayer);
             ovr025.display_map_position_time();
 
-            DaxBlock tmp_block = seg040.LoadDax(0, 0, 1, "SQRPACI");
+            DaxBlock tmp_block = await seg040.LoadDax(0, 0, 1, "SQRPACI");
             System.Array.Copy(tmp_block.data, 0, sqrpaci.data, 0, tmp_block.item_count * tmp_block.bpp);
             int dataLength = tmp_block.item_count * tmp_block.bpp;
 
-            tmp_block = seg040.LoadDax(0, 0, 1, "BACPAC");
+            tmp_block = await seg040.LoadDax(0, 0, 1, "BACPAC");
             System.Array.Copy(tmp_block.data, 0, sqrpaci.data, 0, tmp_block.item_count * tmp_block.bpp);
 
-            tmp_block = seg040.LoadDax(0, 0, 2, "SQRPACI");
+            tmp_block = await seg040.LoadDax(0, 0, 2, "SQRPACI");
             System.Array.Copy(tmp_block.data, 0, sqrpaci.data, dataLength, tmp_block.item_count * tmp_block.bpp);
 
             for (int i = 0; i < 3; i++)
             {
-                ovr034.chead_cbody_comspr_icon((byte)(26 + i), i, "ICON");
+                await ovr034.chead_cbody_comspr_icon((byte)(26 + i), i, "ICON");
             }
 
             if (gbl.EclBlockId == 25)
@@ -869,6 +872,8 @@ namespace engine
             ovr034.draw_combat_icon(26 + (gbl.worldIcon >> 1), (Classes.Combat.Icon)(gbl.worldIcon & 0x1), gbl.mapDirection, 2, 2);
             gbl.worldIcon = (byte)((gbl.worldIcon + 1) % 6);
             Display.UpdateStart();
+
+            return true;
         }
     }
 }

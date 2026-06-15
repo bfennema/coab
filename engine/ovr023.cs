@@ -1,7 +1,9 @@
 using Classes;
+using Classes.Combat;
 using System;
 using System.Collections.Generic;
-using Classes.Combat;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -574,7 +576,7 @@ namespace engine
 		}
 
 
-		internal static void DoSpellCastingWork(string text, DamageType damageFlags, int damage, bool call_affect_table, int TargetCount, Spells spell_id) // sub_5CF7F
+		internal static async Task<bool> DoSpellCastingWork(string text, DamageType damageFlags, int damage, bool call_affect_table, int TargetCount, Spells spell_id) // sub_5CF7F
 		{
 			gbl.damage_flags = (damage == 0) ? 0 : damageFlags;
 
@@ -592,16 +594,16 @@ namespace engine
 					}
 					else
 					{
-						saved = ovr024.RollSavingThrow(0, gbl.spellCastingTable[(byte)spell_id].saveVerse, target);
+						saved = await ovr024.RollSavingThrow(0, gbl.spellCastingTable[(byte)spell_id].saveVerse, target);
 					}
 
 					if (gbl.spellCastingTable[(byte)spell_id].fixedRange == -1)
 					{
 						ovr025.reclac_player_values(target);
 
-						Affects.Effect.Check(target, CheckType.Type_11);
+						await Affects.Effect.Check(target, CheckType.Type_11);
 
-						if (ovr024.PC_CanHitTarget(target.ac, target, gbl.SelectedPlayer) == false)
+						if (await ovr024.PC_CanHitTarget(target.ac, target, gbl.SelectedPlayer) == false)
 						{
 							damage = 0;
 							saved = true;
@@ -610,23 +612,29 @@ namespace engine
 
 					if (damage > 0)
 					{
-						ovr024.damage_person(saved, gbl.spellCastingTable[(byte)spell_id].damageOnSave, damage, target);
+						await ovr024.damage_person(saved, gbl.spellCastingTable[(byte)spell_id].damageOnSave, damage, target);
 					}
 
 					if (gbl.spellCastingTable[(byte)spell_id].affect_id > 0)
 					{
-						ovr024.ApplyAttackSpellAffect(text, saved, gbl.spellCastingTable[(byte)spell_id].damageOnSave,
+						await ovr024.ApplyAttackSpellAffect(text, saved, gbl.spellCastingTable[(byte)spell_id].damageOnSave,
 							call_affect_table, target_count, GetSpellAffectTimeout(spell_id), gbl.spellCastingTable[(byte)spell_id].affect_id,
 							target);
 					}
 				}
 
 				gbl.damage_flags = 0;
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static bool NonCombatSpellCast(QuickFight quick_fight, Spells spellId) // cast_spell_on
+		internal static async Task<bool> NonCombatSpellCast(QuickFight quick_fight, Spells spellId) // cast_spell_on
 		{
 			if (gbl.lastSelectetSpellTarget == null)
 			{
@@ -644,7 +652,7 @@ namespace engine
 					break;
 
 				case SpellTargets.PartyMember:
-					ovr025.LoadPic();
+					await ovr025.LoadPic();
 
 					ovr025.selectAPlayer(ref gbl.lastSelectetSpellTarget, true, "Cast Spell on whom");
 
@@ -673,14 +681,13 @@ namespace engine
 		}
 
 
-		internal static void sub_5D2E1(bool showCastingText, QuickFight quick_fight, Spells spell_id) // sub_5D2E1
+		internal static async Task<bool> sub_5D2E1(bool showCastingText, QuickFight quick_fight, Spells spell_id) // sub_5D2E1
 		{
-			bool dummy = false;
-			sub_5D2E1(ref dummy, showCastingText, quick_fight, spell_id);
+			return await sub_5D2E1(false, showCastingText, quick_fight, spell_id);
 		}
 
 
-		internal static void sub_5D2E1(ref bool arg_0, bool showCastingText, QuickFight quick_fight, Spells spell_id) // sub_5D2E1
+		internal static async Task<bool> sub_5D2E1(bool arg_0, bool showCastingText, QuickFight quick_fight, Spells spell_id) // sub_5D2E1
 		{
 			Player caster = gbl.SelectedPlayer;
 			bool stillCast = true;
@@ -732,7 +739,7 @@ namespace engine
 
 			while (stillCast == true)
 			{
-				arg_0 = gbl.SpellCastFunction(quick_fight, spell_id);
+				arg_0 = await gbl.SpellCastFunction(quick_fight, spell_id);
 
 				if (arg_0 == true)
 				{
@@ -770,14 +777,14 @@ namespace engine
 						}
 					}
 
-					ovr024.remove_invisibility(caster);
+					await ovr024.remove_invisibility(caster);
 
 					if (gbl.spell_from_item == false)
 					{
 						caster.spellList.ClearSpell(spell_id);
 					}
 
-					Affects.Spells.Call(spell_id);
+					await Affects.Spells.Call(spell_id);
 
 					gbl.spell_id = 0;
 					gbl.byte_1D2C7 = false;
@@ -808,6 +815,8 @@ namespace engine
 			{
 				seg037.draw8x8_clear_area(0x17, 0x27, 0x17, 0);
 			}
+
+            return arg_0;
 		}
 
 
@@ -947,7 +956,7 @@ namespace engine
 		}
 
 
-		internal static void MultiTargetedSpell(string text, int save_bonus) // sub_5DB24
+		internal static async Task<bool> MultiTargetedSpell(string text, int save_bonus) // sub_5DB24
 		{
 			for (var i=gbl.spellTargets.Count-1; i >= 0; i--)
 			{
@@ -971,80 +980,86 @@ namespace engine
 				}
 				else
 				{
-					saved = ovr024.RollSavingThrow(save_bonus, gbl.spellCastingTable[(byte)gbl.spell_id].saveVerse, target);
+					saved = await ovr024.RollSavingThrow(save_bonus, gbl.spellCastingTable[(byte)gbl.spell_id].saveVerse, target);
 					can_save_flag = gbl.spellCastingTable[(byte)gbl.spell_id].damageOnSave;
 				}
 
-				ovr024.ApplyAttackSpellAffect(text, saved, can_save_flag, false, ovr025.spellMaxTargetCount(gbl.spell_id), GetSpellAffectTimeout((Spells)gbl.spell_id),
+				await ovr024.ApplyAttackSpellAffect(text, saved, can_save_flag, false, ovr025.spellMaxTargetCount(gbl.spell_id), GetSpellAffectTimeout((Spells)gbl.spell_id),
 					gbl.spellCastingTable[(byte)gbl.spell_id].affect_id, target);
 			}
+            return true;
 		}
 
 
-		static void CastTeamSpell(string text, CombatTeam team) // sub_5DCA0
+		static async Task<bool> CastTeamSpell(string text, CombatTeam team) // sub_5DCA0
 		{
 			gbl.byte_1D2C7 = true;
 
 			gbl.spellTargets.RemoveAll(target => target.combat_team != team ||
 				(gbl.spell_id == Spells.bless && gbl.game_state == GameState.Combat && ovr025.BuildNearTargets(1, target).Count > 0));
 
-			DoSpellCastingWork(text, 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork(text, 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void cleric_bless() /* is_Blessed */
+		internal static async Task<bool> cleric_bless() /* is_Blessed */
 		{
-			CastTeamSpell("is Blessed", gbl.SelectedPlayer.combat_team);
+			return await CastTeamSpell("is Blessed", gbl.SelectedPlayer.combat_team);
 		}
 
 
-		internal static void cleric_curse() /* is_Cursed */
+		internal static async Task<bool> cleric_curse() /* is_Cursed */
 		{
-			CastTeamSpell("is Cursed", gbl.SelectedPlayer.OppositeTeam());
+			return await CastTeamSpell("is Cursed", gbl.SelectedPlayer.OppositeTeam());
 		}
 
 
-		internal static void SpellCureLight() /* sub_5DDBC */
+		internal static async Task<bool> SpellCureLight() /* sub_5DDBC */
 		{
 			if (gbl.spellTargets.Count > 0 &&
-				ovr024.heal_player(0, ovr024.roll_dice(8, 1), gbl.spellTargets[0]) == true)
+				await ovr024.heal_player(0, ovr024.roll_dice(8, 1), gbl.spellTargets[0]) == true)
 			{
 				ovr025.DescribeHealing(gbl.spellTargets[0]);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellCauseLight() /* sub_5DDF8 */
+		internal static async Task<bool> SpellCauseLight() /* sub_5DDF8 */
 		{
-			DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(8, 1), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(8, 1), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void is_affected()
+		internal static async Task<bool> is_affected()
 		{
-			DoSpellCastingWork("is affected", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is affected", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellProtectionFromX() // is_protected
+		internal static async Task<bool> SpellProtectionFromX() // is_protected
 		{
-			DoSpellCastingWork("is protected", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is protected", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellResistCold() // is_cold_resistant
+		internal static async Task<bool> SpellResistCold() // is_cold_resistant
 		{
-			DoSpellCastingWork("is cold-resistant", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is cold-resistant", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellBuringHands() // sub_5DEE1
+		internal static async Task<bool> SpellBuringHands() // sub_5DEE1
 		{
-			DoSpellCastingWork("", DamageType.Magic | DamageType.Fire, ovr025.spellMaxTargetCount(gbl.spell_id), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic | DamageType.Fire, ovr025.spellMaxTargetCount(gbl.spell_id), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellCharm() // is_charmed
+		internal static async Task<bool> SpellCharm() // is_charmed
 		{
 			Player target = gbl.spellTargets[0];
 
@@ -1054,19 +1069,20 @@ namespace engine
 			}
 			else
 			{
-				DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
+				await DoSpellCastingWork("is charmed", 0, 0, true, (byte)(((int)gbl.SelectedPlayer.combat_team << 7) + ovr025.spellMaxTargetCount(gbl.spell_id)), gbl.spell_id);
 
 				Affect affect = target.GetAffect(Classes.Affects.charm_person);
 
 				if (affect != null)
 				{
-					Affects.Effect.Call(Effect.Add, affect, target, Classes.Affects.shield);
+					await Affects.Effect.Call(Effect.Add, affect, target, Classes.Affects.shield);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void SpellEnlarge() // is_stronger
+		internal static async Task<bool> SpellEnlarge() // is_stronger
 		{
 			Player target = gbl.spellTargets[0];
 			int new_str = 18;
@@ -1123,60 +1139,72 @@ namespace engine
 
 				ovr024.add_affect(true, encoded_strength, GetSpellAffectTimeout((Spells)gbl.spell_id), Classes.Affects.enlarge, target);
 
-				ovr024.CalcStatBonuses(Stat.STR, target);
+				await ovr024.CalcStatBonuses(Stat.STR, target);
+
+                return true;
 			}
 			else
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
+
+                return false;
 			}
 		}
 
 
-		internal static void SpellReduce() // has_been_reduced
+		internal static async Task<bool> SpellReduce() // has_been_reduced
 		{
 			Player target = gbl.spellTargets[0];
 
-			if (target != null &&
-				gbl.spellTargets.Count > 0 &&
-				ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false &&
-				target.HasAffect(Classes.Affects.enlarge) == true)
-			{
-				ovr024.remove_affect(null, Classes.Affects.enlarge, target);
-				ovr024.CalcStatBonuses(Stat.STR, target);
-				ovr025.DisplayPlayerStatusString(true, 10, "has been reduced", target);
-			}
+            if (target != null &&
+                gbl.spellTargets.Count > 0 &&
+                await ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false &&
+                target.HasAffect(Classes.Affects.enlarge) == true)
+            {
+                await ovr024.remove_affect(null, Classes.Affects.enlarge, target);
+                await ovr024.CalcStatBonuses(Stat.STR, target);
+                ovr025.DisplayPlayerStatusString(true, 10, "has been reduced", target);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellFriends() // is_friendly
+		internal static async Task<bool> SpellFriends() // is_friendly
 		{
-			DoSpellCastingWork("is friendly", 0, 0, true, ovr024.roll_dice(4, 2), gbl.spell_id);
-			ovr024.CalcStatBonuses(Stat.CHA, gbl.SelectedPlayer);
+			await DoSpellCastingWork("is friendly", 0, 0, true, ovr024.roll_dice(4, 2), gbl.spell_id);
+			await ovr024.CalcStatBonuses(Stat.CHA, gbl.SelectedPlayer);
+
+            return true;
 		}
 
 
-		internal static void SpellMagicMissile() // sub_5E221
+		internal static async Task<bool> SpellMagicMissile() // sub_5E221
 		{
 			int var_1 = ovr025.spellMaxTargetCount(gbl.spell_id) + 1;
 
-			DoSpellCastingWork("", DamageType.Magic, (var_1 / 2) + ovr024.roll_dice_save(4, var_1 / 2), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic, (var_1 / 2) + ovr024.roll_dice_save(4, var_1 / 2), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellShield() // is_shielded
+		internal static async Task<bool> SpellShield() // is_shielded
 		{
-			DoSpellCastingWork("is shielded", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is shielded", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellShockingGrasp() // sub_5E2B2
+		internal static async Task<bool> SpellShockingGrasp() // sub_5E2B2
 		{
-			DoSpellCastingWork("", DamageType.Acid | DamageType.Cold, ovr024.roll_dice_save(8, 1) + ovr025.spellMaxTargetCount(gbl.spell_id),
+			return await DoSpellCastingWork("", DamageType.Acid | DamageType.Cold, ovr024.roll_dice_save(8, 1) + ovr025.spellMaxTargetCount(gbl.spell_id),
 				false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellSleep() // falls_asleep
+		internal static async Task<bool> SpellSleep() // falls_asleep
 		{
 			gbl.byte_1D2C7 = true;
 			int totalSpellPower = ovr024.roll_dice(4, 4);
@@ -1198,7 +1226,7 @@ namespace engine
 				}
 			});
 
-			DoSpellCastingWork("falls asleep", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("falls asleep", 0, 0, false, 0, gbl.spell_id);
 		}
 
 		private static int CalcSleepCost(Player target)
@@ -1236,7 +1264,7 @@ namespace engine
 		}
 
 
-		internal static void SpellHoldX() // is_held
+		internal static async Task<bool> SpellHoldX() // is_held
 		{
 			int save_bonus;
 
@@ -1264,29 +1292,30 @@ namespace engine
 				throw new System.NotSupportedException();
 			}
 
-			MultiTargetedSpell("is held", save_bonus);
+			return await MultiTargetedSpell("is held", save_bonus);
 		}
 
 
-		internal static void SpellFireResistant() // is_fire_resistant
+		internal static async Task<bool> SpellFireResistant() // is_fire_resistant
 		{
-			DoSpellCastingWork("is fire resistant", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is fire resistant", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellSilence15Radius() // is_silenced
+		internal static async Task<bool> SpellSilence15Radius() // is_silenced
 		{
-			DoSpellCastingWork("is silenced", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is silenced", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void is_affected2()
+		internal static async Task<bool> is_affected2()
 		{
 			Player player = gbl.spellTargets[0];
 
 			if (player.health_status == Status.animated)
 			{
 				gbl.spellTargets.Clear();
+                return true;
 			}
 			else if (player.HasAffect(Classes.Affects.poisoned) == true)
 			{
@@ -1295,14 +1324,17 @@ namespace engine
 					player.hit_point_current = 1;
 				}
 
-				DoSpellCastingWork("is affected", 0, 0, true, 0xff, gbl.spell_id);
-				Affects.Effect.Call(Effect.Remove, null, player, Classes.Affects.affect_4e);
+				await DoSpellCastingWork("is affected", 0, 0, true, 0xff, gbl.spell_id);
+				await Affects.Effect.Call(Effect.Remove, null, player, Classes.Affects.affect_4e);
 				ovr024.add_affect(true, 0xff, 10, Classes.Affects.poison_damage, player);
+
+                return true;
 			}
+            return false;
 		}
 
 
-		internal static void SpellSnakeCharm() // is_charmed2
+		internal static async Task<bool> SpellSnakeCharm() // is_charmed2
 		{
 			int totalSpellPower = gbl.SelectedPlayer.hit_point_current;
 
@@ -1320,48 +1352,50 @@ namespace engine
 					}
 				});
 
-			DoSpellCastingWork("is charmed", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is charmed", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellSpiritualHammer() // sub_5E681
+		internal static async Task<bool> SpellSpiritualHammer() // sub_5E681
 		{
-			DoSpellCastingWork(string.Empty, 0, 0, true, 0, gbl.spell_id);
+			await DoSpellCastingWork(string.Empty, 0, 0, true, 0, gbl.spell_id);
 
-			Affects.Effect.Call(Effect.Add, null, gbl.spellTargets[0], Classes.Affects.spiritual_hammer);
+			await Affects.Effect.Call(Effect.Add, null, gbl.spellTargets[0], Classes.Affects.spiritual_hammer);
+
+            return true;
 		}
 
 
-		internal static void is_invisible()
+		internal static async Task<bool> is_invisible()
 		{
-			DoSpellCastingWork("is invisible", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is invisible", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellKnock()
+		internal static async Task<bool> SpellKnock()
 		{
-			DoSpellCastingWork("Knock-Knock", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("Knock-Knock", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellMirrorImage() // is_duplicated
+		internal static async Task<bool> SpellMirrorImage() // is_duplicated
 		{
 			int var_1 = ovr024.roll_dice(4, 1) << 4;
 
 			var_1 += ovr025.spellMaxTargetCount(gbl.spell_id);
 
-			DoSpellCastingWork("is duplicated", 0, 0, false, var_1, gbl.spell_id);
+			return await DoSpellCastingWork("is duplicated", 0, 0, false, var_1, gbl.spell_id);
 		}
 
 
-		internal static void SpellRayOfEnfeeblement() // is_weakened
+		internal static async Task<bool> SpellRayOfEnfeeblement() // is_weakened
 		{
-			DoSpellCastingWork("is weakened", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is weakened", 0, 0, false, 0, gbl.spell_id);
 		}
 
 		const int StinkingCloudMaxTargets = 4;
 
-		internal static void SpellStinkingCloud() //TODO similar to spell_poisonous_cloud
+		internal static async Task<bool> SpellStinkingCloud() //TODO similar to spell_poisonous_cloud
 		{
 			byte var_12;
 			int groundTile;
@@ -1450,13 +1484,14 @@ namespace engine
 			{
 				if (var_C[var_11] > 0)
 				{
-					ovr024.in_poison_cloud(1, gbl.player_array[var_C[var_11]]);
+					await ovr024.in_poison_cloud(1, gbl.player_array[var_C[var_11]]);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void SpellStrength() // sub_5EC5B
+		internal static async Task<bool> SpellStrength() // sub_5EC5B
 		{
 			int strIncrease = 0;
 			Player target = gbl.spellTargets[0];
@@ -1510,17 +1545,23 @@ namespace engine
 
 			int encoded_str;
 
-			if (ovr024.TryEncodeStrength(out encoded_str, str_100, str, target) == true)
-			{
-				encoded_str = strIncrease + 100;
+            if (ovr024.TryEncodeStrength(out encoded_str, str_100, str, target) == true)
+            {
+                encoded_str = strIncrease + 100;
 
-				ovr024.add_affect(true, encoded_str, GetSpellAffectTimeout((Spells)gbl.spell_id), Classes.Affects.strength, target);
-				ovr024.CalcStatBonuses(Stat.STR, target);
-			}
+                ovr024.add_affect(true, encoded_str, GetSpellAffectTimeout((Spells)gbl.spell_id), Classes.Affects.strength, target);
+                await ovr024.CalcStatBonuses(Stat.STR, target);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellAnimateDead() // is_animated
+		internal static async Task<bool> SpellAnimateDead() // is_animated
 		{
 			gbl.byte_1D2C7 = true;
 
@@ -1565,7 +1606,7 @@ namespace engine
 
 						if (ovr024.combat_heal(player.hit_point_max, player) == true)
 						{
-							ovr024.ApplyAttackSpellAffect("is animated", false, 0, true, var_2, 0, Classes.Affects.animate_dead, player);
+							await ovr024.ApplyAttackSpellAffect("is animated", false, 0, true, var_2, 0, Classes.Affects.animate_dead, player);
 							player.health_status = Status.animated;
 						}
 					}
@@ -1573,48 +1614,54 @@ namespace engine
 
 				if (var_3 <= 0) break;
 			}
+            return true;
 		}
 
 
-		internal static void SpellCureBlindness() // can_see
+		internal static async Task<bool> SpellCureBlindness() // can_see
 		{
-			if (ovr024.cure_affect(Classes.Affects.blinded, gbl.spellTargets[0]) == true)
+			if (await ovr024.cure_affect(Classes.Affects.blinded, gbl.spellTargets[0]) == true)
 			{
 				ovr025.MagicAttackDisplay("can see", true, gbl.spellTargets[0]);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellCauseBlindness() // is_blind
+		internal static async Task<bool> SpellCauseBlindness() // is_blind
 		{
-			DoSpellCastingWork("is blind", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is blind", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static bool CureDisease() // sub_5F037
+		internal static async Task<bool> CureDisease() // sub_5F037
 		{
 			bool cured = false;
 
 			gbl.cureSpell = true;
 
-			if (ovr024.cure_affect(Classes.Affects.cause_disease_1, gbl.spellTargets[0]) == true)
+			if (await ovr024.cure_affect(Classes.Affects.cause_disease_1, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
 			}
 
-			if (ovr024.cure_affect(Classes.Affects.weaken, gbl.spellTargets[0]) == true)
+			if (await ovr024.cure_affect(Classes.Affects.weaken, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
 
-				ovr024.remove_affect(null, Classes.Affects.cause_disease_2, gbl.spellTargets[0]);
-				ovr024.remove_affect(null, Classes.Affects.helpless, gbl.spellTargets[0]);
+				await ovr024.remove_affect(null, Classes.Affects.cause_disease_2, gbl.spellTargets[0]);
+				await ovr024.remove_affect(null, Classes.Affects.helpless, gbl.spellTargets[0]);
 			}
 
 			// This is presumably mummy rot from pool of radiance
-			if (ovr024.cure_affect((Classes.Affects)0x32, gbl.spellTargets[0]) == true)
+			if (await ovr024.cure_affect((Classes.Affects)0x32, gbl.spellTargets[0]) == true)
 			{
 				cured = true;
-				ovr024.remove_affect(null, (Classes.Affects)0x39, gbl.spellTargets[0]);
+				await ovr024.remove_affect(null, (Classes.Affects)0x39, gbl.spellTargets[0]);
 			}
 
 			gbl.cureSpell = false;
@@ -1623,15 +1670,15 @@ namespace engine
 		}
 
 
-		internal static void SpellCureDisease() // sub_5F0DC
+		internal static async Task<bool> SpellCureDisease() // sub_5F0DC
 		{
-			bool cured = CureDisease();
+			return await CureDisease();
 		}
 
 
-		internal static void SpellCauseDisease() // is_diseased
+		internal static async Task<bool> SpellCauseDisease() // is_diseased
 		{
-			DoSpellCastingWork("is diseased", 0, 0, true, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is diseased", 0, 0, true, 0, gbl.spell_id);
 		}
 
 
@@ -1656,8 +1703,52 @@ namespace engine
 			return ovr024.roll_dice(100, 1) <= roll;
 		}
 
+        internal static async Task<bool> DispelCloud(int ground_tile, Point mappos, int targetCount, int maxTargetCount, GasCloud var_18)
+        {
+            for (int var_1 = 0; var_1 < targetCount; var_1++)
+            {
+                if (mappos == var_18.targetPos + gbl.MapDirectionDelta[gbl.SmallCloudDirections[var_1]] &&
+                    var_18.field_1D == false)
+                {
+                    if (sub_5F126(var_18.player, maxTargetCount) == true)
+                    {
+                        Affect affect = null;
+                        bool found = false;
 
-		internal static void SpellDispelMagic() // is_affected3
+                        foreach (Affect tmpAffect in var_18.player.affects)
+                        {
+                            if (((affect.type == Classes.Affects.affect_in_cloud_kill && ground_tile == 0x1c) ||
+                                 (affect.type == Classes.Affects.affect_in_stinking_cloud && ground_tile == 0x1E)) &&
+                                (affect.affect_data >> 4) == var_18.field_1C)
+                            {
+                                affect = tmpAffect;
+                                found = true;
+                                break;
+                            }
+                        }
+
+                        if (found == true)
+                        {
+                            if (ground_tile == 0x1C)
+                            {
+                                await ovr024.remove_affect(affect, Classes.Affects.affect_in_cloud_kill, var_18.player);
+                            }
+                            else
+                            {
+                                await ovr024.remove_affect(affect, Classes.Affects.affect_in_stinking_cloud, var_18.player);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        var_18.field_1D = true;
+                    }
+                }
+            }
+            return true;
+        }
+
+		internal static async Task<bool> SpellDispelMagic() // is_affected3
 		{
 			gbl.byte_1D2C7 = true;
 			int maxTargetCount = ovr025.spellMaxTargetCount(gbl.spell_id);
@@ -1699,7 +1790,7 @@ namespace engine
 
 				foreach (Affect affect in removeList)
 				{
-					ovr024.remove_affect(affect, affect.type, target);
+					await ovr024.remove_affect(affect, affect.type, target);
 				}
 				removeList.Clear();
 
@@ -1763,67 +1854,39 @@ namespace engine
 					int targetCount = (ground_tile == 0x1C) ? 9 : 4;
 					var looplist = (ground_tile == 0x1C) ? gbl.CloudKillCloud : gbl.StinkingCloud;
 
-					var mappos = new Point(xPos, yPos);
-					looplist.ForEach(var_18 =>
-					{
-						for (int var_1 = 0; var_1 < targetCount; var_1++)
-						{
-							if (mappos == var_18.targetPos + gbl.MapDirectionDelta[gbl.SmallCloudDirections[var_1]] &&
-								var_18.field_1D == false)
-							{
-								if (sub_5F126(var_18.player, maxTargetCount) == true)
-								{
-									Affect affect = null;
-									bool found = false;
-
-									foreach (Affect tmpAffect in var_18.player.affects)
-									{
-										if (((affect.type == Classes.Affects.affect_in_cloud_kill && ground_tile == 0x1c) ||
-											 (affect.type == Classes.Affects.affect_in_stinking_cloud && ground_tile == 0x1E)) &&
-											(affect.affect_data >> 4) == var_18.field_1C)
-										{
-											affect = tmpAffect;
-											found = true;
-											break;
-										}
-									}
-
-									if (found == true)
-									{
-										if (ground_tile == 0x1C)
-										{
-											ovr024.remove_affect(affect, Classes.Affects.affect_in_cloud_kill, var_18.player);
-										}
-										else
-										{
-											ovr024.remove_affect(affect, Classes.Affects.affect_in_stinking_cloud, var_18.player);
-										}
-									}
-								}
-								else
-								{
-									var_18.field_1D = true;
-								}
-							}
-						}
-					});
+                    var mappos = new Point(xPos, yPos);
+                    CancellationTokenSource cts = new();
+                    ParallelOptions options = new() { CancellationToken = cts.Token };
+                    try
+                    {
+                        await Parallel.ForEachAsync(looplist, options, async (var_18, ct) =>
+                        {
+                            ct.ThrowIfCancellationRequested();
+                            await DispelCloud(ground_tile, mappos, targetCount, maxTargetCount, var_18);
+                            ct.ThrowIfCancellationRequested();
+                        });
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return false;
+                    }
 				}
-
 			}
+            return true;
 		}
 
 
-		internal static void SpellPrayer() // is_praying
+		internal static async Task<bool> SpellPrayer() // is_praying
 		{
 			byte tmpByte = (byte)(((int)gbl.SelectedPlayer.combat_team * 16) + ovr025.spellMaxTargetCount(gbl.spell_id));
 
-			DoSpellCastingWork("is praying", 0, 0, false, tmpByte, gbl.spell_id);
+			return await DoSpellCastingWork("is praying", 0, 0, false, tmpByte, gbl.spell_id);
 		}
 
 
-		internal static void SpellRemoveCurse() // uncurse
+		internal static async Task<bool> SpellRemoveCurse() // uncurse
 		{
-			if (ovr024.cure_affect(Classes.Affects.bestow_curse, gbl.spellTargets[0]) == true)
+			if (await ovr024.cure_affect(Classes.Affects.bestow_curse, gbl.spellTargets[0]) == true)
 			{
 				ovr025.MagicAttackDisplay("is un-cursed", true, gbl.spellTargets[0]);
 			}
@@ -1838,37 +1901,38 @@ namespace engine
 					if ((int)item.affect_3 > 0x7F)
 					{
 						gbl.applyItemAffect = true;
-						Affects.Effect.Call(Effect.Remove, item, gbl.spellTargets[0], item.Affect_3);
+						await Affects.Effect.Call(Effect.Remove, item, gbl.spellTargets[0], item.Affect_3);
 
 						var target = gbl.spellTargets[0];
 
-						ovr024.CalcStatBonuses(Stat.STR, target);
-						ovr024.CalcStatBonuses(Stat.INT, target);
-						ovr024.CalcStatBonuses(Stat.WIS, target);
-						ovr024.CalcStatBonuses(Stat.DEX, target);
-						ovr024.CalcStatBonuses(Stat.CON, target);
-						ovr024.CalcStatBonuses(Stat.CHA, target);
+						await ovr024.CalcStatBonuses(Stat.STR, target);
+						await ovr024.CalcStatBonuses(Stat.INT, target);
+						await ovr024.CalcStatBonuses(Stat.WIS, target);
+						await ovr024.CalcStatBonuses(Stat.DEX, target);
+						await ovr024.CalcStatBonuses(Stat.CON, target);
+						await ovr024.CalcStatBonuses(Stat.CHA, target);
 					}
 
 					ovr025.MagicAttackDisplay("has an item un-cursed", true, gbl.spellTargets[0]);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void curse()
+		internal static async Task<bool> curse()
 		{
-			DoSpellCastingWork("has been cursed!", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("has been cursed!", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void spell_blinking()
+		internal static async Task<bool> spell_blinking()
 		{
-			DoSpellCastingWork("is blinking", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is blinking", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellFireball() // sub_5F782
+		internal static async Task<bool> SpellFireball() // sub_5F782
 		{
 			int dice_count;
 
@@ -1896,52 +1960,57 @@ namespace engine
 
 			ovr033.redrawCombatArea(8, 0, gbl.targetPos);
 
-			DoSpellCastingWork("", DamageType.Magic | DamageType.Fire, ovr024.roll_dice_save(6, dice_count), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic | DamageType.Fire, ovr024.roll_dice_save(6, dice_count), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void RemoveComplimentSpellFirst(string text, CombatTeam combatTeam, Classes.Affects affect) //sub_5F87B
+		internal static async Task<bool> RemoveComplimentSpellFirst(string text, CombatTeam combatTeam, Classes.Affects affect) //sub_5F87B
 		{
 			gbl.byte_1D2C7 = true;
 
 			int maxTargets = ovr025.spellMaxTargetCount(gbl.spell_id);
 
-			gbl.spellTargets.RemoveAll(target =>
-				{
-					if (target.combat_team == combatTeam && maxTargets > 0)
-					{
-						maxTargets -= 1;
+            var itemsToRemove = new List<Player>();
 
-						if (ovr024.cure_affect(affect, target) == true)
-						{
-							return true;
-						}
-					}
-					else
-					{
-						return true;
-					}
-					return false;
-				});
+            foreach (var target in gbl.spellTargets)
+            {
+                if (target.combat_team == combatTeam && maxTargets > 0)
+                {
+                    maxTargets -= 1;
 
-			DoSpellCastingWork(text, 0, 0, false, 0, gbl.spell_id);
+                    if (await ovr024.cure_affect(affect, target) == true)
+                    {
+                        itemsToRemove.Add(target);
+                    }
+                }
+                else
+                {
+                    itemsToRemove.Add(target);
+                }
+            }
+
+            gbl.spellTargets.RemoveAll(target => itemsToRemove.Contains(target));
+
+			await DoSpellCastingWork(text, 0, 0, false, 0, gbl.spell_id);
+
+            return true;
 		}
 
 
-		internal static void cast_haste()
+		internal static async Task<bool> cast_haste()
 		{
-			RemoveComplimentSpellFirst("is Hasted", gbl.SelectedPlayer.combat_team, Classes.Affects.slow);
+			return await RemoveComplimentSpellFirst("is Hasted", gbl.SelectedPlayer.combat_team, Classes.Affects.slow);
 		}
 
 
-		static void DoElecDamage(int player_index, SaveVerseType bonusType, int damage, Point pos)
+		static async Task<bool> DoElecDamage(int player_index, SaveVerseType bonusType, int damage, Point pos)
 		{
 			int playerIndex = ovr033.PlayerIndexAtMapXY(pos.y, pos.x);
 
-			DoActualElecDamage(player_index, bonusType, damage, playerIndex);
+			return await DoActualElecDamage(player_index, bonusType, damage, playerIndex);
 		}
 
-		private static void DoActualElecDamage(int player_index, SaveVerseType bonusType, int damage, int playerIndex)
+		private static async Task<bool> DoActualElecDamage(int player_index, SaveVerseType bonusType, int damage, int playerIndex)
 		{
 			if (playerIndex > 0 &&
 				playerIndex != player_index)
@@ -1949,14 +2018,19 @@ namespace engine
 				Player player = gbl.player_array[playerIndex];
 				gbl.damage_flags = DamageType.Magic | DamageType.Electricity;
 
-				ovr024.damage_person(ovr024.RollSavingThrow(0, bonusType, player), DamageOnSave.Half, damage, player);
+				await ovr024.damage_person(await ovr024.RollSavingThrow(0, bonusType, player), DamageOnSave.Half, damage, player);
 				ovr025.load_missile_icons(0x13);
 				gbl.damage_flags = 0;
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		static bool DoElecDamage(bool arg_0, int player_index, SaveVerseType bonusType, int damage, Point pos)// sub_5F986
+		static async Task<bool> DoElecDamage(bool arg_0, int player_index, SaveVerseType bonusType, int damage, Point pos)// sub_5F986
 		{
 			int groundTile;
 			int playerIndex;
@@ -1975,13 +2049,13 @@ namespace engine
 				arg_0 = false;
 			}
 
-			DoActualElecDamage(player_index, bonusType, damage, playerIndex);
+			await DoActualElecDamage(player_index, bonusType, damage, playerIndex);
 
 			return arg_0;
 		}
 
 
-		internal static void sub_5FA44(byte arg_0, SaveVerseType bonusType, int damage, byte arg_6)
+		internal static async Task<bool> sub_5FA44(byte arg_0, SaveVerseType bonusType, int damage, byte arg_6)
 		{
 			int var_3A = 0; /* Simeon */
 			bool var_36 = false;
@@ -2044,7 +2118,7 @@ namespace engine
 
 						ovr025.draw_missile_attack(0x32, 4, path_a.current, tmppos);
 
-						var_36 = DoElecDamage(var_36, var_39, bonusType, damage, path_a.current);
+						var_36 = await DoElecDamage(var_36, var_39, bonusType, damage, path_a.current);
 						var_39 = var_3A;
 
 						if (var_36 == true)
@@ -2090,25 +2164,28 @@ namespace engine
 
 				gbl.byte_1D2C7 = false;
 			}
+
+            return true;
 		}
 
 
-		internal static void SpellLightningBolt() // sub_5FCD9
+		internal static async Task<bool> SpellLightningBolt() // sub_5FCD9
 		{
 			int damage = ovr024.roll_dice(6, ovr025.spellMaxTargetCount(gbl.spell_id));
 
-			DoElecDamage(0, SaveVerseType.Spell, damage, gbl.targetPos);
-			sub_5FA44(1, SaveVerseType.Spell, damage, 7);
+			await DoElecDamage(0, SaveVerseType.Spell, damage, gbl.targetPos);
+			await sub_5FA44(1, SaveVerseType.Spell, damage, 7);
+            return true;
 		}
 
 
-		internal static void SpellSlow() // sub_5FD2E
+		internal static async Task<bool> SpellSlow() // sub_5FD2E
 		{
-			RemoveComplimentSpellFirst("is Slowed", gbl.SelectedPlayer.OppositeTeam(), Classes.Affects.haste);
+			return await RemoveComplimentSpellFirst("is Slowed", gbl.SelectedPlayer.OppositeTeam(), Classes.Affects.haste);
 		}
 
 
-		internal static void SpellRestoration() // cast_restore
+		internal static Task<bool> SpellRestoration() // cast_restore
 		{
 			Player player = gbl.spellTargets[0];
 
@@ -2153,30 +2230,46 @@ namespace engine
 
 				ovr026.ReclacClassBonuses(player);
 				ovr025.DisplayPlayerStatusString(true, 10, "is restored", player);
+
+                return Task.FromResult(true);
 			}
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void cast_speed()
+		internal static async Task<bool> cast_speed()
 		{
-			if (ovr024.cure_affect(Classes.Affects.slow, gbl.spellTargets[0]) == false)
+			if (await ovr024.cure_affect(Classes.Affects.slow, gbl.spellTargets[0]) == false)
 			{
-				DoSpellCastingWork("is Speedy", 0, 0, false, 0, gbl.spell_id);
+				await DoSpellCastingWork("is Speedy", 0, 0, false, 0, gbl.spell_id);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellCureSeriousWounds() // sub_5FF6D
+		internal static async Task<bool> SpellCureSeriousWounds() // sub_5FF6D
 		{
-			if (gbl.spellTargets.Count > 0 &&
-				ovr024.heal_player(0, ovr024.roll_dice(8, 2) + 1, gbl.spellTargets[0]) == true)
-			{
-				ovr025.DescribeHealing(gbl.spellTargets[0]);
-			}
+            if (gbl.spellTargets.Count > 0 &&
+                await ovr024.heal_player(0, ovr024.roll_dice(8, 2) + 1, gbl.spellTargets[0]) == true)
+            {
+                ovr025.DescribeHealing(gbl.spellTargets[0]);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void cast_strength()
+		internal static async Task<bool> cast_strength()
 		{
 			int encodedStrength = 0;
 			var target = gbl.spellTargets[0];
@@ -2187,57 +2280,66 @@ namespace engine
 			}
 
 			ovr024.add_affect(true, encodedStrength, (ushort)((ovr024.roll_dice(4, 1) * 10) + 0x28), Classes.Affects.strength_spell, target);
-			ovr024.CalcStatBonuses(Stat.STR, target);
+			await ovr024.CalcStatBonuses(Stat.STR, target);
+
+            return true;
 		}
 
 
-		internal static void sub_6003C()
+		internal static async Task<bool> sub_6003C()
 		{
-			DoElecDamage(0, SaveVerseType.Spell, ovr024.roll_dice(6, 1) + 20, gbl.targetPos);
+			await DoElecDamage(0, SaveVerseType.Spell, ovr024.roll_dice(6, 1) + 20, gbl.targetPos);
 			sub_5FA44(0, SaveVerseType.Spell, 20, 3);
+            return true;
 		}
 
 
-		internal static void cast_paralyzed()
+		internal static async Task<bool> cast_paralyzed()
 		{
-			DoSpellCastingWork("is paralyzed", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is paralyzed", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void cast_heal()
+		internal static async Task<bool> cast_heal()
 		{
-			if (ovr024.heal_player(0, ovr024.roll_dice(4, 2) + 2, gbl.spellTargets[0]) == true)
+			if (await ovr024.heal_player(0, ovr024.roll_dice(4, 2) + 2, gbl.spellTargets[0]) == true)
 			{
 				ovr025.MagicAttackDisplay("is Healed", true, gbl.spellTargets[0]);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void cast_invisible()
+		internal static async Task<bool> cast_invisible()
 		{
-			DoSpellCastingWork("is invisible", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is invisible", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void dam2d4plus2()
+		internal static async Task<bool> dam2d4plus2()
 		{
-			DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(4, 2) + 2, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(4, 2) + 2, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellCauseSeriousWounds() // sub_60185
+		internal static async Task<bool> SpellCauseSeriousWounds() // sub_60185
 		{
-			DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(8, 2) + 1, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(8, 2) + 1, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellNeutralizePoison() // cure_poison
+		internal static async Task<bool> SpellNeutralizePoison() // cure_poison
 		{
 			Player target = gbl.spellTargets[0];
 
 			if (target.health_status == Status.animated)
 			{
 				gbl.spellTargets.Remove(target);
+                return true;
 			}
 			else if (target.HasAffect(Classes.Affects.poisoned) == true)
 			{
@@ -2248,9 +2350,9 @@ namespace engine
 
 				gbl.cureSpell = true;
 
-				ovr024.remove_affect(null, Classes.Affects.poisoned, target);
-				ovr024.remove_affect(null, Classes.Affects.slow_poison, target);
-				ovr024.remove_affect(null, Classes.Affects.poison_damage, target);
+				await ovr024.remove_affect(null, Classes.Affects.poisoned, target);
+				await ovr024.remove_affect(null, Classes.Affects.slow_poison, target);
+				await ovr024.remove_affect(null, Classes.Affects.poison_damage, target);
 
 				gbl.cureSpell = false;
 
@@ -2258,79 +2360,95 @@ namespace engine
 
 				target.in_combat = true;
 				target.health_status = Status.okey;
+
+                return true;
 			}
 			else
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
+
+                return false;
 			}
 		}
 
 
-		internal static void SpellPoison() // sub_602D0
+		internal static async Task<bool> SpellPoison() // sub_602D0
 		{
-			DoSpellCastingWork("", DamageType.Magic, 0, false, 0, gbl.spell_id);
+			await DoSpellCastingWork("", DamageType.Magic, 0, false, 0, gbl.spell_id);
 
 			Player target = gbl.SelectedPlayer.actions.target;
 
 			gbl.current_affect = Classes.Affects.poison_plus_0;
-			Affects.Effect.Check(target, CheckType.MagicResistance);
+			await Affects.Effect.Check(target, CheckType.MagicResistance);
 
 			if (gbl.current_affect == Classes.Affects.poison_plus_0)
 			{
-				Affects.Effect.Call(Effect.Add, null, gbl.SelectedPlayer, Classes.Affects.poison_plus_0);
+				await Affects.Effect.Call(Effect.Add, null, gbl.SelectedPlayer, Classes.Affects.poison_plus_0);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellSticksToSnakes() // cast_flattern
+		internal static async Task<bool> SpellSticksToSnakes() // cast_flattern
 		{
 			if (gbl.spellTargets[0].HitDice < 6)
 			{
-				DoSpellCastingWork("", DamageType.Magic, 0, false, ovr025.spellMaxTargetCount(gbl.spell_id), gbl.spell_id);
+				await DoSpellCastingWork("", DamageType.Magic, 0, false, ovr025.spellMaxTargetCount(gbl.spell_id), gbl.spell_id);
 
 				Affect affect;
 				if (ovr025.FindAffect(out affect, Classes.Affects.sticks_to_snakes, gbl.spellTargets[0]) == true)
 				{
-					Affects.Effect.Call(Effect.Add, affect, gbl.spellTargets[0], Classes.Affects.sticks_to_snakes);
+					await Affects.Effect.Call(Effect.Add, affect, gbl.spellTargets[0], Classes.Affects.sticks_to_snakes);
 				}
+                return true;
 			}
 			else
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "smashes them flat", gbl.spellTargets[0]);
+                return false;
 			}
 		}
 
 
-		internal static void SpellCureCriticalWounds() // sub_603F0
+		internal static async Task<bool> SpellCureCriticalWounds() // sub_603F0
 		{
 			if (gbl.spellTargets.Count > 0 &&
-				ovr024.heal_player(0, ovr024.roll_dice(8, 3) + 3, gbl.spellTargets[0]) == true)
+				await ovr024.heal_player(0, ovr024.roll_dice(8, 3) + 3, gbl.spellTargets[0]) == true)
 			{
 				ovr025.DescribeHealing(gbl.spellTargets[0]);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellCauseCriticalWounds() // sub_60431
+		internal static async Task<bool> SpellCauseCriticalWounds() // sub_60431
 		{
-			DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(8, 3) + 3, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic, ovr024.roll_dice_save(8, 3) + 3, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellDispelEvil() // is_affected4
+		internal static async Task<bool> SpellDispelEvil() // is_affected4
 		{
-			ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.dispel_evil), Classes.Affects.dispel_evil, gbl.SelectedPlayer);
-			DoSpellCastingWork("is affected", 0, 0, false, 0, gbl.spell_id);
+			await ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.dispel_evil), Classes.Affects.dispel_evil, gbl.SelectedPlayer);
+			return await DoSpellCastingWork("is affected", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellFlameStrike() // sub_604DA
+		internal static async Task<bool> SpellFlameStrike() // sub_604DA
 		{
-			DoSpellCastingWork("", DamageType.Magic | DamageType.Fire, ovr024.roll_dice_save(8, 6), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Magic | DamageType.Fire, ovr024.roll_dice_save(8, 6), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellRaiseDead() // cast_raise
+		internal static async Task<bool> SpellRaiseDead() // cast_raise
 		{
 			Player player = gbl.spellTargets[0];
 
@@ -2342,78 +2460,91 @@ namespace engine
 			{
 				gbl.cureSpell = true;
 
-				ovr024.remove_affect(null, Classes.Affects.animate_dead, player);
-				ovr024.remove_affect(null, Classes.Affects.poisoned, player);
+				await ovr024.remove_affect(null, Classes.Affects.animate_dead, player);
+				await ovr024.remove_affect(null, Classes.Affects.poisoned, player);
 				gbl.cureSpell = false;
 
 				player.health_status = Status.okey;
 				player.in_combat = true;
                 player.stats.Con.cur--;
 
-				ovr024.CalcStatBonuses(Stat.CON, player);
+				await ovr024.CalcStatBonuses(Stat.CON, player);
 				player.hit_point_current = 1;
 
 				ovr025.DisplayPlayerStatusString(true, 10, "is raised", player);
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellSlayLiving() //cast_slay
+		internal static async Task<bool> SpellSlayLiving() //cast_slay
 		{
 			Player target = gbl.spellTargets[0];
 			gbl.damage_flags = DamageType.Unknown40;
 			gbl.damage = 67;
-			Affects.Effect.Check(target, CheckType.MagicResistance);
+			await Affects.Effect.Check(target, CheckType.MagicResistance);
 
 			if (gbl.damage != 0)
 			{
-				if (ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false)
+				if (await ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false)
 				{
-					ovr024.KillPlayer("is slain", Status.dead, target);
+					await ovr024.KillPlayer("is slain", Status.dead, target);
 				}
 				else
 				{
 					gbl.damage_flags = DamageType.Magic;
 
-					ovr024.damage_person(false, 0, ovr024.roll_dice_save(8, 2) + 1, target);
+					await ovr024.damage_person(false, 0, ovr024.roll_dice_save(8, 2) + 1, target);
 				}
+                return true;
 			}
 			else
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
+                return false;
 			}
 		}
 
 
-		internal static void SpellEntangle() // cast_entangle
+		internal static async Task<bool> SpellEntangle() // cast_entangle
 		{
 			if (gbl.area_ptr.inDungeon == 0)
 			{
 				foreach (var target in gbl.spellTargets)
 				{
-					bool saved = ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
+					bool saved = await ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
 
-					ovr024.ApplyAttackSpellAffect("is entangled", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout((Spells)0x88), Classes.Affects.entangle, target);
+					await ovr024.ApplyAttackSpellAffect("is entangled", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout((Spells)0x88), Classes.Affects.entangle, target);
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void SpellFaerieFire() /* cast_highlisht */
+		internal static async Task<bool> SpellFaerieFire() /* cast_highlisht */
 		{
-			MultiTargetedSpell("is highlighted", 0);
+			return await MultiTargetedSpell("is highlighted", 0);
 		}
 
 
-		internal static void SpellInvisToAnimals() // cast_invisible2
+		internal static async Task<bool> SpellInvisToAnimals() // cast_invisible2
 		{
-			DoSpellCastingWork("is invisible", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is invisible", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellCharmMonsters() // cast_charmed
+		internal static async Task<bool> SpellCharmMonsters() // cast_charmed
 		{
-			MultiTargetedSpell("is charmed", 0);
+			await MultiTargetedSpell("is charmed", 0);
 
 			foreach (var target in gbl.spellTargets)
 			{
@@ -2421,13 +2552,14 @@ namespace engine
 
 				if (ovr025.FindAffect(out affect, Classes.Affects.charm_person, target) == true)
 				{
-					Affects.Effect.Call(Effect.Add, affect, target, Classes.Affects.charm_person);
+					await Affects.Effect.Call(Effect.Add, affect, target, Classes.Affects.charm_person);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void SpellConfusion() // cast_confuse
+		internal static async Task<bool> SpellConfusion() // cast_confuse
 		{
 			int target_count = ovr024.roll_dice(8, 2);
 
@@ -2438,14 +2570,16 @@ namespace engine
 
 			foreach (var target in gbl.spellTargets)
 			{
-				bool saved = ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
+				bool saved = await ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
 
-				ovr024.ApplyAttackSpellAffect("is confused", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout(Spells.confusion), Classes.Affects.confuse, target);
+				await ovr024.ApplyAttackSpellAffect("is confused", saved, DamageOnSave.Zero, false, 0, GetSpellAffectTimeout(Spells.confusion), Classes.Affects.confuse, target);
 			}
+
+            return true;
 		}
 
 
-		internal static void SpellDimensionDoor() // cast_teleport
+		internal static async Task<bool> SpellDimensionDoor() // cast_teleport
 		{
 			Affect affect;
 			Player player = gbl.SelectedPlayer;
@@ -2463,8 +2597,8 @@ namespace engine
 					{
 						if (gbl.player_array[affect.affect_data] == player)
 						{
-							ovr024.remove_affect(null, Classes.Affects.owlbear_hug_round_attack, playerB);
-							ovr024.remove_affect(null, Classes.Affects.affect_8b, playerB);
+							await ovr024.remove_affect(null, Classes.Affects.owlbear_hug_round_attack, playerB);
+							await ovr024.remove_affect(null, Classes.Affects.affect_8b, playerB);
 						}
 					}
 				}
@@ -2477,10 +2611,12 @@ namespace engine
 			ovr033.redrawCombatArea(8, 0, ovr033.PlayerMapPos(player));
 
 			ovr025.DisplayPlayerStatusString(true, 10, "teleports", player);
+
+            return true;
 		}
 
 
-		internal static void SpellFear() /* cast_terror */
+		internal static async Task<bool> SpellFear() /* cast_terror */
 		{
 			Player caster = gbl.SelectedPlayer;
 
@@ -2488,11 +2624,11 @@ namespace engine
 
 			foreach (var target in gbl.spellTargets)
 			{
-				bool saves = ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
+				bool saves = await ovr024.RollSavingThrow(0, SaveVerseType.Spell, target);
 
 				if (saves == false)
 				{
-					ovr024.ApplyAttackSpellAffect("runs in terror", saves, DamageOnSave.Zero, true, 0, GetSpellAffectTimeout(Spells.fear), Classes.Affects.fear, target);
+					await ovr024.ApplyAttackSpellAffect("runs in terror", saves, DamageOnSave.Zero, true, 0, GetSpellAffectTimeout(Spells.fear), Classes.Affects.fear, target);
 					target.actions.fleeing = true;
 					target.quick_fight = QuickFight.True;
 
@@ -2508,10 +2644,11 @@ namespace engine
 					ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", target);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void SpellFireProtection() // cast_protection
+		internal static async Task<bool> SpellFireProtection() // cast_protection
 		{
 			char input_key;
 
@@ -2537,14 +2674,14 @@ namespace engine
 
 				if (input_key == 'H')
 				{
-					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.hot_fire_shield, gbl.SelectedPlayer);
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.fire_shield_damage, gbl.SelectedPlayer);
+					await ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.hot_fire_shield, gbl.SelectedPlayer);
+					await ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.fire_shield_damage, gbl.SelectedPlayer);
 					var_3 = true;
 				}
 				else if (input_key == 'C')
 				{
-					ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.cold_fire_shield, gbl.SelectedPlayer);
-					ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.fire_shield_damage, gbl.SelectedPlayer);
+					await ovr024.ApplyAttackSpellAffect("is protected", false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.cold_fire_shield, gbl.SelectedPlayer);
+					await ovr024.ApplyAttackSpellAffect(string.Empty, false, 0, false, 0, GetSpellAffectTimeout(Spells.fire_shield), Classes.Affects.fire_shield_damage, gbl.SelectedPlayer);
 					var_3 = true;
 				}
 				else
@@ -2558,49 +2695,53 @@ namespace engine
 				}
 
 			} while (var_3 == false);
+
+            return true;
 		}
 
 
-		internal static void SpellFumble() // spell_slow
+		internal static async Task<bool> SpellFumble() // spell_slow
 		{
 			Player target = gbl.spellTargets[0];
 			gbl.damage_flags = DamageType.Unknown40;
 
-			if (ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false)
+			if (await ovr024.RollSavingThrow(0, SaveVerseType.Spell, target) == false)
 			{
-				ovr024.ApplyAttackSpellAffect("is clumsy", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Classes.Affects.fumbling, target);
+				await ovr024.ApplyAttackSpellAffect("is clumsy", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Classes.Affects.fumbling, target);
 
 				if (target.HasAffect(Classes.Affects.fumbling) == true)
 				{
-					Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.fumbling);
+					await Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.fumbling);
 				}
 			}
 			else
 			{
-				ovr024.ApplyAttackSpellAffect("is slowed", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Classes.Affects.slow, target);
+				await ovr024.ApplyAttackSpellAffect("is slowed", false, 0, false, 0, GetSpellAffectTimeout(Spells.fumble), Classes.Affects.slow, target);
 
 				if (target.HasAffect(Classes.Affects.slow) == true)
 				{
-					Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.slow);
+					await Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.slow);
 				}
 			}
-			DoSpellCastingWork("is clumsy", 0, 0, true, 0, gbl.spell_id);
+			await DoSpellCastingWork("is clumsy", 0, 0, true, 0, gbl.spell_id);
+
+            return true;
 		}
 
 
-		internal static void SpellIceStorm() // sub_60F0B
+		internal static async Task<bool> SpellIceStorm() // sub_60F0B
 		{
-			DoSpellCastingWork("", DamageType.Acid, ovr024.roll_dice_save(10, 3), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Acid, ovr024.roll_dice_save(10, 3), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellMinorGlobeOfInvulnerability() // sub_60F4E
+		internal static async Task<bool> SpellMinorGlobeOfInvulnerability() // sub_60F4E
 		{
-			DoSpellCastingWork("is protected", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("is protected", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellCloudKill() // spell_poisonous_cloud // similar to create_noxious_cloud
+		internal static async Task<bool> SpellCloudKill() // spell_poisonous_cloud // similar to create_noxious_cloud
 		{
 			byte dir = 0;
 			int var_16;
@@ -2717,13 +2858,15 @@ namespace engine
 			{
 				if (targets[idx] > 0)
 				{
-					ovr024.in_poison_cloud(1, gbl.player_array[targets[idx]]);
+					await ovr024.in_poison_cloud(1, gbl.player_array[targets[idx]]);
 				}
 			}
+
+            return true;
 		}
 
 
-		internal static void SpellConeOfCold() // sub_61550
+		internal static async Task<bool> SpellConeOfCold() // sub_61550
 		{
 			Player player = gbl.SelectedPlayer;
 			int target_count = ovr025.spellMaxTargetCount(gbl.spell_id);
@@ -2736,11 +2879,11 @@ namespace engine
 
 			BuildAreaDamageTargets(max_range, 2, gbl.targetPos, ovr033.PlayerMapPos(player));
 
-			DoSpellCastingWork("", DamageType.Acid, target_count + ovr024.roll_dice_save(4, target_count), false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", DamageType.Acid, target_count + ovr024.roll_dice_save(4, target_count), false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellFeeblemind() // sub_615F2
+		internal static async Task<bool> SpellFeeblemind() // sub_615F2
 		{
 			Player target = gbl.spellTargets[0];
 			int saveTypeSpell = (int)SaveVerseType.Spell;
@@ -2763,24 +2906,26 @@ namespace engine
 
 			gbl.damage_flags = 0;
 
-			DoSpellCastingWork(string.Empty, 0, 0, false, 0, gbl.spell_id);
+			await DoSpellCastingWork(string.Empty, 0, 0, false, 0, gbl.spell_id);
 
 			if (target.HasAffect(Classes.Affects.feeblemind) == true)
 			{
-				Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.feeblemind);
+				await Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.feeblemind);
 			}
 
 			target.saveVerse[saveTypeSpell] = oldBonus;
+
+            return true;
 		}
 
 
-		internal static void SpellCastSpellIdAffect()
+		internal static async Task<bool> SpellCastSpellIdAffect()
 		{
-			DoSpellCastingWork("", 0, 0, false, 0, gbl.spell_id);
+			return await DoSpellCastingWork("", 0, 0, false, 0, gbl.spell_id);
 		}
 
 
-		internal static void SpellDefoliation() // sub_61727
+		internal static async Task<bool> SpellDefoliation() // sub_61727
 		{
 			Player attacker = gbl.SelectedPlayer;
 
@@ -2790,25 +2935,31 @@ namespace engine
 			{
 				bool change_damage = !target.flags.HasFlag(Flags.Plant);
 
-				ovr024.damage_person(change_damage, gbl.spellCastingTable[(int)Spells.wand_of_defoliation].damageOnSave, ovr024.roll_dice_save(6, 6), target);
+				await ovr024.damage_person(change_damage, gbl.spellCastingTable[(int)Spells.wand_of_defoliation].damageOnSave, ovr024.roll_dice_save(6, 6), target);
 			}
+            return true;
 		}
 
 
-		internal static void cast_heal2()
+		internal static async Task<bool> cast_heal2()
 		{
-			if (ovr024.heal_player(0, ovr024.roll_dice(4, 2) + 2, gbl.spellTargets[0]) == true)
+			if (await ovr024.heal_player(0, ovr024.roll_dice(4, 2) + 2, gbl.spellTargets[0]) == true)
 			{
 				ovr025.MagicAttackDisplay("is Healed", true, gbl.spellTargets[0]);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectPetrifyingGaze(Effect arg_0, object param, Player player) /* spell_stone */
+		internal static async Task<bool> AffectPetrifyingGaze(Effect arg_0, object param, Player player) /* spell_stone */
 		{
 			player.actions.target = null;
 
-			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
+			gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
 
 			if (player.actions.target != null)
 			{
@@ -2832,15 +2983,17 @@ namespace engine
 					}
 				}
 
-				if (ovr024.RollSavingThrow(0, SaveVerseType.Petrification, gbl.spell_target) == false)
+				if (await ovr024.RollSavingThrow(0, SaveVerseType.Petrification, gbl.spell_target) == false)
 				{
-					ovr024.KillPlayer("is Stoned", Status.stoned, gbl.spell_target);
+					await ovr024.KillPlayer("is Stoned", Status.stoned, gbl.spell_target);
 				}
 			}
+
+            return true;
 		}
 
 
-		internal static void DragonBreathElec(Effect arg_0, object param, Player player) // cast_breath
+		internal static async Task<bool> DragonBreathElec(Effect arg_0, object param, Player player) // cast_breath
 		{
 			Affect affect = (Affect)param;
 			bool var_1 = false; /* Simeon */
@@ -2853,7 +3006,7 @@ namespace engine
 
 				ovr025.DisplayPlayerStatusString(true, 10, "Breathes!", player);
 
-                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.lightning_bolt);
+                gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.lightning_bolt);
 
 				gbl.targetPos.x = var_2.x + Math.Sign(gbl.targetPos.x - var_2.x);
 				gbl.targetPos.y = var_2.y + Math.Sign(gbl.targetPos.y - var_2.y);
@@ -2868,11 +3021,11 @@ namespace engine
 					gbl.targetPos.y++;
 				}
 
-				ovr024.remove_invisibility(player);
+				await ovr024.remove_invisibility(player);
 				ovr025.load_missile_icons(0x13);
 
 				ovr025.draw_missile_attack(0x32, 4, gbl.targetPos, var_2);
-				var_1 = DoElecDamage(var_1, 0, SaveVerseType.BreathWeapon, player.hit_point_max, gbl.targetPos);
+				var_1 = await DoElecDamage(var_1, 0, SaveVerseType.BreathWeapon, player.hit_point_max, gbl.targetPos);
 				sub_5FA44(0, SaveVerseType.BreathWeapon, player.hit_point_max, 10);
 
 				if (affect.affect_data > 0xFD)
@@ -2881,18 +3034,24 @@ namespace engine
 				}
 				else
 				{
-					ovr024.remove_affect(affect, Classes.Affects.breath_elec, player);
+					await ovr024.remove_affect(affect, Classes.Affects.breath_elec, player);
 				}
 
 				var_1 = true;
 				ovr025.clear_actions(player);
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectSpitAcid(Effect arg_0, object param, Player player) // spell_spit_acid
+		internal static async Task<bool> AffectSpitAcid(Effect arg_0, object param, Player player) // spell_spit_acid
 		{
-			gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
+			gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
 
 			gbl.spell_target = player.actions.target;
 
@@ -2908,17 +3067,22 @@ namespace engine
 
 					ovr025.draw_missile_attack(30, 1, ovr033.PlayerMapPos(gbl.spell_target), ovr033.PlayerMapPos(player));
 
-					ovr024.damage_person(ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, gbl.spell_target), DamageOnSave.Half, player.hit_point_max, gbl.spell_target);
+					await ovr024.damage_person(await ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, gbl.spell_target), DamageOnSave.Half, player.hit_point_max, gbl.spell_target);
 				}
 				else
 				{
 					ovr025.DisplayPlayerStatusString(true, 10, "Spits Acid and Misses", player);
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void DragonBreathAcid(Effect arg_0, object param, Player attacker) // spell_breathes_acid
+		internal static async Task<bool> DragonBreathAcid(Effect arg_0, object param, Player attacker) // spell_breathes_acid
 		{
 			Affect affect = (Affect)param;
 
@@ -2935,7 +3099,7 @@ namespace engine
 
 				var attackerPos = ovr033.PlayerMapPos(attacker);
 
-				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_paralyzation);
+				gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_paralyzation);
 
 				if (gbl.byte_1DA70 == true)
 				{
@@ -2957,8 +3121,8 @@ namespace engine
 
 					foreach (var target in gbl.spellTargets)
 					{
-						bool save_made = ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, target);
-						ovr024.damage_person(save_made, DamageOnSave.Half, attacker.hit_point_max, target);
+						bool save_made = await ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, target);
+						await ovr024.damage_person(save_made, DamageOnSave.Half, attacker.hit_point_max, target);
 					}
 
 					affect.affect_data--;
@@ -2966,10 +3130,11 @@ namespace engine
 					ovr025.clear_actions(attacker);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void DragonBreathFire(Effect arg_0, object param, Player attacker) // spell_breathes_fire
+		internal static async Task<bool> DragonBreathFire(Effect arg_0, object param, Player attacker) // spell_breathes_fire
 		{
 			Affect affect = (Affect)param;
 
@@ -2983,7 +3148,7 @@ namespace engine
 				gbl.damage_flags = DamageType.DragonBreath | DamageType.Fire;
 				var attackPos = ovr033.PlayerMapPos(attacker);
 
-				gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_paralyzation);
+				gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_paralyzation);
 
 				if (gbl.byte_1DA70 == true)
 				{
@@ -2998,22 +3163,27 @@ namespace engine
 
 						foreach (var target in gbl.spellTargets)
 						{
-							bool saves = ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, target);
+							bool saves = await ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, target);
 
-							ovr024.damage_person(saves, DamageOnSave.Half, attacker.hit_point_max, target);
+							await ovr024.damage_person(saves, DamageOnSave.Half, attacker.hit_point_max, target);
 						}
 
 						affect.affect_data -= 1;
 						ovr025.clear_actions(attacker);
 					}
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void cast_breath_fire(Effect arg_0, object param, Player arg_6)
+		internal static async Task<bool> cast_breath_fire(Effect arg_0, object param, Player arg_6)
 		{
-            gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
+            gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.wand_of_magic_missiles);
 			gbl.spell_target = arg_6.actions.target;
 
 			if ((gbl.spell_target != null) &&
@@ -3029,12 +3199,18 @@ namespace engine
 
 				ovr025.draw_missile_attack(0x1E, 1, ovr033.PlayerMapPos(gbl.spell_target), ovr033.PlayerMapPos(arg_6));
 
-				ovr024.damage_person(ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, gbl.spell_target), DamageOnSave.Half, 7, gbl.spell_target);
+				await ovr024.damage_person(await ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, gbl.spell_target), DamageOnSave.Half, 7, gbl.spell_target);
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void cast_throw_lightening(Effect arg_0, object param, Player caster) /* cast_throw_lightning */
+		internal static async Task<bool> cast_throw_lightening(Effect arg_0, object param, Player caster) /* cast_throw_lightning */
 		{
 			bool var_1 = false; /* Simeon */
 
@@ -3043,25 +3219,27 @@ namespace engine
 				var pos = ovr033.PlayerMapPos(caster);
 
 				ovr025.DisplayPlayerStatusString(true, 10, "throws lightning", caster);
-                gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.lightning_bolt);
+                gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.lightning_bolt);
 
-				ovr024.remove_invisibility(caster);
+				await ovr024.remove_invisibility(caster);
 				ovr025.load_missile_icons(0x13);
 				ovr025.draw_missile_attack(0x32, 4, gbl.targetPos, pos);
 
-				var_1 = DoElecDamage(var_1, 0, SaveVerseType.Spell, ovr024.roll_dice_save(6, 16), gbl.targetPos);
+				var_1 = await DoElecDamage(var_1, 0, SaveVerseType.Spell, ovr024.roll_dice_save(6, 16), gbl.targetPos);
 				sub_5FA44(0, 0, ovr024.roll_dice_save(6, 16), 10);
 				var_1 = true;
 				ovr025.clear_actions(caster);
 			}
+
+            return true;
 		}
 
 
-		internal static void cast_gaze_paralyze(Effect arg_0, object param, Player arg_6)
+		internal static async Task<bool> cast_gaze_paralyze(Effect arg_0, object param, Player arg_6)
 		{
 			arg_6.actions.target = null;
 
-            gbl.byte_1DA70 = gbl.SpellCastFunction(QuickFight.True, Spells.animate_dead);
+            gbl.byte_1DA70 = await gbl.SpellCastFunction(QuickFight.True, Spells.animate_dead);
 
 			gbl.spell_target = arg_6.actions.target;
 
@@ -3073,12 +3251,18 @@ namespace engine
 
 				ovr025.draw_missile_attack(0x2d, 4, ovr033.PlayerMapPos(gbl.spell_target), ovr033.PlayerMapPos(arg_6));
 
-				if (ovr024.RollSavingThrow(0, SaveVerseType.Petrification, gbl.spell_target) == false)
+				if (await ovr024.RollSavingThrow(0, SaveVerseType.Petrification, gbl.spell_target) == false)
 				{
 					ovr024.add_affect(false, 0xff, 0x3c, Classes.Affects.paralyze, gbl.spell_target);
 					ovr025.DisplayPlayerStatusString(false, 10, "is paralyzed", gbl.spell_target);
 				}
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 		internal static void remove_spell_from_scroll(Spells spell, Item item, Player player) /* sub_623FF */

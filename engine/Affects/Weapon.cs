@@ -1,10 +1,11 @@
 ﻿using Classes;
+using System.Threading.Tasks;
 
 namespace engine.Affects
 {
     internal class Weapon
     {
-        internal static void UndeadSlayer(Classes.Effect arg_0, object param, Player player)
+        internal static Task<bool> UndeadSlayer(Classes.Effect arg_0, object param, Player player)
         {
             int bonus = 0;
 
@@ -23,6 +24,8 @@ namespace engine.Affects
             }
             gbl.attack_roll += bonus;
             gbl.damage += bonus;
+
+            return Task.FromResult(true);
         }
     }
 }

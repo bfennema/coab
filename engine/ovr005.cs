@@ -1,6 +1,7 @@
 using Classes;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -63,7 +64,7 @@ namespace engine
         }
 
 
-        internal static void cure_blindness()
+        internal static async Task<bool> cure_blindness()
         {
             bool cast = true;
 
@@ -76,13 +77,16 @@ namespace engine
             {
                 if (buy_cure(1000, "Cure Blindness"))
                 {
-                    ovr024.remove_affect(null, Classes.Affects.blinded, gbl.SelectedPlayer);
+                    await ovr024.remove_affect(null, Classes.Affects.blinded, gbl.SelectedPlayer);
+
+                    return true;
                 }
             }
+            return false;
         }
 
 
-        internal static void cure_disease()
+        internal static async Task<bool> cure_disease()
         {
             bool is_diseased = Array.Exists(disease_types, aff => gbl.SelectedPlayer.HasAffect(aff));
 
@@ -99,16 +103,19 @@ namespace engine
                     gbl.cureSpell = true;
                     for (int i = 0; i < 6; i++)
                     {
-                        ovr024.remove_affect(null, disease_types[i], gbl.SelectedPlayer);
+                        await ovr024.remove_affect(null, disease_types[i], gbl.SelectedPlayer);
                     }
 
                     gbl.cureSpell = false;
+
+                    return true;
                 }
             }
+            return false;
         }
 
 
-        internal static void cure_wounds(int healType)
+        internal static async Task<bool> cure_wounds(int healType)
         {
             switch (healType)
             {
@@ -116,7 +123,7 @@ namespace engine
                     if (buy_cure(100, "Cure Light Wounds"))
                     {
                         int heal_amount = ovr024.roll_dice(8, 1);
-                        ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
+                        return await ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
                     }
                     break;
 
@@ -124,7 +131,7 @@ namespace engine
                     if (buy_cure(350, "Cure Serious Wounds"))
                     {
                         int heal_amount = ovr024.roll_dice(8, 2) + 1;
-                        ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
+                        return await ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
                     }
                     break;
 
@@ -132,7 +139,7 @@ namespace engine
                     if (buy_cure(600, "Cure Critical Wounds"))
                     {
                         int heal_amount = ovr024.roll_dice(8, 3) + 3;
-                        ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
+                        return await ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
                     }
                     break;
 
@@ -143,25 +150,28 @@ namespace engine
                         heal_amount -= gbl.SelectedPlayer.hit_point_current;
                         heal_amount -= ovr024.roll_dice(4, 1);
 
-                        ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
-                        ovr024.remove_affect(null, Classes.Affects.blinded, gbl.SelectedPlayer);
+                        await ovr024.heal_player(0, heal_amount, gbl.SelectedPlayer);
+                        await ovr024.remove_affect(null, Classes.Affects.blinded, gbl.SelectedPlayer);
 
                         for (int i = 0; i < 6; i++)
                         {
-                            ovr024.remove_affect(null, disease_types[i], gbl.SelectedPlayer);
+                            await ovr024.remove_affect(null, disease_types[i], gbl.SelectedPlayer);
                         }
 
-                        ovr024.remove_affect(null, Classes.Affects.feeblemind, gbl.SelectedPlayer);
+                        await ovr024.remove_affect(null, Classes.Affects.feeblemind, gbl.SelectedPlayer);
 
-                        ovr024.CalcStatBonuses(Stat.INT, gbl.SelectedPlayer);
-                        ovr024.CalcStatBonuses(Stat.WIS, gbl.SelectedPlayer);
+                        await ovr024.CalcStatBonuses(Stat.INT, gbl.SelectedPlayer);
+                        await ovr024.CalcStatBonuses(Stat.WIS, gbl.SelectedPlayer);
+
+                        return true;
                     }
                     break;
             }
+            return false;
         }
 
 
-        internal static void raise_dead()
+        internal static async Task<bool> raise_dead()
         {
             Player player = gbl.SelectedPlayer;
             bool player_dead = false;
@@ -179,8 +189,8 @@ namespace engine
                 {
                     gbl.cureSpell = true;
 
-                    ovr024.remove_affect(null, Classes.Affects.animate_dead, player);
-                    ovr024.remove_affect(null, Classes.Affects.poisoned, player);
+                    await ovr024.remove_affect(null, Classes.Affects.animate_dead, player);
+                    await ovr024.remove_affect(null, Classes.Affects.poisoned, player);
 
                     gbl.cureSpell = false;
 
@@ -239,11 +249,16 @@ namespace engine
                         }
                     }
                 }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
 
-        internal static void cure_poison2()
+        internal static async Task<bool> cure_poison2()
         {
             bool isPoisoned = gbl.SelectedPlayer.HasAffect(Classes.Affects.poisoned);
 
@@ -254,17 +269,20 @@ namespace engine
                 {
                     gbl.cureSpell = true;
 
-                    ovr024.remove_affect(null, Classes.Affects.poisoned, gbl.SelectedPlayer);
-                    ovr024.remove_affect(null, Classes.Affects.slow_poison, gbl.SelectedPlayer);
-                    ovr024.remove_affect(null, Classes.Affects.poison_damage, gbl.SelectedPlayer);
+                    await ovr024.remove_affect(null, Classes.Affects.poisoned, gbl.SelectedPlayer);
+                    await ovr024.remove_affect(null, Classes.Affects.slow_poison, gbl.SelectedPlayer);
+                    await ovr024.remove_affect(null, Classes.Affects.poison_damage, gbl.SelectedPlayer);
 
                     gbl.cureSpell = false;
+
+                    return true;
                 }
             }
+            return false;
         }
 
 
-        internal static void remove_curse()
+        internal static async Task<bool> remove_curse()
         {
             bool has_curse_items = gbl.SelectedPlayer.items.Find(item => item.cursed) != null;
             bool cast = true;
@@ -279,8 +297,10 @@ namespace engine
             {
                 gbl.spellTargets.Clear();
                 gbl.spellTargets.Add(gbl.SelectedPlayer);
-                ovr023.SpellRemoveCurse();
+                await ovr023.SpellRemoveCurse();
             }
+
+            return true;
         }
 
 
@@ -300,7 +320,7 @@ namespace engine
         }
 
 
-        internal static void temple_heal()
+        internal static async Task<bool> temple_heal()
         {
             int sl_index = 0;
 
@@ -331,39 +351,39 @@ namespace engine
                     switch (gbl.game.TempleSpells[sl_index])
                     {
                         case "Cure Blindness":
-                            cure_blindness();
+                            await cure_blindness();
                             break;
 
                         case "Cure Disease":
-                            cure_disease();
+                            await cure_disease();
                             break;
 
                         case "Cure Light Wounds":
-                            cure_wounds(1);
+                            await cure_wounds(1);
                             break;
 
                         case "Cure Serious Wounds":
-                            cure_wounds(2);
+                            await cure_wounds(2);
                             break;
 
                         case "Cure Critical Wounds":
-                            cure_wounds(3);
+                            await cure_wounds(3);
                             break;
 
                         case "Heal":
-                            cure_wounds(4);
+                            await cure_wounds(4);
                             break;
 
                         case "Neutralize Poison":
-                            cure_poison2();
+                            await cure_poison2();
                             break;
 
                         case "Raise Dead":
-                            raise_dead();
+                            await raise_dead();
                             break;
 
                         case "Remove Curse":
-                            remove_curse();
+                            await remove_curse();
                             break;
 
                         case "Stone to Flesh":
@@ -384,19 +404,21 @@ namespace engine
 
             stringList.Clear();
 
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
             ovr025.PartySummary(gbl.SelectedPlayer);
+
+            return true;
         }
 
 
-        internal static void temple_shop()
+        internal static async Task<bool> temple_shop()
         {
             bool reloadPics = false;
 
             gbl.game_state = GameState.Shop;
             gbl.redrawBoarder = (gbl.area_ptr.inDungeon == 0);
 
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
             gbl.redrawBoarder = true;
             ovr025.PartySummary(gbl.SelectedPlayer);
 
@@ -428,12 +450,12 @@ namespace engine
                     case 'H':
                         if (ctrl_key == false)
                         {
-                            temple_heal();
+                            await temple_heal();
                         }
                         break;
 
                     case 'V':
-                        ovr020.viewPlayer();
+                        await ovr020.viewPlayer();
                         break;
 
                     case 'T':
@@ -494,16 +516,18 @@ namespace engine
                 if (input_key == 'B' ||
                     input_key == 'T')
                 {
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                 }
                 else if (reloadPics == true)
                 {
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                     reloadPics = false;
                 }
 
                 ovr025.PartySummary(gbl.SelectedPlayer);
             } while (gbl.Exit == false && stop_loop == false);
+
+            return true;
         }
     }
 }

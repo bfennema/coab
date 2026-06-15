@@ -1,4 +1,5 @@
 using Classes;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -21,12 +22,9 @@ namespace engine
         }
 
 
-        internal static void Load8x8Tiles() // load_8x8d1_201
+        internal static async Task<bool> Load8x8Tiles() // load_8x8d1_201
         {
-            byte[] block_ptr;
-            ushort block_size;
-
-            seg042.load_decode_dax(out block_ptr, out block_size, 201, "8X8D", gbl.game.Tile8x8D201);
+            (var block_ptr, var block_size) = await seg042.load_decode_dax(201, "8X8D", gbl.game.Tile8x8D201);
 
             if (block_size != 0)
             {
@@ -38,6 +36,7 @@ namespace engine
                     }
                 }
             }
+            return true;
         }
 
 

@@ -1,5 +1,6 @@
 using Classes;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -8,7 +9,7 @@ namespace engine
         static int[] timeScales = { 10, 10, 6, 24, 30, 12, 0x100 }; //word_1A13C
 
 
-        static void CheckAffectsTimingOut(int timeSlot, int timeSteps) // sub_5801E
+        static async Task<bool> CheckAffectsTimingOut(int timeSlot, int timeSteps) // sub_5801E
         {
             if (gbl.game_state != GameState.Camping)
             {
@@ -34,7 +35,7 @@ namespace engine
 
                 if (var_B == false)
                 {
-                    return;
+                    return false;
                 }
             }
 
@@ -79,7 +80,7 @@ namespace engine
 
                         foreach (Affect remove in removeList)
                         {
-                            ovr024.remove_affect(remove, remove.type, player);
+                            await ovr024.remove_affect(remove, remove.type, player);
                         }
 
                         // Not sure why we are doing this again, but this is what the orig code did...
@@ -104,6 +105,7 @@ namespace engine
                     var_5 = 0;
                 }
             }
+            return true;
         }
 
 
@@ -147,7 +149,7 @@ namespace engine
             }
         }
 
-        internal static void step_game_time(int time_slot, int amount) /* sub_583FA */
+        internal static async Task<bool> step_game_time(int time_slot, int amount) /* sub_583FA */
         {
             RestTime rest_time = new RestTime();
 
@@ -168,7 +170,7 @@ namespace engine
                 gbl.area_ptr.field_6A00_Set(0x6A00 + ((0x4BC6 + i) * 2), (ushort)rest_time[i]);
             }
 
-            CheckAffectsTimingOut(time_slot, amount);
+            return await CheckAffectsTimingOut(time_slot, amount);
         }
 
 
@@ -355,7 +357,7 @@ namespace engine
         }
 
 
-        static void rest_heal(bool show_text) /* reset_heal */
+        static async Task<bool> rest_heal(bool show_text) /* reset_heal */
         {
             gbl.rest_10_seconds++;
 
@@ -365,7 +367,7 @@ namespace engine
 
                 foreach (Player player in gbl.TeamList)
                 {
-                    if (ovr024.heal_player(0, 1, player) == true)
+                    if (await ovr024.heal_player(0, 1, player) == true)
                     {
                         update_ui = true;
                     }
@@ -387,6 +389,7 @@ namespace engine
                 ovr025.ClearPlayerTextArea();
                 gbl.rest_10_seconds = 0;
             }
+            return true;
         }
 
 
@@ -513,7 +516,7 @@ namespace engine
         /// <summary>
         /// returns if the party is interrupted
         /// </summary>
-        internal static bool resting(bool interactive_resting) /* reseting */
+        internal static async Task<bool> resting(bool interactive_resting) /* reseting */
         {
             bool stop_resting;
             bool resting_intetrupted = false;
@@ -578,8 +581,8 @@ namespace engine
                         display_counter = 0;
                     }
 
-                    step_game_time(1, 5);
-                    rest_heal(interactive_resting);
+                    await step_game_time(1, 5);
+                    await rest_heal(interactive_resting);
                     CheckForSpellLearning();
                     sub_58C03(ref var_C);
 

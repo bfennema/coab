@@ -1,5 +1,7 @@
 using Classes;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -51,13 +53,13 @@ namespace engine
                                         "Gems", "Jewelry" };
 
 
-        internal static void playerDisplayFull(Player player, bool cur = false)
+        internal static async Task<bool> playerDisplayFull(Player player, bool cur = false)
         {
             Display.UpdateStop();
             gbl.game.DrawFrame_Portrait();
             if (gbl.game.Portrait && player.body_portrait != 0 && player.head_portrait != 0)
             {
-                ovr008.set_and_draw_head_body(3, gbl.game.PortraitBody[player.body_portrait - 1], gbl.game.PortraitHead[player.head_portrait - 1], 1, 28);
+                await ovr008.set_and_draw_head_body(3, gbl.game.PortraitBody[player.body_portrait - 1], gbl.game.PortraitHead[player.head_portrait - 1], 1, 28);
             }
             ovr025.displayPlayerName(false, 1, 1, player);
 
@@ -205,6 +207,8 @@ namespace engine
             seg041.displayString(statusString[(int)player.health_status], 0, 10, yCol, 8);
 
             Display.UpdateStart();
+
+            return true;
         }
 
         internal static void displayMoney()
@@ -351,7 +355,7 @@ namespace engine
         static Set asc_54B50 = new Set(73, 83, 84 );
         static Set unk_54B03 = new Set(0, 69 );
 
-        internal static bool viewPlayer()
+        internal static async Task<bool> viewPlayer()
         {
             if (gbl.game_state == GameState.Combat)
             {
@@ -363,7 +367,7 @@ namespace engine
 
             gbl.tradeWith = gbl.SelectedPlayer;
 
-            playerDisplayFull(gbl.SelectedPlayer);
+            await playerDisplayFull(gbl.SelectedPlayer);
 
             while (unk_54B03.MemberOf(input_key) == false && arg_0 == false)
             {
@@ -415,7 +419,7 @@ namespace engine
                 switch (input_key)
                 {
                     case 'I':
-                        PlayerItemsMenu(ref arg_0);
+                        arg_0 = await PlayerItemsMenu(arg_0);
                         break;
 
                     case 'S':
@@ -423,7 +427,7 @@ namespace engine
                         break;
 
                     case 'T':
-                        tradeCoin();
+                        await tradeCoin();
                         break;
 
                     case 'D':
@@ -432,18 +436,18 @@ namespace engine
                         break;
 
                     case 'H':
-                        PaladinHeal(gbl.SelectedPlayer);
+                        await PaladinHeal(gbl.SelectedPlayer);
                         break;
 
                     case 'C':
-                        PaladinCureDisease(gbl.SelectedPlayer);
+                        await PaladinCureDisease(gbl.SelectedPlayer);
                         break;
                 }
 
                 if (arg_0 == false &&
                     asc_54B50.MemberOf(input_key) == true)
                 {
-                    playerDisplayFull(gbl.SelectedPlayer);
+                    await playerDisplayFull(gbl.SelectedPlayer);
                 }
             }
 
@@ -451,7 +455,7 @@ namespace engine
             {
                 ovr033.Color_0_8_inverse();
             }
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
 
             return arg_0;
         }
@@ -561,7 +565,7 @@ namespace engine
 
         static Set unk_554EE = new Set(0, 69);
 
-        internal static void PlayerItemsMenu(ref bool arg_0) /*use_item*/
+        internal static async Task<bool> PlayerItemsMenu(bool arg_0) /*use_item*/
         {
             Player player = gbl.SelectedPlayer;
             char inputKey = ' ';
@@ -661,7 +665,7 @@ namespace engine
                                 break;
 
                             case 'R':
-                                ready_Item(curr_item);
+                                await ready_Item(curr_item);
                                 break;
 
                             case 'U':
@@ -673,7 +677,7 @@ namespace engine
                                 else if (curr_item.IsScroll() == true ||
                                     (curr_item.affect_2 > 0 && (int)curr_item.affect_3 < 0x80))
                                 {
-                                    UseMagicItem(ref arg_0, curr_item);
+                                    arg_0 = await UseMagicItem(arg_0, curr_item);
                                     if (gbl.game_state != GameState.Combat)
                                     {
                                         arg_0 = false;
@@ -689,7 +693,7 @@ namespace engine
                             case 'T':
                                 if (CanSellDropTradeItem(curr_item) == true)
                                 {
-                                    trade_item(curr_item);
+                                    await trade_item(curr_item);
                                 }
                                 else
                                 {
@@ -752,6 +756,8 @@ namespace engine
                     redraw_items = true;
                 }
             }
+
+            return arg_0;
         }
 
 
@@ -769,7 +775,7 @@ namespace engine
             {0, 0, 1, 1, 1},
             {0, 0, 0, 1, 1}  };
 
-        internal static void calc_items_effects(bool add_item, Item item) /*sub_55B04*/
+        internal static async Task<bool> calc_items_effects(bool add_item, Item item) /*sub_55B04*/
         {
             Player player = gbl.SelectedPlayer;
 
@@ -779,7 +785,7 @@ namespace engine
             {
                 case 0: // apply affect_2
                     gbl.applyItemAffect = true;
-                    Affects.Effect.Call((add_item) ? Effect.Add : Effect.Remove, item, player, item.Affect_3);
+                    await Affects.Effect.Call((add_item) ? Effect.Add : Effect.Remove, item, player, item.Affect_3);
                     break;
 
                 case 1: // ring of wizardy
@@ -838,7 +844,7 @@ namespace engine
                     break;
 
                 case 2: // Gauntlets of Dexterity
-                    ovr024.CalcStatBonuses(Stat.DEX, player);
+                    await ovr024.CalcStatBonuses(Stat.DEX, player);
                     ovr026.recalc_thief_skills(player);
                     break;
 
@@ -849,12 +855,12 @@ namespace engine
                         if (ovr024.TryEncodeStrength(out encodedStrength, 100, 18, player) == true)
                         {
                             ovr025.DisplayPlayerStatusString(true, 10, "is stronger", player);
-                            ovr024.CalcStatBonuses(Stat.STR, player);
+                            await ovr024.CalcStatBonuses(Stat.STR, player);
                         }
                     }
                     else
                     {
-                        ovr024.CalcStatBonuses(Stat.STR, player);
+                        await ovr024.CalcStatBonuses(Stat.STR, player);
                     }
                     break;
 
@@ -870,18 +876,18 @@ namespace engine
                             ovr025.RedrawCombatScreen();
                         }
 
-                        ovr024.damage_person(false, 0, damage, player);
+                        await ovr024.damage_person(false, 0, damage, player);
                         gbl.byte_1D2C8 = true;
                     }
                     break;
 
                 case 5:
-                    ovr024.CalcStatBonuses(Stat.STR, player);
+                    await ovr024.CalcStatBonuses(Stat.STR, player);
                     break;
 
                 case 6: // Girdle of the Dwarves
-                    ovr024.CalcStatBonuses(Stat.CON, player);
-                    ovr024.CalcStatBonuses(Stat.CHA, player);
+                    await ovr024.CalcStatBonuses(Stat.CON, player);
+                    await ovr024.CalcStatBonuses(Stat.CHA, player);
                     ovr026.recalc_saving_throws(player);
                     break;
 
@@ -894,7 +900,7 @@ namespace engine
                         case 3:
                         case 4:
                         case 5:
-                            ovr024.CalcStatBonuses((Stat)item.affect_2, player);
+                            await ovr024.CalcStatBonuses((Stat)item.affect_2, player);
                             break;
                     }
                     break;
@@ -902,12 +908,12 @@ namespace engine
                 case 9:
                     if (add_item == false)
                     {
-                        ovr024.remove_affect(null, Classes.Affects.spiritual_hammer, player);
+                        await ovr024.remove_affect(null, Classes.Affects.spiritual_hammer, player);
                     }
                     break;
 
                 case 10:
-                    ovr024.CalcStatBonuses(Stat.DEX, player);
+                    await ovr024.CalcStatBonuses(Stat.DEX, player);
                     break;
 
                 case 11: // Gloves of Thievery
@@ -915,14 +921,15 @@ namespace engine
                     break;
 
                 case 12:
-                    ovr024.CalcStatBonuses(Stat.INT, player);
+                    await ovr024.CalcStatBonuses(Stat.INT, player);
                     break;
 
                 case 13:
-                    ovr024.CalcStatBonuses(Stat.STR, player);
-                    ovr024.CalcStatBonuses(Stat.INT, player);
+                    await ovr024.CalcStatBonuses(Stat.STR, player);
+                    await ovr024.CalcStatBonuses(Stat.INT, player);
                     break;
             }
+            return true;
         }
 
         enum Weld
@@ -933,7 +940,7 @@ namespace engine
             HandsFull = 3
         };
 
-        internal static void ready_Item(Item item)
+        internal static async Task<bool> ready_Item(Item item)
         {
             bool magic_item = ((int)item.affect_3 > 0x7f);
 
@@ -952,10 +959,10 @@ namespace engine
 
                     if (magic_item == true)
                     {
-                        calc_items_effects(false, item);
+                        await calc_items_effects(false, item);
                     }
                 }
-                return;
+                return false;
             }
             else
             {
@@ -1013,7 +1020,7 @@ namespace engine
                         item.readied = true;
                         if (magic_item == true)
                         {
-                            calc_items_effects(true, item);
+                            await calc_items_effects(true, item);
                         }
                         break;
 
@@ -1035,13 +1042,14 @@ namespace engine
                         break;
                 }
             }
+            return true;
         }
 
 
-        internal static void trade_item(Item item)
+        internal static async Task<bool> trade_item(Item item)
         {
             Player player = gbl.tradeWith;
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
 
             ovr025.selectAPlayer(ref player, true, "Trade with Whom?");
 
@@ -1058,6 +1066,12 @@ namespace engine
                     ovr025.lose_item(item, gbl.SelectedPlayer);
                     ovr025.reclac_player_values(player);
                 }
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -1126,7 +1140,7 @@ namespace engine
         }
 
 
-        internal static void UseMagicItem(ref bool arg_0, Item item) // sub_56478
+        internal static async Task<bool> UseMagicItem(bool arg_0, Item item) // sub_56478
         {
             gbl.spell_from_item = false;
             Spells spellId = 0;
@@ -1182,12 +1196,12 @@ namespace engine
                 {
                     if (gbl.SelectedPlayer.SkillLevel(SkillType.MagicUser, SkillType.Cleric) > 0)
                     {
-                        ovr023.sub_5D2E1(ref arg_0, false, gbl.SelectedPlayer.quick_fight, spellId);
+                        arg_0 = await ovr023.sub_5D2E1(arg_0, false, gbl.SelectedPlayer.quick_fight, spellId);
                     }
                     else if (gbl.SelectedPlayer.thief_lvl > 9 &&
                             ovr024.roll_dice(100, 1) <= 75)
                     {
-                        ovr023.sub_5D2E1(ref arg_0, false, gbl.SelectedPlayer.quick_fight, spellId);
+                        arg_0 = await ovr023.sub_5D2E1(arg_0, false, gbl.SelectedPlayer.quick_fight, spellId);
                     }
                     else
                     {
@@ -1196,7 +1210,7 @@ namespace engine
                 }
                 else
                 {
-                    ovr023.sub_5D2E1(ref arg_0, false, gbl.SelectedPlayer.quick_fight, spellId);
+                    arg_0 = await ovr023.sub_5D2E1(arg_0, false, gbl.SelectedPlayer.quick_fight, spellId);
                 }
 
                 gbl.spell_from_item = false;
@@ -1231,6 +1245,8 @@ namespace engine
                     }
                 }
             }
+
+            return arg_0;
         }
 
 
@@ -1352,13 +1368,13 @@ namespace engine
         }
 
 
-        internal static void tradeCoin()
+        internal static async Task<bool> tradeCoin()
         {
             bool finished = false;
             do
             {
                 Player dest = gbl.tradeWith;
-                ovr025.LoadPic();
+                await ovr025.LoadPic();
 
                 ovr025.selectAPlayer(ref dest, true, "Trade to?");
 
@@ -1370,7 +1386,7 @@ namespace engine
                 {
                     bool noMoneyLeft;
 
-                    playerDisplayFull(gbl.SelectedPlayer);
+                    await playerDisplayFull(gbl.SelectedPlayer);
                     do
                     {
                         displayMoney();
@@ -1417,6 +1433,8 @@ namespace engine
                     } while (noMoneyLeft == false);
                 }
             } while (finished == false);
+
+            return true;
         }
 
 
@@ -1614,22 +1632,22 @@ namespace engine
         }
 
 
-        internal static void PaladinHeal(Player player)
+        internal static async Task<bool> PaladinHeal(Player player)
         {
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
             Player target = gbl.TeamList[0];
 
             ovr025.selectAPlayer(ref target, true, "Heal whom? ");
 
             if (target == null)
             {
-                playerDisplayFull(gbl.SelectedPlayer);
-                return;
+                await playerDisplayFull(gbl.SelectedPlayer);
+                return false;
             }
 
             int healAmount = player.SkillLevel(SkillType.Paladin) * 2;
 
-            if (ovr024.heal_player(0, healAmount, target) == true)
+            if (await ovr024.heal_player(0, healAmount, target) == true)
             {
                 ovr025.string_print01(target.name + " feels better");
             }
@@ -1639,7 +1657,9 @@ namespace engine
             }
 
             ovr024.add_affect(false, 0, 1440, Classes.Affects.paladinDailyHealCast, player);
-            playerDisplayFull(gbl.SelectedPlayer);
+            await playerDisplayFull(gbl.SelectedPlayer);
+
+            return true;
         }
 
         static Classes.Affects[] paladinCureableDiseases = { // unk_16B39
@@ -1651,16 +1671,16 @@ namespace engine
             (Classes.Affects)0x39,
         };
 
-        internal static void PaladinCureDisease(Player player) /* sub_577EC */
+        internal static async Task<bool> PaladinCureDisease(Player player) /* sub_577EC */
         {
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
             Player target = gbl.TeamList[0];
 
             ovr025.selectAPlayer(ref target, true, "Cure whom? ");
 
             if (target == null)
             {
-                playerDisplayFull(gbl.SelectedPlayer);
+                await playerDisplayFull(gbl.SelectedPlayer);
             }
             else
             {
@@ -1680,7 +1700,7 @@ namespace engine
                 if (input == 'Y')
                 {
                     gbl.cureSpell = true;
-                    System.Array.ForEach(paladinCureableDiseases, affect => ovr024.remove_affect(null, affect, target));
+                    await ovr024.RemoveAffects(paladinCureableDiseases, target);
 
                     gbl.cureSpell = false;
 
@@ -1697,8 +1717,10 @@ namespace engine
                     ovr025.string_print01(target.name + " is cured");
                 }
 
-                playerDisplayFull(gbl.SelectedPlayer);
+                await playerDisplayFull(gbl.SelectedPlayer);
             }
+
+            return true;
         }
     }
 }

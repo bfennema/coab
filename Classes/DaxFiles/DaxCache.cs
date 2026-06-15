@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace Classes.DaxFiles
 {
@@ -7,47 +8,66 @@ namespace Classes.DaxFiles
     {
         private readonly static Dictionary<string, DaxFileCache> fileCache = [];
 
-        public static void PreloadDax(string filename, byte filenum)
+        public static async Task<bool> PreloadDax(string filename, byte filenum)
         {
             if (!fileCache.TryGetValue(filename, out DaxFileCache? dfc))
             {
+                dfc = new DaxFileCache();
                 try
                 {
-                    dfc = new DaxFileCache(filename, filenum);
+                    var status = await dfc.Add(filename, filenum);
+                    if (status == true)
+                    {
+                        fileCache.Add(filename, dfc);
+                    }
+                    return status;
                 }
                 catch (FileNotFoundException)
                 {
-                    return;
+                    return false;
                 }
                 catch (DirectoryNotFoundException)
                 {
-                    return;
+                    return false;
                 }
-                fileCache.Add(filename, dfc);
             }
             else
             {
                 try
                 {
-                    dfc.Add(filename, filenum);
+                    var status = await dfc.Add(filename, filenum);
+                    if (status == true)
+                    {
+                        fileCache.Add(filename, dfc);
+                    }
+                    return status;
                 }
                 catch (FileNotFoundException)
                 {
-                    return;
+                    return false;
                 }
                 catch (DirectoryNotFoundException)
                 {
-                    return;
+                    return false;
                 }
             }
         }
-        public static byte[]? LoadDax(string filename, string filenum, int block_id)
+        public static async Task<byte[]?> LoadDax(string filename, string filenum, int block_id)
         {
             if (!fileCache.TryGetValue(filename, out DaxFileCache? dfc))
             {
+                dfc = new DaxFileCache();
                 try
                 {
-                    dfc = new DaxFileCache(filename, filenum);
+                    var status = await dfc.Add(filename, filenum);
+                    if (status == true)
+                    {
+                        fileCache.Add(filename, dfc);
+                    }
+                    else
+                    {
+                        return null;
+                    }
                 }
                 catch (FileNotFoundException)
                 {
@@ -57,7 +77,6 @@ namespace Classes.DaxFiles
                 {
                     return null;
                 }
-                fileCache.Add(filename, dfc);
             }
 
             var entry = dfc.GetData(block_id);
@@ -65,7 +84,7 @@ namespace Classes.DaxFiles
             {
                 try
                 {
-                    if (dfc.Add(filename, filenum) == false)
+                    if (await dfc.Add(filename, filenum) == false)
                     {
                         return null;
                     }
@@ -83,13 +102,13 @@ namespace Classes.DaxFiles
 
             return entry;
         }
-        public static byte[]? LoadDax(string filename, byte filenum, int block_id)
+        public static async Task<byte[]?> LoadDax(string filename, byte filenum, int block_id)
         {
-            return LoadDax(filename, filenum.ToString(), block_id);
+            return await LoadDax(filename, filenum.ToString(), block_id);
         }
-        public static byte[]? LoadDax(string filename, int block_id)
+        public static async Task<byte[]?> LoadDax(string filename, int block_id)
         {
-            return LoadDax(filename, "", block_id);
+            return await LoadDax(filename, "", block_id);
         }
     }
 }

@@ -2,6 +2,7 @@ using Classes;
 using System;
 using System.Collections.Generic;
 using Classes.Combat;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -1396,7 +1397,7 @@ namespace engine
 		}
 
 
-        internal static void LoadPic() // load_pic
+        internal static async Task<bool> LoadPic() // load_pic
 		{
 			gbl.can_draw_bigpic = true;
 
@@ -1418,7 +1419,7 @@ namespace engine
 					}
 					else
 					{
-						ovr030.head_body(gbl.game_area, gbl.body_block_id, gbl.head_block_id);
+						await ovr030.head_body(gbl.game_area, gbl.body_block_id, gbl.head_block_id);
 						ovr030.draw_head_and_body(true, 3, 3);
 					}
 
@@ -1428,14 +1429,14 @@ namespace engine
 
 				case GameState.Camping:
 					gbl.game.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.CampingImage, "PIC", gbl.game_area);
+					await ovr030.load_pic_final(gbl.byte_1D556, 0, gbl.game.CampingImage, "PIC", gbl.game_area);
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
 					break;
 
 				case GameState.DungeonMap:
 					gbl.game.DrawFrame_Dungeon();
-					ovr029.RedrawView();
+					await ovr029.RedrawView();
 					PartySummary(gbl.SelectedPlayer);
 					display_map_position_time();
 					gbl.byte_1EE98 = false;
@@ -1445,23 +1446,28 @@ namespace engine
 					if (gbl.game.Name == Logging.Game.PoolOfRadiance)
 					{
 						gbl.game.DrawFrame_Wilderness();
-						ovr029.RedrawView();
+						await ovr029.RedrawView();
 						PartySummary(gbl.SelectedPlayer);
 						display_map_position_time();
 						gbl.byte_1EE98 = false;
 					}
 					else if (gbl.lastDaxBlockId != 0x50)
 					{
-						ovr029.RedrawView();
+						await ovr029.RedrawView();
 					}
 					break;
 
 				case GameState.AfterCombat:
 					gbl.game.DrawFrame_Dungeon();
-					ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.game.TreasureImage, "PIC", gbl.game_area);
+					await ovr030.load_pic_final(gbl.byte_1D556, 0, gbl.game.TreasureImage, "PIC", gbl.game_area);
 					PartySummary(gbl.SelectedPlayer);
 					break;
+
+                default:
+                    return false;
 			}
+
+            return true;
 		}
 
 		static string direction(int dir)

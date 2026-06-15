@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Classes.Champ
 {
@@ -8,24 +9,26 @@ namespace Classes.Champ
         {
             gbl.import_func[(int)ImportSource.Curse] = Player.LoadPlayer;
         }
-        public override void Load()
+        public override async Task<bool> Load()
         {
             byte[]? pic_data;
-            pic_data = DaxFiles.DaxCache.LoadDax("SKY", 250);
+            pic_data = await DaxFiles.DaxCache.LoadDax("SKY", 250);
             if (pic_data != null && pic_data.Length > 0)
             {
                 gbl.sky_dax_250 = new DaxBlock(pic_data, 1, 13);
             }
-            pic_data = DaxFiles.DaxCache.LoadDax("SKY", 251);
+            pic_data = await DaxFiles.DaxCache.LoadDax("SKY", 251);
             if (pic_data != null && pic_data.Length > 0)
             {
                 gbl.sky_dax_251 = new DaxBlock(pic_data, 1, 13);
             }
-            pic_data = DaxFiles.DaxCache.LoadDax("SKY", 252);
+            pic_data = await DaxFiles.DaxCache.LoadDax("SKY", 252);
             if (pic_data != null && pic_data.Length > 0)
             {
                 gbl.sky_dax_252 = new DaxBlock(pic_data, 1, 13);
             }
+
+            return true;
         }
         public override GameState GameState(byte data)
         {

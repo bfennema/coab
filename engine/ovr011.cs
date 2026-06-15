@@ -1,5 +1,7 @@
 using Classes;
 using System.Collections.Generic;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -1151,7 +1153,7 @@ namespace engine
         }
 
 
-        internal static void BattleSetup() // battle_begins
+        internal static async Task<bool> BattleSetup() // battle_begins
         {
             gbl.DelayBetweenCharacters = false;
 
@@ -1196,12 +1198,14 @@ namespace engine
             ovr025.RedrawCombatScreen();
             foreach (Player player in gbl.TeamList)
             {
-                Affects.Effect.Check(player, CheckType.BattleSetup1);
-                Affects.Effect.Check(player, CheckType.BattleSetup2);
+                await Affects.Effect.Check(player, CheckType.BattleSetup1);
+                await Affects.Effect.Check(player, CheckType.BattleSetup2);
             }
 
             ovr014.calc_enemy_health_percentage();
             gbl.game_state = GameState.Combat;
+
+            return true;
         }
     }
 }

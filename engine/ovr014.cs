@@ -1,11 +1,12 @@
 using Classes;
 using Classes.Combat;
+using System.Threading.Tasks;
 
 namespace engine
 {
     class ovr014
     {
-        internal static void CalculateInitiative(Player player) // sub_3E000
+        internal static async Task<bool> CalculateInitiative(Player player) // sub_3E000
         {
             Action action = player.actions;
 
@@ -15,12 +16,12 @@ namespace engine
             action.field_8 = false;
             action.attackIdx = 2;
 
-            reclac_attacks(player);
+            await reclac_attacks(player);
             gbl.halfActionsLeft = player.baseHalfMoves;
 
             gbl.resetMovesLeft = false;
 
-            Affects.Effect.Check(player, CheckType.Movement);
+            await Affects.Effect.Check(player, CheckType.Movement);
 
             player.attack2_AttacksLeft = (byte)ThisRoundActionCount(gbl.halfActionsLeft);
 
@@ -51,11 +52,13 @@ namespace engine
                 action.delay = 0;
             }
 
-            player.actions.move = CalcMoves(player);
+            player.actions.move = await CalcMoves(player);
+
+            return true;
         }
 
 
-        internal static int CalcMoves(Player player) // sub_3E124
+        internal static async Task<int> CalcMoves(Player player) // sub_3E124
         {
             int moves = player.movement;
 
@@ -73,7 +76,7 @@ namespace engine
 
             gbl.resetMovesLeft = true;
 
-            Affects.Effect.Check(player, CheckType.Movement);
+            await Affects.Effect.Check(player, CheckType.Movement);
 
             gbl.resetMovesLeft = false;
 
@@ -81,7 +84,7 @@ namespace engine
         }
 
 
-        static void sub_3E192(int index, Player target, Player attacker)
+        static async Task<bool> sub_3E192(int index, Player target, Player attacker)
         {
             gbl.damage = ovr024.roll_dice_save(attacker.attackDiceSize(index), attacker.attackDiceCount(index));
             gbl.damage += attacker.attackDamageBonus(index);
@@ -97,8 +100,10 @@ namespace engine
             }
 
             gbl.damage_flags = 0;
-            Affects.Effect.Check(attacker, CheckType.SpecialAttacks);
-            Affects.Effect.Check(target, CheckType.Type_5);
+            await Affects.Effect.Check(attacker, CheckType.SpecialAttacks);
+            await Affects.Effect.Check(target, CheckType.Type_5);
+
+            return true;
         }
 
 
@@ -110,7 +115,7 @@ namespace engine
             Slay = 3
         }
 
-        static void DisplayAttackMessage(bool attackHits, int attackDamge, int actualDamage, AttackType attack, Player target, Player attacker) /* backstab */
+        static async Task<bool> DisplayAttackMessage(bool attackHits, int attackDamge, int actualDamage, AttackType attack, Player target, Player attacker) /* backstab */
         {
             string text;
 
@@ -207,9 +212,9 @@ namespace engine
 
                 line += 2;
 
-                ovr024.RemoveCombatAffects(target);
+                await ovr024.RemoveCombatAffects(target);
 
-                Affects.Effect.Check(target, CheckType.Death);
+                await Affects.Effect.Check(target, CheckType.Death);
 
                 if (target.in_combat == false)
                 {
@@ -224,10 +229,12 @@ namespace engine
             ovr025.ClearPlayerTextArea();
 
             Display.UpdateStart();
+
+            return true;
         }
 
 
-        static void move_step_into_attack(Player target) /* sub_3E65D */
+        static async Task<bool> move_step_into_attack(Player target) /* sub_3E65D */
         {
             var nearTargets = ovr025.BuildNearTargets(1, target);
 
@@ -246,14 +253,15 @@ namespace engine
 
                         RecalcAttacksReceived(target, attacker);
 
-                        AttackTarget(null, 0, target, attacker);
+                        await AttackTarget(null, 0, target, attacker);
                     }
                 }
             }
+            return true;
         }
 
 
-        internal static void sub_3E748(int direction, Player player)
+        internal static async Task<bool> sub_3E748(int direction, Player player)
         {
             int player_index = ovr033.GetPlayerIndex(player);
 
@@ -263,7 +271,7 @@ namespace engine
             // TODO does this solve more problems than it causes? Regarding AI flee
             if (newPos.MapInBounds() == false)
             {
-                return;
+                return false;
             }
 
             int costToMove = 0;
@@ -317,23 +325,24 @@ namespace engine
             player.actions.directionChanges = 0;
             seg044.PlaySound(Sound.sound_a);
 
-            move_step_into_attack(player);
+            await move_step_into_attack(player);
 
             if (player.in_combat == false ||
                 player.IsHeld() == true)
             {
                 player.actions.move = 0;
             }
+            return true;
         }
 
 
-        internal static void move_step_away_attack(int direction, Player player) /* sub_3E954 */
+        internal static async Task<bool> move_step_away_attack(int direction, Player player) /* sub_3E954 */
         {
             var originAttackers = ovr025.BuildNearTargets(1, player);
 
             if (originAttackers.Count == 0)
             {
-                return;
+                return false;
             }
 
             var combatmap = gbl.CombatMap[ovr033.GetPlayerIndex(player)];
@@ -357,7 +366,7 @@ namespace engine
                 //what the heck are we doing here then?
                 // and why is this test not earlier in the function.
                 //throw new System.NotSupportedException();
-                return;
+                return false;
             }
 
             foreach (var cpiA in originAttackers)
@@ -370,7 +379,7 @@ namespace engine
 
                 if (player.health_status == Status.okey && 
                     attacker.IsHeld() == false &&
-                    CanSeeTargetA(player, attacker) == true &&
+                    await CanSeeTargetA(player, attacker) == true &&
                     attacker.HasAffect(Classes.Affects.weap_dragon_slayer) == false &&
                     attacker.HasAffect(Classes.Affects.affect_4a) == false)
                 {
@@ -409,7 +418,7 @@ namespace engine
 
                                 Player backupTarget = attacker.actions.target;
 
-                                AttackTarget(null, 1, player, attacker);
+                                await AttackTarget(null, 1, player, attacker);
                                 found = true;
 
                                 attacker.actions.target = backupTarget;
@@ -424,11 +433,12 @@ namespace engine
                     }
                 }
             }
+            return true;
         }
 
 
 
-        internal static void flee_battle(Player player)
+        internal static async Task<bool> flee_battle(Player player)
         {
             bool gets_away = false;
 
@@ -438,8 +448,8 @@ namespace engine
             }
             else
             {
-                int var_4 = CalcMoves(player) / 2;
-                int var_3 = MaxOppositionMoves(player);
+                int var_4 = await CalcMoves(player) / 2;
+                int var_3 = await MaxOppositionMoves(player);
 
                 if (var_3 < var_4)
                 {
@@ -453,7 +463,7 @@ namespace engine
 
             if (gets_away == true)
             {
-                ovr024.RemoveFromCombat("Got Away", Status.running, player);
+                await ovr024.RemoveFromCombat("Got Away", Status.running, player);
             }
             else
             {
@@ -461,10 +471,11 @@ namespace engine
             }
 
             ovr025.clear_actions(player);
+            return true;
         }
 
 
-        internal static void reclac_attacks(Player player) // sub_3EDD4
+        internal static async Task<bool> reclac_attacks(Player player) // sub_3EDD4
         {
             bool foundRanged = false;
             Item rangedItem = null;
@@ -490,7 +501,7 @@ namespace engine
             }
 
             gbl.resetMovesLeft = false;
-            Affects.Effect.Check(player, CheckType.Movement);
+            await Affects.Effect.Check(player, CheckType.Movement);
 
             int attacks = ThisRoundActionCount(gbl.halfActionsLeft);
 
@@ -518,6 +529,7 @@ namespace engine
             {
                 player.attack1_AttacksLeft = (byte)attacks;
             }
+            return true;
         }
 
 
@@ -532,7 +544,7 @@ namespace engine
         }
 
 
-        internal static bool TrySweepAttack(Player target, Player attacker) // sub_3EF3D
+        internal static async Task<bool> TrySweepAttack(Player target, Player attacker) // sub_3EF3D
         {
             if (attacker.attack1_AttacksLeft < attacker.actions.maxSweapTargets &&
                 target.HitDice == 0 &&
@@ -562,7 +574,7 @@ namespace engine
 
                         attacker.attack1_AttacksLeft = 1;
 
-                        AttackTarget(null, 0, sweeptarget, attacker);
+                        await AttackTarget(null, 0, sweeptarget, attacker);
                     }
 
                     return true;
@@ -573,7 +585,7 @@ namespace engine
         }
 
 
-        internal static bool CanSeeTargetA(Player targetA, Player targetB) //sub_3F143 
+        internal static async Task<bool> CanSeeTargetA(Player targetA, Player targetB) //sub_3F143 
         {
             if (targetA != null)
             {
@@ -589,7 +601,7 @@ namespace engine
 
                     gbl.SelectedPlayer = targetB;
 
-                    Affects.Effect.Check(targetA, CheckType.Visibility);
+                    await Affects.Effect.Check(targetA, CheckType.Visibility);
 
                     gbl.SelectedPlayer = player_bkup;
 
@@ -599,7 +611,7 @@ namespace engine
 
                         targetB.actions.target = targetA;
 
-                        Affects.Effect.Check(targetB, CheckType.None);
+                        await Affects.Effect.Check(targetB, CheckType.None);
 
                         targetB.actions.target = old_target;
                     }
@@ -741,7 +753,7 @@ namespace engine
         }
 
 
-        internal static bool AttackTarget01(Item item, int arg_8, Player target, Player attacker) // sub_3F4EB
+        internal static async Task<bool> AttackTarget01(Item item, int arg_8, Player target, Player attacker) // sub_3F4EB
         {
             int target_ac;
             bool turnComplete = true;
@@ -768,8 +780,8 @@ namespace engine
 
                 gbl.attacksTaken[attacker.actions.attackIdx] += 1;
 
-                DisplayAttackMessage(true, 1, target.hit_point_current + 5, AttackType.Slay, target, attacker);
-                ovr024.remove_invisibility(attacker);
+                await DisplayAttackMessage(true, 1, target.hit_point_current + 5, AttackType.Slay, target, attacker);
+                await ovr024.remove_invisibility(attacker);
 
                 attacker.attack1_AttacksLeft = 0;
                 attacker.attack2_AttacksLeft = 0;
@@ -791,7 +803,7 @@ namespace engine
                 }
 
                 ovr025.reclac_player_values(target);
-                Affects.Effect.Check(target, CheckType.Type_11);
+                await Affects.Effect.Check(target, CheckType.Type_11);
 
                 if (CanBackStabTarget(target, attacker) == true)
                 {
@@ -838,7 +850,7 @@ namespace engine
 
                         gbl.attacksTaken[attackIdx] += 1;
 
-                        if (ovr024.PC_CanHitTarget(target_ac, target, attacker) ||
+                        if (await ovr024.PC_CanHitTarget(target_ac, target, attacker) ||
                             target.IsHeld() == true)
                         {
                             gbl.attacksHit[attackIdx] += 1;
@@ -846,14 +858,14 @@ namespace engine
                             seg044.PlaySound(Sound.sound_attackHeld);
                             hit = true;
                             sub_3E192(attackIdx, target, attacker);
-                            DisplayAttackMessage(true, gbl.damage, gbl.damage, attack_type, target, attacker);
+                            await DisplayAttackMessage(true, gbl.damage, gbl.damage, attack_type, target, attacker);
 
                             if (target.in_combat == true)
                             {
                                 if (attackIdx == 1)
-                                    Affects.Effect.Check(attacker, CheckType.PostHit1_Damage);
+                                    await Affects.Effect.Check(attacker, CheckType.PostHit1_Damage);
                                 else if (attackIdx == 2)
-                                    Affects.Effect.Check(attacker, CheckType.PostHit2_Damage);
+                                    await Affects.Effect.Check(attacker, CheckType.PostHit2_Damage);
                             }
 
                             if (target.in_combat == false)
@@ -880,7 +892,7 @@ namespace engine
                 if (hit == false)
                 {
                     seg044.PlaySound(Sound.sound_9);
-                    DisplayAttackMessage(false, 0, 0, attack_type, target, attacker);
+                    await DisplayAttackMessage(false, 0, 0, attack_type, target, attacker);
                 }
 
                 turnComplete = true;
@@ -924,7 +936,7 @@ namespace engine
         }
 
 
-        internal static bool AttackTarget(Item rangedWeapon, int attackType, Player target, Player attacker) // sub_3F9DB
+        internal static async Task<bool> AttackTarget(Item rangedWeapon, int attackType, Player target, Player attacker) // sub_3F9DB
         {
             int dir = 0;
 
@@ -984,7 +996,7 @@ namespace engine
 
                 gbl.SelectedPlayer = attacker;
 
-                turnComplete = AttackTarget01(rangedWeapon, attackType, target, attacker);
+                turnComplete = await AttackTarget01(rangedWeapon, attackType, target, attacker);
 
                 if (rangedWeapon != null)
                 {
@@ -1121,14 +1133,14 @@ namespace engine
             Classes.Affects.helpless
         };
 
-        internal static bool sub_4001C(DownedPlayerTile arg_0, bool canTargetEmptyGround, QuickFight quick_fight, Spells spellId)
+        internal static async Task<bool> sub_4001C(DownedPlayerTile arg_0, bool canTargetEmptyGround, QuickFight quick_fight, Spells spellId)
         {
             bool var_2 = false;
             if (quick_fight == QuickFight.False)
             {
                 bool allowTarget = spellId != Spells.dimension_door;
 
-                var_2 = aim_menu(arg_0, allowTarget, canTargetEmptyGround, false, ovr023.SpellRange(spellId), gbl.SelectedPlayer);
+                var_2 = await aim_menu(arg_0, allowTarget, canTargetEmptyGround, false, ovr023.SpellRange(spellId), gbl.SelectedPlayer);
                 gbl.SelectedPlayer.actions.target = arg_0.target;
             }
             else if (gbl.spellCastingTable[(byte)spellId].targetsEnemy == 0)
@@ -1150,7 +1162,7 @@ namespace engine
                 {
                     bool var_3 = true;
 
-                    if (find_target(true, 0, ovr023.SpellRange(spellId), gbl.SelectedPlayer) == true)
+                    if (await find_target(true, 0, ovr023.SpellRange(spellId), gbl.SelectedPlayer) == true)
                     {
                         Player target = gbl.SelectedPlayer.actions.target;
 
@@ -1190,7 +1202,7 @@ namespace engine
             return var_2;
         }
 
-        internal static bool target(QuickFight quick_fight, Spells spellId)
+        internal static async Task<bool> target(QuickFight quick_fight, Spells spellId)
         {
             DownedPlayerTile var_C = new DownedPlayerTile();
 
@@ -1227,7 +1239,7 @@ namespace engine
 
                 do
                 {
-                    if (sub_4001C(var_C, false, quick_fight, spellId) == true)
+                    if (await sub_4001C(var_C, false, quick_fight, spellId) == true)
                     {
                         bool found = gbl.spellTargets.Exists(st => st == var_C.target);
 
@@ -1304,7 +1316,7 @@ namespace engine
             }
             else if (area == 15)
             {
-                if (sub_4001C(var_C, false, quick_fight, spellId) == true)
+                if (await sub_4001C(var_C, false, quick_fight, spellId) == true)
                 {
                     if (gbl.SelectedPlayer.actions.target != null)
                     {
@@ -1332,7 +1344,7 @@ namespace engine
             }
             else if (area >= 8 && area <= 14)
             {
-                if (sub_4001C(var_C, true, quick_fight, spellId) == true)
+                if (await sub_4001C(var_C, true, quick_fight, spellId) == true)
                 {
                     var scl = ovr032.Rebuild_SortedCombatantList(1, gbl.spellCastingTable[(byte)spellId].effectArea & 0x03, gbl.targetPos, sc => true);
 
@@ -1356,7 +1368,7 @@ namespace engine
 
                 while (max_targets > 0)
                 {
-                    if (sub_4001C(var_C, false, quick_fight, spellId) == true)
+                    if (await sub_4001C(var_C, false, quick_fight, spellId) == true)
                     {
                         bool found = gbl.spellTargets.Exists(st => st == var_C.target);
 
@@ -1400,12 +1412,12 @@ namespace engine
         }
 
 
-        internal static void spell_menu3(out bool casting_spell, QuickFight quick_fight, Spells spell_id)
+        internal static async Task<bool> spell_menu3(QuickFight quick_fight, Spells spell_id)
         {
             Player player = gbl.SelectedPlayer;
             bool var_6 = true;
             int var_5 = -1;
-            casting_spell = false;
+            bool casting_spell = false;
 
             if (spell_id == 0)
             {
@@ -1435,7 +1447,7 @@ namespace engine
 
                 if (delay == 0)
                 {
-                    ovr023.sub_5D2E1(true, quick_fight, spell_id);
+                    await ovr023.sub_5D2E1(true, quick_fight, spell_id);
 
                     casting_spell = true;
                     ovr025.clear_actions(player);
@@ -1457,6 +1469,7 @@ namespace engine
                     }
                 }
             }
+            return casting_spell;
         }
 
 
@@ -1726,7 +1739,7 @@ namespace engine
         }
 
 
-        internal static int MaxOppositionMoves(Player player) // sub_40E8F
+        internal static async Task<int> MaxOppositionMoves(Player player) // sub_40E8F
         {
             int maxMoves = 0;
 
@@ -1734,7 +1747,7 @@ namespace engine
             {
                 if (player.OppositeTeam() == mob.combat_team && mob.in_combat == true)
                 {
-                    int moves = CalcMoves(mob) / 2;
+                    int moves = await CalcMoves(mob) / 2;
 
                     maxMoves = System.Math.Max(moves, maxMoves);
                 }
@@ -1833,7 +1846,7 @@ namespace engine
         }
 
 
-        internal static bool sub_411D8(DownedPlayerTile arg_0, bool showRange, Player target, Player attacker)
+        internal static async Task<bool> sub_411D8(DownedPlayerTile arg_0, bool showRange, Player target, Player attacker)
         {
             bool arg_4 = true;
 
@@ -1853,7 +1866,7 @@ namespace engine
 
                 if (showRange)
                 {
-                    if (TrySweepAttack(target, attacker) == true)
+                    if (await TrySweepAttack(target, attacker) == true)
                     {
                         arg_4 = true;
                         ovr025.clear_actions(attacker);
@@ -1872,7 +1885,7 @@ namespace engine
                             rangedWeapon = null;
                         }
 
-                        arg_4 = AttackTarget(rangedWeapon, 0, target, attacker);
+                        arg_4 = await AttackTarget(rangedWeapon, 0, target, attacker);
                     }
                 }
             }
@@ -1886,7 +1899,7 @@ namespace engine
 
         static Set asc_41342 = new Set(0, 69, 84);
 
-        internal static bool Target(DownedPlayerTile arg_0, bool allowTarget, bool canTargetEmptyGround, bool showRange, int maxRange, Player target, Player player01)
+        internal static async Task<bool> Target(DownedPlayerTile arg_0, bool allowTarget, bool canTargetEmptyGround, bool showRange, int maxRange, Player target, Player player01)
         {
             Item dummyItem;
 
@@ -1972,7 +1985,7 @@ namespace engine
 
                 if (target != null)
                 {
-                    if (CanSeeTargetA(target, player01) == false ||
+                    if (await CanSeeTargetA(target, player01) == false ||
                         allowTarget == false)
                     {
                         can_target = false;
@@ -2029,7 +2042,7 @@ namespace engine
 
                             if (showRange)
                             {
-                                arg_4 = sub_411D8(arg_0, showRange, arg_0.target, player01);
+                                arg_4 = await sub_411D8(arg_0, showRange, arg_0.target, player01);
                             }
                             else
                             {
@@ -2148,7 +2161,7 @@ namespace engine
         static Set unk_41B05 = new Set(71, 72, 73, 75, 77, 79, 80, 81);
 
 
-        internal static bool aim_menu(DownedPlayerTile arg_0, bool allowTarget, bool canTargetEmptyGround, bool showRange, int maxRange, Player attacker) /* sub_41B25 */
+        internal static async Task<bool> aim_menu(DownedPlayerTile arg_0, bool allowTarget, bool canTargetEmptyGround, bool showRange, int maxRange, Player attacker) /* sub_41B25 */
         {
             Player target; /* var_E5 */
 
@@ -2191,7 +2204,7 @@ namespace engine
 
             while (arg_4 == false && unk_41AE5.MemberOf(input) == false)
             {
-                if (CanSeeTargetA(target, attacker) == false)
+                if (await CanSeeTargetA(target, attacker) == false)
                 {
                     target = step_combat_list(false, next_prev_step, ref list_index, ref attackerPos, sorted_list);
                 }
@@ -2220,7 +2233,7 @@ namespace engine
                             case 'O':
                             case 'Q':
                             case 'I':
-                                arg_4 = Target(arg_0, allowTarget, canTargetEmptyGround, showRange, maxRange, target, attacker);
+                                arg_4 = await Target(arg_0, allowTarget, canTargetEmptyGround, showRange, maxRange, target, attacker);
                                 ovr025.load_missile_dax(false, 0, 0, 0x19);
 
                                 sorted_list = copy_sorted_players(attacker);
@@ -2228,7 +2241,7 @@ namespace engine
                                 break;
 
                             case 'T':
-                                arg_4 = sub_411D8(arg_0, showRange, target, attacker);
+                                arg_4 = await sub_411D8(arg_0, showRange, target, attacker);
                                 ovr025.load_missile_dax(false, 0, 0, 0x19);
 
                                 sorted_list = copy_sorted_players(attacker);
@@ -2243,7 +2256,7 @@ namespace engine
                     }
                     else if (unk_41B05.MemberOf(input) == true)
                     {
-                        arg_4 = Target(arg_0, allowTarget, canTargetEmptyGround, showRange, maxRange, target, attacker);
+                        arg_4 = await Target(arg_0, allowTarget, canTargetEmptyGround, showRange, maxRange, target, attacker);
                         ovr025.load_missile_dax(false, 0, 0, 0x19);
                         sorted_list = copy_sorted_players(attacker);
                         target_step = 0;
@@ -2265,7 +2278,7 @@ namespace engine
         }
 
 
-        internal static bool find_target(bool clear_target, byte arg_2, int max_range, Player player) /* sub_41E44 */
+        internal static async Task<bool> find_target(bool clear_target, byte arg_2, int max_range, Player player) /* sub_41E44 */
         {
             bool target_found = false;
 
@@ -2275,7 +2288,7 @@ namespace engine
                  (target != null &&
                    (target.combat_team == player.combat_team ||
                     target.in_combat == false ||
-                    CanSeeTargetA(target, player) == false)))
+                    await CanSeeTargetA(target, player) == false)))
             {
                 player.actions.target = null;
             }
@@ -2308,7 +2321,7 @@ namespace engine
                     target = epi.player;
 
                     if ((arg_2 != 0 && gbl.mapToBackGroundTile.ignoreWalls == true) ||
-                        CanSeeTargetA(target, player) == true)
+                        await CanSeeTargetA(target, player) == true)
                     {
                         target_found = true;
                         player.actions.target = target;
@@ -2331,7 +2344,7 @@ namespace engine
         }
 
 
-        internal static void AffectEngulf(Effect arg_0, object param, Player attacker)
+        internal static async Task<bool> AffectEngulf(Effect arg_0, object param, Player attacker)
         {
             Player target = attacker.actions.target;
 
@@ -2344,9 +2357,15 @@ namespace engine
                 ovr025.DisplayPlayerStatusString(true, 12, "engulfs " + target.name, attacker);
                 ovr024.add_affect(false, ovr033.GetPlayerIndex(target), 0, Classes.Affects.clear_movement, target);
 
-                Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.clear_movement);
+                await Affects.Effect.Call(Effect.Add, null, target, Classes.Affects.clear_movement);
                 ovr024.add_affect(false, ovr024.roll_dice(4, 2), 0, Classes.Affects.reduce, target);
                 ovr024.add_affect(true, ovr033.GetPlayerIndex(target), 0, Classes.Affects.affect_8b, attacker);
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -2359,11 +2378,11 @@ namespace engine
         }
 
 
-        internal static bool sub_421C1(bool clear_target, ref int range, Player player) // sub_421C1
+        internal static async Task<(bool, int)> sub_421C1(bool clear_target, int range, Player player) // sub_421C1
         {
             bool var_5 = true;
 
-            if (find_target(clear_target, 0, 0xff, player) == true)
+            if (await find_target(clear_target, 0, 0xff, player) == true)
             {
                 var target = ovr033.PlayerMapPos(player.actions.target);
 
@@ -2373,11 +2392,11 @@ namespace engine
                 }
             }
 
-            return var_5;
+            return (var_5, range);
         }
 
 
-        internal static void beholder_eyestalk(Effect arg_0, object param, Player attacker)
+        internal static async Task<bool> beholder_eyestalk(Effect arg_0, object param, Player attacker)
         {
             int range = 0xFF; /* simeon */
 
@@ -2385,7 +2404,7 @@ namespace engine
             int attackTiresLeft = 4;
 
             attacker.actions.target = null;
-            sub_421C1(true, ref range, attacker);
+            (_, range) = await sub_421C1(true, range, attacker);
 
             do
             {
@@ -2403,12 +2422,12 @@ namespace engine
                         ovr025.DisplayPlayerStatusString(true, 10, "fires a disintegrate ray", attacker);
                         LoadMissleIconAndDraw(5, target, attacker);
 
-                        if (ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, target) == false)
+                        if (await ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, target) == false)
                         {
-                            ovr024.KillPlayer("is disintergrated", Status.gone, target);
+                            await ovr024.KillPlayer("is disintergrated", Status.gone, target);
                         }
 
-                        sub_421C1(false, ref range, attacker);
+                        (_, range) = await sub_421C1(false, range, attacker);
                     }
                     else if (range == 3 && (attacksTired & 2) == 0)
                     {
@@ -2417,12 +2436,12 @@ namespace engine
                         ovr025.DisplayPlayerStatusString(true, 10, "fires a stone to flesh ray", attacker);
                         LoadMissleIconAndDraw(10, target, attacker);
 
-                        if (ovr024.RollSavingThrow(0, SaveVerseType.Petrification, target) == false)
+                        if (await ovr024.RollSavingThrow(0, SaveVerseType.Petrification, target) == false)
                         {
-                            ovr024.KillPlayer("is Stoned", Status.stoned, target);
+                            await ovr024.KillPlayer("is Stoned", Status.stoned, target);
                         }
 
-                        sub_421C1(false, ref range, attacker);
+                        (_, range) = await sub_421C1(false, range, attacker);
                     }
                     else if (range == 4 && (attacksTired & 4) == 0)
                     {
@@ -2431,12 +2450,12 @@ namespace engine
                         ovr025.DisplayPlayerStatusString(true, 10, "fires a death ray", attacker);
                         LoadMissleIconAndDraw(5, target, attacker);
 
-                        if (ovr024.RollSavingThrow(0, 0, target) == false)
+                        if (await ovr024.RollSavingThrow(0, 0, target) == false)
                         {
-                            ovr024.KillPlayer("is killed", Status.dead, target);
+                            await ovr024.KillPlayer("is killed", Status.dead, target);
                         }
 
-                        sub_421C1(false, ref range, attacker);
+                        (_, range) = await sub_421C1(false, range, attacker);
                     }
                     else if (range == 5 && (attacksTired & 8) == 0)
                     {
@@ -2445,30 +2464,32 @@ namespace engine
                         ovr025.DisplayPlayerStatusString(true, 10, "wounds you", attacker);
                         LoadMissleIconAndDraw(5, target, attacker);
 
-                        ovr024.damage_person(false, 0, ovr024.roll_dice_save(8, 2) + 1, target);
-                        sub_421C1(false, ref range, attacker);
+                        await ovr024.damage_person(false, 0, ovr024.roll_dice_save(8, 2) + 1, target);
+                        (_, range) = await sub_421C1(false, range, attacker);
                     }
                     else if ((attacksTired & 0x10) == 0)
                     {
-                        ovr023.sub_5D2E1(true, QuickFight.True, Spells.fear);
+                        await ovr023.sub_5D2E1(true, QuickFight.True, Spells.fear);
                         attacksTired |= 0x10;
                     }
                     else if ((attacksTired & 0x20) == 0)
                     {
-                        ovr023.sub_5D2E1(true, QuickFight.True, Spells.slow);
+                        await ovr023.sub_5D2E1(true, QuickFight.True, Spells.slow);
                         attacksTired |= 0x20;
                     }
                     else if ((attacksTired & 0x40) == 0)
                     {
-                        ovr023.sub_5D2E1(true, QuickFight.True, Spells.sleep);
+                        await ovr023.sub_5D2E1(true, QuickFight.True, Spells.sleep);
                         attacksTired |= 0x40;
                     }
                 }
             } while (attackTiresLeft > 0 && attacker.actions.target != null);
+
+            return true;
         }
 
 
-        internal static void sub_425C6(Effect add_remove, object param, Player player)
+        internal static async Task<bool> sub_425C6(Effect add_remove, object param, Player player)
         {
             Affect affect = (Affect)param;
 
@@ -2478,14 +2499,14 @@ namespace engine
                 player.in_combat == false ||
                 gbl.spell_target.in_combat == false)
             {
-                ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
-                ovr024.remove_affect(null, Classes.Affects.reduce, gbl.spell_target);
+                await ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
+                await ovr024.remove_affect(null, Classes.Affects.reduce, gbl.spell_target);
 
                 if (add_remove == Effect.Add)
                 {
                     affect.callAffectTable = false;
 
-                    ovr024.remove_affect(affect, Classes.Affects.affect_8b, player);
+                    await ovr024.remove_affect(affect, Classes.Affects.affect_8b, player);
                 }
             }
             else
@@ -2495,21 +2516,22 @@ namespace engine
                 player.attack1_DiceCount = 2;
                 player.attack1_DiceSize = 8;
 
-                AttackTarget(null, 1, gbl.spell_target, player);
+                await AttackTarget(null, 1, gbl.spell_target, player);
 
                 ovr025.clear_actions(player);
 
                 if (gbl.spell_target.in_combat == false)
                 {
-                    ovr024.remove_affect(null, Classes.Affects.affect_8b, player);
-                    ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
-                    ovr024.remove_affect(null, Classes.Affects.reduce, gbl.spell_target);
+                    await ovr024.remove_affect(null, Classes.Affects.affect_8b, player);
+                    await ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
+                    await ovr024.remove_affect(null, Classes.Affects.reduce, gbl.spell_target);
                 }
             }
+            return true;
         }
 
 
-        internal static void AffectOwlbearHugRoundAttack(Effect arg_0, object param, Player player) // sub_426FC
+        internal static async Task<bool> AffectOwlbearHugRoundAttack(Effect arg_0, object param, Player player) // sub_426FC
         {
             Affect affect = (Affect)param;
 
@@ -2519,11 +2541,11 @@ namespace engine
                 player.in_combat == false ||
                 gbl.spell_target.in_combat == false)
             {
-                ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
+                await ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
                 if (arg_0 == Effect.Add)
                 {
                     affect.callAffectTable = false;
-                    ovr024.remove_affect(affect, Classes.Affects.owlbear_hug_round_attack, player);
+                    await ovr024.remove_affect(affect, Classes.Affects.owlbear_hug_round_attack, player);
                 }
             }
             else
@@ -2534,20 +2556,21 @@ namespace engine
                 player.attack1_DiceSize = 8;
 
 
-                AttackTarget(null, 2, gbl.spell_target, player);
+                await AttackTarget(null, 2, gbl.spell_target, player);
 
                 ovr025.clear_actions(player);
 
                 if (gbl.spell_target.in_combat == false)
                 {
-                    ovr024.remove_affect(null, Classes.Affects.owlbear_hug_round_attack, player);
-                    ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
+                    await ovr024.remove_affect(null, Classes.Affects.owlbear_hug_round_attack, player);
+                    await ovr024.remove_affect(null, Classes.Affects.clear_movement, gbl.spell_target);
                 }
             }
+            return true;
         }
 
 
-        internal static void AffectOwlbearHugAttackCheck(Effect arg_0, object param, Player player) // hugs
+        internal static async Task<bool> AffectOwlbearHugAttackCheck(Effect arg_0, object param, Player player) // hugs
         {
             if (gbl.attack_roll >= 18)
             {
@@ -2555,9 +2578,14 @@ namespace engine
                 ovr025.DisplayPlayerStatusString(true, 12, "hugs " + gbl.spell_target.name, player);
 
                 ovr024.add_affect(false, ovr033.GetPlayerIndex(gbl.spell_target), 0, Classes.Affects.clear_movement, gbl.spell_target);
-                Affects.Effect.Call(Effect.Add, null, gbl.spell_target, Classes.Affects.clear_movement);
+                await Affects.Effect.Call(Effect.Add, null, gbl.spell_target, Classes.Affects.clear_movement);
 
                 ovr024.add_affect(true, ovr033.GetPlayerIndex(gbl.spell_target), 0, Classes.Affects.owlbear_hug_round_attack, player);
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

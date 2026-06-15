@@ -1,4 +1,5 @@
 using Classes;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -313,7 +314,7 @@ namespace engine
         }
 
 
-        internal static void MovePartyForward() /* sub_43813 */
+        internal static async Task<bool> MovePartyForward() /* sub_43813 */
         {
             seg044.PlaySound(Sound.sound_a);
             seg049.SysDelay(50);
@@ -334,16 +335,17 @@ namespace engine
 
             if ((gbl.area2_ptr.search_flags & 1) > 0)
             {
-                ovr021.step_game_time(2, 1);
+                await ovr021.step_game_time(2, 1);
             }
             else
             {
-                ovr021.step_game_time(1, 1);
+                await ovr021.step_game_time(1, 1);
             }
+            return true;
         }
 
 
-        internal static char main_3d_world_menu() /* sub_438DF */
+        internal static async Task<char> main_3d_world_menu() /* sub_438DF */
         {
             char input_key = '\0'; /* simeon */
 
@@ -381,13 +383,13 @@ namespace engine
                                 if (gbl.SelectedPlayer.health_status == Status.okey)
                                 {
                                     gbl.menuSelectedWord = 1;
-                                    ovr016.cast_spell();
+                                    await ovr016.cast_spell();
                                 }
                                 break;
 
                             case 'V':
                                 gbl.menuSelectedWord = 1;
-                                ovr020.viewPlayer();
+                                await ovr020.viewPlayer();
                                 break;
 
                             case 'E':
@@ -401,7 +403,7 @@ namespace engine
 
                             case 'L':
                                 gbl.area2_ptr.search_flags |= 2;
-                                ovr021.step_game_time(2, 1);
+                                await ovr021.step_game_time(2, 1);
                                 gbl.ecl_offset = gbl.SearchLocationAddr;
                                 stop_loop = true;
                                 break;
@@ -469,13 +471,13 @@ namespace engine
                                 if (gbl.SelectedPlayer.health_status == Status.okey)
                                 {
                                     gbl.menuSelectedWord = 1;
-                                    ovr016.cast_spell();
+                                    await ovr016.cast_spell();
                                 }
                                 break;
 
                             case 'V':
                                 gbl.menuSelectedWord = 1;
-                                ovr020.viewPlayer();
+                                await ovr020.viewPlayer();
                                 break;
 
                             case 'E':
@@ -489,7 +491,7 @@ namespace engine
 
                             case 'L':
                                 gbl.area2_ptr.search_flags |= 2;
-                                ovr021.step_game_time(2, 1);
+                                await ovr021.step_game_time(2, 1);
                                 gbl.ecl_offset = gbl.SearchLocationAddr;
                                 stop_loop = true;
                                 break;
@@ -542,7 +544,7 @@ namespace engine
         }
 
 
-        internal static void locked_door()
+        internal static async Task<bool> locked_door()
         {
             char input;
             bool var_2;
@@ -650,7 +652,7 @@ namespace engine
 
                     if (var_1 == true)
                     {
-                        MovePartyForward();
+                        await MovePartyForward();
                     }
 
                     ovr025.display_map_position_time();
@@ -659,6 +661,7 @@ namespace engine
                 {
                     gbl.area2_ptr.field_592 = 0;
                 }
+                return true;
             }
 
             ovr030.DaxArrayFreeDaxBlocks(gbl.byte_1D556);
@@ -667,6 +670,8 @@ namespace engine
             gbl.bodyX_dax = null;
             gbl.current_head_id = 0xFF;
             gbl.current_body_id = 0xFF;
+
+            return true;
         }
     }
 }

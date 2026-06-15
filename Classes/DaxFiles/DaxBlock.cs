@@ -93,8 +93,10 @@ namespace Classes
             }
         }
 
-        public void MergeIcons(DaxBlock srcIcon) /* icon_xx, could be implemented using alpha-blending */
+        public void MergeIcons(DaxBlock? srcIcon) /* icon_xx, could be implemented using alpha-blending */
         {
+            ArgumentNullException.ThrowIfNull(srcIcon);
+
             for (int i = 0; i < srcIcon.bpp; i++)
             {
                 byte a = data[i];

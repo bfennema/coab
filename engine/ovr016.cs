@@ -1,5 +1,6 @@
 using Classes;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -156,7 +157,7 @@ namespace engine
         }
 
 
-        internal static void cast_spell()
+        internal static async Task<bool> cast_spell()
         {
             bool redraw = false;
 
@@ -180,7 +181,7 @@ namespace engine
                         redraw = true;
                         seg037.draw8x8_clear_area(TextRegion.NormalBottom);
 
-                        ovr023.sub_5D2E1(true, QuickFight.False, spell_id);
+                        await ovr023.sub_5D2E1(true, QuickFight.False, spell_id);
                     }
                     else if (var_3 == true)
                     {
@@ -195,8 +196,10 @@ namespace engine
 
             if (redraw == true)
             {
-                ovr025.LoadPic();
+                await ovr025.LoadPic();
             }
+
+            return true;
         }
 
 
@@ -271,7 +274,7 @@ namespace engine
         }
 
 
-        internal static bool rest_menu()
+        internal static async Task<bool> rest_menu()
         {
             int max_rest_time = 0;
             foreach (Player player in gbl.TeamList)
@@ -288,7 +291,7 @@ namespace engine
             gbl.timeToRest.field_4 = (ushort)((max_rest_time - (gbl.timeToRest.field_6 * 60)) / 10);
             gbl.timeToRest.field_2 = (ushort)(max_rest_time % 10);
 
-            bool action_interrupted = ovr021.resting(true);
+            bool action_interrupted = await ovr021.resting(true);
 
             gbl.timeToRest.Clear();
 
@@ -298,7 +301,7 @@ namespace engine
         }
 
 
-        internal static void memorize_spell()
+        internal static async Task<bool> memorize_spell()
         {
             bool var_2;
 
@@ -368,13 +371,15 @@ namespace engine
 
                 if (redraw == true)
                 {
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                 }
             }
+
+            return true;
         }
 
 
-        internal static void scribe_spell()
+        internal static async Task<bool> scribe_spell()
         {
             bool redraw;
             bool var_2;
@@ -493,9 +498,11 @@ namespace engine
 
                 if (redraw)
                 {
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                 }
             }
+
+            return true;
         }
 
         static Dictionary<Classes.Affects, string> EffectNameMap = new Dictionary<Classes.Affects, string>();
@@ -583,7 +590,7 @@ namespace engine
         }
 
 
-        static void DisplayMagicEffects()
+        static async Task<bool> DisplayMagicEffects()
         {
             List<MenuItem> var_C = new List<MenuItem>();
 
@@ -623,11 +630,13 @@ namespace engine
                 0x16, 0x26, 4, 1, new MenuColorSet(15, 10, 11), string.Empty, string.Empty);
 
             var_C.Clear();
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
+
+            return true;
         }
 
 
-        internal static bool magic_menu()
+        internal static async Task<bool> magic_menu()
         {
             char inputKey = ' ';
             bool actionInterrupted = false;
@@ -647,23 +656,23 @@ namespace engine
                     switch (inputKey)
                     {
                         case 'C':
-                            cast_spell();
+                            await cast_spell();
                             break;
 
                         case 'M':
-                            memorize_spell();
+                            await memorize_spell();
                             break;
 
                         case 'S':
-                            scribe_spell();
+                            await scribe_spell();
                             break;
 
                         case 'D':
-                            DisplayMagicEffects();
+                            await DisplayMagicEffects();
                             break;
 
                         case 'R':
-                            actionInterrupted = rest_menu();
+                            actionInterrupted = await rest_menu();
                             break;
                     }
                 }
@@ -860,7 +869,7 @@ namespace engine
 
         static Set AlterSet = new Set(0, 69);
 
-        internal static void alter_menu()
+        internal static async Task<bool> alter_menu()
         {
             char inputKey = ' ';
 
@@ -892,14 +901,14 @@ namespace engine
 
                         case 'I':
                             ovr018.icon_builder();
-                            ovr025.LoadPic();
+                            await ovr025.LoadPic();
                             break;
                     }
                 }
             }
+
+            return true;
         }
-
-
 
         static int CalculateInitialHealing() // sub_45F22
         {
@@ -1033,7 +1042,7 @@ namespace engine
         }
 
 
-        static void DoTeamHealing(ref int healingAvailable) //sub_46280
+        static async Task<int> DoTeamHealing(int healingAvailable) //sub_46280
         {
             foreach (Player player in gbl.TeamList)
             {
@@ -1052,17 +1061,18 @@ namespace engine
                     }
 
                     if (damge_taken > 0 &&
-                        ovr024.heal_player(0, damge_taken, player) == true &&
+                        await ovr024.heal_player(0, damge_taken, player) == true &&
                         damge_taken <= healingAvailable)
                     {
                         healingAvailable -= damge_taken;
                     }
                 }
             }
+            return healingAvailable;
         }
 
 
-        static bool FixTeam() // fix_menu
+        static async Task<bool> FixTeam() // fix_menu
         {
             bool action_interrupted = false;
 
@@ -1084,12 +1094,12 @@ namespace engine
                     int numCureLight;
                     CalculateTimeAndSpellNumbers(out numCureCritical, out numCureSerious, out numCureLight);
 
-                    action_interrupted = ovr021.resting(false);
+                    action_interrupted = await ovr021.resting(false);
 
                     if (action_interrupted == false)
                     {
                         CalculateHealing(ref healingAvailable, numCureLight, numCureSerious, numCureCritical);
-                        DoTeamHealing(ref healingAvailable);
+                        healingAvailable = await DoTeamHealing(healingAvailable);
 
                         ovr025.PartySummary(gbl.SelectedPlayer);
                         ovr025.display_map_position_time();
@@ -1107,7 +1117,7 @@ namespace engine
         /// <summary>
         /// Does Camp menu, returns if interrupted
         /// </summary>
-        internal static bool MakeCamp() // make_camp
+        internal static async Task<bool> MakeCamp() // make_camp
         {
             gbl.last_game_state = gbl.game_state;
             gbl.game_state = GameState.Camping;
@@ -1118,7 +1128,7 @@ namespace engine
             gbl.byte_1D5AB = gbl.lastDaxFile;
             gbl.byte_1D5B5 = gbl.lastDaxBlockId;
 
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
             seg037.draw8x8_clear_area(TextRegion.NormalBottom);
 
             seg041.displayString("The party makes camp...", 0, 10, 18, 1);
@@ -1142,7 +1152,7 @@ namespace engine
                     switch (input_key)
                     {
                         case 'S':
-                            ovr017.SaveGame();
+                            await ovr017.SaveGame();
                             if (ovr027.yes_no(gbl.alertMenuColors, "Quit TO DOS ") == 'Y')
                             {
                                 seg043.print_and_exit();
@@ -1152,26 +1162,26 @@ namespace engine
 
                         case 'V':
                             gbl.menuSelectedWord = 1;
-                            ovr020.viewPlayer();
+                            await ovr020.viewPlayer();
                             break;
 
                         case 'M':
                             gbl.menuSelectedWord = 1;
-                            actionInterrupted = magic_menu();
+                            actionInterrupted = await magic_menu();
                             break;
 
                         case 'R':
                             gbl.menuSelectedWord = 1;
-                            actionInterrupted = rest_menu();
+                            actionInterrupted = await rest_menu();
                             break;
 
                         case 'F':
-                            actionInterrupted = FixTeam();
+                            actionInterrupted = await FixTeam();
                             break;
 
                         case 'A':
                             gbl.menuSelectedWord = 1;
-                            alter_menu();
+                            await alter_menu();
                             break;
                     }
                 }
@@ -1179,7 +1189,7 @@ namespace engine
 
             if (seg051.Copy(3, 1, gbl.byte_1D5AB) == "PIC")
             {
-                ovr030.load_pic_final(ref gbl.byte_1D556, 0, gbl.byte_1D5B5, gbl.byte_1D5AB, gbl.game_area);
+                await ovr030.load_pic_final(gbl.byte_1D556, 0, gbl.byte_1D5B5, gbl.byte_1D5AB, gbl.game_area);
             }
 
             cancel_spells();

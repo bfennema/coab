@@ -1,5 +1,6 @@
 using Classes;
 using Classes.Combat;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -34,7 +35,7 @@ namespace engine
             seg044.SoundInit(resourceName);
         }
 
-        public static void PROGRAM()
+        public static async Task<bool> PROGRAM()
         {
             /* Memory Init - Start */
             gbl.CombatMap = new CombatantMap[gbl.MaxCombatantCount + 1]; /* God damm 1-n arrays */
@@ -50,7 +51,7 @@ namespace engine
             {
                 if (gbl.Exit == true)
                 {
-                    return;
+                    return false;
                 }
                 seg041.GameDelay();
             }
@@ -59,7 +60,7 @@ namespace engine
 
             gbl.game = gbl.games[(int)Logging.Config.Game];
 
-            InitFirst();
+            await InitFirst();
 
             ItemLibrary.Read();
 
@@ -120,15 +121,15 @@ namespace engine
             //}
             //Logging.Logger.Debug("");
 
-            Classes.Debug.AddBreakpoint(0x9A18);
-            Classes.Debug.AddBreakpoint(0x9A36);
-            Classes.Debug.AddBreakpoint(0x9964);
+            //Classes.Debug.AddBreakpoint(0x9A18);
+            //Classes.Debug.AddBreakpoint(0x9A36);
+            //Classes.Debug.AddBreakpoint(0x9964);
 
-            gbl.game.Load();
+            await gbl.game.Load();
 
             if (Cheats.skip_title_screen == false)
             {
-                ovr002.title_screen();
+                await ovr002.title_screen();
             }
 
             string demoString = gbl.game.DemoString;
@@ -174,20 +175,20 @@ namespace engine
 
                 if (gbl.inDemo == false)
                 {
-                    ovr018.startGameMenu();
+                    await ovr018.startGameMenu();
                     if (gbl.Exit == true)
                     {
-                        return;
+                        return false;
                     }
                 }
 
-                ovr003.sub_29758();
+                await ovr003.sub_29758();
 
                 InitAgain();
 
                 if (gbl.inDemo == true)
                 {
-                    ovr002.title_screen();
+                    await ovr002.title_screen();
                     seg043.clear_keyboard();
 
                     demoString = gbl.game.DemoString;
@@ -219,9 +220,11 @@ namespace engine
                     seg044.PlaySound(Sound.sound_0);
                 }
             }
+
+            return true;
         }
 
-        static void InitFirst() /* sub_39054 */
+        static async Task<bool> InitFirst() /* sub_39054 */
         {
             seg051.Randomize();
 
@@ -242,7 +245,7 @@ namespace engine
 
             ovr016.BuildEffectNameMap();
 
-            gbl.cmd_ops.Init(ovr008.vm_GetMemoryValue);
+            gbl.cmd_ops.Init(Vm.GetMemoryValue);
 
             gbl.cursor_bkup = new DaxBlock(0, 1, 1, 8);
             gbl.cursor = new DaxBlock(0, 1, 1, 8);
@@ -359,24 +362,26 @@ namespace engine
             gbl.sky_dax_252 = null;
             gbl.gameWon = false;
             gbl.worldIcon = 0;
-            seg041.Load8x8Tiles();
+            await seg041.Load8x8Tiles();
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-            ovr038.Load8x8D(4, 202);
-            ovr038.Load8x8D(0, 203);
+            await ovr038.Load8x8D(4, 202);
+            await ovr038.Load8x8D(0, 203);
 
             for (gbl.byte_1AD44 = 0; gbl.byte_1AD44 <= 0x0b; gbl.byte_1AD44++)
             {
-                ovr034.chead_cbody_comspr_icon((byte)(gbl.byte_1AD44 + 0x0D), gbl.byte_1AD44, "COMSPR");
+                await ovr034.chead_cbody_comspr_icon((byte)(gbl.byte_1AD44 + 0x0D), gbl.byte_1AD44, "COMSPR");
             }
 
-            ovr034.chead_cbody_comspr_icon(0x19, 0x19, "COMSPR");
+            await ovr034.chead_cbody_comspr_icon(0x19, 0x19, "COMSPR");
 
             gbl.ItemDataTable = new ItemDataTable("ITEMS");
 
             Affects.Spells.Setup();
             Affects.Effect.Setup();
+
+            return true;
         }
 
 

@@ -1,4 +1,5 @@
 using Classes;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace engine
@@ -64,20 +65,24 @@ namespace engine
         }
 
 
-        internal static void load_decode_dax(out byte[] out_data, out ushort decodeSize, int block_id, string filename, byte filenum)
+        internal static async Task<(byte[], ushort)> load_decode_dax(int block_id, string filename, byte filenum)
         {
-            seg044.PlaySound(Sound.sound_0);
+            //seg044.PlaySound(Sound.sound_0);
 
-            out_data = Classes.DaxFiles.DaxCache.LoadDax(filename, filenum, block_id);
-            decodeSize = out_data == null ? (ushort)0 : (ushort)out_data.Length;
+            var out_data = await Classes.DaxFiles.DaxCache.LoadDax(filename, filenum, block_id);
+            var decodeSize = out_data == null ? (ushort)0 : (ushort)out_data.Length;
+
+            return (out_data, decodeSize);
         }
 
-        internal static void load_decode_dax(out byte[] out_data, out ushort decodeSize, int block_id, string filename)
+        internal static async Task<(byte[], ushort)> load_decode_dax(int block_id, string filename)
         {
-            seg044.PlaySound(Sound.sound_0);
+            //seg044.PlaySound(Sound.sound_0);
 
-            out_data = Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
-            decodeSize = out_data == null ? (ushort)0 : (ushort)out_data.Length;
+            var out_data = await Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
+            var decodeSize = out_data == null ? (ushort)0 : (ushort)out_data.Length;
+
+            return (out_data, decodeSize);
         }
 
 

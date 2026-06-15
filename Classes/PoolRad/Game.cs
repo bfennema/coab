@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Classes.PoolRad
 {
@@ -8,7 +9,7 @@ namespace Classes.PoolRad
         {
             gbl.import_func[(int)ImportSource.Pool] = Player.LoadPlayer;
         }
-        public override void Load() { }
+        public override Task<bool> Load() { return Task.FromResult(true); }
         public override GameState GameState(byte data)
         {
             switch (data)

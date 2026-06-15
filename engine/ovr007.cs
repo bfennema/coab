@@ -1,5 +1,6 @@
 using Classes;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -152,7 +153,7 @@ namespace engine
         }
 
 
-        internal static void CityShop() // sub_2F6E7
+        internal static async Task<bool> CityShop() // sub_2F6E7
         {
             bool reloadPics = false; /* Simeon */
             bool items_on_ground;
@@ -162,7 +163,7 @@ namespace engine
             gbl.game_state = GameState.Shop;
             gbl.redrawBoarder = (gbl.area_ptr.inDungeon == 0);
 
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
             gbl.redrawBoarder = true;
             ovr025.PartySummary(gbl.SelectedPlayer);
 
@@ -197,7 +198,7 @@ namespace engine
                         break;
 
                     case 'V':
-                        ovr020.viewPlayer();
+                        await ovr020.viewPlayer();
                         break;
 
                     case 'T':
@@ -258,17 +259,19 @@ namespace engine
                 if (inputKey == 'B' ||
                     inputKey == 'T')
                 {
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                 }
                 else if (reloadPics == true)
                 {
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                     reloadPics = false;
                 }
 
                 ovr025.PartySummary(gbl.SelectedPlayer);
 
             } while (gbl.Exit == false && exitShop == false);
+
+            return true;
         }
     }
 }

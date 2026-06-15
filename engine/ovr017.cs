@@ -2,6 +2,7 @@ using Classes;
 using System.Collections.Generic;
 using Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -90,7 +91,7 @@ namespace engine
         static Set unk_47635 = new Set(0, 5);
 
 
-        internal static void LoadPlayerCombatIcon(bool recolour) /* sub_47A90 */
+        internal static async Task<bool> LoadPlayerCombatIcon(bool recolour) /* sub_47A90 */
         {
             seg042.set_game_area(1);
 
@@ -98,8 +99,8 @@ namespace engine
 
             char[] sizeToken = new char[] { '\0', 'S', 'T' };
 
-            ovr034.chead_cbody_comspr_icon(11, player.head_icon, "CHEAD" + sizeToken[player.icon_size].ToString());
-            ovr034.chead_cbody_comspr_icon(player.icon_id, player.weapon_icon, "CBODY" + sizeToken[player.icon_size].ToString());
+            await ovr034.chead_cbody_comspr_icon(11, player.head_icon, "CHEAD" + sizeToken[player.icon_size].ToString());
+            await ovr034.chead_cbody_comspr_icon(player.icon_id, player.weapon_icon, "CBODY" + sizeToken[player.icon_size].ToString());
 
             gbl.combat_icons[player.icon_id].MergeIcon(gbl.combat_icons[11]);
 
@@ -126,16 +127,19 @@ namespace engine
             ovr034.ReleaseCombatIcon(11);
             seg042.restore_game_area();
             seg043.clear_keyboard();
+            return true;
         }
 
 
-        internal static async void remove_player_file(Player player)
+        internal static async Task<bool> remove_player_file(Player player)
         {
             var filename = File.CleanFilename(player.name);
 
-            gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", filename, gbl.game.SavePlayerExt));
-            gbl.file.Delete(gbl.DataPath, string.Format("{0}.{1}", filename, gbl.game.SaveItemExt));
-            gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", filename, gbl.game.SaveAffectExt));
+            await gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", filename, gbl.game.SavePlayerExt));
+            await gbl.file.Delete(gbl.DataPath, string.Format("{0}.{1}", filename, gbl.game.SaveItemExt));
+            await gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", filename, gbl.game.SaveAffectExt));
+
+            return true;
         }
 
         internal static async void SavePlayer(string arg_0, Player player) // sub_47DFC
@@ -187,7 +191,7 @@ namespace engine
             }
             else
             {
-                gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", file_text, gbl.game.SaveItemExt));
+                await gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", file_text, gbl.game.SaveItemExt));
             }
 
             if (player.affects.Count > 0)
@@ -196,7 +200,7 @@ namespace engine
             }
             else
             {
-                gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", file_text, gbl.game.SaveAffectExt));
+                await gbl.file.Delete(gbl.SavePath, string.Format("{0}.{1}", file_text, gbl.game.SaveAffectExt));
             }
 
             gbl.game.SavePlayer(player, player_stream, item_stream, affect_stream);
@@ -579,16 +583,14 @@ namespace engine
         }
 
 
-        internal static Player load_mob(int monster_id)
+        internal static async Task<Player> load_mob(int monster_id)
         {
-            return load_mob(monster_id, true);
+            return await load_mob(monster_id, true);
         }
 
-        internal static Player load_mob(int monster_id, bool exit)
+        internal static async Task<Player> load_mob(int monster_id, bool exit)
         {
-            byte[] player_data, item_data, affect_data;
-            ushort player_len, item_len, affect_len;
-            seg042.load_decode_dax(out player_data, out player_len, monster_id, string.Format("MON{0}CHA", gbl.saveData.game_area));
+            (var player_data, var player_len) = await seg042.load_decode_dax(monster_id, string.Format("MON{0}CHA", gbl.saveData.game_area));
 
             if (player_len == 0)
             {
@@ -603,9 +605,9 @@ namespace engine
                 }
             }
 
-            seg042.load_decode_dax(out item_data, out item_len, monster_id, string.Format("MON{0}ITM", gbl.game_area));
+            (var item_data, var item_len) = await seg042.load_decode_dax(monster_id, string.Format("MON{0}ITM", gbl.game_area));
 
-            seg042.load_decode_dax(out affect_data, out affect_len, monster_id, string.Format("MON{0}SPC", gbl.game_area));
+            (var affect_data, var affect_len) = await seg042.load_decode_dax(monster_id, string.Format("MON{0}SPC", gbl.game_area));
 
             var player = gbl.game.LoadPlayer(player_data, item_data, item_len, affect_data, affect_len);
 
@@ -615,11 +617,11 @@ namespace engine
         }
 
 
-        internal static void load_npc(int monster_id, byte morale) // sub_4A57D
+        internal static async Task<bool> load_npc(int monster_id, byte morale) // sub_4A57D
         {
             if (gbl.area2_ptr.party_size <= 7)
             {
-                Player player = load_mob(monster_id);
+                Player player = await load_mob(monster_id);
 
                 player.mod_id = (byte)monster_id;
 
@@ -646,8 +648,13 @@ namespace engine
                 }
                 else // if (gbl.game == Game.CurseOfTheAzureBonds)
                 {
-                    ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
+                    await ovr034.chead_cbody_comspr_icon(player.icon_id, monster_id, "CPIC");
                 }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -688,7 +695,7 @@ namespace engine
         static Set save_game_keys = new Set('A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // asc_4A761
 
 
-        internal static async void loadGameMenu() // loadGame
+        internal static async Task<bool> loadGameMenu() // loadGame
         {
             gbl.import_from = gbl.game.ImportFrom;
 
@@ -728,12 +735,14 @@ namespace engine
                 {
                     string file_name = string.Format("SAVGAM{0}.DAT", save_letter.ToString());
 
-                    loadSaveGame(string.Format("SAVGAM{0}.DAT", save_letter.ToString()));
+                    await loadSaveGame(string.Format("SAVGAM{0}.DAT", save_letter.ToString()));
                 }
             }
+
+            return true;
         }
 
-        internal static async void loadSaveGame(string file_name)
+        internal static async Task<bool> loadSaveGame(string file_name)
         {
             System.IO.Stream file = await seg042.find_and_open_file(true, gbl.SavePath, file_name);
 
@@ -781,7 +790,7 @@ namespace engine
 
             foreach (Player tmp_player in gbl.TeamList)
             {
-                remove_player_file(tmp_player);
+                await remove_player_file(tmp_player);
             }
 
             foreach (Player tmp_player in gbl.TeamList)
@@ -789,7 +798,7 @@ namespace engine
                 gbl.SelectedPlayer = tmp_player;
                 if (tmp_player.head_portrait == 0xFF && tmp_player.body_portrait == 0x00)
                 {
-                    ovr034.chead_cbody_comspr_icon(tmp_player.icon_id, tmp_player.mod_id, "CPIC");
+                    await ovr034.chead_cbody_comspr_icon(tmp_player.icon_id, tmp_player.mod_id, "CPIC");
                 }
                 else
                 {
@@ -809,21 +818,21 @@ namespace engine
                     if (gbl.setBlocks[0].blockId > 0)
                     {
                         gbl.byte_1AB0B = true;
-                        ovr031.Load3DMap(gbl.area_ptr.current_3DMap_block_id);
+                        await ovr031.Load3DMap(gbl.area_ptr.current_3DMap_block_id);
                     }
 
                     for (int i = 0; i < 3; i++)
                     {
                         if (gbl.setBlocks[i].blockId > 0)
                         {
-                            ovr031.LoadWalldef(gbl.setBlocks[i].setId, gbl.setBlocks[i].blockId);
+                            await ovr031.LoadWalldef(gbl.setBlocks[i].setId, gbl.setBlocks[i].blockId);
                         }
                     }
                 }
             }
             else if (gbl.game.WildernessImage != 0xFF)
             {
-                ovr030.load_bigpic(gbl.game.WildernessImage);
+                await ovr030.load_bigpic(gbl.game.WildernessImage);
             }
 
             seg043.clear_keyboard();
@@ -836,13 +845,15 @@ namespace engine
             {
                 gbl.last_game_state = game_state;
             }
+
+            return true;
         }
 
         static Set save_slots = new Set(0, 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'); // unk_4AEA0
         static Set unk_4AEEF = new Set(0, 2, 18); 
 
 
-        internal static async void SaveGame()
+        internal static async Task<bool> SaveGame()
         {
             char inputKey;
             string[] var_171 = new string[9];
@@ -867,7 +878,7 @@ namespace engine
                     {
                         seg041.DisplayAndPause("Unexpected error during save: " + gbl.FIND_result.ToString(), 14);
                         gbl.file.Close(save_file);
-                        return;
+                        return false;
                     }
                 } while (unk_4AEEF.MemberOf(gbl.FIND_result) == false);
 
@@ -935,12 +946,14 @@ namespace engine
                 {
                     party_count++;
                     SavePlayer(string.Format("CHRDAT{0}{1}", Char.ToUpper(inputKey), party_count.ToString()), tmp_player);
-                    remove_player_file(tmp_player);
+                    await remove_player_file(tmp_player);
                 }
 
                 gbl.gameSaved = true;
                 ovr027.ClearPromptArea();
             }
+
+            return true;
         }
     }
 }

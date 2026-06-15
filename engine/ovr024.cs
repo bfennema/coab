@@ -1,5 +1,8 @@
 using Classes;
+using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -33,7 +36,7 @@ namespace engine
 
     public class ovr024
     {
-        internal static void KillPlayer(string text, Status new_health_status, Player player) // sub_63014
+        internal static async Task<bool> KillPlayer(string text, Status new_health_status, Player player) // sub_63014
         {
             ovr025.DisplayPlayerStatusString(false, 10, text, player);
 
@@ -45,8 +48,8 @@ namespace engine
                 player.in_combat = false;
                 player.hit_point_current = 0;
 
-                RemoveCombatAffects(player);
-                Affects.Effect.Check(player, CheckType.Death);
+                await RemoveCombatAffects(player);
+                await Affects.Effect.Check(player, CheckType.Death);
 
                 if (player.in_combat == false)
                 {
@@ -60,11 +63,16 @@ namespace engine
                 {
                     ovr025.PartySummary(gbl.SelectedPlayer);
                 }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
 
-        internal static void remove_affect(Affect? affect, Classes.Affects affect_id, Player player)
+        internal static async Task<bool> remove_affect(Affect? affect, Classes.Affects affect_id, Player player)
         {
             if (affect == null)
             {
@@ -75,28 +83,30 @@ namespace engine
             {
                 if (affect.callAffectTable == true)
                 {
-                    Affects.Effect.Call(Effect.Remove, affect, player, affect_id);
+                    await Affects.Effect.Call(Effect.Remove, affect, player, affect_id);
                 }
 
                 player.affects.Remove(affect);
 
                 if (affect_id == Classes.Affects.spell_resist_fire)
                 {
-                    CalcStatBonuses(Stat.CHA, player);
+                    await CalcStatBonuses(Stat.CHA, player);
                 }
 
                 if (affect_id == Classes.Affects.enlarge ||
                     affect_id == Classes.Affects.strength ||
                     affect_id == Classes.Affects.strength_spell)
                 {
-                    CalcStatBonuses(Stat.STR, player);
+                    await CalcStatBonuses(Stat.STR, player);
                 }
             }
+
+            return true;
         }
 
         static Classes.Affects[] unk_6325A = { Classes.Affects.silence_15_radius, Classes.Affects.prot_from_evil_10_radius, Classes.Affects.prot_from_good_10_radius, Classes.Affects.prayer };
 
-        internal static void calc_affect_effect(Classes.Affects affect_type, Player player)
+        internal static async Task<bool> calc_affect_effect(Classes.Affects affect_type, Player player)
         {
             bool found = false;
 
@@ -131,8 +141,10 @@ namespace engine
 
             if (found == true)
             {
-                Affects.Effect.Call(Effect.Add, affect, player, affect_type);
+                await Affects.Effect.Call(Effect.Add, affect, player, affect_type);
             }
+
+            return found;
         }
 
         static Player sub_63D03(byte[] directions, int arraySize, List<GasCloud> list, Point mapPos) // sub_63D03
@@ -157,7 +169,7 @@ namespace engine
         }
 
 
-        internal static void in_poison_cloud(byte arg_0, Player player)
+        internal static async Task<bool> in_poison_cloud(byte arg_0, Player player)
         {
             if (player.in_combat == true)
             {
@@ -175,7 +187,7 @@ namespace engine
                     ovr025.FindAffect(out affect, Classes.Affects.prot_paralysis_poison, player) == false &&
                     ovr025.FindAffect(out affect, Classes.Affects.prot_sleep_charm_paralysis_poison, player) == false)
                 {
-                    bool save_passed = RollSavingThrow(0, 0, player);
+                    bool save_passed = await RollSavingThrow(0, 0, player);
 
                     if (save_passed == true)
                     {
@@ -183,11 +195,11 @@ namespace engine
 
                         gbl.SelectedPlayer = sub_63D03(gbl.unk_18AEA, 4, gbl.StinkingCloud, ovr033.PlayerMapPos(player));
 
-                        ApplyAttackSpellAffect("starts to cough", save_passed, 0, false, 0xff, 1, Classes.Affects.stinking_cloud, player);
+                        await ApplyAttackSpellAffect("starts to cough", save_passed, 0, false, 0xff, 1, Classes.Affects.stinking_cloud, player);
 
                         if (player.HasAffect(Classes.Affects.stinking_cloud) == true)
                         {
-                            Affects.Effect.Call(Effect.Add, affect, player, Classes.Affects.stinking_cloud);
+                            await Affects.Effect.Call(Effect.Add, affect, player, Classes.Affects.stinking_cloud);
                         }
 
                         gbl.SelectedPlayer = tmp_player_ptr;
@@ -198,11 +210,11 @@ namespace engine
 
                         gbl.SelectedPlayer = sub_63D03(gbl.unk_18AEA, 4, gbl.StinkingCloud, ovr033.PlayerMapPos(player));
 
-                        ApplyAttackSpellAffect("chokes and gags from nausea", save_passed, 0, false, 0xff, (ushort)(roll_dice(4, 1) + 1), Classes.Affects.helpless, player);
+                        await ApplyAttackSpellAffect("chokes and gags from nausea", save_passed, 0, false, 0xff, (ushort)(roll_dice(4, 1) + 1), Classes.Affects.helpless, player);
 
                         if (ovr025.FindAffect(out affect, Classes.Affects.helpless, player) == true)
                         {
-                            Affects.Effect.Call(Effect.Add, affect, player, Classes.Affects.helpless);
+                            await Affects.Effect.Call(Effect.Add, affect, player, Classes.Affects.helpless);
                         }
 
                         gbl.SelectedPlayer = tmp_player_ptr;
@@ -217,34 +229,36 @@ namespace engine
                         ovr025.DisplayPlayerStatusString(false, 10, "is Poisoned", player);
                         seg041.GameDelay();
                         add_affect(false, 0xff, 0, Classes.Affects.minor_globe_of_invulnerability, player);
-                        KillPlayer("is killed", Status.dead, player);
+                        await KillPlayer("is killed", Status.dead, player);
                     }
                     else if (player.HitDice == 5)
                     {
-                        if (RollSavingThrow(-4, 0, player) == false)
+                        if (await RollSavingThrow(-4, 0, player) == false)
                         {
                             ovr025.DisplayPlayerStatusString(false, 10, "is Poisoned", player);
                             seg041.GameDelay();
                             add_affect(false, 0xff, 0, Classes.Affects.poisoned, player);
-                            KillPlayer("is killed", Status.dead, player);
+                            await KillPlayer("is killed", Status.dead, player);
                         }
                     }
                     else if (player.HitDice == 6)
                     {
-                        if (RollSavingThrow(0, 0, player) == false)
+                        if (await RollSavingThrow(0, 0, player) == false)
                         {
                             ovr025.DisplayPlayerStatusString(false, 10, "is Poisoned", player);
                             seg041.GameDelay();
                             add_affect(false, 0xff, 0, Classes.Affects.poisoned, player);
-                            KillPlayer("is killed", Status.dead, player);
+                            await KillPlayer("is killed", Status.dead, player);
                         }
                     }
                 }
             }
+
+            return true;
         }
 
 
-        internal static bool CanHitTarget(int bonus, Player target) // sub_641DD
+        internal static async Task<bool> CanHitTarget(int bonus, Player target) // sub_641DD
         {
             bool hit = false;
             gbl.attack_roll = roll_dice(20, 1);
@@ -257,7 +271,7 @@ namespace engine
                     gbl.attack_roll = 100;
                 }
 
-                Affects.Effect.Check(target, CheckType.CanHitTarget);
+                await Affects.Effect.Check(target, CheckType.CanHitTarget);
 
                 if (gbl.attack_roll >= 0)
                 {
@@ -272,11 +286,11 @@ namespace engine
         }
 
 
-        internal static bool PC_CanHitTarget(int target_ac, Player target, Player attacker) /* sub_64245 */
+        internal static async Task<bool> PC_CanHitTarget(int target_ac, Player target, Player attacker) /* sub_64245 */
         {
             bool hit = false;
 
-            remove_invisibility(attacker);
+            await remove_invisibility(attacker);
             gbl.attack_roll = roll_dice(20, 1);
 
             if (gbl.attack_roll > 1)
@@ -286,8 +300,8 @@ namespace engine
                     gbl.attack_roll = 100;
                 }
 
-                Affects.Effect.Check(attacker, CheckType.CanHitAttacker);
-                Affects.Effect.Check(target, CheckType.CanHitTarget);
+                await Affects.Effect.Check(attacker, CheckType.CanHitAttacker);
+                await Affects.Effect.Check(target, CheckType.CanHitTarget);
 
                 int team_bonus;
                 if (attacker.combat_team == CombatTeam.Ours)
@@ -311,7 +325,7 @@ namespace engine
         }
 
 
-        internal static bool RollSavingThrow(int saveBonus, SaveVerseType saveType, Player player) // do_saving_throw
+        internal static async Task<bool> RollSavingThrow(int saveBonus, SaveVerseType saveType, Player player) // do_saving_throw
         {
             gbl.savingThrowMade = true;
             gbl.savingThrowRoll = roll_dice(20, 1);
@@ -334,7 +348,7 @@ namespace engine
                 gbl.savingThrowRoll += saveBonus + player.field_186;
                 gbl.saveVerseType = saveType;
 
-                Affects.Effect.Check(player, CheckType.SavingThrow);
+                await Affects.Effect.Check(player, CheckType.SavingThrow);
 
                 gbl.savingThrowMade = gbl.savingThrowRoll >= player.saveVerse[(int)saveType];
             }
@@ -388,7 +402,7 @@ namespace engine
         }
 
 
-        internal static void RemoveFromCombat(string msg, Status health_status, Player player) // sub_644A7
+        internal static async Task<bool> RemoveFromCombat(string msg, Status health_status, Player player) // sub_644A7
         {
             if (player.in_combat == true)
             {
@@ -415,23 +429,25 @@ namespace engine
                 ovr033.setup_mapToPlayerIndex_and_playerScreen();
 
                 ovr025.clear_actions(player);
-                RemoveCombatAffects(player);
+                await RemoveCombatAffects(player);
             }
+            return true;
         }
 
 
-        internal static void remove_invisibility(Player player)
+        internal static async Task<bool> remove_invisibility(Player player)
         {
             Affect affect;
 
             while (ovr025.FindAffect(out affect, Classes.Affects.invisibility, player) == true)
             {
-                remove_affect(affect, Classes.Affects.invisibility, player);
+                await remove_affect(affect, Classes.Affects.invisibility, player);
             }
+            return true;
         }
 
 
-        internal static void RemoveCombatAffects(Player player) // sub_645AB
+        internal static async Task<bool> RemoveCombatAffects(Player player) // sub_645AB
         {
             Classes.Affects[] table = {
                 Classes.Affects.faerie_fire,
@@ -455,16 +471,16 @@ namespace engine
                 Classes.Affects.owlbear_hug_round_attack
             };
 
-            System.Array.ForEach(table, affect => remove_affect(null, affect, player));
+            await RemoveAffects(table, player);
 
             if (player.HasAffect(Classes.Affects.berserk) == true && player.control_morale == Control.PC_Berserk)
             {
                 player.combat_team = CombatTeam.Ours;
             }
+
+            return true;
         }
-
-
-        internal static void RemoveAttackersAffects(Player player) // sub_6460D
+        internal static async Task<bool> RemoveAttackersAffects(Player player)
         {
             Classes.Affects[] table = {
                 Classes.Affects.reduce,
@@ -473,18 +489,42 @@ namespace engine
                 Classes.Affects.owlbear_hug_round_attack
             };
 
-            System.Array.ForEach(table, affect => remove_affect(null, affect, player));
+            return await RemoveAffects(table, player);
         }
 
 
-        internal static bool cure_affect(Classes.Affects affectId, Player player) /* is_cured */
+        internal static async Task<bool> RemoveAffects(Classes.Affects[] table, Player player) // sub_6460D
+        {
+            CancellationTokenSource cts = new();
+            ParallelOptions options = new() { CancellationToken = cts.Token };
+
+            try
+            {
+                await Parallel.ForEachAsync(table, options, async (affect, ct) =>
+                {
+                    ct.ThrowIfCancellationRequested();
+                    await remove_affect(null, affect, player);
+                    ct.ThrowIfCancellationRequested();
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                return false;
+            }
+
+            return true;
+
+        }
+
+
+        internal static async Task<bool> cure_affect(Classes.Affects affectId, Player player) /* is_cured */
         {
             Affect affect = player.GetAffect(affectId);
             if (affect != null)
             {
                 ovr025.DisplayPlayerStatusString(true, 10, "is Cured", player);
 
-                remove_affect(affect, affectId, player);
+                await remove_affect(affect, affectId, player);
 
                 return true;
             }
@@ -607,7 +647,7 @@ namespace engine
         }
 
 
-        internal static void CalcStatBonuses(Stat stat_index, Player player) // sub_648D9
+        internal static async Task<bool> CalcStatBonuses(Stat stat_index, Player player) // sub_648D9
         {
             int stat_b = 0;
             int str_00_b = 0;
@@ -876,7 +916,7 @@ namespace engine
                 }
                 else
                 {
-                    remove_affect(null, Classes.Affects.highConRegen, player);
+                    await remove_affect(null, Classes.Affects.highConRegen, player);
                 }
                 ovr026.recalc_saving_throws(player);
             }
@@ -935,15 +975,17 @@ namespace engine
 
                 player.stats.Cha.full = stat_a;
             }
+
+            return true;
         }
 
-        internal static void damage_person(bool change_damage, DamageOnSave arg_2, int damage, Player player)
+        internal static async Task<bool> damage_person(bool change_damage, DamageOnSave arg_2, int damage, Player player)
         {
             string text;
 
             gbl.damage = damage;
 
-            Affects.Effect.Check(player, CheckType.PreDamage);
+            await Affects.Effect.Check(player, CheckType.PreDamage);
 
             if (change_damage == true)
             {
@@ -958,7 +1000,7 @@ namespace engine
             }
             else
             {
-                Affects.Effect.Check(player, CheckType.FireShield);
+                await Affects.Effect.Check(player, CheckType.FireShield);
             }
 
             if (gbl.damage > 0)
@@ -1027,9 +1069,9 @@ namespace engine
                     }
                     else
                     {
-                        RemoveCombatAffects(player);
+                        await RemoveCombatAffects(player);
 
-                        Affects.Effect.Check(player, CheckType.Death);
+                        await Affects.Effect.Check(player, CheckType.Death);
 
                         if (player.in_combat == false)
                         {
@@ -1043,7 +1085,9 @@ namespace engine
                 }
 
                 ovr025.ClearPlayerTextArea();
+
             }
+            return true;
         }
 
         internal static void TryLooseSpell(Player player)
@@ -1060,11 +1104,11 @@ namespace engine
         }
 
 
-        internal static void ApplyAttackSpellAffect(string text, bool saved, DamageOnSave can_save, bool call_affect_table, int data, ushort time, Classes.Affects affect_id, Player target) // is_unaffected
+        internal static async Task<bool> ApplyAttackSpellAffect(string text, bool saved, DamageOnSave can_save, bool call_affect_table, int data, ushort time, Classes.Affects affect_id, Player target) // is_unaffected
 		{
             gbl.current_affect = affect_id;
 
-            Affects.Effect.Check(target, CheckType.MagicResistance);
+            await Affects.Effect.Check(target, CheckType.MagicResistance);
 
             if (gbl.current_affect == 0 ||
                 (saved == true && can_save == DamageOnSave.Zero))
@@ -1078,7 +1122,7 @@ namespace engine
                 if (ovr025.FindAffect(out found_affect, affect_id, target) == true &&
                     found_affect.minutes > 0)
                 {
-                    remove_affect(found_affect, affect_id, target);
+                    await remove_affect(found_affect, affect_id, target);
                 }
 
                 add_affect(call_affect_table, data, time, affect_id, target);
@@ -1089,10 +1133,12 @@ namespace engine
                     ovr025.ClearPlayerTextArea();
                 }
             }
+
+            return true;
         }
 
 
-        internal static bool heal_player(byte arg_0, int amount_healed, Player player)
+        internal static async Task<bool> heal_player(byte arg_0, int amount_healed, Player player)
         {
             if (player.health_status == Status.okey ||
                 player.health_status == Status.animated ||
@@ -1120,7 +1166,7 @@ namespace engine
                         if (player.health_status == Status.unconscious &&
                             gbl.game_state != GameState.Combat)
                         {
-                            Affects.Effect.Call(Effect.Remove, null, player, Classes.Affects.affect_4e);
+                            await Affects.Effect.Call(Effect.Remove, null, player, Classes.Affects.affect_4e);
                         }
                     }
 

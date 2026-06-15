@@ -1,11 +1,12 @@
 using Classes;
 using Classes.Combat;
+using System.Threading.Tasks;
 
 namespace engine
 {
     class ovr010
     {
-        internal static void PlayerQuickFight(Player player) // sub_3504B
+        internal static async Task<bool> PlayerQuickFight(Player player) // sub_3504B
         {
             bool var_2 = process_input_in_monsters_turn(player);
             ovr027.ClearPromptArea();
@@ -37,7 +38,7 @@ namespace engine
 
             if (var_2 == false)
             {
-                var_2 = FleeCheck_001(player);
+                var_2 = await FleeCheck_001(player);
             }
 
             if (player.actions.moral_failure == true &&
@@ -48,44 +49,44 @@ namespace engine
 
             if (var_2 == true)
             {
-                return;
+                return false;
             }
 
-            if (sub_354AA(player))
+            if (await sub_354AA(player))
             {
                 ovr025.clear_actions(player);
-                return;
+                return false;
             }
 
             if (player.actions.spell_id > 0)
             {
-                ovr023.sub_5D2E1(true, QuickFight.True, player.actions.spell_id);
+                await ovr023.sub_5D2E1(true, QuickFight.True, player.actions.spell_id);
 
                 ovr025.clear_actions(player);
-                return;
+                return false;
             }
 
             if (turn_undead(player))
             {
                 ovr025.clear_actions(player);
-                return;
+                return false;
             }
 
-            if (sub_3560B(player) == true)
+            if (await sub_3560B(player) == true)
             {
-                return;
+                return false;
             }
 
-            AI_items_selection(player);
+            await AI_items_selection(player);
             var_2 = process_input_in_monsters_turn(player);
 
             while (var_2 == false)
             {
-                if (ovr014.find_target(false, 1, 0xff, player) == true &&
+                if (await ovr014.find_target(false, 1, 0xff, player) == true &&
                     player.actions.delay > 0 &&
                     player.in_combat == true)
                 {
-                    var_2 = sub_35DB1(player);
+                    var_2 = await sub_35DB1(player);
                 }
                 else
                 {
@@ -93,6 +94,8 @@ namespace engine
                     TryGuarding(player);
                 }
             }
+
+            return true;
         }
 
 
@@ -115,7 +118,7 @@ namespace engine
         }
 
 
-        internal static bool ShouldCastSpellX_sub1(Spells spell_id, Point pos) // sub_352AF
+        internal static async Task<bool> ShouldCastSpellX_sub1(Spells spell_id, Point pos) // sub_352AF
         {
             bool result = false;
             var spell_entry = gbl.spellCastingTable[(byte)spell_id];
@@ -131,7 +134,7 @@ namespace engine
                 {
                     Player tmpPlayer = sc.player;
 
-                    if (ovr024.RollSavingThrow(save_bonus, spell_entry.saveVerse, sc.player) == false)
+                    if (await ovr024.RollSavingThrow(save_bonus, spell_entry.saveVerse, sc.player) == false)
                     {
                         result = true;
                     }
@@ -141,7 +144,7 @@ namespace engine
         }
 
 
-        internal static bool ShouldCastSpellX(int minPriority, Spells spellId, Player attacker) // sub_353B1
+        internal static async Task<bool> ShouldCastSpellX(int minPriority, Spells spellId, Player attacker) // sub_353B1
         {
             var spell_entry = gbl.spellCastingTable[(byte)spellId];
             if (spell_entry.priority >= minPriority)
@@ -166,7 +169,7 @@ namespace engine
                         {
                             foreach (var cpi in nearTargets)
                             {
-                                if (ShouldCastSpellX_sub1(spellId, cpi.pos) == true)
+                                if (await ShouldCastSpellX_sub1(spellId, cpi.pos) == true)
                                 {
                                     return false;
                                 }
@@ -181,7 +184,7 @@ namespace engine
         }
 
 
-        internal static bool sub_354AA(Player player)
+        internal static async Task<bool> sub_354AA(Player player)
         {
             Item bestWand = null;
 
@@ -203,7 +206,7 @@ namespace engine
                             item_ptr.readied &&
                             spell_id != 0)
                         {
-                            if (ShouldCastSpellX(priority, spell_id, player))
+                            if (await ShouldCastSpellX(priority, spell_id, player))
                             {
                                 bestWand = item_ptr;
                                 break;
@@ -215,8 +218,7 @@ namespace engine
 
             if (bestWand != null)
             {
-                bool var_15 = false; /* simeon */
-                ovr020.UseMagicItem(ref var_15, bestWand);
+                var var_15 = await ovr020.UseMagicItem(false, bestWand);
                 return true;
             }
 
@@ -224,7 +226,7 @@ namespace engine
         }
 
 
-        internal static bool sub_3560B(Player player)
+        internal static async Task<bool> sub_3560B(Player player)
         {
             Spells[] spell_list = new Spells[gbl.max_spells];
 
@@ -256,7 +258,7 @@ namespace engine
                             int random_spell_index = ovr024.roll_dice(spells_count, 1) - 1;
                             Spells random_spell_id = spell_list[random_spell_index];
 
-                            if (ShouldCastSpellX(priority, random_spell_id, player))
+                            if (await ShouldCastSpellX(priority, random_spell_id, player))
                             {
                                 spell_id = random_spell_id;
                             }
@@ -272,7 +274,7 @@ namespace engine
 
             if (spell_id > 0)
             {
-                ovr014.spell_menu3(out casting_spell, QuickFight.True, spell_id);
+                casting_spell = await ovr014.spell_menu3(QuickFight.True, spell_id);
             }
             else
             {
@@ -287,9 +289,9 @@ namespace engine
             {8, 1, 2, 3, 4, 8}, {8, 4, 6, 2, 8, 6}, {6, 4, 0, 8, 0, 6}, {6, 2, 8, 2, 0, 4}, {4, 0, 0, 2, 6, 2}, 
             {2, 2, 0, 4, 4, 4} /*, {4, 2, 6, 6}*/ };/* actual from seg600:02BD - seg600:02F8 */
 
-        internal static bool CanMove(out bool groundClear, int baseDirecction, int dirStep, Player player) // sub_3573B
+        internal static async Task<(bool canMove, bool groundClear)> CanMove(int baseDirecction, int dirStep, Player player) // sub_3573B
         {
-            groundClear = false;
+            bool groundClear = false;
             bool canMove = false;
 
             int var_6 = data_2B8[player.actions.field_15, dirStep - 1];
@@ -309,7 +311,7 @@ namespace engine
             {
                 if (gbl.game.BackgroundTiles[groundTile].blocked)
                 {
-                    return false;
+                    return (false, groundClear);
                 }
 
                 int move_cost = gbl.game.BackgroundTiles[groundTile].move_cost;
@@ -333,7 +335,7 @@ namespace engine
                         player.HasAffect(Classes.Affects.minor_globe_of_invulnerability) == false &&
                         player.actions.fleeing == false)
                     {
-                        if (ovr024.RollSavingThrow(0, 0, player) == false)
+                        if (await ovr024.RollSavingThrow(0, 0, player) == false)
                         {
                             move_cost = player.actions.move + 1;
                         }
@@ -357,11 +359,11 @@ namespace engine
                 }
             }
 
-            return canMove;
+            return (canMove, groundClear);
         }
 
 
-        internal static void moralFailureEscape(Player player) // sub_359D1
+        internal static async Task<bool> moralFailureEscape(Player player) // sub_359D1
         {
             int var_2 = 0; /* Simeon */
             int dir;
@@ -372,7 +374,7 @@ namespace engine
 
             if (process_input_in_monsters_turn(player))
             {
-                return;
+                return false;
             }
 
             if ((player.actions.move / 2) > 0 &&
@@ -408,13 +410,13 @@ namespace engine
                         int dirStep = 1;
 
                         while (dirStep < 6 && var_5 == false &&
-                            CanMove(out zeroTitle, dir, dirStep, player) == false)
+                            ((_, zeroTitle) = await CanMove(dir, dirStep, player)) is (false,_))
                         {
                             if (player.actions.moral_failure == true &&
                                 zeroTitle == true)
                             {
                                 var_5 = true;
-                                ovr014.flee_battle(player);
+                                await ovr014.flee_battle(player);
                             }
                             else
                             {
@@ -446,7 +448,7 @@ namespace engine
                                         player.actions.move = 0;
                                         var_5 = true;
                                     }
-                                    else if (ovr014.find_target(false, 1, 0xFF, player) == false)
+                                    else if (await ovr014.find_target(false, 1, 0xFF, player) == false)
                                     {
                                         var_5 = true;
                                         TryGuarding(player);
@@ -469,7 +471,7 @@ namespace engine
                             gbl.focusCombatAreaOnPlayer = (gbl.byte_1D90E || ovr033.PlayerOnScreen(false, player) || player.combat_team == CombatTeam.Ours);
 
                             ovr033.draw_74B3F(false, Icon.Normal, var_2, player);
-                            ovr014.move_step_away_attack(player.actions.direction, player);
+                            await ovr014.move_step_away_attack(player.actions.direction, player);
 
                             if (player.in_combat == false)
                             {
@@ -480,7 +482,7 @@ namespace engine
                             {
                                 if (player.actions.move > 0)
                                 {
-                                    ovr014.sub_3E748(player.actions.direction, player);
+                                    await ovr014.sub_3E748(player.actions.direction, player);
                                 }
 
                                 if (player.in_combat == false)
@@ -489,26 +491,28 @@ namespace engine
                                     ovr025.clear_actions(player);
                                 }
 
-                                ovr024.in_poison_cloud(1, player);
+                                await ovr024.in_poison_cloud(1, player);
                             }
                         }
-                        return;
+                        return false;
                     }
                 }
             }
 
             TryGuarding(player);
+
+            return true;
         }
 
         static int byte_1AB18; // byte_1AB18
         static int byte_1AB19; // byte_1AB19
 
-        internal static bool sub_35DB1(Player player)
+        internal static async Task<bool> sub_35DB1(Player player)
         {
             byte_1AB18 = 8;
             byte_1AB19 = 0;
 
-            Affects.Effect.Check(player, CheckType.Type_14);
+            await Affects.Effect.Check(player, CheckType.Type_14);
 
             if (player.combat_team == CombatTeam.Ours &&
                 ovr025.bandage(true) == true)
@@ -528,7 +532,7 @@ namespace engine
                         player.actions.delay > 0 &&
                         player.actions.delay < 20)
                     {
-                        moralFailureEscape(player);
+                        await moralFailureEscape(player);
                     }
                 }
 
@@ -576,7 +580,7 @@ namespace engine
                     }
 
                     if (target != null &&
-                        ovr014.CanSeeTargetA(target, player) == true)
+                        await ovr014.CanSeeTargetA(target, player) == true)
                     {
                         var targetPos = ovr033.PlayerMapPos(target);
                         var attackPos = ovr033.PlayerMapPos(player);
@@ -598,9 +602,9 @@ namespace engine
 
                         if (nearTargets.Count == 0)
                         {
-                            if (ovr014.find_target(false, 0, 0xff, player) == true)
+                            if (await ovr014.find_target(false, 0, 0xff, player) == true)
                             {
-                                moralFailureEscape(player);
+                                await moralFailureEscape(player);
                             }
                             else
                             {
@@ -618,11 +622,11 @@ namespace engine
                                 ovr025.is_weapon_ranged_melee(player) == false &&
                                 ovr025.BuildNearTargets(1, player).Count > 0)
                             {
-                                AI_items_selection(player);
+                                await AI_items_selection(player);
                                 stop = true;
                             }
                             else if (ovr025.getTargetRange(target, player) == 1 ||
-                                ovr014.CanSeeTargetA(target, player) == true)
+                                await ovr014.CanSeeTargetA(target, player) == true)
                             {
                                 gbl.byte_1D90E = true;
                             }
@@ -636,7 +640,7 @@ namespace engine
 
                     if (gbl.byte_1D90E == true)
                     {
-                        if (ovr014.TrySweepAttack(target, player) == true)
+                        if (await ovr014.TrySweepAttack(target, player) == true)
                         {
                             stop = true;
                             ovr025.clear_actions(player);
@@ -658,7 +662,7 @@ namespace engine
                                 }
                             }
 
-                            stop = ovr014.AttackTarget(item, 0, target, player);
+                            stop = await ovr014.AttackTarget(item, 0, target, player);
 
                             if (stop == true)
                             {
@@ -752,12 +756,12 @@ namespace engine
         }
 
 
-        static bool FleeCheck_001(Player player) // sub_3637F
+        static async Task<bool> FleeCheck_001(Player player) // sub_3637F
         {
             bool var_1 = false;
             player.actions.moral_failure = false;
 
-            ovr024.RemoveAttackersAffects(player);
+            await ovr024.RemoveAttackersAffects(player);
 
             if (player.actions.fleeing == true)
             {
@@ -772,7 +776,7 @@ namespace engine
                 {
                     gbl.monster_morale = 0;
                 }
-                Affects.Effect.Check(player, CheckType.Morale);
+                await Affects.Effect.Check(player, CheckType.Morale);
 
                 if (gbl.monster_morale < (100 - ((player.hit_point_current * 100) / player.hit_point_max)) ||
                     gbl.monster_morale == 0)
@@ -780,23 +784,23 @@ namespace engine
                     //byte var_3 = gbl.byte_1D2CC;
                     gbl.monster_morale = gbl.enemyHealthPercentage;
 
-                    Affects.Effect.Check(player, CheckType.Morale);
+                    await Affects.Effect.Check(player, CheckType.Morale);
 
                     if (gbl.monster_morale < (100 - gbl.area2_ptr.field_58C) ||
                         gbl.monster_morale == 0 ||
                         player.combat_team == CombatTeam.Ours)
                     {
-                        int var_2 = ovr014.MaxOppositionMoves(player);
+                        int var_2 = await ovr014.MaxOppositionMoves(player);
 
-                        if (var_2 <= (ovr014.CalcMoves(player) / 2))
+                        if (var_2 <= (await ovr014.CalcMoves(player) / 2))
                         {
                             player.actions.moral_failure = true;
-                            ovr024.remove_affect(null, Classes.Affects.affect_4a, player);
-                            ovr024.remove_affect(null, Classes.Affects.weap_dragon_slayer, player);
+                            await ovr024.remove_affect(null, Classes.Affects.affect_4a, player);
+                            await ovr024.remove_affect(null, Classes.Affects.weap_dragon_slayer, player);
                         }
                         else if (player.stats.Int.full > 5)
                         {
-                            ovr024.RemoveFromCombat("Surrenders", Status.unconscious, player);
+                            await ovr024.RemoveFromCombat("Surrenders", Status.unconscious, player);
 
                             var_1 = true;
                             ovr025.clear_actions(player);
@@ -867,7 +871,7 @@ namespace engine
         }
 
 
-        static void AI_items_selection(Player player)  // sub_36673 
+        static async Task<bool> AI_items_selection(Player player)  // sub_36673 
         {         
             player.weaponsHandsUsed -= player.activeItems.PrimaryWeaponHandCount();
             player.weaponsHandsUsed -= player.activeItems.SecondaryWeaponHandCount();
@@ -990,7 +994,7 @@ namespace engine
             {
                 if (player.activeItems.primaryWeapon != null)
                 {
-                    ovr020.ready_Item(player.activeItems.primaryWeapon);
+                    await ovr020.ready_Item(player.activeItems.primaryWeapon);
                 }
 
                 ovr025.reclac_player_values(player);
@@ -1003,14 +1007,14 @@ namespace engine
 
                 if (weapon != null)
                 {
-                    ovr020.ready_Item(weapon);
+                    await ovr020.ready_Item(weapon);
                 }
 
                 itemsChanged = true;
             }
 
             ovr025.reclac_player_values(player);
-            ovr014.reclac_attacks(player);
+            await ovr014.reclac_attacks(player);
             replace_weapon = true;
 
             if (player.activeItems.secondaryWeapon != null &&
@@ -1024,12 +1028,12 @@ namespace engine
                 if (player.activeItems.secondaryWeapon == null ||
                     player.activeItems.secondaryWeapon.cursed == true)
                 {
-                    ovr020.ready_Item(weapon);
+                    await ovr020.ready_Item(weapon);
                     itemsChanged = true;
                 }
                 else
                 {
-                    ovr020.ready_Item(player.activeItems.secondaryWeapon);
+                    await ovr020.ready_Item(player.activeItems.secondaryWeapon);
                     itemsChanged = true;
                 }
             }
@@ -1037,13 +1041,13 @@ namespace engine
             {
                 if (player.activeItems.secondaryWeapon != null)
                 {
-                    ovr020.ready_Item(player.activeItems.secondaryWeapon);
+                    await ovr020.ready_Item(player.activeItems.secondaryWeapon);
                 }
                 ovr025.reclac_player_values(player);
 
                 if (best_weapon != null)
                 {
-                    ovr020.ready_Item(best_weapon);
+                    await ovr020.ready_Item(best_weapon);
                 }
 
                 itemsChanged = true;
@@ -1056,6 +1060,8 @@ namespace engine
             {
                 ovr025.CombatDisplayPlayerSummary(player);
             }
+
+            return true;
         }
     }
 }

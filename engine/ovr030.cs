@@ -1,5 +1,6 @@
 using Classes;
 using Logging;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -32,7 +33,7 @@ namespace engine
         }
 
 
-        internal static void load_pic_final(ref DaxArray daxArray, byte masked, byte block_id, string filename, byte filenum)
+        internal static async Task<bool> load_pic_final(DaxArray daxArray, byte masked, byte block_id, string filename, byte filenum)
         {
             if (filename != gbl.lastDaxFile ||
                 block_id != gbl.lastDaxBlockId)
@@ -52,10 +53,7 @@ namespace engine
 
                     bool is_pic_or_final = (filename == "PIC" || filename == "FINAL");
 
-                    ushort uncompressed_size;
-                    byte[] uncompressed_data;
-
-                    seg042.load_decode_dax(out uncompressed_data, out uncompressed_size, block_id, filename, filenum);
+                    (var uncompressed_data, var uncompressed_size) = await seg042.load_decode_dax(block_id, filename, filenum);
 
                     if (uncompressed_size == 0)
                     {
@@ -144,7 +142,16 @@ namespace engine
                             ovr027.ClearPromptAreaNoUpdate();
                         }
                     }
+                    return true;
                 }
+                else
+                {
+                    return false;
+                }
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -165,12 +172,12 @@ namespace engine
         }
 
 
-        internal static void head_body(byte area, byte body_id, byte head_id)
+        internal static async Task<bool> head_body(byte area, byte body_id, byte head_id)
         {
             if (head_id != 0xff &&
                 (gbl.current_head_id == 0xff || gbl.current_head_id != head_id))
             {
-                gbl.headX_dax = seg040.LoadDax(0, 0, head_id, "HEAD", area);
+                gbl.headX_dax = await seg040.LoadDax(0, 0, head_id, "HEAD", area);
 
                 if (gbl.headX_dax == null)
                 {
@@ -183,7 +190,7 @@ namespace engine
             if (body_id != 0xff &&
                 (gbl.current_body_id == 0xff || gbl.current_body_id != body_id))
             {
-                gbl.bodyX_dax = seg040.LoadDax(0, 0, body_id, "BODY", area);
+                gbl.bodyX_dax = await seg040.LoadDax(0, 0, body_id, "BODY", area);
                 if (gbl.bodyX_dax == null)
                 {
                     seg041.DisplayAndPause("body not found", 14);
@@ -193,6 +200,8 @@ namespace engine
             }
 
             seg043.clear_keyboard();
+
+            return true;
         }
 
 
@@ -230,7 +239,7 @@ namespace engine
         }
 
 
-        internal static void load_bigpic(byte block_id) /* bigpic */
+        internal static async Task<bool> load_bigpic(byte block_id) /* bigpic */
         {
             if (gbl.game.BigpicImage != 0xFF)
             {
@@ -238,9 +247,14 @@ namespace engine
 
                 if (gbl.bigpic_block_id != block_id)
                 {
-                    gbl.bigpic_dax = seg040.LoadDax(0, 0, block_id, "BIGPIC", gbl.game_area);
+                    gbl.bigpic_dax = await seg040.LoadDax(0, 0, block_id, "BIGPIC", gbl.game_area);
                     gbl.bigpic_block_id = block_id;
                 }
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

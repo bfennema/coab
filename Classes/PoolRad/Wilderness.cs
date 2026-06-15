@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Classes.PoolRad
 {
@@ -89,7 +90,7 @@ namespace Classes.PoolRad
             }
         }
 
-        internal static void DrawWildernessMap()
+        internal static async Task<bool> DrawWildernessMap()
         {
             byte x = gbl.area_ptr.field_186;
             byte y = gbl.area_ptr.field_188;
@@ -99,14 +100,14 @@ namespace Classes.PoolRad
             //ovr025.PartySummary(gbl.SelectedPlayer);
             //ovr025.display_map_position_time();
 
-            DaxBlock tmp_block = LoadDax(0, 0, 1, "SQRPACI");
+            DaxBlock tmp_block = await LoadDax(0, 0, 1, "SQRPACI");
             System.Array.Copy(tmp_block.data, 0, sqrpaci.data, 0, tmp_block.item_count * tmp_block.bpp);
             int dataLength = tmp_block.item_count * tmp_block.bpp;
 
-            tmp_block = LoadDax(0, 0, 1, "BACPAC");
+            tmp_block = await LoadDax(0, 0, 1, "BACPAC");
             System.Array.Copy(tmp_block.data, 0, sqrpaci.data, 0, tmp_block.item_count * tmp_block.bpp);
 
-            tmp_block = LoadDax(0, 0, 2, "SQRPACI");
+            tmp_block = await LoadDax(0, 0, 2, "SQRPACI");
             System.Array.Copy(tmp_block.data, 0, sqrpaci.data, dataLength, tmp_block.item_count * tmp_block.bpp);
 
             for (int i = 0; i < 3; i++)
@@ -156,11 +157,13 @@ namespace Classes.PoolRad
             //ovr034.draw_combat_icon(26 + (gbl.worldIcon >> 1), (Classes.Combat.Icon)(gbl.worldIcon & 0x1), gbl.mapDirection, 2, 2);
             gbl.worldIcon = (byte)((gbl.worldIcon + 1) % 6);
             Display.UpdateStart();
+
+            return true;
         }
-        internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string filename)
+        internal static async Task<DaxBlock> LoadDax(byte mask_colour, byte masked, int block_id, string filename)
         {
             ushort pic_size;
-            byte[] pic_data = Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
+            byte[] pic_data = await Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
             pic_size = pic_data == null ? (ushort)0 : (ushort)pic_data.Length;
 
             if (pic_size != 0)

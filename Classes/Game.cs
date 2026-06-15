@@ -1,8 +1,10 @@
-﻿namespace Classes
+﻿using System.Threading.Tasks;
+
+namespace Classes
 {
     public abstract class Game
     {
-        public abstract void Load();
+        public abstract Task<bool> Load();
         public abstract GameState GameState(byte data);
         public abstract byte GameState(GameState data);
         public abstract GameState LoadGameState { get; }

@@ -1,4 +1,5 @@
 using Classes;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -408,14 +409,14 @@ namespace engine
         }
 
 
-        internal static void ShowAnimation(int num_loops, byte block_id, short row_y, short col_x) // sub_52B79
+        internal static async Task<bool> ShowAnimation(int num_loops, byte block_id, short row_y, short col_x) // sub_52B79
         {
             int loop_count = 0;
             int start_time = seg041.time01();
 
             DaxArray animation = new DaxArray();
 
-            ovr030.load_pic_final(ref animation, 2, block_id, "PIC", gbl.game_area);
+            await ovr030.load_pic_final(animation, 2, block_id, "PIC", gbl.game_area);
             seg040.OverlayBounded(animation.frames[0].picture, 0, 0, row_y - 1, col_x - 1);
             seg040.DrawOverlay();
 
@@ -441,6 +442,8 @@ namespace engine
             } while (loop_count != num_loops);
 
             ovr030.DaxArrayFreeDaxBlocks(animation);
+
+            return true;
         }
 
         static string aTyranthraxusSp = "Tyranthraxus' spirit coalesces over the slain ";
@@ -471,7 +474,7 @@ namespace engine
 
 
 
-        internal static void end_game_text()
+        internal static async Task<bool> end_game_text()
         {
             gbl.last_game_state = gbl.game_state;
             gbl.game_state = GameState.EndGame;
@@ -487,7 +490,7 @@ namespace engine
             seg041.press_any_key(aWillUnleashDan, false, 10, TextRegion.NormalBottom);
             seg041.press_any_key(aGauntletContac, false, 10, TextRegion.NormalBottom);
 
-            ShowAnimation(1, 0x4a, 3, 3);
+            await ShowAnimation(1, 0x4a, 3, 3);
 
             seg041.DisplayAndPause("Press any key to continue.", 13);
             ovr027.ClearPromptArea();
@@ -497,7 +500,7 @@ namespace engine
             seg041.press_any_key(aIsSlainThisDay, false, 10, TextRegion.NormalBottom);
             seg041.press_any_key(aNothingness_, false, 10, TextRegion.NormalBottom);
 
-            ShowAnimation(1, 0x4B, 3, 3);
+            await ShowAnimation(1, 0x4B, 3, 3);
 
             seg041.DisplayAndPause("Press any key to continue.", 13);
             ovr027.ClearPromptArea();
@@ -509,11 +512,11 @@ namespace engine
 
             gbl.area_ptr.picture_fade = 1;
 
-            ShowAnimation((10 - gbl.game_speed_var) * 2, 0x4d, 3, 3);
+            await ShowAnimation((10 - gbl.game_speed_var) * 2, 0x4d, 3, 3);
 
             gbl.area_ptr.picture_fade = 0;
 
-            ovr030.head_body(gbl.game_area, 0x41, 0x41);
+            await ovr030.head_body(gbl.game_area, 0x41, 0x41);
             ovr030.draw_head_and_body(true, 3, 3);
 
             seg041.press_any_key(aTheKnightsOfMy, true, 10, TextRegion.NormalBottom);
@@ -523,7 +526,7 @@ namespace engine
 
             seg041.DisplayAndPause("Press any key to continue.", 13);
             ovr027.ClearPromptArea();
-            ovr030.load_bigpic(gbl.game.EndGameImage);
+            await ovr030.load_bigpic(gbl.game.EndGameImage);
 
             ovr030.draw_bigpic();
 
@@ -534,7 +537,9 @@ namespace engine
             endgame_529F4();
 
             gbl.game_state = gbl.last_game_state;
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
+
+            return true;
         }
     }
 }

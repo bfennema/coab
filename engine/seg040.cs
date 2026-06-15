@@ -1,14 +1,13 @@
 using Classes;
+using System.Threading.Tasks;
 
 namespace engine
 {
     class seg040
     {
-        internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string filename, byte filenum) // load_dax
+        internal static async Task<DaxBlock?> LoadDax(byte mask_colour, byte masked, int block_id, string filename, byte filenum) // load_dax
         {
-            ushort pic_size;
-            byte[] pic_data;
-            seg042.load_decode_dax(out pic_data, out pic_size, block_id, filename, filenum);
+            (var pic_data, var pic_size) = await seg042.load_decode_dax(block_id, filename, filenum);
 
             if (pic_size != 0)
             {
@@ -18,11 +17,9 @@ namespace engine
             return null;
         }
 
-        internal static DaxBlock LoadDax(byte mask_colour, byte masked, int block_id, string filename)
+        internal static async Task<DaxBlock?> LoadDax(byte mask_colour, byte masked, int block_id, string filename)
         {
-            ushort pic_size;
-            byte[] pic_data;
-            seg042.load_decode_dax(out pic_data, out pic_size, block_id, filename);
+            (var pic_data, var pic_size) = await seg042.load_decode_dax(block_id, filename);
 
             if (pic_size != 0)
             {
@@ -31,8 +28,6 @@ namespace engine
 
             return null;
         }
-
-
 
         internal static void OverlayUnbounded(DaxBlock source, int arg_8, int itemIdex, int rowY, int colX)
         {

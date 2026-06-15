@@ -1,5 +1,6 @@
 using Classes;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -166,7 +167,7 @@ namespace engine
             Classes.Affects.helpless
         };
 
-        internal static void CleanupPlayersStateAfterCombat() // sub_2D556
+        internal static async Task<bool> CleanupPlayersStateAfterCombat() // sub_2D556
         {
             gbl.partyAnimatedCount = 0;
             gbl.party_killed = true;
@@ -243,7 +244,7 @@ namespace engine
                         gbl.partyAnimatedCount++;
                     }
 
-                    System.Array.ForEach(affects_array, affect => ovr024.remove_affect(null, affect, player));
+                    await ovr024.RemoveAffects(affects_array, player);
                 }
 
                 if (gbl.battleWon == true)
@@ -375,6 +376,8 @@ namespace engine
                     }
                 }
             }
+
+            return true;
         }
 
 
@@ -466,7 +469,7 @@ namespace engine
         }
 
 
-        internal static void take_items_treasure() /* sub_2DDFC */
+        internal static async Task<bool> take_items_treasure() /* sub_2DDFC */
         {
             bool stop;
             int index = 0;
@@ -498,11 +501,13 @@ namespace engine
                 }
             } while (stop == false);
 
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
+
+            return true;
         }
 
 
-        internal static void take_treasure(ref bool items_present, ref bool money_present) /* sub_2DF2E */
+        internal static async Task<(bool items_present, bool money_present)> take_treasure(bool items_present, bool money_present) /* sub_2DF2E */
         {
             if (money_present == true)
             {
@@ -517,11 +522,11 @@ namespace engine
                         {
                             case 'M':
                                 ovr022.TakePoolMoney();
-                                ovr025.LoadPic();
+                                await ovr025.LoadPic();
                                 break;
 
                             case 'I':
-                                take_items_treasure();
+                                await take_items_treasure();
                                 break;
 
                             case 'E':
@@ -551,21 +556,23 @@ namespace engine
                 else
                 {
                     ovr022.TakePoolMoney();
-                    ovr025.LoadPic();
+                    await ovr025.LoadPic();
                 }
             }
             else
             {
-                take_items_treasure();
+                await take_items_treasure();
             }
+
+            return (items_present,money_present);
         }
 
 
-        internal static void distributeCombatTreasure() /* sub_2E0C3 */
+        internal static async Task<bool> distributeCombatTreasure() /* sub_2E0C3 */
         {
             Spells spellId = 0;
 
-            ovr025.LoadPic();
+            await ovr025.LoadPic();
 
             bool done = false;
             do
@@ -612,11 +619,11 @@ namespace engine
                 switch (input_key)
                 {
                     case 'V':
-                        ovr020.viewPlayer();
+                        await ovr020.viewPlayer();
                         break;
 
                     case 'T':
-                        take_treasure(ref items_present, ref money_present);
+                        (items_present, money_present) = await take_treasure(items_present, money_present);
                         break;
 
                     case 'P':
@@ -631,7 +638,7 @@ namespace engine
                         break;
 
                     case 'D':
-                        ovr023.sub_5D2E1(false, QuickFight.False, spellId);
+                        await ovr023.sub_5D2E1(false, QuickFight.False, spellId);
                         break;
 
                     case 'E':
@@ -670,6 +677,8 @@ namespace engine
                         break;
                 }
             } while (gbl.Exit == false && done == false);
+
+            return true;
         }
 
 
@@ -760,14 +769,14 @@ namespace engine
         }
 
 
-        internal static void AfterCombatExpAndTreasure() // sub_2E7A2
+        internal static async Task<bool> AfterCombatExpAndTreasure() // sub_2E7A2
         {
             gbl.area2_ptr.field_58E = 0;
             gbl.byte_1AB14 = false;
 
             if (gbl.inDemo == false)
             {
-                CleanupPlayersStateAfterCombat();
+                await CleanupPlayersStateAfterCombat();
             }
 
             gbl.game_state = GameState.AfterCombat;
@@ -793,7 +802,7 @@ namespace engine
                     {
                         distributeNpcTreasure();
                         displayCombatResults(gbl.exp_to_add);
-                        distributeCombatTreasure();
+                        await distributeCombatTreasure();
                     }
 
                     gbl.items_pointer.Clear();
@@ -815,6 +824,8 @@ namespace engine
                 gbl.area2_ptr.field_5C6 = 0;
                 gbl.area2_ptr.isDuel = false;
             }
+
+            return true;
         }
     }
 }

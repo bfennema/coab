@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace engine.Affects
 {
     internal class Spells
     {
-        delegate void spellDelegate();
+        delegate Task<bool> spellDelegate();
         readonly static Dictionary<Classes.Spells, spellDelegate> spellTable = [];
 
         static Spells()
@@ -119,13 +120,17 @@ namespace engine.Affects
 
             Classes.gbl.SpellCastFunction = new Classes.spellDelegate(ovr023.NonCombatSpellCast);
         }
-        internal static void Call(Classes.Spells spell_id)
+        internal static async Task<bool> Call(Classes.Spells spell_id)
         {
             Classes.gbl.spell_id = spell_id;
             spellDelegate func;
             if (spellTable.TryGetValue(spell_id, out func))
             {
-                func();
+                return await func();
+            }
+            else
+            {
+                return false;
             }
         }
     }

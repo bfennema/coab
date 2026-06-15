@@ -1,4 +1,5 @@
 using Classes;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -7,7 +8,7 @@ namespace engine
         static int[] sky_colours = new int[]{ /* seg600:0A8A unk_16D9A*/
         0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02, 0x09, 0x0E, 0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02 , 0x09, 0x0E};
 
-        internal static void RedrawView() /* sub_6F0BA */
+        internal static async Task<bool> RedrawView() /* sub_6F0BA */
         {
             if (gbl.lastDaxBlockId == 0x50)
             {
@@ -41,7 +42,7 @@ namespace engine
                 }
                 else if (gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.game_state == GameState.WildernessMap)
                 {
-                    ovr031.DrawWildernessMap();
+                    await ovr031.DrawWildernessMap();
                 }
                 else if (gbl.can_draw_bigpic == true)
                 {
@@ -50,6 +51,8 @@ namespace engine
 
                 gbl.can_draw_bigpic = false;
             }
+
+            return true;
         }
     }
 }

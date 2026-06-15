@@ -1,6 +1,8 @@
 
 using Classes;
 using Classes.Combat;
+using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -19,11 +21,11 @@ namespace engine
         }
 
 
-        internal static void MainCombatLoop() //sub_33100
+        internal static async Task<bool> MainCombatLoop() //sub_33100
         {
             gbl.game_state = GameState.Combat;
             gbl.SpellCastFunction = new spellDelegate(ovr014.target);
-            ovr011.BattleSetup();
+            await ovr011.BattleSetup();
             bool end_combat = false;
 
             if (gbl.friends_count == 0 ||
@@ -38,21 +40,23 @@ namespace engine
 
                 foreach (Player player in gbl.TeamList)
                 {
-                    ovr014.CalculateInitiative(player);
+                    await ovr014.CalculateInitiative(player);
                 }
 
                 gbl.area2_ptr.field_596 = 0;
 
                 foreach (Player player in FindNextCombatant())
                 {
-                    DoPlayerCombatTurn(player);
+                    await DoPlayerCombatTurn(player);
                 }
 
-                end_combat = BattleRoundChecks();
+                end_combat = await BattleRoundChecks();
             }
 
             free_combat_stuff();
             gbl.DelayBetweenCharacters = true;
+
+            return true;
         }
 
 
@@ -100,12 +104,12 @@ namespace engine
         }
 
 
-        internal static void DoPlayerCombatTurn(Player player) // sub_33281
+        internal static async Task<bool> DoPlayerCombatTurn(Player player) // sub_33281
         {
             player.actions.AttacksReceived = 0;
             player.actions.directionChanges = 0;
             player.actions.guarding = false;
-            Affects.Effect.Check(player, CheckType.PlayerRestrained);
+            await Affects.Effect.Check(player, CheckType.PlayerRestrained);
 
             if (player.actions.delay > 0)
             {
@@ -122,31 +126,37 @@ namespace engine
                 ovr025.reclac_player_values(player);
                 gbl.display_hitpoints_ac = true;
                 ovr025.CombatDisplayPlayerSummary(player);
-                Affects.Effect.Check(player, CheckType.Type_15);
+                await Affects.Effect.Check(player, CheckType.Type_15);
 
                 if (player.actions.spell_id == 0)
                 {
-                    Affects.Effect.Check(player, CheckType.Confusion);
+                    await Affects.Effect.Check(player, CheckType.Confusion);
                 }
 
                 if (player.actions.delay > 0)
                 {
                     if (player.quick_fight == QuickFight.True)
                     {
-                        ovr010.PlayerQuickFight(player);
+                        await ovr010.PlayerQuickFight(player);
                     }
                     else
                     {
-                        combat_menu(player);
+                        await camp_menu(player);
                     }
                 }
 
                 ovr033.RedrawPosition(ovr033.PlayerMapPos(player));
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
 
-        internal static void combat_menu(Player player) /* camp_menu */
+        internal static async Task<bool> camp_menu(Player player) /* camp_menu */
         {
             Spells spell_id;
             DownedPlayerTile var_D = new DownedPlayerTile();
@@ -159,7 +169,7 @@ namespace engine
                     spell_id = player.actions.spell_id;
                     player.actions.spell_id = 0;
 
-                    ovr023.sub_5D2E1(true, QuickFight.False, spell_id);
+                    await ovr023.sub_5D2E1(true, QuickFight.False, spell_id);
                     ovr025.clear_actions(player);
                 }
                 else
@@ -168,7 +178,7 @@ namespace engine
 
                     while (gbl.Exit == false && var_2 == false)
                     {
-                        combat_menu(out var_1, player);
+                        var_1 = await combat_menu(player);
 
                         if (gbl.displayInput_specialKeyPressed == false)
                         {
@@ -180,16 +190,16 @@ namespace engine
                                     seg043.clear_keyboard();
                                     seg049.SysDelay(0x0C8);
                                     var_2 = true;
-                                    ovr010.PlayerQuickFight(player);
+                                    await ovr010.PlayerQuickFight(player);
                                     break;
 
                                 case 'M':
-                                    sub_33B26(ref var_2, ' ', player);
+                                    var_2 = await sub_33B26(var_2, ' ', player);
                                     break;
 
                                 case 'V':
-                                    var_2 = ovr020.viewPlayer();
-                                    ovr014.reclac_attacks(player);
+                                    var_2 = await ovr020.viewPlayer();
+                                    await ovr014.reclac_attacks(player);
                                     if (var_2 == false)
                                     {
                                         ovr025.RedrawCombatScreen();
@@ -197,13 +207,13 @@ namespace engine
                                     break;
 
                                 case 'A':
-                                    var_2 = ovr014.aim_menu(var_D, true, false, true, -1, player);
+                                    var_2 = await ovr014.aim_menu(var_D, true, false, true, -1, player);
                                     break;
 
                                 case 'U':
                                     gbl.menuSelectedWord = 2;
-                                    ovr020.PlayerItemsMenu(ref var_2);
-                                    ovr014.reclac_attacks(player);
+                                    var_2 = await ovr020.PlayerItemsMenu(var_2);
+                                    await ovr014.reclac_attacks(player);
                                     if (var_2 == false)
                                     {
                                         ovr025.RedrawCombatScreen();
@@ -211,7 +221,7 @@ namespace engine
                                     break;
 
                                 case 'C':
-                                    ovr014.spell_menu3(out var_2, 0, 0);
+                                    var_2 = await ovr014.spell_menu3(0, 0);
                                     break;
 
                                 case 'T':
@@ -248,7 +258,7 @@ namespace engine
                                 case 'P':
                                 case 'Q':
                                 case 'I':
-                                    sub_33B26(ref var_2, var_1, player);
+                                    var_2 = await sub_33B26(var_2, var_1, player);
                                     break;
 
                                 case '2':
@@ -304,14 +314,17 @@ namespace engine
             {
                 ovr025.clear_actions(player);
             }
+
+            return true;
         }
 
         static Set unk_33748 = new Set(16, 19, 45, 50, 71, 72, 73, 75, 77, 79, 80, 81);
         static Set unk_33768 = new Set(16, 19, 32, 45, 50, 65, 67, 68, 71, 72, 73, 75, 77, 79, 80, 81, 84, 85, 86);
 
 
-        internal static void combat_menu(out char arg_0, Player player)
+        internal static Task<char> combat_menu(Player player)
         {
+            char arg_0;
             string menuText = string.Empty;
 
             if (player.actions.move > 0)
@@ -358,20 +371,22 @@ namespace engine
             } while (gbl.Exit == false && unk_33768.MemberOf(arg_0) == false);
 
             ovr027.ClearPromptArea();
+
+            return Task.FromResult(arg_0);
         }
 
 
-        internal static bool BattleRoundChecks() // battle01
+        internal static async Task<bool> BattleRoundChecks() // battle01
         {
-            ovr021.step_game_time(1, 1);
+            await ovr021.step_game_time(1, 1);
             gbl.combat_round++;
             ovr014.calc_enemy_health_percentage();
 
             foreach (Player player in gbl.TeamList)
             {
                 gbl.SelectedPlayer = player;
-                Affects.Effect.Check(player, CheckType.BattleRound);
-                ovr024.in_poison_cloud(0, player);
+                await Affects.Effect.Check(player, CheckType.BattleRound);
+                await ovr024.in_poison_cloud(0, player);
 
                 if (player.health_status == Status.dying)
                 {
@@ -416,7 +431,7 @@ namespace engine
         }
 
 
-        internal static void sub_33B26(ref bool arg_0, char arg_4, Player player)
+        internal static async Task<bool> sub_33B26(bool arg_0, char arg_4, Player player)
         {
             int movesBackup = player.actions.move;
             int dirBackup = player.actions.direction;
@@ -506,7 +521,7 @@ namespace engine
 
                     if (target_index > 0)
                     {
-                        sub_33F03(ref arg_0, gbl.player_array[target_index], player);
+                        arg_0 = await sub_33F03(arg_0, gbl.player_array[target_index], player);
                     }
                     else if (ground_tile == 0)
                     {
@@ -514,7 +529,7 @@ namespace engine
                         if (b == 'Y')
                         {
                             arg_0 = true;
-                            ovr014.flee_battle(player);
+                            await ovr014.flee_battle(player);
                         }
                         else if (b == 'N')
                         {
@@ -547,7 +562,7 @@ namespace engine
                         }
                         else
                         {
-                            ovr014.move_step_away_attack(dir, player);
+                            await ovr014.move_step_away_attack(dir, player);
 
                             if (player.in_combat == false)
                             {
@@ -558,7 +573,7 @@ namespace engine
                             {
                                 if (player.actions.move > 0)
                                 {
-                                    ovr014.sub_3E748(dir, player);
+                                    await ovr014.sub_3E748(dir, player);
                                 }
 
                                 if (player.in_combat == false)
@@ -567,7 +582,7 @@ namespace engine
                                     ovr025.clear_actions(player);
                                 }
 
-                                ovr024.in_poison_cloud(1, player);
+                                await ovr024.in_poison_cloud(1, player);
 
                                 if (player.IsHeld())
                                 {
@@ -590,10 +605,11 @@ namespace engine
             {
                 player.actions.move = 0;
             }
+
+            return arg_0;
         }
 
-
-        internal static void sub_33F03(ref bool arg_0, Player target, Player player)
+        internal static async Task<bool> sub_33F03(bool arg_0, Player target, Player player)
         {
             if (ovr025.is_weapon_ranged(player) == true &&
                 ovr025.is_weapon_ranged_melee(player) == false)
@@ -604,7 +620,7 @@ namespace engine
             {
                 player.actions.target = target;
 
-                if (ovr014.TrySweepAttack(target, player) == true)
+                if (await ovr014.TrySweepAttack(target, player) == true)
                 {
                     arg_0 = true;
                 }
@@ -612,9 +628,10 @@ namespace engine
                 {
                     ovr014.RecalcAttacksReceived(target, player);
 
-                    arg_0 = ovr014.AttackTarget(null, 0, target, player);
+                    arg_0 = await ovr014.AttackTarget(null, 0, target, player);
                 }
             }
+            return arg_0;
         }
 
 

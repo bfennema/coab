@@ -1,4 +1,5 @@
 using Classes;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -36,20 +37,24 @@ namespace engine
 		}
 
 
-		internal static void sub_3A071(Effect arg_0, object param, Player player)
+		internal static Task<bool> sub_3A071(Effect arg_0, object param, Player player)
 		{
 			ovr025.clear_actions(player);
+
+            return Task.FromResult(true);
 		}
 
 
-		internal static void Bless(Effect add_remove, object param, Player player)
+		internal static Task<bool> Bless(Effect add_remove, object param, Player player)
 		{
 			gbl.monster_morale += 5;
 			gbl.attack_roll++;
+
+            return Task.FromResult(true);
 		}
 
 
-		internal static void Curse(Effect arg_0, object param, Player player)
+		internal static Task<bool> Curse(Effect arg_0, object param, Player player)
 		{
 			if (gbl.monster_morale < 5)
 			{
@@ -60,10 +65,12 @@ namespace engine
 				gbl.monster_morale -= 5;
 			}
 			gbl.attack_roll--;
-		}
+
+            return Task.FromResult(true);
+        }
 
 
-		internal static void SticksToSnakes(Effect arg_0, object param, Player player)
+		internal static async Task<bool> SticksToSnakes(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
@@ -75,26 +82,30 @@ namespace engine
 			}
 			else
 			{
-				ovr024.remove_affect(null, Classes.Affects.sticks_to_snakes, player);
+				await ovr024.remove_affect(null, Classes.Affects.sticks_to_snakes, player);
 			}
 
 			ovr025.MagicAttackDisplay("is fighting with snakes", true, player);
 			ovr025.ClearPlayerTextArea();
 
 			ovr025.clear_actions(player);
+
+            return true;
 		}
 
 
-		internal static void DispelEvil(Effect arg_0, object param, Player player)
+		internal static Task<bool> DispelEvil(Effect arg_0, object param, Player player)
 		{
 			if (gbl.SelectedPlayer.flags.HasFlag(Flags.EvilSummon))
 			{
 				gbl.attack_roll -= 7;
 			}
-		}
+
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectFlameTongue(Effect arg_0, object param, Player player) // sub_3A17A
+		internal static Task<bool> AffectFlameTongue(Effect arg_0, object param, Player player) // sub_3A17A
 		{
 			int bonus = 0;
 
@@ -123,16 +134,20 @@ namespace engine
 			gbl.attack_roll += bonus;
 			gbl.damage += bonus;
 			gbl.damage_flags = DamageType.Magic | DamageType.Fire;
-		}
+
+            return Task.FromResult(true);
+        }
 
 
-		internal static void FaerieFire(Effect arg_0, object param, Player player)
+		internal static Task<bool> FaerieFire(Effect arg_0, object param, Player player)
 		{
 			gbl.attack_roll += 2;
+
+            return Task.FromResult(true);
 		}
 
 
-		internal static void affect_protect_evil(Effect arg_0, object param, Player player) /* sub_3A224 */
+		internal static Task<bool> affect_protect_evil(Effect arg_0, object param, Player player) /* sub_3A224 */
 		{
 			if (gbl.SelectedPlayer.alignment == 2 ||
 				gbl.SelectedPlayer.alignment == 5 ||
@@ -140,11 +155,17 @@ namespace engine
 			{
 				gbl.savingThrowRoll += 2;
 				gbl.attack_roll -= 2;
-			}
-		}
+
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+        }
 
 
-		internal static void affect_protect_good(Effect arg_0, object param, Player player) /* sub_3A259 */
+		internal static Task<bool> affect_protect_good(Effect arg_0, object param, Player player) /* sub_3A259 */
 		{
 			if (gbl.SelectedPlayer.alignment == 0 ||
 				gbl.SelectedPlayer.alignment == 3 ||
@@ -152,21 +173,32 @@ namespace engine
 			{
 				gbl.savingThrowRoll += 2;
 				gbl.attack_roll -= 2;
-			}
-		}
+
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+        }
 
 
-		internal static void affect_resist_cold(Effect arg_0, object param, Player player) /* sub_3A28E */
+		internal static Task<bool> affect_resist_cold(Effect arg_0, object param, Player player) /* sub_3A28E */
 		{
-			if ((gbl.damage_flags.HasFlag(DamageType.Cold)))
-			{
-				gbl.damage /= 2;
-				gbl.savingThrowRoll += 3;
-			}
+            if ((gbl.damage_flags.HasFlag(DamageType.Cold)))
+            {
+                gbl.damage /= 2;
+                gbl.savingThrowRoll += 3;
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void affect_charm_person(Effect arg_0, object param, Player player) /* sub_3A2AD */
+		internal static Task<bool> affect_charm_person(Effect arg_0, object param, Player player) /* sub_3A2AD */
 		{
 			Affect affect = (Affect)param;
 
@@ -198,25 +230,28 @@ namespace engine
 				}
 				gbl.monster_morale = 100;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void Suffocates(Effect arg_0, object param, Player player)
+		internal static async Task<bool> Suffocates(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
 			if (affect.affect_data == 0)
 			{
-				ovr024.KillPlayer("Suffocates", Status.dead, player);
+				await ovr024.KillPlayer("Suffocates", Status.dead, player);
+                return true;
 			}
 			else
 			{
 				affect.affect_data--;
+                return false;
 			}
 		}
 
 
-		internal static void AffectPoisonDamage(Effect arg_0, object param, Player player) // sub_3A3BC
+		internal static async Task<bool> AffectPoisonDamage(Effect arg_0, object param, Player player) // sub_3A3BC
 		{
 			Affect affect = (Affect)param;
 
@@ -225,17 +260,23 @@ namespace engine
 			{
 				gbl.damage_flags = 0;
 
-				ovr024.damage_person(false, 0, 1, player);
+				await ovr024.damage_person(false, 0, 1, player);
 
 				if (gbl.game_state != GameState.Combat)
 				{
 					ovr025.PartySummary(gbl.SelectedPlayer);
 				}
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void Affectshield(Effect arg_0, object param, Player player) /* sub_3A41F */
+		internal static Task<bool> Affectshield(Effect arg_0, object param, Player player) /* sub_3A41F */
 		{
 			if (player.ac < 57) // AC 3
 			{
@@ -248,10 +289,11 @@ namespace engine
 			{
 				gbl.damage = 0;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectGnomeVsGoblinKobold(Effect arg_0, object param, Player player) // sub_3A44A
+		internal static Task<bool> AffectGnomeVsGoblinKobold(Effect arg_0, object param, Player player) // sub_3A44A
 		{
 			if (player.actions != null &&
 				player.actions.target != null &&
@@ -259,22 +301,32 @@ namespace engine
 			{
 				gbl.spell_target = player.actions.target;
 				gbl.attack_roll++;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectResistFire(Effect add_remove, object param, Player player) /* sub_3A480 */
+		internal static Task<bool> AffectResistFire(Effect add_remove, object param, Player player) /* sub_3A480 */
 		{
 			if (add_remove == Effect.Add &&
 				(gbl.damage_flags & DamageType.Fire) != 0)
 			{
 				gbl.damage /= 2;
 				gbl.savingThrowRoll += 3;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void is_silenced1(Effect arg_0, object param, Player player)
+		internal static Task<bool> is_silenced1(Effect arg_0, object param, Player player)
 		{
 			if (player.actions.can_use == true)
 			{
@@ -283,25 +335,29 @@ namespace engine
 
 			player.actions.can_use = false;
 			player.actions.can_cast = false;
-		}
+
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectslowPoison(Effect arg_0, object param, Player player) // sub_3A517
+		internal static async Task<bool> AffectslowPoison(Effect arg_0, object param, Player player) // sub_3A517
 		{
 			if (player.HasAffect(Classes.Affects.poisoned) == true)
 			{
-				ovr024.KillPlayer("dies from poison", Status.dead, player);
+				await ovr024.KillPlayer("dies from poison", Status.dead, player);
 			}
 
 			gbl.cureSpell = true;
 
-			ovr024.remove_affect(null, Classes.Affects.poison_damage, player);
+			await ovr024.remove_affect(null, Classes.Affects.poison_damage, player);
 
 			gbl.cureSpell = false;
+
+            return true;
 		}
 
 
-		internal static void affect_spiritual_hammer(Effect add_remove, object param, Player player) /* sub_3A583 */
+		internal static async Task<bool> affect_spiritual_hammer(Effect add_remove, object param, Player player) /* sub_3A583 */
 		{
 			Item item = player.items.Find(i => i.type == Item.Type.Hammer && i.namenum[2] == Classes.Item.Names.Spiritual);
 			bool item_found = item != null;
@@ -320,41 +376,53 @@ namespace engine
 				player.items.Add(item);
 				if (gbl.SelectedPlayer.activeItems[ItemSlot.Weapon] != null)
 				{
-					ovr020.ready_Item(gbl.SelectedPlayer.activeItems[ItemSlot.Weapon]);
+					await ovr020.ready_Item(gbl.SelectedPlayer.activeItems[ItemSlot.Weapon]);
 					ovr025.reclac_player_values(player);
 				}
-				ovr020.ready_Item(item);
+				await ovr020.ready_Item(item);
 
 				ovr025.DisplayPlayerStatusString(true, 10, "Gains an item", player);
 			}
 
 			ovr025.reclac_player_values(player);
+
+            return true;
 		}
 
 
-		internal static void sub_3A6C6(Effect arg_0, object param, Player player)
+		internal static Task<bool> sub_3A6C6(Effect arg_0, object param, Player player)
 		{
 			if (gbl.SelectedPlayer.HasAffect(Classes.Affects.detect_invisibility) == false &&
 				player.HasAffect(Classes.Affects.faerie_fire) == false)
 			{
 				gbl.targetInvisible = true;
 				gbl.attack_roll -= 4;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectDwarfVsOrcGoblin(Effect arg_0, object param, Player player) // sub_3A7E8
+		internal static Task<bool> AffectDwarfVsOrcGoblin(Effect arg_0, object param, Player player) // sub_3A7E8
 		{
 			gbl.spell_target = player.actions.target;
 
-			if (gbl.spell_target.flags.HasFlag(Flags.DwarfBonus))
-			{
-				gbl.attack_roll++;
-			}
+            if (gbl.spell_target.flags.HasFlag(Flags.DwarfBonus))
+            {
+                gbl.attack_roll++;
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void MirrorImage(Effect arg_0, object param, Player player)
+		internal static async Task<bool> MirrorImage(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
@@ -370,19 +438,25 @@ namespace engine
 
 				if (affect.affect_data == 0)
 				{
-					ovr024.remove_affect(null, Classes.Affects.mirror_image, player);
+					await ovr024.remove_affect(null, Classes.Affects.mirror_image, player);
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void three_quarters_damage(Effect arg_0, object param, Player player)
+		internal static Task<bool> three_quarters_damage(Effect arg_0, object param, Player player)
 		{
 			gbl.damage -= gbl.damage / 4;
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void StinkingCloud(Effect arg_0, object param, Player player)
+		internal static Task<bool> StinkingCloud(Effect arg_0, object param, Player player)
 		{
 			if (player.actions.can_use == true)
 			{
@@ -409,10 +483,11 @@ namespace engine
 			{
 				ovr025.CombatDisplayPlayerSummary(player);
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void sub_3A89E(Effect arg_0, object param, Player player)
+		internal static async Task<bool> sub_3A89E(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
@@ -420,7 +495,8 @@ namespace engine
 
 			if (gbl.cureSpell == false)
 			{
-				ovr024.KillPlayer("collapses", Status.dead, player);
+				await ovr024.KillPlayer("collapses", Status.dead, player);
+                return false;
 			}
 
 			player.combat_team = (CombatTeam)(affect.affect_data >> 4);
@@ -436,10 +512,11 @@ namespace engine
 			}
 
 			player.flags |= Flags.Undead;
+            return true;
 		}
 
 
-		internal static void AffectBlinded(Effect arg_0, object param, Player player) // sub_3A951
+		internal static Task<bool> AffectBlinded(Effect arg_0, object param, Player player) // sub_3A951
 		{
 			gbl.attack_roll -= 4;
 
@@ -447,23 +524,26 @@ namespace engine
 			player.ac_behind -= 4;
 
 			gbl.savingThrowRoll -= 4;
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectCauseDisease(Effect add_remove, object param, Player player) // sub_3A974
+		internal static async Task<bool> AffectCauseDisease(Effect add_remove, object param, Player player) // sub_3A974
 		{
-			Affects.Effect.Call(add_remove, param, player, Classes.Affects.weaken);
-			Affects.Effect.Call(add_remove, param, player, Classes.Affects.cause_disease_2);
+			await Affects.Effect.Call(add_remove, param, player, Classes.Affects.weaken);
+			await Affects.Effect.Call(add_remove, param, player, Classes.Affects.cause_disease_2);
+
+            return true;
 		}
 
 
-		internal static void AffectConfuse(Effect arg_0, object arg_2, Player player) // sub_3A9D9
+		internal static async Task<bool> AffectConfuse(Effect arg_0, object arg_2, Player player) // sub_3A9D9
 		{
 			byte var_1 = ovr024.roll_dice(100, 1);
 
 			if (var_1 >= 1 && var_1 <= 10)
 			{
-				ovr024.remove_affect(null, Classes.Affects.confuse, player);
+				await ovr024.remove_affect(null, Classes.Affects.confuse, player);
 				player.actions.fleeing = true;
 				player.quick_fight = QuickFight.True;
 
@@ -474,7 +554,7 @@ namespace engine
 
 				player.actions.target = null;
 
-				ovr024.ApplyAttackSpellAffect("runs away", false, DamageOnSave.Zero, true, 0, 10, Classes.Affects.fear, player);
+				await ovr024.ApplyAttackSpellAffect("runs away", false, DamageOnSave.Zero, true, 0, 10, Classes.Affects.fear, player);
 			}
 			else if (var_1 >= 11 && var_1 <= 60)
 			{
@@ -484,8 +564,8 @@ namespace engine
 			}
 			else if (var_1 >= 61 && var_1 <= 80)
 			{
-				ovr024.ApplyAttackSpellAffect("goes berserk", false, DamageOnSave.Zero, true, (byte)player.combat_team, 1, Classes.Affects.confuse_berserk, player);
-				Affects.Effect.Call(Effect.Add, null, player, Classes.Affects.confuse_berserk);
+				await ovr024.ApplyAttackSpellAffect("goes berserk", false, DamageOnSave.Zero, true, (byte)player.combat_team, 1, Classes.Affects.confuse_berserk, player);
+				await Affects.Effect.Call(Effect.Add, null, player, Classes.Affects.confuse_berserk);
 			}
 			else if (var_1 >= 81 && var_1 <= 100)
 			{
@@ -493,31 +573,39 @@ namespace engine
 				ovr025.ClearPlayerTextArea();
 			}
 
-			if (ovr024.RollSavingThrow(-2, SaveVerseType.Spell, player) == true)
+			if (await ovr024.RollSavingThrow(-2, SaveVerseType.Spell, player) == true)
 			{
-				ovr024.remove_affect(null, Classes.Affects.confuse, player);
+				await ovr024.remove_affect(null, Classes.Affects.confuse, player);
 			}
+
+            return true;
 		}
 
 
-		internal static void affect_curse(Effect arg_0, object param, Player player) /* sub_3AB6F */
+		internal static Task<bool> affect_curse(Effect arg_0, object param, Player player) /* sub_3AB6F */
 		{
 			gbl.attack_roll -= 4;
 			gbl.savingThrowRoll -= 4;
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectBlink(Effect arg_0, object param, Player player) // has_action_timedout
+		internal static Task<bool> AffectBlink(Effect arg_0, object param, Player player) // has_action_timedout
 		{
 			if (player.actions.delay == 0)
 			{
 				gbl.targetInvisible = true;
 				gbl.attack_roll = -1;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectHaste(Effect arg_0, object param, Player player) // spl_age
+		internal static Task<bool> AffectHaste(Effect arg_0, object param, Player player) // spl_age
 		{
 			Affect affect = (Affect)param;
 
@@ -530,10 +618,12 @@ namespace engine
 			}
 
 			gbl.halfActionsLeft *= 2;
-		}
+
+            return Task.FromResult(true);
+        }
 
 
-		internal static void StinkingCloudAffect(Effect arg_0, object param, Player player) // sub_3AC1D
+		internal static Task<bool> StinkingCloudAffect(Effect arg_0, object param, Player player) // sub_3AC1D
 		{
 			Affect affect = (Affect)param;
 
@@ -577,7 +667,8 @@ namespace engine
 					}
 				}
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
 		static void AvoidMissleAttack(int percentage, Player player) // sub_3AF06
@@ -612,24 +703,30 @@ namespace engine
 		}
 
 
-		internal static void AffectProtNormalMissles(Effect arg_0, object param, Player player) // sub_3AFE0
+		internal static Task<bool> AffectProtNormalMissles(Effect arg_0, object param, Player player) // sub_3AFE0
 		{
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
 			if (item != null && item.plus == 0)
 			{
 				AvoidMissleAttack(100, player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void Affectslow(Effect arg_0, object param, Player player) //sub_3B01B
+		internal static Task<bool> Affectslow(Effect arg_0, object param, Player player) //sub_3B01B
 		{
 			gbl.halfActionsLeft /= 2;
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void weaken(Effect arg_0, object param, Player player)
+		internal static Task<bool> weaken(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
@@ -644,11 +741,16 @@ namespace engine
 				{
 					ovr024.add_affect(false, 0xff, 0, Classes.Affects.helpless, player);
 				}
-			}
-		}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+        }
 
 
-		internal static void sub_3B0C2(Effect arg_0, object param, Player player)
+		internal static async Task<bool> sub_3B0C2(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
@@ -658,7 +760,7 @@ namespace engine
 				{
 					gbl.damage_flags = 0;
 
-					ovr024.damage_person(false, 0, 1, player);
+					await ovr024.damage_person(false, 0, 1, player);
 
 					if (gbl.game_state != GameState.Combat)
 					{
@@ -669,31 +771,46 @@ namespace engine
 				{
 					ovr024.add_affect(false, 0xff, 0, Classes.Affects.helpless, player);
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectGiantVsDwarfGnome(Effect arg_0, object param, Player player)
+		internal static Task<bool> AffectGiantVsDwarfGnome(Effect arg_0, object param, Player player)
 		{
 			gbl.spell_target = player.actions.target;
 
 			if (gbl.SelectedPlayer.flags.HasFlag(Flags.DwarfPenalty))
 			{
 				gbl.attack_roll -= 4;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectGnollBugbearVsGnome(Effect arg_0, object param, Player player)
+		internal static Task<bool> AffectGnollBugbearVsGnome(Effect arg_0, object param, Player player)
 		{
 			if (gbl.SelectedPlayer.flags.HasFlag(Flags.GnomePenalty))
 			{
 				gbl.attack_roll -= 4;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectPrayer(Effect arg_0, object param, Player player) // sub_3B1C9
+		internal static Task<bool> AffectPrayer(Effect arg_0, object param, Player player) // sub_3B1C9
 		{
 			Affect affect = (Affect)param;
 
@@ -709,10 +826,11 @@ namespace engine
 				gbl.attack_roll -= 1;
 				gbl.savingThrowRoll -= 1;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void HotFireShield(Effect arg_0, object param, Player player) // sub_3B212
+		internal static Task<bool> HotFireShield(Effect arg_0, object param, Player player) // sub_3B212
 		{
 			if ((gbl.damage_flags & DamageType.Cold) != 0)
 			{
@@ -722,10 +840,11 @@ namespace engine
 			{
 				gbl.damage *= 2;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void ColdFireShield(Effect arg_0, object param, Player player) // sub_3B243
+		internal static Task<bool> ColdFireShield(Effect arg_0, object param, Player player) // sub_3B243
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0)
 			{
@@ -735,33 +854,41 @@ namespace engine
 			{
 				gbl.damage *= 2;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void sub_3B27B(Effect arg_0, object param, Player player) // sub_3B27B
+		internal static Task<bool> sub_3B27B(Effect arg_0, object param, Player player) // sub_3B27B
 		{
 			ovr024.add_affect(false, 12, 1, Classes.Affects.invisibility, player);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectClearMovement(Effect arg_0, object param, Player player) //sub_3B29A
+		internal static Task<bool> AffectClearMovement(Effect arg_0, object param, Player player) //sub_3B29A
 		{
 			player.actions.move = 0;
 
 			if (gbl.resetMovesLeft == true)
 			{
 				gbl.halfActionsLeft = 0;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectRegenration(Effect arg_0, object param, Player player)
+		internal static Task<bool> AffectRegenration(Effect arg_0, object param, Player player)
 		{
 			ovr024.add_affect(false, 0xff, 0, Classes.Affects.regen_3_hp, player);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectResistWeapons(Effect arg_0, object param, Player player) // sub_3B2D8
+		internal static Task<bool> AffectResistWeapons(Effect arg_0, object param, Player player) // sub_3B2D8
 		{
 			Item weapon = get_primary_weapon(gbl.SelectedPlayer);
 
@@ -774,10 +901,11 @@ namespace engine
 			{
 				gbl.damage /= 2;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectFireResist(Effect arg_0, object param, Player player)
+		internal static Task<bool> AffectFireResist(Effect arg_0, object param, Player player)
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0)
 			{
@@ -797,11 +925,16 @@ namespace engine
 				{
 					Protected();
 				}
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectHighConRegen(Effect arg_0, object param, Player player) /* sub_3B386 */
+		internal static async Task<bool> AffectHighConRegen(Effect arg_0, object param, Player player) /* sub_3B386 */
 		{
 			Affect affect = (Affect)param;
 
@@ -811,72 +944,94 @@ namespace engine
 				// Per 1e, healing is 1/6 turns at 20, 1/5 turns at 21, ... 1/1 turn at 25
 				ushort rounds = (ushort)((26 - player.stats.Con.full) * 10);
 				if (addAffect(rounds, affect.affect_data, Classes.Affects.highConRegen, player) == true && 
-					ovr024.heal_player(1, 1, player) == true)
+					await ovr024.heal_player(1, 1, player) == true)
 				{
 					ovr025.DescribeHealing(player);
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectMinorGlobeOfInvulnerability(Effect arg_0, object param, Player player) /* sub_3B3CA */
+		internal static Task<bool> AffectMinorGlobeOfInvulnerability(Effect arg_0, object param, Player player) /* sub_3B3CA */
 		{
 			if (gbl.spell_id > 0 &&
 				gbl.spellCastingTable[(byte)gbl.spell_id].spellLevel < 4)
 			{
 				Protected();
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void PoisonAttack(int save_bonus, Player player)
+		internal static async Task<bool> PoisonAttack(int save_bonus, Player player)
 		{
 			gbl.spell_target = player.actions.target;
 
-			if (ovr024.RollSavingThrow(save_bonus, SaveVerseType.Poison, gbl.spell_target) == false)
-			{
-				ovr025.DisplayPlayerStatusString(false, 10, "is Poisoned", gbl.spell_target);
-				seg041.GameDelay();
-				ovr024.add_affect(false, 0xff, 0, Classes.Affects.poisoned, gbl.spell_target);
+            if (await ovr024.RollSavingThrow(save_bonus, SaveVerseType.Poison, gbl.spell_target) == false)
+            {
+                ovr025.DisplayPlayerStatusString(false, 10, "is Poisoned", gbl.spell_target);
+                seg041.GameDelay();
+                ovr024.add_affect(false, 0xff, 0, Classes.Affects.poisoned, gbl.spell_target);
 
-				ovr024.KillPlayer("is killed", Status.dead, gbl.spell_target);
-			}
+                await ovr024.KillPlayer("is killed", Status.dead, gbl.spell_target);
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectPoisonPlus0(Effect arg_0, object param, Player player) // sub_3B520
+		internal static async Task<bool> AffectPoisonPlus0(Effect arg_0, object param, Player player) // sub_3B520
 		{
-			PoisonAttack(0, player);
+			return await PoisonAttack(0, player);
 		}
 
 
-		internal static void AffectPoisonPlus4(Effect arg_0, object param, Player player) // sub_3B534
+		internal static async Task<bool> AffectPoisonPlus4(Effect arg_0, object param, Player player) // sub_3B534
 		{
-			PoisonAttack(4, player);
+			return await PoisonAttack(4, player);
 		}
 
 
-		internal static void AffectPoisonPlus2(Effect arg_0, object param, Player player) // sub_3B548
+		internal static async Task<bool> AffectPoisonPlus2(Effect arg_0, object param, Player player) // sub_3B548
 		{
-			PoisonAttack(2, player);
+			return await PoisonAttack(2, player);
 		}
 
 
-		internal static void ThriKreenParalyze(Effect arg_0, object param, Player player) // sub_3B55C
+		internal static async Task<bool> ThriKreenParalyze(Effect arg_0, object param, Player player) // sub_3B55C
 		{
 			ushort time = ovr024.roll_dice(8, 2);
 
 			gbl.spell_target = player.actions.target;
 
-			if (ovr024.RollSavingThrow(0, SaveVerseType.Poison, gbl.spell_target) == false)
+			if (await ovr024.RollSavingThrow(0, SaveVerseType.Poison, gbl.spell_target) == false)
 			{
 				ovr025.MagicAttackDisplay("is Paralyzed", true, gbl.spell_target);
 				ovr024.add_affect(false, 12, time, Classes.Affects.paralyze, gbl.spell_target);
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectFeebleMind(Effect arg_0, object param, Player player) // spell_stupid
+		internal static Task<bool> AffectFeebleMind(Effect arg_0, object param, Player player) // spell_stupid
 		{
             player.stats.Int.full = 7;
             player.stats.Wis.full = 7;
@@ -887,10 +1042,11 @@ namespace engine
 			{
 				ovr024.TryLooseSpell(player);
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectInvisToAnimals(Effect arg_0, object param, Player player) // sub_3B636
+		internal static Task<bool> AffectInvisToAnimals(Effect arg_0, object param, Player player) // sub_3B636
 		{
 			if (gbl.SelectedPlayer.flags.HasFlag(Flags.Animal))
 			{
@@ -899,44 +1055,58 @@ namespace engine
 				{
 					gbl.targetInvisible = true;
 					gbl.attack_roll -= 4;
-				}
+                    return Task.FromResult(true);
+                }
 			}
-		}
+            return Task.FromResult(false);
+        }
 
 
-		internal static void AffectPoisonNeg2(Effect arg_0, object param, Player player) // sub_3B671
+		internal static async Task<bool> AffectPoisonNeg2(Effect arg_0, object param, Player player) // sub_3B671
 		{
-			PoisonAttack(-2, player);
+			return await PoisonAttack(-2, player);
 		}
 
 
-		internal static void AffectInvisible(Effect arg_0, object param, Player player) // sub_3B685
+		internal static Task<bool> AffectInvisible(Effect arg_0, object param, Player player) // sub_3B685
 		{
 			gbl.targetInvisible = true;
 			gbl.attack_roll -= 4;
+
+            return Task.FromResult(true);
 		}
 
 
-		internal static void AffectCamouflage(Effect arg_0, object param, Player player) // sub_3B696
+		internal static Task<bool> AffectCamouflage(Effect arg_0, object param, Player player) // sub_3B696
 		{
 			if (ovr024.roll_dice(100, 1) <= 95)
 			{
 				ovr024.add_affect(false, 12, 1, Classes.Affects.invisibility, player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void ProtDragonsBreath(Effect arg_0, object param, Player player)
+		internal static Task<bool> ProtDragonsBreath(Effect arg_0, object param, Player player)
 		{
 			if ((gbl.damage_flags & DamageType.DragonBreath) > 0)
 			{
 				Protected();
 				ovr025.DisplayPlayerStatusString(true, 10, "is unaffected", player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectDragonSlayer(Effect arg_0, object param, Player player) // sub_3B71A
+		internal static Task<bool> AffectDragonSlayer(Effect arg_0, object param, Player player) // sub_3B71A
 		{
 			if (player.actions != null &&
 				player.actions.target != null)
@@ -947,12 +1117,14 @@ namespace engine
 				{
 					gbl.damage = (ovr024.roll_dice(12, 1) * 3) + 4 + ovr025.strengthDamBonus(player);
 					gbl.attack_roll += 2;
-				}
+                    return Task.FromResult(true);
+                }
 			}
-		}
+            return Task.FromResult(false);
+        }
 
 
-		internal static void AffectFrostBrand(Effect arg_0, object param, Player player) // sub_3B772
+		internal static Task<bool> AffectFrostBrand(Effect arg_0, object param, Player player) // sub_3B772
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0)
 			{
@@ -984,10 +1156,11 @@ namespace engine
 					gbl.damage += 3;
 				}
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectBerzerk(Effect arg_0, object param, Player player)
+		internal static Task<bool> AffectBerzerk(Effect arg_0, object param, Player player)
 		{
 			if (arg_0 == Effect.Add)
 			{
@@ -1026,48 +1199,55 @@ namespace engine
 
 				player.combat_team = CombatTeam.Ours;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void sub_3B8D9(Effect arg_0, object param, Player player)
+		internal static Task<bool> sub_3B8D9(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 
 			if (ovr024.combat_heal(player.hit_point_current, player) == false)
 			{
 				addAffect(1, affect.affect_data, Classes.Affects.affect_4e, player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void MagicFireAttack_2d10(Effect arg_0, object param, Player player) // sub_3B919
+		internal static async Task<bool> MagicFireAttack_2d10(Effect arg_0, object param, Player player) // sub_3B919
 		{
 			gbl.damage_flags = DamageType.Magic | DamageType.Fire;
 
-			ovr024.damage_person(false, 0, ovr024.roll_dice_save(10, 2), player.actions.target);
+			return await ovr024.damage_person(false, 0, ovr024.roll_dice_save(10, 2), player.actions.target);
 		}
 
 
-		internal static void AnkhegMeleeAcidAttack(Effect arg_0, object param, Player player) // sub_3B94C
+		internal static async Task<bool> AnkhegMeleeAcidAttack(Effect arg_0, object param, Player player) // sub_3B94C
 		{
 			gbl.damage_flags = DamageType.Acid;
 
-			ovr024.damage_person(false, 0, ovr024.roll_dice_save(4, 1), player.actions.target);
+			return await ovr024.damage_person(false, 0, ovr024.roll_dice_save(4, 1), player.actions.target);
 		}
 
 
-		internal static void half_damage(Effect arg_0, object param, Player player) /* sub_3B97F */
+		internal static Task<bool> half_damage(Effect arg_0, object param, Player player) /* sub_3B97F */
 		{
 			gbl.damage /= 2;
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectResistFireAndCold(Effect arg_0, object param, Player player) // sub_3B990
+		internal static async Task<bool> AffectResistFireAndCold(Effect arg_0, object param, Player player) // sub_3B990
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0 ||
 				(gbl.damage_flags & DamageType.Cold) != 0)
 			{
-				if (ovr024.RollSavingThrow(0, SaveVerseType.Spell, player) == true &&
+				if (await ovr024.RollSavingThrow(0, SaveVerseType.Spell, player) == true &&
                     gbl.spell_id > 0 &&
 					gbl.spellCastingTable[(byte)gbl.spell_id].damageOnSave != 0)
 				{
@@ -1077,25 +1257,35 @@ namespace engine
 				{
 					gbl.damage /= 2;
 				}
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectshamblerAbsorbLightning(Effect arg_0, object param, Player player) // sub_3B9E1
+		internal static Task<bool> AffectshamblerAbsorbLightning(Effect arg_0, object param, Player player) // sub_3B9E1
 		{
 			// Shambling Mounds absorb lighting and get more powerful.
 
 			if ((gbl.damage_flags & DamageType.Electricity) != 0)
 			{
 				Protected();
-				//byte var_1 = ovr024.roll_dice(8, 1);
+                //byte var_1 = ovr024.roll_dice(8, 1);
 
-				player.hit_point_current += 8;
-			}
+                player.hit_point_current += 8;
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectResistPiercing(Effect arg_0, object param, Player player) // sub_3BA14
+		internal static Task<bool> AffectResistPiercing(Effect arg_0, object param, Player player) // sub_3BA14
 		{
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
@@ -1103,11 +1293,16 @@ namespace engine
 				item.itemData.field_7 == 1)
 			{
 				gbl.damage = 1;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectDisplace(Effect arg_0, object param, Player player) /*sub_3BA55*/
+		internal static Task<bool> AffectDisplace(Effect arg_0, object param, Player player) /*sub_3BA55*/
 		{
 			Affect affect = (Affect)param;
 
@@ -1123,10 +1318,11 @@ namespace engine
 					affect.affect_data |= 0x10;
 				}
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void CloudKillAffect(Effect arg_0, object param, Player player) // sub_3BAB9
+		internal static Task<bool> CloudKillAffect(Effect arg_0, object param, Player player) // sub_3BAB9
 		{
 			Affect affect = (Affect)param;
 
@@ -1170,20 +1366,30 @@ namespace engine
 						}
 					}
 				}
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void half_fire_damage(Effect arg_0, object param, Player arg_6) // sub_3BD98
+		internal static Task<bool> half_fire_damage(Effect arg_0, object param, Player arg_6) // sub_3BD98
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0)
 			{
 				gbl.damage /= 2;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectResistBluntPierce(Effect arg_0, object param, Player arg_6) // sub_3BDB2
+		internal static Task<bool> AffectResistBluntPierce(Effect arg_0, object param, Player arg_6) // sub_3BDB2
 		{
 			Item item = get_primary_weapon(gbl.SelectedPlayer);
 
@@ -1191,23 +1397,33 @@ namespace engine
 				(item.itemData.field_7 & 0x81) != 0)
 			{
 				gbl.damage /= 2;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectDelayDeath(Effect arg_0, object param, Player player)
+		internal static async Task<bool> AffectDelayDeath(Effect arg_0, object param, Player player)
 		{
 			Affect affect = (Affect)param;
 			affect.callAffectTable = false;
 
 			if (player.in_combat == true)
 			{
-				ovr024.KillPlayer("Falls dead", Status.dead, player);
+				await ovr024.KillPlayer("Falls dead", Status.dead, player);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void con_saving_bonus(Effect arg_0, object param, Player player) /* sub_3BE42 */
+		internal static Task<bool> con_saving_bonus(Effect arg_0, object param, Player player) /* sub_3BE42 */
 		{
 			if (gbl.saveVerseType == SaveVerseType.Spell ||
 				gbl.saveVerseType == SaveVerseType.RodStaffWand)
@@ -1245,21 +1461,27 @@ namespace engine
 
 				gbl.savingThrowRoll += save_bonus;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectRegen3Hp(Effect arg_0, object param, Player player) // sub_3BEB8
+		internal static Task<bool> AffectRegen3Hp(Effect arg_0, object param, Player player) // sub_3BEB8
 		{
 			player.hit_point_current += 3;
 
 			if (player.hit_point_current > player.hit_point_max)
 			{
 				player.hit_point_current = player.hit_point_max;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectFightUnconscious(Effect arg_0, object param, Player player) // sub_3BEE8
+		internal static async Task<bool> AffectFightUnconscious(Effect arg_0, object param, Player player) // sub_3BEE8
 		{
 			Affect arg_2 = (Affect)param;
 
@@ -1281,43 +1503,63 @@ namespace engine
 			{
 				ovr024.add_affect(true, 0xff, (ushort)(ovr024.roll_dice(4, 1) + 1), Classes.Affects.delay_death, player);
 				arg_2.callAffectTable = false;
-				ovr024.remove_affect(arg_2, Classes.Affects.fight_unconscious, player);
+				await ovr024.remove_affect(arg_2, Classes.Affects.fight_unconscious, player);
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectTrollFireOrAcid(Effect arg_0, object param, Player player)
+		internal static Task<bool> AffectTrollFireOrAcid(Effect arg_0, object param, Player player)
 		{
 			if ((gbl.damage_flags & DamageType.Fire) == 0 &&
 				(gbl.damage_flags & DamageType.Acid) == 0)
 			{
 				ovr024.add_affect(true, 0xff, ovr024.roll_dice(6, 3), Classes.Affects.TrollRegen, player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectTrollRegenerate(Effect arg_0, object param, Player player) // sp_regenerate
+		internal static Task<bool> AffectTrollRegenerate(Effect arg_0, object param, Player player) // sp_regenerate
 		{
 			if (player.HasAffect(Classes.Affects.regen_3_hp) == false &&
 				player.HasAffect(Classes.Affects.regenerate) == false)
 			{
 				ovr024.add_affect(true, 0xff, 3, Classes.Affects.regenerate, player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectTrollRegen(Effect arg_0, object param, Player player) // sub_3C01E
+		internal static Task<bool> AffectTrollRegen(Effect arg_0, object param, Player player) // sub_3C01E
 		{
 			Affect affect = (Affect)param;
 
 			if (ovr024.combat_heal(player.hit_point_max, player) == false)
 			{
 				addAffect(1, affect.affect_data, Classes.Affects.TrollRegen, player);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectsalamanderHeatDamage(Effect arg_0, object param, Player player) // sub_3C05D
+		internal static Task<bool> AffectsalamanderHeatDamage(Effect arg_0, object param, Player player) // sub_3C05D
 		{
 			gbl.spell_target = player.actions.target;
 
@@ -1327,17 +1569,23 @@ namespace engine
 				gbl.spell_target.HasAffect(Classes.Affects.weap_frost_brand) == false)
 			{
 				gbl.damage += ovr024.roll_dice(6, 1);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void sub_3C0DA(Effect arg_0, object param, Player player)
+		internal static Task<bool> sub_3C0DA(Effect arg_0, object param, Player player)
 		{
 			AvoidMissleAttack(60, player);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void ResistMagicPercent(int rollBase) // sub_3C0EE
+		internal static Task<bool> ResistMagicPercent(int rollBase) // sub_3C0EE
 		{
 			int target_count = ovr025.spellMaxTargetCount(gbl.spell_id);
 			int rollNeeded = rollBase + ((11 - target_count) * 5);
@@ -1347,56 +1595,72 @@ namespace engine
 				if (ovr024.roll_dice(100, 1) <= rollNeeded)
 				{
 					Protected();
-				}
+                    return Task.FromResult(true);
+                }
 			}
-		}
+            return Task.FromResult(false);
+        }
 
 
-		internal static void ResistMagic50Percent(Effect arg_0, object param, Player arg_6) // sub_3C14F
+		internal static Task<bool> ResistMagic50Percent(Effect arg_0, object param, Player arg_6) // sub_3C14F
 		{
 			ResistMagicPercent(50);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void ResistMagic15Percent(Effect arg_0, object param, Player arg_6) // sub_3C15D
+		internal static Task<bool> ResistMagic15Percent(Effect arg_0, object param, Player arg_6) // sub_3C15D
 		{
 			ResistMagicPercent(15);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectElfRisistSleep(Effect arg_0, object param, Player arg_6) // sub_3C16B
+		internal static Task<bool> AffectElfRisistSleep(Effect arg_0, object param, Player arg_6) // sub_3C16B
 		{
 			if (ovr024.roll_dice(100, 1) <= 90)
 			{
 				ProtectedIf(Classes.Affects.sleep);
 				ProtectedIf(Classes.Affects.charm_person);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectProtCharmSleep(Effect arg_0, object param, Player arg_6) // sub_3C18F
+		internal static Task<bool> AffectProtCharmSleep(Effect arg_0, object param, Player arg_6) // sub_3C18F
 		{
 			ProtectedIf(Classes.Affects.charm_person);
 			ProtectedIf(Classes.Affects.sleep);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void ResistParalyze(Effect arg_0, object param, Player arg_6) // sub_3C1A4
+		internal static Task<bool> ResistParalyze(Effect arg_0, object param, Player arg_6) // sub_3C1A4
 		{
 			ProtectedIf(Classes.Affects.paralyze);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectImmuneToCold(Effect arg_0, object param, Player arg_6) // sub_3C1B2
+		internal static Task<bool> AffectImmuneToCold(Effect arg_0, object param, Player arg_6) // sub_3C1B2
 		{
 			if ((gbl.damage_flags & DamageType.Cold) != 0)
 			{
 				Protected();
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectProtParalysisPoison(Effect arg_0, object param, Player arg_6) // sub_3C1C9
+		internal static Task<bool> AffectProtParalysisPoison(Effect arg_0, object param, Player arg_6) // sub_3C1C9
 		{
 			ProtectedIf(Classes.Affects.poisoned);
 			ProtectedIf(Classes.Affects.paralyze);
@@ -1404,20 +1668,31 @@ namespace engine
 			if (gbl.saveVerseType == SaveVerseType.Poison)
 			{
 				gbl.savingThrowRoll = 100;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+
 		}
 
 
-		internal static void AffectImmuneToFire(Effect arg_0, object param, Player arg_6) // sub_3C1EA
+		internal static Task<bool> AffectImmuneToFire(Effect arg_0, object param, Player arg_6) // sub_3C1EA
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0)
 			{
 				Protected();
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectEfreetiFireResist(Effect arg_0, object param, Player arg_6) // sub_3C201
+		internal static Task<bool> AffectEfreetiFireResist(Effect arg_0, object param, Player arg_6) // sub_3C201
 		{
 			if ((gbl.damage_flags & DamageType.Fire) != 0)
 			{
@@ -1429,21 +1704,31 @@ namespace engine
 					{
 						gbl.damage = gbl.dice_count;
 					}
-				}
-			}
-		}
+                }
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
+        }
 
 
-		internal static void AffectProtectionFromElectricity(Effect arg_0, object param, Player player) // sub_3C246
+		internal static Task<bool> AffectProtectionFromElectricity(Effect arg_0, object param, Player player) // sub_3C246
 		{
 			if ((gbl.damage_flags & DamageType.Electricity) != 0)
 			{
 				gbl.damage /= 2;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectResistPierceSlash(Effect arg_0, object param, Player player) // sub_3C260
+		internal static Task<bool> AffectResistPierceSlash(Effect arg_0, object param, Player player) // sub_3C260
 		{
 			Item weapon = get_primary_weapon(gbl.SelectedPlayer);
 
@@ -1453,12 +1738,14 @@ namespace engine
 					(weapon.itemData.field_7 & 1) != 0)
 				{
 					gbl.damage /= 2;
-				}
+                    return Task.FromResult(true);
+                }
 			}
-		}
+            return Task.FromResult(false);
+        }
 
 
-		internal static void half_damage_if_weap_magic(Effect arg_0, object param, Player player) /* sub_3C2BF */
+		internal static Task<bool> half_damage_if_weap_magic(Effect arg_0, object param, Player player) /* sub_3C2BF */
 		{
 			Item weapon = get_primary_weapon(gbl.SelectedPlayer);
 
@@ -1466,31 +1753,46 @@ namespace engine
 				weapon.plus > 0)
 			{
 				gbl.damage /= 2;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectVulnHolyWater(Effect arg_0, object param, Player player) // sub_3C2F9
+		internal static Task<bool> AffectVulnHolyWater(Effect arg_0, object param, Player player) // sub_3C2F9
 		{
             Item item = gbl.SelectedPlayer.activeItems.primaryWeapon;
 
 			if (item != null && item.type == Item.Type.HolyWater)
 			{
 				gbl.damage = ovr024.roll_dice_save(6, 1) + 1;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectProtCold(Effect arg_0, object param, Player player) // sub_3C33C
+		internal static Task<bool> AffectProtCold(Effect arg_0, object param, Player player) // sub_3C33C
 		{
 			if ((gbl.damage_flags & DamageType.Cold) != 0)
 			{
 				gbl.damage /= 2;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectProtNonMagicWeapons(Effect arg_0, object param, Player player) // sub_3C356
+		internal static Task<bool> AffectProtNonMagicWeapons(Effect arg_0, object param, Player player) // sub_3C356
 		{
 			Item weapon = get_primary_weapon(gbl.SelectedPlayer);
 
@@ -1498,11 +1800,16 @@ namespace engine
 				(gbl.SelectedPlayer.race > 0 || gbl.SelectedPlayer.HitDice < 4))
 			{
 				gbl.damage = 0;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectBoulderEvasion(Effect arg_0, object param, Player player) // sub_3C3A2
+		internal static Task<bool> AffectBoulderEvasion(Effect arg_0, object param, Player player) // sub_3C3A2
 		{
 			Item field_151 = player.activeItems.primaryWeapon;
 
@@ -1511,12 +1818,14 @@ namespace engine
 				if (field_151.type == Item.Type.HillGiantBoulder || field_151.type == Item.Type.CloudGiantBoulder)
 				{
 					AvoidMissleAttack(50, player);
-				}
+                    return Task.FromResult(true);
+                }
 			}
-		}
+            return Task.FromResult(false);
+        }
 
 
-		internal static void AffectAnkhedRangedAcidAttack(Effect arg_0, object param, Player player) // sub_3C3F6
+		internal static async Task<bool> AffectAnkhedRangedAcidAttack(Effect arg_0, object param, Player player) // sub_3C3F6
 		{
 			Affect affect = (Affect)param;
 
@@ -1535,49 +1844,65 @@ namespace engine
 					ovr025.draw_missile_attack(0x1e, 1, ovr033.PlayerMapPos(gbl.spell_target), ovr033.PlayerMapPos(player));
 
 					int damage = ovr024.roll_dice_save(4, 8);
-					bool saved = ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, gbl.spell_target);
+					bool saved = await ovr024.RollSavingThrow(0, SaveVerseType.BreathWeapon, gbl.spell_target);
 
-					ovr024.damage_person(saved, DamageOnSave.Half, damage, gbl.spell_target);
+					await ovr024.damage_person(saved, DamageOnSave.Half, damage, gbl.spell_target);
 
-					ovr024.remove_affect(affect, Classes.Affects.ankheg_ranged_acid_attack, player);
-					ovr024.remove_affect(null, Classes.Affects.ankheg_melee_acid_attack, player);
+					await ovr024.remove_affect(affect, Classes.Affects.ankheg_ranged_acid_attack, player);
+					await ovr024.remove_affect(null, Classes.Affects.ankheg_melee_acid_attack, player);
+
+                    return true;
 				}
 			}
+            return false;
 		}
 
 
-		internal static void AffectDracolichParalysis(Effect arg_0, object param, Player player) // spl_paralyze
+		internal static async Task<bool> AffectDracolichParalysis(Effect arg_0, object param, Player player) // spl_paralyze
 		{
 			gbl.spell_target = player.actions.target;
 
-			if (ovr024.RollSavingThrow(0, 0, gbl.spell_target) == false)
+			if (await ovr024.RollSavingThrow(0, 0, gbl.spell_target) == false)
 			{
 				ovr024.add_affect(false, 0xff, 0, Classes.Affects.paralyze, gbl.spell_target);
 
 				ovr025.DisplayPlayerStatusString(true, 10, "is paralyzed", gbl.spell_target);
+
+                return true;
 			}
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectDracolichColdDamage(Effect arg_0, object param, Player player) // sub_3C59
+		internal static async Task<bool> AffectDracolichColdDamage(Effect arg_0, object param, Player player) // sub_3C59
 		{
 			gbl.damage_flags = DamageType.Cold; // was DamageType.Acid;
 
-			ovr024.damage_person(false, 0, ovr024.roll_dice_save(8, 2), player.actions.target);
+			await ovr024.damage_person(false, 0, ovr024.roll_dice_save(8, 2), player.actions.target);
+
+            return true;
 		}
 
 
-		internal static void AffectHalfElfResistance(Effect arg_0, object param, Player player) // sub_3C5D0
+		internal static Task<bool> AffectHalfElfResistance(Effect arg_0, object param, Player player) // sub_3C5D0
 		{
 			if (ovr024.roll_dice(100, 1) <= 30)
 			{
 				ProtectedIf(Classes.Affects.charm_person);
 				ProtectedIf(Classes.Affects.sleep);
+                return Task.FromResult(true);
 			}
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectProtSleepCharmParalysisPoison(Effect arg_0, object param, Player player) // sub_3C5F4
+		internal static Task<bool> AffectProtSleepCharmParalysisPoison(Effect arg_0, object param, Player player) // sub_3C5F4
 		{
 			ProtectedIf(Classes.Affects.charm_person);
 			ProtectedIf(Classes.Affects.sleep);
@@ -1588,20 +1913,28 @@ namespace engine
 			{
 				gbl.savingThrowRoll = 100;
 			}
+
+            return Task.FromResult(true);
 		}
 
 
-		internal static void AffectProtMagic(Effect arg_0, object param, Player player) // sub_3C623
+		internal static Task<bool> AffectProtMagic(Effect arg_0, object param, Player player) // sub_3C623
 		{
 			if (gbl.current_affect != 0 ||
 				(gbl.damage_flags & DamageType.Magic) != 0)
 			{
 				Protected();
+
+                return Task.FromResult(true);
 			}
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectVulnBlessedQuarrel(Effect arg_0, object arg_2, Player player) // sub_3C643
+		internal static async Task<bool> AffectVulnBlessedQuarrel(Effect arg_0, object arg_2, Player player) // sub_3C643
 		{
 			Item item;
 
@@ -1613,18 +1946,19 @@ namespace engine
 				player.health_status = Status.gone;
 				player.in_combat = false;
 				player.hit_point_current = 0;
-				ovr024.RemoveCombatAffects(player);
-				Affects.Effect.Check(player, CheckType.Death);
+				await ovr024.RemoveCombatAffects(player);
+				await Affects.Effect.Check(player, CheckType.Death);
 
 				if (player.in_combat == true)
 				{
 					ovr033.CombatantKilled(player);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void do_items_affect(Effect remove_affect, object param, Player player) /* sub_3C6D3 */
+		internal static async Task<bool> do_items_affect(Effect remove_affect, object param, Player player) /* sub_3C6D3 */
 		{
 			Item item = (Item)param;
 
@@ -1632,7 +1966,7 @@ namespace engine
 
 			if (remove_affect == Effect.Remove)
 			{
-				ovr024.remove_affect(null, item.Affect_2, player);
+				await ovr024.remove_affect(null, item.Affect_2, player);
 			}
 			else
 			{
@@ -1640,13 +1974,14 @@ namespace engine
 
 				if (gbl.game_state != GameState.Combat)
 				{
-					Affects.Effect.Call(Effect.Add, null, player, item.Affect_2);
+					await Affects.Effect.Call(Effect.Add, null, player, item.Affect_2);
 				}
 			}
+            return true;
 		}
 
 
-		internal static void AffectDracolichProtection(Effect arg_0, object param, Player player) //sub_3C750
+		internal static Task<bool> AffectDracolichProtection(Effect arg_0, object param, Player player) //sub_3C750
 		{
 			ProtectedIf(Classes.Affects.fear);
 			ProtectedIf(Classes.Affects.ray_of_enfeeblement);
@@ -1655,37 +1990,53 @@ namespace engine
 			if ((gbl.damage_flags & DamageType.Electricity) != 0)
 			{
 				Protected();
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectRangerVsGiant(Effect arg_0, object param, Player player) // sub_3C77C
+		internal static Task<bool> AffectRangerVsGiant(Effect arg_0, object param, Player player) // sub_3C77C
 		{
 			gbl.spell_target = player.actions.target;
 
 			if (gbl.spell_target.flags.HasFlag(Flags.RangerBonus))
 			{
 				gbl.damage += player.ranger_lvl;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectProtElec(Effect arg_0, object param, Player player)//sub_3C7B5
+		internal static Task<bool> AffectProtElec(Effect arg_0, object param, Player player)//sub_3C7B5
 		{
 			if ((gbl.damage_flags & DamageType.Electricity) != 0)
 			{
 				Protected();
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectEntangle(Effect arg_0, object param, Player player) // sub_3C7CC
+		internal static Task<bool> AffectEntangle(Effect arg_0, object param, Player player) // sub_3C7CC
 		{
 			player.actions.move = 0;
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectConfuseBerserk(Effect arg_0, object param, Player player) // sub_3C7E0
+		internal static Task<bool> AffectConfuseBerserk(Effect arg_0, object param, Player player) // sub_3C7E0
 		{
 			Affect affect = (Affect)param;
 
@@ -1719,25 +2070,32 @@ namespace engine
 
 				player.combat_team = (CombatTeam)affect.affect_data;
 			}
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void AffectAddInvisibility(Effect arg_0, object param, Player player) // add_affect_19
+		internal static Task<bool> AffectAddInvisibility(Effect arg_0, object param, Player player) // add_affect_19
 		{
 			ovr024.add_affect(false, 0xff, 0xff, Classes.Affects.invisibility, player);
-		}
+            return Task.FromResult(true);
+        }
 
 
-		internal static void PaladinCastCureRefresh(Effect add_remove, object param, Player player) // sub_3C8EF
+		internal static Task<bool> PaladinCastCureRefresh(Effect add_remove, object param, Player player) // sub_3C8EF
 		{
 			if (add_remove == Effect.Remove)
 			{
 				player.paladinCuresLeft = (byte)(((player.SkillLevel(SkillType.Paladin) - 1) / 5) + 1);
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectFear(Effect add_remove, object param, Player player) /* sub_3C932 */
+		internal static Task<bool> AffectFear(Effect add_remove, object param, Player player) /* sub_3C932 */
 		{
 			if (add_remove == Effect.Remove)
 			{
@@ -1748,49 +2106,62 @@ namespace engine
 				}
 
 				player.actions.fleeing = false;
-			}
+                return Task.FromResult(true);
+            }
+            else
+            {
+                return Task.FromResult(false);
+            }
 		}
 
 
-		internal static void AffectFireShieldDamage(Effect arg_0, object arg_2, Player target)
+		internal static async Task<bool> AffectFireShieldDamage(Effect arg_0, object arg_2, Player target)
 		{
-			if (ovr025.getTargetRange(target, gbl.SelectedPlayer) < 2)
-			{
-				int bkup_damage = gbl.damage;
-				DamageType bkup_damage_flags = gbl.damage_flags;
+            if (ovr025.getTargetRange(target, gbl.SelectedPlayer) < 2)
+            {
+                int bkup_damage = gbl.damage;
+                DamageType bkup_damage_flags = gbl.damage_flags;
 
-				gbl.damage *= 2;
-				gbl.damage_flags = DamageType.Magic;
+                gbl.damage *= 2;
+                gbl.damage_flags = DamageType.Magic;
 
-				ovr025.DisplayPlayerStatusString(true, 10, "gets zapped", gbl.SelectedPlayer);
+                ovr025.DisplayPlayerStatusString(true, 10, "gets zapped", gbl.SelectedPlayer);
 
-				ovr024.damage_person(false, 0, gbl.damage, gbl.SelectedPlayer);
-				gbl.damage = bkup_damage;
-				gbl.damage_flags = bkup_damage_flags;
-			}
+                await ovr024.damage_person(false, 0, gbl.damage, gbl.SelectedPlayer);
+                gbl.damage = bkup_damage;
+                gbl.damage_flags = bkup_damage_flags;
+                return true;
+            }
+            else
+            {
+                return false;
+            }
 		}
 
 
-		internal static void AffectDispelEvilBanish(Effect arg_0, object param, Player player)
+		internal static async Task<bool> AffectDispelEvilBanish(Effect arg_0, object param, Player player)
 		{
 			gbl.spell_target = player.actions.target;
 
 			if ((gbl.spell_target.flags & Flags.EvilSummon) != 0 &&
-				ovr024.RollSavingThrow(0, SaveVerseType.Spell, gbl.spell_target) == false)
+				await ovr024.RollSavingThrow(0, SaveVerseType.Spell, gbl.spell_target) == false)
 			{
-				ovr024.KillPlayer("is dispelled", Status.gone, gbl.spell_target);
+				await ovr024.KillPlayer("is dispelled", Status.gone, gbl.spell_target);
 
-				ovr024.remove_affect(null, Classes.Affects.dispel_evil, gbl.SelectedPlayer);
-				ovr024.remove_affect(null, Classes.Affects.dispel_evil_banish, gbl.SelectedPlayer);
+				await ovr024.remove_affect(null, Classes.Affects.dispel_evil, gbl.SelectedPlayer);
+				await ovr024.remove_affect(null, Classes.Affects.dispel_evil_banish, gbl.SelectedPlayer);
+                return true;
 			}
 			else
 			{
 				ovr025.DisplayPlayerStatusString(true, 10, "resists dispel evil", gbl.spell_target);
+                return false;
 			}
 		}
 
-		internal static void empty(Effect arg_0, object param, Player player)
+		internal static Task<bool> empty(Effect arg_0, object param, Player player)
 		{
+            return Task.FromResult(false);
 		}
 	}
 }

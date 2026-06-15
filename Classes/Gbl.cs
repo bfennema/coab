@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using Classes.Combat;
 
 
@@ -74,13 +75,13 @@ namespace Classes
         sound_f = 0xf
     }
 
-    public delegate bool spellDelegate(QuickFight quick_fight, Spells spellId);
+    public delegate Task<bool> spellDelegate(QuickFight quick_fight, Spells spellId);
     public delegate void DisplayString(string str, int bgColor, int fgColor, int yCol, int xCol);
     public delegate void Put8x8Symbol(byte arg_0, bool use_overlay, int symbol_id, int rowY, int colX);
     public delegate void Draw8x8_clear_area(int yEnd, int xEnd, int yStart, int xStart);
     public delegate void DrawIsoTile(int tileIndex, int rowY, int colX);
-    public delegate void Load24x24Set(int cellCount, int destCellOffset, int block_id, string filename);
-    public delegate void CalcStatBonuses(Stat stat_index, Player player);
+    public delegate Task<bool> Load24x24Set(int cellCount, int destCellOffset, int block_id, string filename);
+    public delegate Task<bool> CalcStatBonuses(Stat stat_index, Player player);
 
     [Flags]
     public enum DamageType
@@ -624,7 +625,7 @@ namespace Classes
         public static DaxBlock sky_dax_251;
         public static DaxBlock sky_dax_252;
 
-        public static string[] unk_1D972 = new string[15] { string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty };
+        //public static string[] unk_1D972 = new string[15] { string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, string.Empty };
 
         public const int cmdOpsLimit = 0x40;
         public static CmdOperation cmd_ops = new CmdOperation(cmdOpsLimit);

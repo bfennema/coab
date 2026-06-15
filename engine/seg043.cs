@@ -1,5 +1,6 @@
 using Classes;
 using Logging;
+using System.Threading.Tasks;
 
 namespace engine
 {
@@ -237,7 +238,7 @@ namespace engine
             dw.WriteLine("</tr>");
         }
 
-        public static void DumpMonstersFiltered()
+        public static async Task<bool> DumpMonstersFiltered()
         {
             var bkupArea = gbl.game_area;
 
@@ -249,67 +250,69 @@ namespace engine
             DebugWriter dw = new DebugWriter(filename);
 
             dw.WriteLine("GnomeVsManSizedGiant");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.GnomeBonus) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.GnomeBonus) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("RangerBonus");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.RangerBonus) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.RangerBonus) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Giant");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Giant) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Giant) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Dragon");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Dragon) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Dragon) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Undead");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Undead) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Undead) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Cold");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Cold) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Cold) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Fire");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Fire) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Fire) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Regenrate");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Regenerate) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Regenerate) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Aviant");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Avian) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Avian) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Snake");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Snake) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Snake) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Plant");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Plant) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Plant) != 0);
             dw.WriteLine("");
 
             dw.WriteLine("Animal");
-            DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Animal) != 0);
+            await DumpMonstersFilteredSub(dw, p => (p.flags & Flags.Animal) != 0);
             dw.WriteLine("");
 
 
             dw.Close();
 
             gbl.game_area = bkupArea;
+
+            return true;
         }
 
-        static void DumpMonstersFilteredSub(DebugWriter dw, System.Predicate<Player> filter)
+        static async Task<bool> DumpMonstersFilteredSub(DebugWriter dw, System.Predicate<Player> filter)
         {
             for (byte area = 1; area <= 6; area++)
             {
                 gbl.game_area = area;
                 for (int id = 0; id < 256; id++)
                 {
-                    Player p = ovr017.load_mob(id, false);
+                    Player p = await ovr017.load_mob(id, false);
                     if (p != null)
                     {
                         ovr025.reclac_player_values(p);
@@ -321,11 +324,12 @@ namespace engine
                     }
                 }
             }
+            return true;
         }
 
-        public static void DumpMonsters()
+        public static async Task<bool> DumpMonsters()
         {
-            DumpMonstersFiltered();
+            await DumpMonstersFiltered();
 
             var bkupArea = gbl.game_area;
 
@@ -343,7 +347,7 @@ namespace engine
                 gbl.game_area = area;
                 for (int id = 0; id < 256; id++)
                 {
-                    Player p = ovr017.load_mob(id, false);
+                    Player p = await ovr017.load_mob(id, false);
                     if (p != null)
                     {
                         ovr025.reclac_player_values(p);
@@ -358,6 +362,8 @@ namespace engine
             dw.Close();
 
             gbl.game_area = bkupArea;
+
+            return true;
         }
         public static async void CompareSave(string file_name)
         {

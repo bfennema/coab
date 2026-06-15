@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Classes.DaxFiles
 {
@@ -9,17 +10,13 @@ namespace Classes.DaxFiles
         Dictionary<int, byte[]> entries;
         List<string> files;
 
-        internal DaxFileCache(string filename, string filenum)
+        internal DaxFileCache()
         {
             entries = new Dictionary<int, byte[]>();
             files = new List<string>();
-
-            LoadFile(filename, filenum);
-            files.Add(filenum);
         }
-        internal DaxFileCache(string filename, byte filenum) : this(filename, filenum.ToString()) { }
 
-        public bool Add(string filename, string filenum)
+        public async Task<bool> Add(string filename, string filenum)
         {
             if (files.Contains(filenum))
             {
@@ -27,16 +24,15 @@ namespace Classes.DaxFiles
             }
             else
             {
-                LoadFile(filename, filenum);
-                files.Add(filenum);
-                return true;
+                //return System.Threading.Tasks.Task.Run(() => LoadFile(filename, filenum)).GetAwaiter().GetResult();
+                return await LoadFile(filename, filenum);
             }
         }
-        public bool Add(string filename, byte filenum) {
-            return Add(filename, filenum.ToString());
+        public async Task<bool> Add(string filename, byte filenum) {
+            return await Add(filename, filenum.ToString());
         }
 
-        private async void LoadFile(string filename, string filenum)
+        private async Task<bool> LoadFile(string filename, string filenum)
         {
             string name = string.Format("{0}{1}.DAX", filename, filenum);
             var path = gbl.DataPath;
@@ -48,7 +44,7 @@ namespace Classes.DaxFiles
 
                 if (fsA == null)
                 {
-                    return;
+                    return false;
                 }
                 else
                 {
@@ -57,7 +53,7 @@ namespace Classes.DaxFiles
             }
             catch (System.ApplicationException)
             {
-                return;
+                return false;
             }
 
             int dataOffset = fileA.ReadInt16() + 2;
@@ -101,6 +97,9 @@ namespace Classes.DaxFiles
             }
 
             fileA.Close();
+            files.Add(filename);
+
+            return true;
         }
 
         static void Decode(int decodeSize, int dataLength, byte[] output_ptr, byte[] input_ptr)

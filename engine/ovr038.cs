@@ -1,15 +1,16 @@
 using Classes;
 using Logging;
+using System.Threading.Tasks;
 
 namespace engine
 {
     class ovr038
     {
-        internal static void Load8x8D(int symbolSet, int block_id)
+        internal static async Task<bool> Load8x8D(int symbolSet, int block_id)
         {
             if (symbolSet >= 0 && symbolSet < 5)
             {
-                gbl.symbol_8x8_set[symbolSet] = seg040.LoadDax(13, 1, block_id, string.Format("8X8D{0}", gbl.game_area));
+                gbl.symbol_8x8_set[symbolSet] = await seg040.LoadDax(13, 1, block_id, string.Format("8X8D{0}", gbl.game_area));
 
                 if (gbl.symbol_8x8_set[symbolSet] == null)
                 {
@@ -17,6 +18,12 @@ namespace engine
                 }
 
                 seg043.clear_keyboard();
+
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
