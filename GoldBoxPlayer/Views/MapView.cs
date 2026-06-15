@@ -21,8 +21,16 @@ namespace GoldBoxPlayer.Views
             double width = bounds.Width;
             double height = bounds.Height;
 
-            // Fill background with a muted/darker tan color representing unexplored area
+            // Define padding to keep edge squares away from window border
+            const double padding = 12.0; // enough to accommodate thick border and visual margin
+
+            // Adjust drawing area to account for padding
+            double drawWidth = width - 2 * padding;
+            double drawHeight = height - 2 * padding;
+
+            // Fill background within padded area
             var unexploredBrush = new SolidColorBrush(Color.Parse("#8c7653"));
+            // Fill full background with border color (unexplored area)
             context.FillRectangle(unexploredBrush, new Rect(0, 0, width, height));
 
             if (gbl.geo_ptr?.maps == null)
@@ -42,8 +50,9 @@ namespace GoldBoxPlayer.Views
             int mapRows = gbl.geo_ptr.maps.GetLength(0);
             int mapCols = gbl.geo_ptr.maps.GetLength(1);
 
-            double cellWidth = width / mapCols;
-            double cellHeight = height / mapRows;
+            // Compute cell size based on padded drawing area
+            double cellWidth = drawWidth / mapCols;
+            double cellHeight = drawHeight / mapRows;
 
             int gameArea = gbl.game_area;
             int blockId = gbl.area_ptr != null ? gbl.area_ptr.current_3DMap_block_id : 0;
@@ -56,20 +65,22 @@ namespace GoldBoxPlayer.Views
                 {
                     if (MapTracker.IsExplored(gameArea, blockId, x, y))
                     {
-                        context.FillRectangle(exploredBrush, new Rect(x * cellWidth, y * cellHeight, cellWidth, cellHeight));
+                        context.FillRectangle(exploredBrush, new Rect(padding + x * cellWidth, padding + y * cellHeight, cellWidth, cellHeight));
                     }
                 }
             }
 
-            // Draw grid lines
-            var gridPen = new Pen(new SolidColorBrush(Color.Parse("#6d573d")), 0.5);
-            for (int r = 0; r <= mapRows; r++)
+            // Draw grid lines (same color as unexplored cells) with padding offset
+            var gridPen = new Pen(new SolidColorBrush(Color.Parse("#8c7653")), 0.5);
+            for (int r = 0; r < mapRows; r++)
             {
-                context.DrawLine(gridPen, new Avalonia.Point(0, r * cellHeight), new Avalonia.Point(width, r * cellHeight));
+                double yPos = padding + r * cellHeight;
+                context.DrawLine(gridPen, new Avalonia.Point(padding, yPos), new Avalonia.Point(padding + drawWidth, yPos));
             }
-            for (int c = 0; c <= mapCols; c++)
+            for (int c = 0; c < mapCols; c++)
             {
-                context.DrawLine(gridPen, new Avalonia.Point(c * cellWidth, 0), new Avalonia.Point(c * cellWidth, height));
+                double xPos = padding + c * cellWidth;
+                context.DrawLine(gridPen, new Avalonia.Point(xPos, padding), new Avalonia.Point(xPos, padding + drawHeight));
             }
 
             // Draw walls and doors.
@@ -83,8 +94,8 @@ namespace GoldBoxPlayer.Views
 
                     bool currentExplored = MapTracker.IsExplored(gameArea, blockId, x, y);
 
-                    double cellLeft = x * cellWidth;
-                    double cellTop = y * cellHeight;
+                    double cellLeft = padding + x * cellWidth;
+                    double cellTop = padding + y * cellHeight;
                     double cellRight = cellLeft + cellWidth;
                     double cellBottom = cellTop + cellHeight;
 
@@ -126,14 +137,57 @@ namespace GoldBoxPlayer.Views
                     }
                 }
             }
+            // Draw small corner squares where two walls meet
+            var cornerPen = new Pen(new SolidColorBrush(Color.Parse("#4a371c")), 1.75);
+            double cornerSize = 1.75; // match wall thickness
+            for (int y = 0; y < mapRows; y++)
+            {
+                for (int x = 0; x < mapCols; x++)
+                {
+                    MapInfo mi = gbl.geo_ptr.maps[y, x];
+                    if (mi == null) continue;
+                    bool explored = MapTracker.IsExplored(gameArea, blockId, x, y);
+                    // Determine wall presence with exploration check
+                    bool hasNorth = mi.wall_type_dir_0 != 0 && (explored || (y > 0 && MapTracker.IsExplored(gameArea, blockId, x, y - 1)));
+                    bool hasEast = mi.wall_type_dir_2 != 0 && (explored || (x < mapCols - 1 && MapTracker.IsExplored(gameArea, blockId, x + 1, y)));
+                    bool hasSouth = mi.wall_type_dir_4 != 0 && (explored || (y < mapRows - 1 && MapTracker.IsExplored(gameArea, blockId, x, y + 1)));
+                    bool hasWest = mi.wall_type_dir_6 != 0 && (explored || (x > 0 && MapTracker.IsExplored(gameArea, blockId, x - 1, y)));
+                    double cellLeft = padding + x * cellWidth;
+                    double cellTop = padding + y * cellHeight;
+                    // Top‑left corner (north + west)
+                    if (hasNorth && hasWest)
+                    {
+                        var rect = new Rect(cellLeft - cornerSize / 2, cellTop - cornerSize / 2, cornerSize, cornerSize);
+                        context.DrawRectangle(null, cornerPen, rect);
+                    }
+                    // Top‑right corner (north + east)
+                    if (hasNorth && hasEast)
+                    {
+                        var rect = new Rect(cellLeft + cellWidth - cornerSize / 2, cellTop - cornerSize / 2, cornerSize, cornerSize);
+                        context.DrawRectangle(null, cornerPen, rect);
+                    }
+                    // Bottom‑left corner (south + west)
+                    if (hasSouth && hasWest)
+                    {
+                        var rect = new Rect(cellLeft - cornerSize / 2, cellTop + cellHeight - cornerSize / 2, cornerSize, cornerSize);
+                        context.DrawRectangle(null, cornerPen, rect);
+                    }
+                    // Bottom‑right corner (south + east)
+                    if (hasSouth && hasEast)
+                    {
+                        var rect = new Rect(cellLeft + cellWidth - cornerSize / 2, cellTop + cellHeight - cornerSize / 2, cornerSize, cornerSize);
+                        context.DrawRectangle(null, cornerPen, rect);
+                    }
+                }
+            }
 
             // Draw player position and orientation as a green triangle
             int px = gbl.mapPosX;
             int py = gbl.mapPosY;
             if (px >= 0 && px < mapCols && py >= 0 && py < mapRows)
             {
-                double centerLeft = px * cellWidth + cellWidth / 2;
-                double centerTop = py * cellHeight + cellHeight / 2;
+                double centerLeft = padding + px * cellWidth + cellWidth / 2;
+                double centerTop = padding + py * cellHeight + cellHeight / 2;
 
                 var playerBrush = new SolidColorBrush(Color.Parse("#2e7d32")); // Green
                 var playerPen = new Pen(new SolidColorBrush(Colors.White), 1.0);
@@ -201,6 +255,8 @@ namespace GoldBoxPlayer.Views
             }
             else if (doorFlag == 1 || doorFlag == 2) // Door or Locked Door
             {
+                // Draw wall line first
+                context.DrawLine(wallPen, new Avalonia.Point(x1, y1), new Avalonia.Point(x2, y2));
                 double midX = (x1 + x2) / 2;
                 double midY = (y1 + y2) / 2;
 
