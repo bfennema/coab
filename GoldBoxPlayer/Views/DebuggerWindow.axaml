@@ -1,0 +1,393 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="GoldBoxPlayer.Views.DebuggerWindow"
+        Title="ECL Debugger"
+        Width="980" Height="560"
+        Background="#181818"
+        Foreground="#e0e0e0"
+        WindowStartupLocation="CenterOwner"
+        FontFamily="Consolas,Courier New,monospace">
+
+  <Window.Styles>
+
+    <!-- ===== TextBlock defaults ===== -->
+    <Style Selector="TextBlock">
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+    </Style>
+
+    <!-- ===== TextBox ===== -->
+    <Style Selector="TextBox">
+      <Setter Property="Background" Value="#252525"/>
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+      <Setter Property="CaretBrush" Value="#e0e0e0"/>
+      <Setter Property="BorderBrush" Value="#444444"/>
+    </Style>
+
+    <!-- ===== Custom Tab Buttons ===== -->
+    <Style Selector="Button.tabBtn">
+      <Setter Property="Background" Value="#2a2a2a"/>
+      <Setter Property="Foreground" Value="#909090"/>
+      <Setter Property="Padding" Value="10,6"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="MinWidth" Value="0"/>
+    </Style>
+    <Style Selector="Button.tabBtn /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2a2a2a"/>
+      <Setter Property="Foreground" Value="#909090"/>
+    </Style>
+    <Style Selector="Button.tabBtn:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#353535"/>
+      <Setter Property="Foreground" Value="#d0d0d0"/>
+    </Style>
+    <Style Selector="Button.tabActive">
+      <Setter Property="Background" Value="#181818"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.tabActive /template/ ContentPresenter">
+      <Setter Property="Background" Value="#181818"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.tabActive:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1e1e1e"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+
+    <!-- ===== Toolbar Buttons ===== -->
+    <Style Selector="Button">
+      <Setter Property="CornerRadius" Value="3"/>
+      <Setter Property="FontWeight" Value="SemiBold"/>
+      <Setter Property="Padding" Value="10,5"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="VerticalAlignment" Value="Center"/>
+      <Setter Property="FontSize" Value="12"/>
+    </Style>
+    <Style Selector="Button.danger">
+      <Setter Property="Background" Value="#b71c1c"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.danger /template/ ContentPresenter">
+      <Setter Property="Background" Value="#b71c1c"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.danger:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#d32f2f"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.danger:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="#3a1c1c"/>
+      <Setter Property="Foreground" Value="#666666"/>
+    </Style>
+
+    <Style Selector="Button.warning">
+      <Setter Property="Background" Value="#e65100"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.warning /template/ ContentPresenter">
+      <Setter Property="Background" Value="#e65100"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.warning:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#f57c00"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.warning:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2d1a00"/>
+      <Setter Property="Foreground" Value="#666666"/>
+    </Style>
+
+    <Style Selector="Button.success">
+      <Setter Property="Background" Value="#1b5e20"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.success /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1b5e20"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.success:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#388e3c"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.success:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1d351f"/>
+      <Setter Property="Foreground" Value="#666666"/>
+    </Style>
+
+    <Style Selector="Button.secondary">
+      <Setter Property="Background" Value="#3a3a3a"/>
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+      <Setter Property="Padding" Value="6,3"/>
+      <Setter Property="FontSize" Value="11"/>
+    </Style>
+    <Style Selector="Button.secondary /template/ ContentPresenter">
+      <Setter Property="Background" Value="#3a3a3a"/>
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+    </Style>
+    <Style Selector="Button.secondary:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#505050"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+    <Style Selector="Button.secondary:disabled /template/ ContentPresenter">
+      <Setter Property="Background" Value="#222222"/>
+      <Setter Property="Foreground" Value="#555555"/>
+    </Style>
+
+    <Style Selector="Button.remove">
+      <Setter Property="Background" Value="#7b0000"/>
+      <Setter Property="Foreground" Value="#ffcccc"/>
+      <Setter Property="Padding" Value="4,1"/>
+      <Setter Property="FontSize" Value="10"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+    </Style>
+    <Style Selector="Button.remove /template/ ContentPresenter">
+      <Setter Property="Background" Value="#7b0000"/>
+      <Setter Property="Foreground" Value="#ffcccc"/>
+    </Style>
+    <Style Selector="Button.remove:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#c62828"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+
+    <!-- Clickable memory ref items -->
+    <Style Selector="Button.memRef">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="#80deea"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="4,1"/>
+      <Setter Property="FontFamily" Value="Consolas,Courier New,monospace"/>
+      <Setter Property="FontSize" Value="12"/>
+      <Setter Property="HorizontalAlignment" Value="Stretch"/>
+      <Setter Property="HorizontalContentAlignment" Value="Left"/>
+      <Setter Property="FontWeight" Value="Normal"/>
+      <Setter Property="CornerRadius" Value="0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+    <Style Selector="Button.memRef /template/ ContentPresenter">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="#80deea"/>
+    </Style>
+    <Style Selector="Button.memRef:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#1a3a40"/>
+      <Setter Property="Foreground" Value="#b2eaf4"/>
+    </Style>
+
+    <!-- Disassembly ListBox -->
+    <Style Selector="ListBox">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="0"/>
+    </Style>
+    <Style Selector="ListBoxItem">
+      <Setter Property="Padding" Value="4,1"/>
+      <Setter Property="Margin" Value="0"/>
+      <Setter Property="MinHeight" Value="0"/>
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+      <Setter Property="Background" Value="Transparent"/>
+    </Style>
+    <Style Selector="ListBoxItem /template/ ContentPresenter">
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+    </Style>
+    <Style Selector="ListBoxItem:pointerover /template/ ContentPresenter">
+      <Setter Property="Background" Value="#252525"/>
+      <Setter Property="Foreground" Value="#e0e0e0"/>
+    </Style>
+    <Style Selector="ListBoxItem:selected /template/ ContentPresenter">
+      <Setter Property="Background" Value="#2a2a4a"/>
+      <Setter Property="Foreground" Value="#ffffff"/>
+    </Style>
+
+  </Window.Styles>
+
+  <Grid RowDefinitions="Auto, *, Auto">
+
+    <!-- ===== Toolbar ===== -->
+    <Border Grid.Row="0" Background="#1e1e1e" BorderBrush="#303030" BorderThickness="0,0,0,1" Padding="8,5">
+      <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+        <Button Name="PauseButton"  Content="Pause"   Click="PauseButton_Click"  Classes="danger"/>
+        <Button Name="StepButton"   Content="Step"    Click="StepButton_Click"   Classes="warning"/>
+        <Button Name="ResumeButton" Content="Resume"  Click="ResumeButton_Click" Classes="success"/>
+        <Rectangle Width="1" Fill="#404040" Margin="4,0" VerticalAlignment="Stretch"/>
+        <TextBlock Name="StatusTextBlock" Text="Status: Running"
+                   VerticalAlignment="Center" FontWeight="Bold" FontSize="12"
+                   Foreground="#81c784"/>
+      </StackPanel>
+    </Border>
+
+    <!-- ===== Main Workspace ===== -->
+    <Grid Grid.Row="1" ColumnDefinitions="2*, 1.2*" Margin="6">
+
+      <!-- Disassembly (keeps ListBox for double-tap) -->
+      <Grid Grid.Column="0" RowDefinitions="Auto, *" Margin="0,0,4,0">
+        <TextBlock Grid.Row="0" Text="Disassembly"
+                   FontWeight="Bold" FontSize="12" Foreground="#aaaaaa" Margin="2,0,0,3"/>
+        <Border Grid.Row="1" Background="#111111" BorderBrush="#303030" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+          <ListBox Name="DisassemblyListBox" DoubleTapped="DisassemblyListBox_DoubleTapped"
+                   Background="Transparent" Padding="0">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock Text="{Binding Text}" Foreground="{Binding Color}"
+                           FontFamily="Consolas,Courier New,monospace" FontSize="12"
+                           Padding="0"/>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+        </Border>
+      </Grid>
+
+      <!-- ===== Custom Tab Sidebar ===== -->
+      <Grid Grid.Column="1" RowDefinitions="Auto, *" Margin="4,0,0,0">
+
+        <!-- Tab Header Buttons -->
+        <Border Grid.Row="0" Background="#242424" BorderBrush="#303030" BorderThickness="0,0,0,1">
+          <StackPanel Orientation="Horizontal" Spacing="0">
+            <Button Name="TabBtnCallStack"   Content="Call Stack"  Click="TabBtn_Click" Classes="tabBtn tabActive"/>
+            <Button Name="TabBtnBreakpoints" Content="Breakpoints" Click="TabBtn_Click" Classes="tabBtn"/>
+            <Button Name="TabBtnMemory"      Content="Memory"      Click="TabBtn_Click" Classes="tabBtn"/>
+          </StackPanel>
+        </Border>
+
+        <!-- Tab Content Area (panels overlaid, one visible at a time) -->
+        <Grid Grid.Row="1" Margin="0,4,0,0">
+
+          <!-- ── Call Stack Panel ── -->
+          <Border Name="PanelCallStack"
+                  Background="#111111" BorderBrush="#303030" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+              <ItemsControl Name="CallStackListBox" Background="Transparent">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <TextBlock Text="{Binding}"
+                               Foreground="#7ec8e3"
+                               FontFamily="Consolas,Courier New,monospace" FontSize="12"
+                               Padding="4,1"/>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Border>
+
+          <!-- ── Breakpoints Panel ── -->
+          <Grid Name="PanelBreakpoints" IsVisible="False" RowDefinitions="*, *">
+
+            <Grid Grid.Row="0" RowDefinitions="Auto, *" Margin="0,0,0,4">
+              <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,3">
+                <TextBlock Text="Opcode Breaks" VerticalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#aaaaaa"/>
+                <TextBox Name="BreakpointTextBox" Width="65" Watermark="Hex" Height="22" Padding="3,1" FontSize="11"/>
+                <Button Content="Add"   Click="AddBreakpointButton_Click"   Classes="secondary"/>
+                <Button Content="Clear" Click="ClearBreakpointsButton_Click" Classes="secondary"/>
+              </StackPanel>
+              <Border Grid.Row="1" Background="#111111" BorderBrush="#303030" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <ItemsControl Name="BreakpointsListBox" Background="Transparent">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Grid ColumnDefinitions="*, Auto">
+                          <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"
+                                     Foreground="#ff6b6b"
+                                     FontFamily="Consolas,Courier New,monospace" FontSize="12"
+                                     Padding="4,1"/>
+                          <Button Grid.Column="1" Content="X" Click="RemoveBreakpointButton_Click"
+                                  Tag="{Binding}" Classes="remove" Margin="2,1"/>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Border>
+            </Grid>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto, *" Margin="0,4,0,0">
+              <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,3">
+                <TextBlock Text="Watchpoints" VerticalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#aaaaaa"/>
+                <TextBox Name="WatchpointTextBox" Width="65" Watermark="Hex" Height="22" Padding="3,1" FontSize="11"/>
+                <Button Content="Add"   Click="AddWatchpointButton_Click"   Classes="secondary"/>
+                <Button Content="Clear" Click="ClearWatchpointsButton_Click" Classes="secondary"/>
+              </StackPanel>
+              <Border Grid.Row="1" Background="#111111" BorderBrush="#303030" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <ItemsControl Name="WatchpointsListBox" Background="Transparent">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Grid ColumnDefinitions="*, Auto">
+                          <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"
+                                     Foreground="#ffb74d"
+                                     FontFamily="Consolas,Courier New,monospace" FontSize="12"
+                                     Padding="4,1"/>
+                          <Button Grid.Column="1" Content="X" Click="RemoveWatchpointButton_Click"
+                                  Tag="{Binding}" Classes="remove" Margin="2,1"/>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Border>
+            </Grid>
+
+          </Grid>
+
+          <!-- ── Memory Monitor Panel ── -->
+          <Grid Name="PanelMemory" IsVisible="False" RowDefinitions="*, *">
+
+            <Grid Grid.Row="0" RowDefinitions="Auto, *" Margin="0,0,0,4">
+              <TextBlock Grid.Row="0" Text="Current Instruction Refs  (click to watch)"
+                         FontWeight="Bold" FontSize="11" Foreground="#aaaaaa" Margin="0,0,0,3"/>
+              <Border Grid.Row="1" Background="#111111" BorderBrush="#303030" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <ItemsControl Name="InstructionAccessListBox" Background="Transparent">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Button Content="{Binding}" Click="InstructionRef_Click"
+                                Classes="memRef"/>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Border>
+            </Grid>
+
+            <Grid Grid.Row="1" RowDefinitions="Auto, *" Margin="0,4,0,0">
+              <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="6" Margin="0,0,0,3">
+                <TextBlock Text="Watch" VerticalAlignment="Center" FontWeight="Bold" FontSize="11" Foreground="#aaaaaa"/>
+                <TextBox Name="MonitorTextBox" Width="65" Watermark="Hex" Height="22" Padding="3,1" FontSize="11"/>
+                <Button Content="Add"   Click="AddMonitorButton_Click"   Classes="secondary"/>
+                <Button Content="Clear" Click="ClearMonitorsButton_Click" Classes="secondary"/>
+              </StackPanel>
+              <Border Grid.Row="1" Background="#111111" BorderBrush="#303030" BorderThickness="1" CornerRadius="4" ClipToBounds="True">
+                <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                  <ItemsControl Name="MonitorListBox" Background="Transparent">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate>
+                        <Grid ColumnDefinitions="*, Auto">
+                          <TextBlock Grid.Column="0" Text="{Binding}" VerticalAlignment="Center"
+                                     Foreground="#a7ffeb"
+                                     FontFamily="Consolas,Courier New,monospace" FontSize="12"
+                                     Padding="4,1"/>
+                          <Button Grid.Column="1" Content="X" Click="RemoveMonitorButton_Click"
+                                  Tag="{Binding}" Classes="remove" Margin="2,1"/>
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </ScrollViewer>
+              </Border>
+            </Grid>
+
+          </Grid>
+
+        </Grid>
+      </Grid>
+
+    </Grid>
+
+    <!-- ===== Status Bar ===== -->
+    <Border Grid.Row="2" Background="#1a1a1a" BorderBrush="#303030" BorderThickness="0,1,0,0" Padding="8,4">
+      <TextBlock Text="Double-click disassembly to toggle breakpoint. Click memory refs to add to watch list."
+                 Foreground="#666666" FontSize="10"/>
+    </Border>
+
+  </Grid>
+</Window>

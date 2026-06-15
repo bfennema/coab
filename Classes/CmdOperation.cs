@@ -19,6 +19,8 @@ namespace Classes
 
             ushort word;
 
+            string str = string.Empty;
+
             public VmGetMemoryValue getMemoryValue;
 
             public void Clear()
@@ -26,6 +28,7 @@ namespace Classes
                 codeSet = false;
                 lowSet = false;
                 highSet = false;
+                str = String.Empty;
             }
 
             public byte Code
@@ -95,6 +98,23 @@ namespace Classes
                     else throw new InvalidOperationException();
                 }
             }
+            public string String
+            {
+                set
+                {
+                    if (Code == 0x80 || Code == 0x81)
+                    {
+                        str = value;
+                    }
+                    else throw new InvalidOperationException();
+                }
+                get
+                {
+                    if (Code == 0x80 || Code == 0x81)
+                        return str;
+                    else throw new InvalidOperationException();
+                }
+            }
 
             public ushort GetCmdValue()
             {
@@ -148,7 +168,7 @@ namespace Classes
                             if (highSet)
                                 return String.Format("<${0,4:X4}>", word);
                             else
-                                return String.Format("\"{0}\"", gbl.unk_1D972[1]);
+                                return String.Format("\"{0}\"", str);
 
                         case 0x02:
                         case 0x81:
@@ -162,6 +182,16 @@ namespace Classes
                     }
                 }
                 else throw new InvalidOperationException();
+            }
+            public bool IsPointer
+            {
+                get
+                {
+                    if (Code == 0x1 || Code == 0x3 || Code == 0x81)
+                        return true;
+                    else
+                        return false;
+                }
             }
         }
         private readonly Operation[] cmd_ops;
@@ -186,10 +216,10 @@ namespace Classes
             Array.ForEach(cmd_ops, op => op.Clear());
         }
 
-        public Operation this[int index]
+        public ref Operation this[int index]
         {
-            get => cmd_ops[index-1];
-            set => cmd_ops[index-1] = value;
+            get => ref cmd_ops[index-1];
+            //set => cmd_ops[index-1] = value;
         }
     }
 }
