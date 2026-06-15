@@ -27,6 +27,9 @@
                   Header="Command Debugging"
                   ToggleType="CheckBox"
                   PointerPressed="Debugging_PointerPressed"/>
+        <MenuItem x:Name="EclDebugger"
+                  Header="ECL Debugger"
+                  PointerPressed="Debugging_PointerPressed"/>
         <MenuItem x:Name="DumpPlayerAffects"
                   Header="Dump Player Affects"
                   PointerPressed="Debugging_PointerPressed"/>

@@ -1,4 +1,4 @@
-﻿using Avalonia.Controls;
+using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Platform;
@@ -10,6 +10,7 @@ namespace GoldBoxPlayer.Views;
 public partial class MainView : UserControl
 {
     private Settings settings;
+    private DebuggerWindow? _debuggerWindow;
     public MainView()
     {
         InitializeComponent();
@@ -134,13 +135,17 @@ public partial class MainView : UserControl
         {
             engine.seg043.ToggleCommandDebugging();
         }
+        else if (EclDebugger == menu)
+        {
+            ShowEclDebugger();
+        }
         else if (DumpPlayerAffects == menu)
         {
             engine.seg043.DumpPlayerAffects();
         }
         else if (DumpMonsters == menu)
         {
-            engine.seg043.DumpMonsters();
+            await engine.seg043.DumpMonsters();
         }
         else if (DumpTreasureItems == menu)
         {
@@ -392,6 +397,24 @@ public partial class MainView : UserControl
         }
 
         return 0x0020;
+    }
+
+    private void ShowEclDebugger()
+    {
+        if (_debuggerWindow == null)
+        {
+            var desktop = Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+            if (desktop?.MainWindow != null)
+            {
+                _debuggerWindow = new DebuggerWindow();
+                _debuggerWindow.Closed += (s, e) => _debuggerWindow = null;
+                _debuggerWindow.Show(desktop.MainWindow);
+            }
+        }
+        else
+        {
+            _debuggerWindow.Activate();
+        }
     }
 
     private void MainViewUserControl_SizeChanged(object? sender, SizeChangedEventArgs e)

@@ -81,15 +81,17 @@ public partial class File : Classes.File
 
         return await storageFile.OpenWriteAsync();
     }
-    public async void Delete(string path, string filename)
+    public async Task<bool> Delete(string path, string filename)
     {
         IStorageFile? storageFile = await InternalOpen(path, filename);
 
         if (storageFile == null)
         {
-            return;
+            return false;
         }
         await storageFile.DeleteAsync();
+
+        return true;
     }
     public async Task<bool> Find(string path, string filename)
     {
