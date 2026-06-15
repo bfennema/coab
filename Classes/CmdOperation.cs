@@ -19,7 +19,7 @@ namespace Classes
 
             ushort word;
 
-            string str = string.Empty;
+            string? str = null;
 
             public VmGetMemoryValue getMemoryValue;
 
@@ -28,7 +28,7 @@ namespace Classes
                 codeSet = false;
                 lowSet = false;
                 highSet = false;
-                str = String.Empty;
+                str = null;
             }
 
             public byte Code
@@ -102,17 +102,14 @@ namespace Classes
             {
                 set
                 {
-                    if (Code == 0x80 || Code == 0x81)
-                    {
-                        str = value;
-                    }
-                    else throw new InvalidOperationException();
+                    str = value;
                 }
                 get
                 {
-                    if (Code == 0x80 || Code == 0x81)
+                    if (str is not null)
                         return str;
-                    else throw new InvalidOperationException();
+                    else
+                        throw new InvalidOperationException();
                 }
             }
 
