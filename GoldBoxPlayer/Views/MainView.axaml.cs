@@ -4,6 +4,7 @@ using Avalonia.Interactivity;
 using Avalonia.Platform;
 using System;
 using System.Reflection.Metadata;
+using GoldBoxPlayer.ViewModels;
 
 namespace GoldBoxPlayer.Views;
 
@@ -11,9 +12,11 @@ public partial class MainView : UserControl
 {
     private Settings settings;
     private DebuggerWindow? _debuggerWindow;
+    private MapWindow? _mapWindow;
     public MainView()
     {
         InitializeComponent();
+        MainViewModel.MapWindowRefreshed += () => _mapWindow?.RefreshMap();
     }
 
     public void UpdateMenuIsChecked(Settings _settings)
@@ -109,6 +112,7 @@ public partial class MainView : UserControl
         {
             PicturesOn.IsChecked = true;
         }
+        ShowMapWindow.IsChecked = _mapWindow != null;
     }
 
     protected override void OnLoaded(RoutedEventArgs e)
@@ -279,6 +283,32 @@ public partial class MainView : UserControl
         else if (PicturesOn == menu)
         {
             settings.PictureOn = toggle;
+        }
+        else if (ShowMapWindow == menu)
+        {
+            ToggleMapWindow();
+        }
+    }
+    private void ToggleMapWindow()
+    {
+        if (_mapWindow == null)
+        {
+            var desktop = Avalonia.Application.Current?.ApplicationLifetime as Avalonia.Controls.ApplicationLifetimes.IClassicDesktopStyleApplicationLifetime;
+            if (desktop?.MainWindow != null)
+            {
+                _mapWindow = new MapWindow();
+                _mapWindow.Closed += (s, e) =>
+                {
+                    _mapWindow = null;
+                    ShowMapWindow.IsChecked = false;
+                };
+                _mapWindow.Show(desktop.MainWindow);
+                ShowMapWindow.IsChecked = true;
+            }
+        }
+        else
+        {
+            _mapWindow.Close();
         }
     }
     private void Menu_PointerPressed(object? sender, PointerPressedEventArgs e)

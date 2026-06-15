@@ -1,4 +1,4 @@
-﻿using System.Reactive;
+using System.Reactive;
 using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
@@ -235,9 +235,15 @@ public class MainViewModel : ViewModelBase
         }
     }
 
+    public static event Action? MapWindowRefreshed;
 
     public void UpdateDisplay()
     {
+        if (Classes.gbl.saveData != null && Classes.gbl.geo_ptr?.maps != null)
+        {
+            Classes.MapTracker.MarkExplored(Classes.gbl.game_area, Classes.gbl.area_ptr.current_3DMap_block_id, Classes.gbl.mapPosX, Classes.gbl.mapPosY);
+            MapWindowRefreshed?.Invoke();
+        }
         _image?.InvalidateVisual();
     }
 

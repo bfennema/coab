@@ -746,6 +746,8 @@ namespace engine
         {
             System.IO.Stream file = await seg042.find_and_open_file(true, gbl.SavePath, file_name);
 
+            await Classes.MapTracker.Load(gbl.SavePath, file_name);
+
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
             gbl.reload_ecl_and_pictures = true;
@@ -940,6 +942,8 @@ namespace engine
                 }
                 gbl.file.BlockWrite(0x148, data, save_file);
                 gbl.file.Close(save_file);
+
+                await Classes.MapTracker.Save(gbl.SavePath, string.Format("SAVGAM{0}.DAT", inputKey));
 
                 party_count = 0;
                 foreach (Player tmp_player in gbl.TeamList)
