@@ -20,7 +20,12 @@ namespace ECLTools
                     if (bytes != null)
                     {
                         string output = Eclh.EclhDecompilerProgram.Run(bytes, 0x9900);
-                        System.IO.File.WriteAllText("output.txt", output);
+                        System.IO.File.WriteAllText($"output_{Eclh.EclhDecompiler.Version}.txt", output);
+                        Eclh.Lexer lexer = new(output);
+                        var list = lexer.Tokenize();
+                        Eclh.Parser parser = new(list);
+                        var unit = parser.ParseUnit();
+
                     }
                 }
             }

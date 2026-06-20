@@ -384,13 +384,22 @@ dest = lhs * rhs
 dest = lhs / rhs
 ```
 
-Examples:
+**Shorthand forms for self-assignment:**
+
 ```eclh
-counter = counter + 1      // ADD  [counter], #1,       &counter
-gold    = gold    - cost   // SUB  [gold],    [cost],   &gold
-damage  = dice    * bonus  // MUL  [dice],    [bonus],  &damage
-share   = total   / 4      // DIV  [total],   #4,       &share
+x++       // x = x + #1  — ADD [x], #1, [x]  (x is operand 0)
+++x       // x = #1 + x  — ADD #1, [x], [x]  (1 is operand 0)
+x--       // x = x - #1  — SUB #1, [x], [x]
+x += n    // x = x + n
+x -= n    // x = x - n
 ```
+
+**`x++` vs `++x` — round-trip distinction:**
+ECL's ADD instruction encodes `op0 + op1 → dest`. Both `x = x + 1` and `x = 1 + x`
+compile to ADD, but with operands in different order — producing different bytes.
+ECLH uses post-increment `x++` when `x` is `op0`, and pre-increment `++x` when `#1`
+is `op0`. The compiler must emit them in the correct operand order. In practice nearly
+all occurrences use the `x++` form; `++x` is rare but does appear in real ECL.
 
 **SUBTRACT operand order warning:** In the ECL binary, SUBTRACT is encoded as
 `op2 − op1 → op3`, i.e. the right-hand side of the binary instruction is the minuend and
