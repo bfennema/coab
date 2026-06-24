@@ -6,6 +6,124 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.7.4 — Fixed _flagReuseIfs look-back regression from v1.7.3: the new
+//            backward walk was skipping block-if guard GOTOs (which jump forward
+//            past the current IF) as if they were single-action-if actions. Added
+//            the key rule: only skip an IF/GOTO pair when the GOTO's target is at
+//            or before the current IF's address (meaning it branches away, not
+//            over). A GOTO whose target is past the current IF is a block-if guard
+//            — a genuine control-flow break — and the look-back stops there,
+//            correctly classifying the IF as flag-reuse.
+//   1.7.3 — Generalized the _flagReuseIfs look-back fix from v1.7.0: instead of
+//            looking back exactly one GOTO/COMPARE pair, now walks backward past
+//            any number of single-action-if GOTO/IF pairs (each pair is COMPARE +
+//            IF + GOTO) to find the COMPARE that originally set the flags. The
+//            v1.7.0 fix only handled one prior single-action-if; chains of two or
+//            more (as in ECL1_18's COMPARE/IF>/GOTO, COMPARE/IF>/GOTO, COMPARE/
+//            IF== sequence) still incorrectly classified the last IF as flag-reuse.
+//   1.7.2 — NEWECL confirmed genuinely terminal (it replaces the entire ECL in
+//            memory; old code cannot continue). The 0x00 byte after NEWECL in
+//            ECL6_1 is assembler padding, not reachable code. The compiler now
+//            handles such gaps via zero-padding (EclhCompiler v0.2.1) rather than
+//            treating them as CFG bugs.
+//   1.7.1 — Fixed TryEmitBlockIf false-positive else detection: a GOTO at the
+//            end of a then-body that is the action of a single-action if (part of
+//            a COMPARE+IF+GOTO triple) was mistakenly treated as an else-skip jump
+//            because its target was forward of the guard target. Added a check:
+//            if the two preceding body instructions are COMPARE and IF, the GOTO
+//            is part of that triple and is not an else-skip. This fixes the pattern
+//            where two consecutive single-action ifs appear in a block-if body and
+//            the last one jumps forward past the guard target.
+//   1.7.0 — Fixed _flagReuseIfs detection: an IF immediately following a GOTO
+//            that is itself immediately following a COMPARE was incorrectly
+//            classified as flag-reuse (no preceding COMPARE). This occurs in
+//            sequences like: COMPARE/IF/GOTO, COMPARE/IF/GOTO where the second
+//            triple's IF was adjacent to the first triple's GOTO (not to its own
+//            COMPARE) in the address-ordered instruction list. The GOTO is the
+//            action of the first IF+GOTO pair, not a control-flow break between
+//            the second COMPARE and the second IF. Fixed by extending the look-back
+//            one extra step past a GOTO when checking for a preceding COMPARE.
+//   1.6.9 — Added @tail { 0xXX, ... } directive: any bytes past the last decoded
+//            instruction or data table are emitted as a verbatim tail block so the
+//            compiler can reproduce the file byte-exactly. Addresses the 0xF7 (and
+//            any similar) alignment-padding byte found at the very end of ECL6_1.
+//            Added ComputeContentEnd() to find the high-water mark of all decoded
+//            content (instructions via Operand.Size + data tables via _codeBytes
+//            scan) and emit anything beyond it.
+//   1.6.8 — Corrected the += compound-assignment shorthand to fire for the
+//            destIsRhs case (ADD n, [x], [x] — amount as op0, variable as op1
+//            and dest) rather than destIsLhs (ADD [x], n, [x]). The original
+//            ECL compiler always uses the amount-first form for compound addition
+//            — destIsLhs never appears in practice. The previous convention
+//            (v1.6.5) was based on the wrong assumption about which form is
+//            common. The compiler's LayoutCompoundAssign is updated to match,
+//            so "x += n" round-trips as ADD n, [x], [x] byte-exactly.
+//            SUB compound-assign (x -= n) is unchanged since its raw encoding
+//            always had the variable as lhs after unswap, making destIsLhs
+//            correct for SUB regardless.
+//   1.6.7 — Audit pass: same ambiguity class as v1.6.4/1.6.6, found in
+//            ResolveLabel. GOTO, GOSUB, CALL-as-engine-function, and ON GOTO/ON
+//            GOSUB target lists all resolved jump targets to a bare label name
+//            with no marker, regardless of whether the underlying operand was
+//            WordRef (0x01) or WordImm (0x03) — never yet triggered in test data,
+//            but the same unrecoverable ambiguity if it occurred. Added an
+//            Operand-aware ResolveLabel overload that applies the ## marker
+//            consistently, matching FormatOp's WordImm handling. Audited every
+//            other operand-formatting path (FormatOp, FormatTableRef,
+//            FormatCondition, Operand.ToString(), and the rest of
+//            FormatInstruction) — no further instances found; all other
+//            named-lookup sites already route through the fixed FormatOp.
+//   1.6.6 — CRITICAL FIX: FormatOp's StringPtr case now emits @[name] for named
+//            addresses instead of the bare name, eliminating the same WordRef/
+//            StringPtr ambiguity class as the v1.6.4 WordImm marker fix. The
+//            bare name was indistinguishable from a WordRef (0x01) reference to
+//            the same address, even though StringPtr (0x81) encodes to different
+//            bytes. Affects every StringPtr operand used as a plain argument
+//            (e.g. "print shared_985E", or both operands of a COMPARE that
+//            checks string-pointer identity directly, such as
+//            "compare player_6B00 vs shared_9890" inside sub_AF56) — not just
+//            SAVE destinations, which is the only case the earlier ToStringPtr
+//            compiler workaround (v0.1.5) covered.
+//   1.6.5 — CRITICAL FIX: removed the ambiguous "x += n" shorthand for the
+//            destIsRhs case (ADD n, [x], [x] — amount as op0, dest as op1).
+//            It produced text identical to the much more common destIsLhs case
+//            (ADD [x], n, [x] — dest as op0), an unrecoverable ambiguity for
+//            round-trip compilation since the two encode to different bytes
+//            (same issue class as the x++ / ++x distinction). The destIsRhs case
+//            now falls through to the explicit "dest = lhs + rhs" form, which
+//            fully preserves operand order.
+//   1.6.4 — CRITICAL FIX: FormatOp now preserves the ## WordImm marker even when
+//            the address resolves to a named mem-region variable, label, hardware
+//            register, or engine function. Previously the named-lookup branches
+//            (hardware reg / var / label / engine func) returned the bare name
+//            with no prefix regardless of operand kind, making WordRef (0x01) and
+//            WordImm (0x03) operands referencing the same named address produce
+//            IDENTICAL source text — an unrecoverable ambiguity for round-trip
+//            compilation, since the two kinds encode to different bytes. The ##
+//            marker previously only ever appeared for unclassified addresses
+//            (the [$XXXX] fallback), which in practice almost never triggered
+//            since most WordImm-in-mem-region addresses are named variables.
+//   1.6.3 — CRITICAL FIX: reverted the redundant-GOTO suppression added in
+//            v1.5.5. It was a lossy transformation: a GOTO whose target is the
+//            immediately next instruction is still a real, addressable
+//            instruction occupying real file bytes. Suppressing it from the
+//            source for readability left the round-trip compiler with no way
+//            to reconstruct those bytes — every such GOTO now caused a pinned-
+//            label address mismatch in EclhCompiler for any subsequent label.
+//            Correctness for round-trip compilation takes priority over this
+//            minor readability improvement.
+//   1.6.2 — CRITICAL FIX: COMBAT (0x24) removed from IsTerminal. COMBAT falls
+//            through — subsequent code checks combat-result flags, and the same
+//            fall-through path is used for shop entry (PICTURE #255 / EXIT
+//            immediately after COMBAT is the shop-closed path). Previously the
+//            CFG traversal treated COMBAT as having no fall-through successor,
+//            silently omitting all reachable code immediately after it from the
+//            decompiled output across every affected ECL file.
+//   1.6.1 — EngineFunctions and HardwareRegisters are now static, so EclhCompiler
+//            can reference the same profile directly via
+//            Eclh.EclhDecompiler.EngineFunctions / .HardwareRegisters instead of
+//            duplicating the address tables, eliminating profile drift between
+//            the decompiler and compiler.
 //   1.6.0 — Added do/while loop detection (TryEmitDoWhile). Condition at bottom,
 //            not negated — GOTO fires when loop continues.
 //   1.5.5 — Redundant GOTO suppressed when target is the immediately next instruction.
@@ -85,9 +203,15 @@ namespace Eclh
         /// True for terminal instructions that have no fall-through successor.
         /// </summary>
         public bool IsTerminal =>
-            Opcode is 0x00 or 0x13 or 0x20 or 0x24;
-            // EXIT, RETURN, NEWECL, COMBAT all stop sequential flow.
+            Opcode is 0x00 or 0x13 or 0x20;
+            // EXIT, RETURN, NEWECL stop sequential flow.
             // GOTO (0x01) is also terminal for fall-through but handled separately.
+            // COMBAT (0x24) falls through — subsequent code checks combat-result
+            // flags, and the same fall-through is used for shop entry (PICTURE
+            // #255 / EXIT immediately after COMBAT is the shop-closed path).
+            // NEWECL (0x20) is genuinely terminal — it replaces the entire current
+            // ECL in memory so execution of the old code cannot continue. Any byte
+            // immediately after NEWECL is unreachable dead code (assembler padding).
 
         public bool IsGoto    => Opcode == 0x01;
         public bool IsGosub   => Opcode == 0x02;
@@ -143,9 +267,12 @@ namespace Eclh
         public ushort Base { get; }
 
         /// <summary>
-        /// Pool of Radiance engine function addresses.  Override for other games.
+        /// Pool of Radiance engine function addresses. Static — shared across all
+        /// decompiler instances and directly referenceable by EclhCompiler via
+        /// Eclh.EclhDecompiler.EngineFunctions, so the compiler's game profile can
+        /// never drift out of sync with the decompiler's.
         /// </summary>
-        public Dictionary<ushort, string> EngineFunctions { get; set; } = new()
+        public static Dictionary<ushort, string> EngineFunctions { get; set; } = new()
         {
             [0x2C90] = "redraw",
             [0x8000] = "duel_player",
@@ -158,9 +285,10 @@ namespace Eclh
 
         /// <summary>
         /// Hardware register addresses (map position, wall type, engine params etc.)
-        /// Named separately from mem_regions since they are engine state, not ECL variables.
+        /// Named separately from mem_regions since they are engine state, not ECL
+        /// variables. Static for the same reason as EngineFunctions above.
         /// </summary>
-        public Dictionary<ushort, string> HardwareRegisters { get; set; } = new()
+        public static Dictionary<ushort, string> HardwareRegisters { get; set; } = new()
         {
             // Map state (vm_GetMemoryValue case 4, offset from 0xC04B)
             [0xC04B] = "map_x",
@@ -502,13 +630,46 @@ namespace Eclh
                 if (!_labelNames.ContainsKey(addr))
                     _labelNames[addr] = $"loc_{addr:X4}";
 
-            // Walk instructions in order to detect flag-reuse IFs
+            // Walk instructions in order to detect flag-reuse IFs.
+            // An IF is flag-reuse if there is no COMPARE instruction immediately
+            // before it in sequential code flow. "Immediately before" means
+            // looking back past GOTO instructions that are actions of prior
+            // single-action ifs (COMPARE+IF+GOTO triples), since those GOTOs
+            // don't reset the comparison flags.
+            //
+            // Key rule: only skip an IF/GOTO pair when the GOTO's target is at
+            // or before the address of the IF we're currently testing. If the
+            // GOTO's target is past the current IF, that GOTO jumps OVER it —
+            // it's a block-if guard, not a single-action-if action — which is
+            // a genuine control-flow break that resets what "preceding COMPARE"
+            // means for the current IF.
             var ordered = _instructions.Values.OrderBy(i => i.Address).ToList();
             for (int i = 0; i < ordered.Count; i++)
             {
                 var instr = ordered[i];
                 if (!instr.IsIf) continue;
-                bool preceded_by_compare = i > 0 && ordered[i - 1].IsCompare;
+
+                bool preceded_by_compare = false;
+                int k = i - 1;
+                while (k >= 0)
+                {
+                    if (ordered[k].IsCompare) { preceded_by_compare = true; break; }
+                    // Only skip an IF/GOTO pair if the GOTO does NOT jump past
+                    // the current IF (i.e. its target <= current IF's address).
+                    // A GOTO that jumps past the current IF is a block-if guard.
+                    if (ordered[k].IsGoto && k >= 1 && ordered[k - 1].IsIf)
+                    {
+                        ushort gotoTarget = ordered[k].Operands.Count > 0
+                            ? ordered[k].Operands[0].Word : (ushort)0;
+                        if (gotoTarget <= instr.Address)
+                        {
+                            k -= 2; // single-action-if action; safe to skip
+                            continue;
+                        }
+                    }
+                    break; // real control-flow break; stop looking back
+                }
+
                 if (!preceded_by_compare)
                     _flagReuseIfs.Add(instr.Address);
             }
@@ -539,7 +700,7 @@ namespace Eclh
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.6.0";
+        public const string Version = "1.7.4";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -611,7 +772,59 @@ namespace Eclh
             var allAddrs = _instructions.Keys.OrderBy(a => a).ToList();
             EmitRange(sb, allAddrs, 0, allAddrs.Count, indent: "");
 
+            // Tail bytes — any bytes past the last known content (instruction or
+            // data table) that are unreachable and not part of any named structure.
+            // Stored verbatim so the compiler can reproduce the file byte-exactly.
+            int tailStart = ComputeContentEnd();
+            if (tailStart < _fileSize)
+            {
+                var tailBytes = Enumerable.Range(tailStart, _fileSize - tailStart)
+                                          .Select(i => $"0x{_data[i]:X2}");
+                sb.AppendLine();
+                sb.AppendLine($"@tail {{ {string.Join(", ", tailBytes)} }}");
+            }
+
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Computes the file offset of the first byte past the last decoded
+        /// instruction or data table — any bytes from here to end-of-file are
+        /// unreachable tail padding.
+        /// </summary>
+        private int ComputeContentEnd()
+        {
+            int end = 2 + 20; // DAX prefix + header
+
+            // High-water mark from decoded instructions
+            foreach (var (addr, instr) in _instructions)
+            {
+                int instrEnd = FileOffset(addr) + 1; // opcode byte
+                foreach (var op in instr.Operands)
+                    instrEnd += op.Kind switch
+                    {
+                        OperandKind.ByteImm => 2,
+                        OperandKind.WordRef => 3,
+                        OperandKind.Code02 => 3,
+                        OperandKind.WordImm => 3,
+                        OperandKind.StringPtr => 3,
+                        OperandKind.StringInline => op.Size,
+                        _ => 0
+                    };
+                if (instrEnd > end) end = instrEnd;
+            }
+
+            // High-water mark from data tables
+            foreach (ushort tableBase in _dataAddrs)
+            {
+                int tblOff = FileOffset(tableBase);
+                int scan = tblOff;
+                while (scan < _fileSize && !_codeBytes.Contains((ushort)(Base + scan - 2)))
+                    scan++;
+                if (scan > end) end = scan;
+            }
+
+            return end;
         }
 
         /// <summary>
@@ -668,15 +881,18 @@ namespace Eclh
                 }
 
                 // ── Plain instruction ─────────────────────────────────────────
-                // Suppress a GOTO whose target is the very next instruction —
-                // it is a no-op jump that adds no information.
-                bool isRedundantGoto = instr.IsGoto
-                    && instr.Operands.Count > 0
-                    && i + 1 < end
-                    && instr.Operands[0].Word == allAddrs[i + 1];
-
-                if (!isRedundantGoto)
-                    sb.AppendLine($"{indent}    {FormatInstruction(instr)}");
+                // NOTE: a prior version (v1.5.5) suppressed GOTO instructions whose
+                // target was the immediately next instruction, treating them as
+                // redundant no-op jumps for readability. That suppression was
+                // reverted in v1.6.3: every such GOTO is a real, addressable
+                // instruction occupying real bytes in the file, and omitting it
+                // from the source left the compiler with no way to reconstruct
+                // those bytes, breaking byte-exact round-trip compilation. Some of
+                // these "redundant" GOTOs may also exist because the original
+                // compiler emitted them deliberately (e.g. as a stable jump target
+                // for code shared across multiple paths) — they are not actually
+                // meaningless even though they look like no-ops in isolation.
+                sb.AppendLine($"{indent}    {FormatInstruction(instr)}");
                 i++;
 
                 // After an unconditional terminal (standalone GOTO, EXIT, RETURN,
@@ -833,15 +1049,31 @@ namespace Eclh
                     ushort elseTgt = lastBodyInstr.Operands[0].Word;
                     if (elseTgt > guardTarget)
                     {
-                        int afterIdx = allAddrs.BinarySearch(elseTgt);
-                        if (afterIdx >= 0 && afterIdx <= end &&
-                            !HasExternalJumpsIntoRange(allAddrs, guardIdx, afterIdx,
-                                                       bodyStart - 3, afterIdx))
+                        // Make sure this GOTO is a standalone unconditional jump,
+                        // not the action of a single-action if (COMPARE+IF+GOTO).
+                        // If the two preceding instructions are COMPARE and IF, this
+                        // GOTO is part of that triple and is NOT an else-skip jump.
+                        bool isElseSkip = true;
+                        if (bodyEnd - bodyStart >= 3)
                         {
-                            elseStart = guardIdx;
-                            elseEnd   = afterIdx;
-                            hasElse   = true;
-                            bodyEnd--;  // exclude terminal GOTO from body
+                            var prev1 = _instructions[allAddrs[bodyEnd - 2]];
+                            var prev2 = _instructions[allAddrs[bodyEnd - 3]];
+                            if (prev1.IsIf && prev2.IsCompare)
+                                isElseSkip = false;
+                        }
+
+                        if (isElseSkip)
+                        {
+                            int afterIdx = allAddrs.BinarySearch(elseTgt);
+                            if (afterIdx >= 0 && afterIdx <= end &&
+                                !HasExternalJumpsIntoRange(allAddrs, guardIdx, afterIdx,
+                                                           bodyStart - 3, afterIdx))
+                            {
+                                elseStart = guardIdx;
+                                elseEnd   = afterIdx;
+                                hasElse   = true;
+                                bodyEnd--;  // exclude terminal GOTO from body
+                            }
                         }
                     }
                 }
@@ -1078,15 +1310,18 @@ namespace Eclh
             if (instr.Opcode == 0x2D && instr.Operands.Count == 1 &&
                 instr.Operands[0].IsAddress &&
                 EngineFunctions.TryGetValue(instr.Operands[0].Word, out string? fname))
-                return $"{fname}()";
+            {
+                string callPrefix = instr.Operands[0].Kind == OperandKind.WordImm ? "##" : "";
+                return $"{callPrefix}{fname}()";
+            }
 
             // GOTO / GOSUB
             if (instr.IsGoto && instr.Operands.Count > 0)
-                return $"goto {ResolveLabel(instr.Operands[0].Word)}";
+                return $"goto {ResolveLabel(instr.Operands[0])}";
 
             if (instr.IsGosub && instr.Operands.Count > 0)
             {
-                string target = ResolveLabel(instr.Operands[0].Word);
+                string target = ResolveLabel(instr.Operands[0]);
                 return $"{target}()";
             }
 
@@ -1146,8 +1381,14 @@ namespace Eclh
                     if (instr.Opcode == 0x04 && lhsIsOne && destIsRhs) return $"++{destStr}";
                     if (instr.Opcode == 0x05 && rhsIsOne && destIsLhs) return $"{destStr}--";
 
-                    // x += n / x -= n
-                    if (destIsLhs) return $"{destStr} {op}= {rhsStr}";
+                    // x += n  — emit shorthand when dest is op1 (rhs): ADD n, [x], [x]
+                    // (amount is op0, variable is op1 and also dest). This is the form
+                    // the original ECL compiler always produces for compound addition —
+                    // ADD [x], n, [x] (destIsLhs) never appears in practice.
+                    // The compiler maps "x += n" back to ADD n, [x], [x] to match.
+                    // SUB is unchanged: SUB n, [x], [x] normalises to lhs=x, rhs=n,
+                    // so destIsLhs is always true for SUB compound-assign and correctly
+                    // emits "x -= n".
                     if (instr.Opcode == 0x04 && destIsRhs) return $"{destStr} += {lhsStr}";
 
                     return $"{destStr} = {lhsStr} {op} {rhsStr}";
@@ -1185,7 +1426,7 @@ namespace Eclh
                 string idx  = FormatOp(instr.Operands[0]);
                 var targets  = instr.Operands.Skip(1)
                                     .Where(o => o.IsAddress)
-                                    .Select(o => ResolveLabel(o.Word));
+                                    .Select(o => ResolveLabel(o));
                 return $"{verb}({idx}) {{ {string.Join(", ", targets)} }}";
             }
 
@@ -1200,26 +1441,42 @@ namespace Eclh
             {
                 case OperandKind.WordRef:
                 case OperandKind.WordImm:
+                    // The ## marker for WordImm must be preserved regardless of whether
+                    // the address also resolves to a named variable/label/engine func —
+                    // WordRef (0x01) and WordImm (0x03) produce different bytes even when
+                    // they reference the exact same address, so the text must always be
+                    // able to distinguish them for round-trip compilation. Only the
+                    // generic [$XXXX] fallback form omitted the marker for named cases;
+                    // fixed by applying the prefix uniformly at the top.
+                    string wPrefix = op.Kind == OperandKind.WordImm ? "##" : "";
+
                     // Hardware registers take priority
                     if (HardwareRegisters.TryGetValue(op.Word, out string? hwname))
-                        return hwname;
+                        return wPrefix + hwname;
                     // Named variables (from mem_regions)
                     if (_varNames.TryGetValue(op.Word, out string? vname))
-                        return vname;
+                        return wPrefix + vname;
                     // Code labels
                     if (_labelNames.TryGetValue(op.Word, out string? lname))
-                        return lname;
+                        return wPrefix + lname;
                     // Engine functions
                     if (EngineFunctions.TryGetValue(op.Word, out string? ename))
-                        return ename;
-                    // String pointers (0x81) handled below; for 0x01/0x03 unclassified:
-                    string prefix = op.Kind == OperandKind.WordImm ? "##" : "";
-                    return $"{prefix}[${op.Word:X4}]";
+                        return wPrefix + ename;
+                    // Unclassified — raw address form
+                    return $"{wPrefix}[${op.Word:X4}]";
 
                 case OperandKind.StringPtr:
-                    // Named if in a mem region
+                    // @[name] marker must be preserved even when the address resolves
+                    // to a named variable — StringPtr (0x81) and WordRef (0x01)
+                    // referencing the same address produce different bytes, so the
+                    // text must always distinguish them (same issue class as the ##
+                    // WordImm marker fix in v1.6.4). Reuses the existing @[symbol]
+                    // syntax (already parsed by EclhCompiler) rather than the bare
+                    // name, which would be indistinguishable from a WordRef.
                     if (_varNames.TryGetValue(op.Word, out string? spname))
-                        return spname;
+                        return $"@[{spname}]";
+                    if (_labelNames.TryGetValue(op.Word, out string? splname))
+                        return $"@[{splname}]";
                     return $"@[${op.Word:X4}]";
 
                 default:
@@ -1232,6 +1489,21 @@ namespace Eclh
             if (op.Kind == OperandKind.WordRef && _dataAddrs.Contains(op.Word))
                 return $"tbl_{op.Word:X4}";
             return FormatOp(op);
+        }
+
+        /// <summary>
+        /// Resolves a jump/call target address to its label name, with the same ##
+        /// WordImm marker used elsewhere — GOTO/GOSUB/CALL/ON-GOTO/ON-GOSUB targets
+        /// are not guaranteed to always be WordRef-encoded, and silently assuming so
+        /// would be the same unrecoverable ambiguity class fixed in v1.6.4/1.6.6 for
+        /// plain operands, just undetected so far because no test data has
+        /// exercised a WordImm-encoded jump target yet.
+        /// </summary>
+        private string ResolveLabel(Operand op)
+        {
+            string prefix = op.Kind == OperandKind.WordImm ? "##" : "";
+            if (_labelNames.TryGetValue(op.Word, out string? name)) return prefix + name;
+            return $"{prefix}loc_{op.Word:X4}";
         }
 
         private string ResolveLabel(ushort addr)
