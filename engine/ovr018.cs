@@ -74,7 +74,7 @@ namespace engine
             gbl.game_state = GameState.StartGameMenu;
             bool reclac_menus = true;
 
-            while (gbl.Exit == false)
+            while (gbl.Token.IsCancellationRequested == false)
             {
                 if (reclac_menus == true)
                 {
@@ -716,12 +716,12 @@ namespace engine
 
                 for (int i = 0; i < 6; i++)
                 {
-                    player.stats.Str.Load(Math.Max(player.stats.Str.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats.Int.Load(Math.Max(player.stats.Int.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats.Wis.Load(Math.Max(player.stats.Wis.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats.Dex.Load(Math.Max(player.stats.Dex.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats.Con.Load(Math.Max(player.stats.Con.cur, ovr024.roll_dice(6, 3)+1));
-                    player.stats.Cha.Load(Math.Max(player.stats.Cha.cur, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Str.Load(Math.Max(player.stats.Str.Base, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Int.Load(Math.Max(player.stats.Int.Base, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Wis.Load(Math.Max(player.stats.Wis.Base, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Dex.Load(Math.Max(player.stats.Dex.Base, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Con.Load(Math.Max(player.stats.Con.Base, ovr024.roll_dice(6, 3)+1));
+                    player.stats.Cha.Load(Math.Max(player.stats.Cha.Base, ovr024.roll_dice(6, 3)+1));
                 }
 
                 Race race = player.race;
@@ -736,7 +736,7 @@ namespace engine
                             player.stats.Str.EnforceRaceSexLimits(race, sex);
                             player.stats.Str.EnforceClassLimits(player._class);
 
-                            if (player.stats.Str.cur == 18)
+                            if (player.stats.Str.Base == 18)
                             {
                                 if (player.fighter_lvl > 0 ||
                                     player.knight_lvl > 0 ||
@@ -760,11 +760,11 @@ namespace engine
                             player.stats.Wis.EnforceRaceSexLimits(race, sex);
                             player.stats.Wis.EnforceClassLimits(player._class);
 
-                            if (player.stats.Wis.cur < 13 &&
+                            if (player.stats.Wis.Base < 13 &&
                                 player._class >= ClassId.mc_c_f && player._class <= ClassId.mc_c_t)
                             {
                                 // Multi-Class Cleric
-                                player.stats.Wis.cur = 13;
+                                player.stats.Wis.Load(13);
                             }
                             break;
 
@@ -922,14 +922,14 @@ namespace engine
                 await portrait_builder();
             }
 
-            icon_builder();
+            await icon_builder();
 
             //for (var_1B = 0; var_1B <= 5; var_1B++)
             //{
             //    player.stats[var_1B].cur = player.stats[var_1B].full;
             //}
 
-            player.stats.Str00.full = player.stats.Str00.cur;
+            player.stats.Str00.Current = player.stats.Str00.Base;
 
             input_key = ovr027.yes_no(gbl.defaultMenuColors, "Save " + player.name + "? ");
 
@@ -965,7 +965,7 @@ namespace engine
 
         internal static int con_bonus(SkillType skill)
         {
-            return con_bonus(skill, gbl.SelectedPlayer.stats.Con.full);
+            return con_bonus(skill, gbl.SelectedPlayer.stats.Con.Current);
         }
 
 
@@ -1073,16 +1073,16 @@ namespace engine
             {
                 if (edited_stat == 7)
                 {
-                    while (seg049.KEYPRESSED() == false)
+                    while (Input.KEYPRESSED() == false)
                     {
                         /* empty */
                     }
 
-                    inputkey = (char)seg043.GetInputKey();
+                    inputkey = (char)Input.GetInputKey();
 
                     if (inputkey == 0)
                     {
-                        inputkey = (char)seg043.GetInputKey();
+                        inputkey = (char)Input.GetInputKey();
                         controlkey = true;
                     }
                     else
@@ -1153,7 +1153,7 @@ namespace engine
                                 switch ((Stat)stat_var)
                                 {
                                     case Stat.STR:
-                                        if (player.stats.Str00.cur > 0)
+                                        if (player.stats.Str00.Base > 0)
                                         {
                                             player.stats.Str00.Dec();
                                             player.stats.Str.Inc();
@@ -1245,7 +1245,7 @@ namespace engine
                                     case Stat.STR:
                                         player.stats.Str.EnforceRaceSexLimits(race, sex);
 
-                                        if( player.stats.Str.cur == 18 &&
+                                        if( player.stats.Str.Base == 18 &&
                                             ((player.multiclassLevel == 0 &&
                                               (player.fighter_lvl > 0 || player.ranger_lvl > 0 || player.paladin_lvl > 0)) ||
                                              (player.multiclassLevel > 0 &&
@@ -1433,7 +1433,7 @@ namespace engine
 
             player = gbl.SelectedPlayer;
 
-            player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats.Con.cur));
+            player.hit_point_rolled = (byte)(player.hit_point_max - calc_fixed_hp_bonus(player, player.stats.Con.Base));
 
             return true;
         }
@@ -1550,7 +1550,7 @@ namespace engine
                             gbl.area2_ptr.party_size = 0;
                             ovr017.AssignPlayerIconId(new_player);
 
-                            ovr017.LoadPlayerCombatIcon(true);
+                            await ovr017.LoadPlayerCombatIcon(true);
                         }
                         else
                         {
@@ -1599,7 +1599,7 @@ namespace engine
                                 (((new_player.alignment + 1) % 3) != 0 || paladin_present == false))
                             {
                                 ovr017.AssignPlayerIconId(new_player);
-                                ovr017.LoadPlayerCombatIcon(true);
+                                await ovr017.LoadPlayerCombatIcon(true);
 
                                 if (new_player.control_morale < Control.NPC_Base)
                                 {
@@ -1727,7 +1727,7 @@ namespace engine
 
         static Set unk_4FE94 = new Set(0, 69);
 
-        internal static void icon_builder()
+        internal static async Task<bool> icon_builder()
         {
             Player player_ptr2;
             Player player;
@@ -1753,7 +1753,7 @@ namespace engine
 
             do
             {
-                ovr017.LoadPlayerCombatIcon(false);
+                await ovr017.LoadPlayerCombatIcon(false);
 
                 player = gbl.SelectedPlayer;
 
@@ -1762,7 +1762,7 @@ namespace engine
 
                 byte bkup_icon_id = player.icon_id;
                 player.icon_id = 0x0C;
-                ovr017.LoadPlayerCombatIcon(false);
+                await ovr017.LoadPlayerCombatIcon(false);
                 player.icon_id = bkup_icon_id;
 
                 headIcon = player.head_icon;
@@ -1906,12 +1906,12 @@ namespace engine
                                 {
                                     case 'L':
                                         player.icon_size = 2;
-                                        ovr017.LoadPlayerCombatIcon(false);
+                                        await ovr017.LoadPlayerCombatIcon(false);
                                         break;
 
                                     case 'S':
                                         player.icon_size = 1;
-                                        ovr017.LoadPlayerCombatIcon(false);
+                                        await ovr017.LoadPlayerCombatIcon(false);
                                         break;
 
                                     case 'K':
@@ -1930,7 +1930,7 @@ namespace engine
                                         break;
                                 }
 
-                                ovr017.LoadPlayerCombatIcon(false);
+                                await ovr017.LoadPlayerCombatIcon(false);
                                 break;
 
                             case 5:
@@ -1960,7 +1960,7 @@ namespace engine
                                             inputKey = ' ';
                                         }
 
-                                        ovr017.LoadPlayerCombatIcon(false);
+                                        await ovr017.LoadPlayerCombatIcon(false);
                                     }
                                     else if (var_1B == 'W')
                                     {
@@ -2000,7 +2000,7 @@ namespace engine
                                             inputKey = ' ';
                                         }
 
-                                        ovr017.LoadPlayerCombatIcon(false);
+                                        await ovr017.LoadPlayerCombatIcon(false);
                                     }
                                 }
                                 else if (var_1A == 3)
@@ -2072,6 +2072,8 @@ namespace engine
             } while (inputKey != 'Y');
 
             ovr033.Color_0_8_normal();
+
+            return true;
         }
 
 
@@ -2109,7 +2111,7 @@ namespace engine
 
                 if (classLvl > 0 && classLvl <= hp_calc_table[skill].max_hit_die)
                 {
-                    hp_adj += (sbyte)con_bonus(skill, player.stats.Con.full);
+                    hp_adj += (sbyte)con_bonus(skill, player.stats.Con.Current);
 
                     if (player.ClassLevel[(int)skill] == 1 && hp_calc_table[skill].lvl_bonus == 1)
                     {
@@ -2188,7 +2190,7 @@ namespace engine
 
         internal static int calc_min_hp(Player player) /* sub_50793 */
         {
-            return calc_hp(player, player.stats.Con.full, 1);
+            return calc_hp(player, player.stats.Con.Current, 1);
         }
 
         public static int calc_fixed_hp_bonus(Player player, int con)
@@ -2209,7 +2211,7 @@ namespace engine
                 {
                     hp_calc hpt = hp_calc_table[skill];
 
-                    int con_hp_bonus = con_bonus(skill, player.stats.Con.full);
+                    int con_hp_bonus = con_bonus(skill, player.stats.Con.Current);
 
                     if (classLvl + hpt.lvl_bonus <= hpt.max_hit_die)
                     {
@@ -2230,7 +2232,7 @@ namespace engine
                 {
                     hp_calc hpt = hp_calc_table[skill];
 
-                    int con_hp_bonus = con_bonus(skill, player.stats.Con.full);
+                    int con_hp_bonus = con_bonus(skill, player.stats.Con.Current);
 
                     if (classLvl > player.multiclassLevel)
                     {
@@ -2295,15 +2297,15 @@ namespace engine
                         }
 
                         // high con disallows low HD rolls
-                        if (player.stats.Con.full == 20)
+                        if (player.stats.Con.Current == 20)
                         {
                             min_roll = 2;
                         }
-                        else if (player.stats.Con.full == 21 || player.stats.Con.full == 22)
+                        else if (player.stats.Con.Current == 21 || player.stats.Con.Current == 22)
                         {
                             min_roll = 3;
                         }
-                        else if (player.stats.Con.full >= 23 && player.stats.Con.full <= 25)
+                        else if (player.stats.Con.Current >= 23 && player.stats.Con.Current <= 25)
                         {
                             min_roll = 4;
                         }

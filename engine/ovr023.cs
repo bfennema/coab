@@ -135,7 +135,7 @@ namespace engine
 			switch (gbl.spellCastingTable[spell_id].spellClass)
 			{
 				case SpellClass.Cleric:
-                    if (player.stats.Wis.full > 8 &&
+                    if (player.stats.Wis.Current > 8 &&
 						(player.SkillLevel(SkillType.Cleric) > 0 ||
 						 player.SkillLevel(SkillType.Paladin) > 8))
 					{
@@ -144,14 +144,14 @@ namespace engine
 					break;
 
 				case SpellClass.Druid:
-                    if ((player.stats.Wis.full > 8 && player.SkillLevel(SkillType.Ranger) > 6))
+                    if ((player.stats.Wis.Current > 8 && player.SkillLevel(SkillType.Ranger) > 6))
 					{
 						can_learn = true;
 					}
 					break;
 
 				case SpellClass.MagicUser:
-					if (player.stats.Int.full > 8 &&
+					if (player.stats.Int.Current > 8 &&
 						((player.race != Race.human) ||
                          (player.activeItems.armor == null) ||
 						 (gbl.game_state != GameState.Combat) ||
@@ -1516,7 +1516,7 @@ namespace engine
 				strIncrease = ovr024.roll_dice(8, 1);
 			}
 
-            int str = target.stats.Str.full + strIncrease;
+            int str = target.stats.Str.Current + strIncrease;
 			int str_100 = 0;
 
 			if (str > 18)
@@ -1528,7 +1528,7 @@ namespace engine
 					target.ranger_lvl > 0 ||
 					target.ranger_old_lvl > target.multiclassLevel)
 				{
-                    str_100 = target.stats.Str00.cur + ((str - 18) * 10);
+                    str_100 = target.stats.Str00.Base + ((str - 18) * 10);
 
 					if (str_100 > 100)
 					{
@@ -2289,7 +2289,7 @@ namespace engine
 		internal static async Task<bool> sub_6003C()
 		{
 			await DoElecDamage(0, SaveVerseType.Spell, ovr024.roll_dice(6, 1) + 20, gbl.targetPos);
-			sub_5FA44(0, SaveVerseType.Spell, 20, 3);
+			await sub_5FA44(0, SaveVerseType.Spell, 20, 3);
             return true;
 		}
 
@@ -2453,7 +2453,7 @@ namespace engine
 			Player player = gbl.spellTargets[0];
 
 			if ((player.health_status == Status.dead || player.health_status == Status.animated) &&
-                player.stats.Con.cur > 0 &&
+                player.stats.Con.Base > 0 &&
 				player.race != Race.elf &&
                 player.race != Race.silvanesti_elf &&
                 player.race != Race.qualinesti_elf)
@@ -2466,7 +2466,7 @@ namespace engine
 
 				player.health_status = Status.okey;
 				player.in_combat = true;
-                player.stats.Con.cur--;
+                player.stats.Con.Dec();
 
 				await ovr024.CalcStatBonuses(Stat.CON, player);
 				player.hit_point_current = 1;
@@ -3026,7 +3026,7 @@ namespace engine
 
 				ovr025.draw_missile_attack(0x32, 4, gbl.targetPos, var_2);
 				var_1 = await DoElecDamage(var_1, 0, SaveVerseType.BreathWeapon, player.hit_point_max, gbl.targetPos);
-				sub_5FA44(0, SaveVerseType.BreathWeapon, player.hit_point_max, 10);
+				await sub_5FA44(0, SaveVerseType.BreathWeapon, player.hit_point_max, 10);
 
 				if (affect.affect_data > 0xFD)
 				{
@@ -3226,7 +3226,7 @@ namespace engine
 				ovr025.draw_missile_attack(0x32, 4, gbl.targetPos, pos);
 
 				var_1 = await DoElecDamage(var_1, 0, SaveVerseType.Spell, ovr024.roll_dice_save(6, 16), gbl.targetPos);
-				sub_5FA44(0, 0, ovr024.roll_dice_save(6, 16), 10);
+				await sub_5FA44(0, 0, ovr024.roll_dice_save(6, 16), 10);
 				var_1 = true;
 				ovr025.clear_actions(caster);
 			}

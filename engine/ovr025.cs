@@ -508,7 +508,7 @@ namespace engine
 		{
 			sbyte bonus;
 
-            int stat_val = player.stats.Dex.full;
+            int stat_val = player.stats.Dex.Current;
 
 			if (stat_val >= 1 && stat_val <= 3)
 			{
@@ -547,7 +547,7 @@ namespace engine
 		{
 			int bonus;
 
-            int stat_val = player.stats.Dex.full;
+            int stat_val = player.stats.Dex.Current;
 
 			if (stat_val >= 0 && stat_val <= 2)
 			{
@@ -586,33 +586,33 @@ namespace engine
 		{
 			int ret_val;
 
-            if (player.stats.Str.full >= 0 && player.stats.Str.full <= 17)
+            if (player.stats.Str.Current >= 0 && player.stats.Str.Current <= 17)
 			{
-                ret_val = player.stats.Str.full;
+                ret_val = player.stats.Str.Current;
 			}
-            else if (player.stats.Str.full == 18)
+            else if (player.stats.Str.Current == 18)
 			{
-                if (player.stats.Str00.full == 0)
+                if (player.stats.Str00.Current == 0)
 				{
 					ret_val = 18;
 				}
-                else if (player.stats.Str00.full >= 1 && player.stats.Str00.full <= 50)
+                else if (player.stats.Str00.Current >= 1 && player.stats.Str00.Current <= 50)
 				{
 					ret_val = 19;
 				}
-                else if (player.stats.Str00.full >= 51 && player.stats.Str00.full <= 75)
+                else if (player.stats.Str00.Current >= 51 && player.stats.Str00.Current <= 75)
 				{
 					ret_val = 20;
 				}
-                else if (player.stats.Str00.full >= 76 && player.stats.Str00.full <= 90)
+                else if (player.stats.Str00.Current >= 76 && player.stats.Str00.Current <= 90)
 				{
 					ret_val = 21;
 				}
-                else if (player.stats.Str00.full >= 91 && player.stats.Str00.full <= 99)
+                else if (player.stats.Str00.Current >= 91 && player.stats.Str00.Current <= 99)
 				{
 					ret_val = 22;
 				}
-                else if (player.stats.Str00.full >= 100)
+                else if (player.stats.Str00.Current >= 100)
 				{
 					ret_val = 23;
 				}
@@ -621,9 +621,9 @@ namespace engine
 					throw new System.NotSupportedException();
 				}
 			}
-            else if (player.stats.Str.full >= 19 && player.stats.Str.full <= 25)
+            else if (player.stats.Str.Current >= 19 && player.stats.Str.Current <= 25)
 			{
-                ret_val = player.stats.Str.full + 5;
+                ret_val = player.stats.Str.Current + 5;
 			}
 			else
 			{
@@ -1490,86 +1490,56 @@ namespace engine
 
 		internal static void display_map_position_time() // camping_search
 		{
-			if (gbl.game.Name == Logging.Game.PoolOfRadiance &&
-				(gbl.game_state == GameState.WildernessMap || gbl.last_game_state == GameState.WildernessMap))
-			{
-				string output = string.Empty;
+            int x_coord, y_coord;
 
-				string hours = gbl.area_ptr.time_hour.ToString("00");
-				string minutes = ((gbl.area_ptr.time_minutes_tens * 10) + gbl.area_ptr.time_minutes_ones).ToString("00");
+            if (gbl.wilderness_area <= 1)
+            {
+                x_coord = gbl.mapPosX;
+                y_coord = gbl.mapPosY;
+            }
+            else
+            {
+                x_coord = gbl.area_ptr.field_186;
+                y_coord = gbl.area_ptr.field_188;
+                if (gbl.wilderness_area == 3)
+                    x_coord += 13;
+                else if (gbl.wilderness_area == 4)
+                    x_coord += 26;
+            }
 
-				if (gbl.area_ptr.block_area_view == 0 ||
-					Cheats.always_show_areamap)
-				{
-					int x = gbl.area_ptr.field_186;
-					if (gbl.EclBlockId == 25)
-					{
-						x += 0;
-					}
-					else if (gbl.EclBlockId == 26)
-					{
-						x += 13;
-					}
-					else if (gbl.EclBlockId == 27)
-					{
-						x += 26;
-					}
-					output = string.Format("{0},{1} ", x, gbl.area_ptr.field_188);
-				}
+            if (gbl.wilderness_area >= 2 || gbl.game_state != GameState.WildernessMap)
+            {
+                string output = string.Empty;
 
-				output += direction(gbl.mapDirection) + " " + hours + ":" + minutes;
+                string hours = gbl.area_ptr.time_hour.ToString("00");
+                string minutes = ((gbl.area_ptr.time_minutes_tens * 10) + gbl.area_ptr.time_minutes_ones).ToString("00");
 
-				if (gbl.printCommands == true)
-				{
-					output += "*";
-				}
+                if (gbl.area_ptr.block_area_view == 0 ||
+                    Cheats.always_show_areamap)
+                {
+                    output = string.Format("{0},{1} ", x_coord, y_coord);
+                }
 
-				if (gbl.game_state == GameState.Camping)
-				{
-					output += " camping";
-				}
-				else if ((gbl.area2_ptr.search_flags & 1) > 0)
-				{
-					output += " search";
-				}
+                output += direction(gbl.mapDirection) + " " + hours + ":" + minutes;
 
-				seg037.draw8x8_clear_area(15, 0x26, 15, 17);
+                if (gbl.printCommands == true)
+                {
+                    output += "*";
+                }
 
-				seg041.displayString(output, 0, 10, 15, 17);
-			}
-			else if (gbl.game_state != GameState.WildernessMap)
-			{
-				string output = string.Empty;
+                if (gbl.game_state == GameState.Camping)
+                {
+                    output += " camping";
+                }
+                else if ((gbl.area2_ptr.search_flags & 1) > 0)
+                {
+                    output += " search";
+                }
 
-				string hours = gbl.area_ptr.time_hour.ToString("00");
-				string minutes = ((gbl.area_ptr.time_minutes_tens * 10) + gbl.area_ptr.time_minutes_ones).ToString("00");
+                seg037.draw8x8_clear_area(15, 0x26, 15, 17);
 
-				if (gbl.area_ptr.block_area_view == 0 ||
-					Cheats.always_show_areamap)
-				{
-					output = string.Format("{0},{1} ", gbl.mapPosX, gbl.mapPosY);
-				}
-
-				output += direction(gbl.mapDirection) + " " + hours + ":" + minutes;
-
-				if (gbl.printCommands == true)
-				{
-					output += "*";
-				}
-
-				if (gbl.game_state == GameState.Camping)
-				{
-					output += " camping";
-				}
-				else if ((gbl.area2_ptr.search_flags & 1) > 0)
-				{
-					output += " search";
-				}
-
-				seg037.draw8x8_clear_area(15, 0x26, 15, 17);
-
-				seg041.displayString(output, 0, 10, 15, 17);
-			}
+                seg041.displayString(output, 0, 10, 15, 17);
+            }
 		}
 
 
@@ -1639,8 +1609,8 @@ namespace engine
 		}
 
 		internal static bool is_weapon_ranged(Player player) /* offset_above_1 */
-		{
-            return player.activeItems.primaryWeapon != null && player.activeItems.primaryWeapon.IsRanged();
+            {
+                return player.activeItems.primaryWeapon != null && player.activeItems.primaryWeapon.IsRanged();
 		}
 
 

@@ -269,7 +269,7 @@ namespace engine
 
                 ovr025.PartySummary(gbl.SelectedPlayer);
 
-            } while (gbl.Exit == false && exitShop == false);
+            } while (gbl.Token.IsCancellationRequested == false && exitShop == false);
 
             return true;
         }

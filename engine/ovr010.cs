@@ -705,13 +705,13 @@ namespace engine
         {
             bool player_turn = false;
 
-            if (seg049.KEYPRESSED() == true)
+            if (Input.KEYPRESSED() == true)
             {
-                byte var_6 = seg043.GetInputKey();
+                byte var_6 = Input.GetInputKey();
 
                 if (var_6 == 0)
                 {
-                    var_6 = seg043.GetInputKey();
+                    var_6 = Input.GetInputKey();
                 }
 
                 if (var_6 == '2')
@@ -750,7 +750,7 @@ namespace engine
                 }
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
 
             return player_turn;
         }
@@ -798,7 +798,7 @@ namespace engine
                             await ovr024.remove_affect(null, Classes.Affects.affect_4a, player);
                             await ovr024.remove_affect(null, Classes.Affects.weap_dragon_slayer, player);
                         }
-                        else if (player.stats.Int.full > 5)
+                        else if (player.stats.Int.Current > 5)
                         {
                             await ovr024.RemoveFromCombat("Surrenders", Status.unconscious, player);
 

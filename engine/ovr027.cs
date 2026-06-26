@@ -206,13 +206,13 @@ namespace engine
                     input_key = gbl.displayInputTimeoutValue;
                     stopLoop = true;
                 }
-                else if (seg049.KEYPRESSED() == true)
+                else if (Input.KEYPRESSED() == true)
                 {
-                    input_key = (char)seg043.GetInputKey();
+                    input_key = (char)Input.GetInputKey();
 
                     if (input_key == 0)
                     {
-                        input_key = (char)seg043.GetInputKey();
+                        input_key = (char)Input.GetInputKey();
 
                         if (accept_ctrlkeys != 0)
                         {
@@ -327,7 +327,7 @@ namespace engine
 
                 seg049.SysDelay(20);
 
-            } while (gbl.Exit == false && stopLoop == false);
+            } while (gbl.Token.IsCancellationRequested == false && stopLoop == false);
 
             gbl.area_ptr.picture_fade = 0;
 
@@ -687,7 +687,7 @@ namespace engine
             {
                 inputKey = displayInput(false, 0, colors, "Yes No", inputString);
 
-            } while (gbl.Exit == false && inputKey != 'N' && inputKey != 'Y');
+            } while (gbl.Token.IsCancellationRequested == false && inputKey != 'N' && inputKey != 'Y');
 
             return inputKey;
         }

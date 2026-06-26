@@ -65,9 +65,9 @@ namespace engine
                 {
                     seg041.DisplayStatusText(0, 14, "Sorry, that's incorrect.");
                 }
-            } while (gbl.Exit == false && input != input_expected && attempt < 3);
+            } while (gbl.Token.IsCancellationRequested == false && input != input_expected && attempt < 3);
 
-            if (gbl.Exit == false && attempt >= 3)
+            if (gbl.Token.IsCancellationRequested == false && attempt >= 3)
             {
                 seg044.PlaySound(Sound.sound_1);
                 seg044.PlaySound(Sound.sound_5);

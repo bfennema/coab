@@ -142,7 +142,7 @@ namespace engine
             //VmLog.WriteLine("CMD_AdSubDivMulti: {0} A: {1} B: {2} Loc: {3} Res: {4}",
             //    sym[gbl.command], val_a, val_b, new MemLoc(location), value);
 
-            await ovr008.vm_SetMemoryValue(value, location);
+            await Vm.SetMemoryValue(value, location);
 
             return true;
         }
@@ -166,7 +166,7 @@ namespace engine
             Vm.WriteLine("${0,4:X4}   {1,2:X2}   {2,-10}  {3}", ecl_offset, gbl.command, name, ovr008.vm_PrintCmd(1));
             //VmLog.WriteLine("CMD_Random: Max: {0} Loc: {1} Val: {2}", rand_max, new MemLoc(loc), val);
 
-            await ovr008.vm_SetMemoryValue(val, loc);
+            await Vm.SetMemoryValue(val, loc);
 
             return true;
         }
@@ -184,7 +184,7 @@ namespace engine
 
                 //VmLog.WriteLine("CMD_Save: Value {0} Loc: {1}", val, new MemLoc(loc));
                 Vm.WriteLine("${0,4:X4}   {1,2:X2}   {2,-10}  {3}  {4}", ecl_offset, gbl.command, name, ovr008.vm_PrintCmd(1), ovr008.vm_PrintCmd(2));
-                await ovr008.vm_SetMemoryValue(val, loc);
+                await Vm.SetMemoryValue(val, loc);
             }
             else
             {
@@ -403,7 +403,7 @@ namespace engine
 
             ushort var_4 = seg041.getUserInputShort(0, 0x0a, string.Empty);
 
-            await ovr008.vm_SetMemoryValue(var_4, loc);
+            await Vm.SetMemoryValue(var_4, loc);
 
             return true;
         }
@@ -684,7 +684,7 @@ namespace engine
             //VmLog.WriteLine("CMD_AndOr: {0} A: {1} B: {2} Loc: {3} Val: {4}", sym, val_a, val_b, new MemLoc(loc), resultant);
 
             ovr008.compare_variables(resultant, 0);
-            await ovr008.vm_SetMemoryValue(resultant, loc);
+            await Vm.SetMemoryValue(resultant, loc);
 
             return true;
         }
@@ -704,7 +704,7 @@ namespace engine
             ushort var_6 = (ushort)(var_9 + var_2);
 
             ushort var_8 = Vm.GetMemoryValue(var_6);
-            await ovr008.vm_SetMemoryValue(var_8, result_loc);
+            await Vm.SetMemoryValue(var_8, result_loc);
 
             return true;
         }
@@ -719,7 +719,7 @@ namespace engine
             ushort result_loc = gbl.cmd_ops[2].Word;
             result_loc += ovr008.vm_GetCmdValue(3);
 
-            await ovr008.vm_SetMemoryValue(var_6, result_loc);
+            await Vm.SetMemoryValue(var_6, result_loc);
 
             return true;
         }
@@ -752,7 +752,7 @@ namespace engine
 
             int index = ovr008.VertMenuSelect(0, true, false, menuList, 0x16, 0x26, gbl.textYCol + 1, 1);
 
-            await ovr008.vm_SetMemoryValue((ushort)index, mem_loc);
+            await Vm.SetMemoryValue((ushort)index, mem_loc);
 
             menuList.Clear();
             seg037.draw8x8_clear_area(TextRegion.NormalBottom);
@@ -813,7 +813,7 @@ namespace engine
 
             byte menu_selected = (byte)ovr008.sub_317AA(useOverlay, var_3B, colors, text, "");
 
-            await ovr008.vm_SetMemoryValue(menu_selected, loc);
+            await Vm.SetMemoryValue(menu_selected, loc);
 
             ovr027.ClearPromptAreaNoUpdate();
 
@@ -875,7 +875,7 @@ namespace engine
             }
 
             ushort loc = gbl.cmd_ops[1].Word;
-            await ovr008.vm_SetMemoryValue(power_value, loc);
+            await Vm.SetMemoryValue(power_value, loc);
 
             return true;
         }
@@ -884,10 +884,10 @@ namespace engine
         internal static async Task<bool> setMemoryFour(bool val_d, byte val_c, byte val_b, byte val_a,
         ushort loc_a, ushort loc_b, ushort loc_c, ushort loc_d) /* sub_273F6 */
         {
-            await ovr008.vm_SetMemoryValue(val_a, loc_a);
-            await ovr008.vm_SetMemoryValue(val_b, loc_b);
-            await ovr008.vm_SetMemoryValue(val_c, loc_c);
-            await ovr008.vm_SetMemoryValue(val_d ? (ushort)1 : (ushort)0, loc_d);
+            await Vm.SetMemoryValue(val_a, loc_a);
+            await Vm.SetMemoryValue(val_b, loc_b);
+            await Vm.SetMemoryValue(val_c, loc_c);
+            await Vm.SetMemoryValue(val_d ? (ushort)1 : (ushort)0, loc_d);
 
             return true;
         }
@@ -1002,8 +1002,8 @@ namespace engine
             ushort loc_a = gbl.cmd_ops[1].Word;
             ushort loc_b = gbl.cmd_ops[2].Word;
 
-            await ovr008.vm_SetMemoryValue(val_a, loc_a);
-            await ovr008.vm_SetMemoryValue(val_b, loc_b);
+            await Vm.SetMemoryValue(val_a, loc_a);
+            await Vm.SetMemoryValue(val_b, loc_b);
 
             return true;
         }
@@ -1042,7 +1042,7 @@ namespace engine
                 val_a = 2;
             }
 
-            await ovr008.vm_SetMemoryValue(val_a, 0x2cb);
+            await Vm.SetMemoryValue(val_a, 0x2cb);
 
             return true;
         }
@@ -1259,26 +1259,69 @@ namespace engine
                     {
                         item_type = Item.Type.ClrcScroll;
                     }
-                    else if (roll1 >= 91 && roll1 <= 98) // actually 93-98
+                    else if (roll1 >= 93 && roll1 <= 98) // CoAB: 91 - 98
                     {
-                        int roll2 = ovr024.roll_dice(15, 1);
+                        if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                        {
+                            int roll2 = ovr024.roll_dice(16, 1);
 
-                        if (roll2 >= 1 && roll2 <= 9)
-                        {
-                            item_type = Item.Type.Potion;
+                            if (roll2 >= 1 && roll2 <= 7)
+                            {
+                                item_type = Item.Type.Potion;
+                            }
+                            else if (roll2 >= 8 && roll2 <= 9)
+                            {
+                                item_type = Item.Type.GemsJewelry;
+                            }
+                            else if (roll2 == 10)
+                            {
+                                item_type = Item.Type.PotionOfGiantStr;
+                            }
+                            else if (roll2 >= 11 && roll2 <= 12)
+                            {
+                                item_type = Item.Type.WandA;
+                            }
+                            else if (roll2 >= 13 && roll2 <= 14)
+                            {
+                                item_type = Item.Type.WandB;
+                            }
+                            else if (roll2 == 15)
+                            {
+                                item_type = Item.Type.CloakOfDisplacement;
+                            }
+                            else if (roll2 == 16)
+                            {
+                                item_type = Item.Type.Cloak;
+                            }
                         }
-                        else if (roll2 == 10)
+                        else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
                         {
-                            item_type = Item.Type.PotionOfGiantStr;
-                        }
-                        else if (roll2 >= 11 && roll2 <= 15)
-                        {
-                            item_type = Item.Type.WandB;
+                            int roll2 = ovr024.roll_dice(15, 1);
+
+                            if (roll2 >= 1 && roll2 <= 9)
+                            {
+                                item_type = Item.Type.Potion;
+                            }
+                            else if (roll2 == 10)
+                            {
+                                item_type = Item.Type.PotionOfGiantStr;
+                            }
+                            else if (roll2 >= 11 && roll2 <= 15)
+                            {
+                                item_type = Item.Type.WandB;
+                            }
                         }
                     }
                     else if (roll1 == 99 || roll1 == 100)
                     {
-                        item_type = Item.Type.Shield;
+                        if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                        {
+                            item_type = Item.Type.Ring;
+                        }
+                        else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                        {
+                            item_type = Item.Type.Shield;
+                        }
                     }
 
                     gbl.items_pointer.Add(ovr022.create_item(item_type));
@@ -1471,17 +1514,17 @@ namespace engine
                     case 0:
                         if (menu_selected != 2)
                         {
-                            await ovr008.vm_SetMemoryValue(1, var_43D);
+                            await Vm.SetMemoryValue(1, var_43D);
                         }
                         else
                         {
                             if (init_min >= var_407)
                             {
-                                await ovr008.vm_SetMemoryValue(2, var_43D);
+                                await Vm.SetMemoryValue(2, var_43D);
                             }
                             else
                             {
-                                await ovr008.vm_SetMemoryValue(1, var_43D);
+                                await Vm.SetMemoryValue(1, var_43D);
                             }
                         }
                         break;
@@ -1489,7 +1532,7 @@ namespace engine
                     case 1:
                         if (menu_selected == 0)
                         {
-                            await ovr008.vm_SetMemoryValue(1, var_43D);
+                            await Vm.SetMemoryValue(1, var_43D);
                         }
                         else if (menu_selected == 1)
                         {
@@ -1498,7 +1541,7 @@ namespace engine
                         }
                         else if (menu_selected == 2)
                         {
-                            await ovr008.vm_SetMemoryValue(2, var_43D);
+                            await Vm.SetMemoryValue(2, var_43D);
                         }
                         else if (menu_selected == 3)
                         {
@@ -1525,7 +1568,7 @@ namespace engine
                             }
                             else
                             {
-                                await ovr008.vm_SetMemoryValue(3, var_43D);
+                                await Vm.SetMemoryValue(3, var_43D);
                             }
                         }
                         break;
@@ -1535,7 +1578,7 @@ namespace engine
                         {
                             if (var_408 > var_40A)
                             {
-                                await ovr008.vm_SetMemoryValue(0, var_43D);
+                                await Vm.SetMemoryValue(0, var_43D);
 
                                 gbl.textXCol = 1;
                                 gbl.textYCol = 0x11;
@@ -1543,12 +1586,12 @@ namespace engine
                             }
                             else
                             {
-                                await ovr008.vm_SetMemoryValue(1, var_43D);
+                                await Vm.SetMemoryValue(1, var_43D);
                             }
                         }
                         else if (menu_selected >= 1 && menu_selected <= 4)
                         {
-                            await ovr008.vm_SetMemoryValue(0, var_43D);
+                            await Vm.SetMemoryValue(0, var_43D);
 
                             gbl.textXCol = 1;
                             gbl.textYCol = 0x11;
@@ -1559,7 +1602,7 @@ namespace engine
                     case 3:
                         if (menu_selected == 0)
                         {
-                            await ovr008.vm_SetMemoryValue(1, var_43D);
+                            await Vm.SetMemoryValue(1, var_43D);
                         }
                         else if (menu_selected == 1 || menu_selected == 3)
                         {
@@ -1578,13 +1621,13 @@ namespace engine
                         }
                         else if (menu_selected == 2)
                         {
-                            await ovr008.vm_SetMemoryValue(2, var_43D);
+                            await Vm.SetMemoryValue(2, var_43D);
                         }
                         else if (menu_selected == 4)
                         {
                             if (gbl.area2_ptr.encounter_distance <= 0)
                             {
-                                await ovr008.vm_SetMemoryValue(3, var_43D);
+                                await Vm.SetMemoryValue(3, var_43D);
                             }
                             else
                             {
@@ -1599,14 +1642,14 @@ namespace engine
                     case 4:
                         if (menu_selected == 0)
                         {
-                            await ovr008.vm_SetMemoryValue(1, var_43D);
+                            await Vm.SetMemoryValue(1, var_43D);
                         }
                         else if (menu_selected == 1 || menu_selected == 3 || menu_selected == 4)
                         {
 
                             if (gbl.area2_ptr.encounter_distance <= 0)
                             {
-                                await ovr008.vm_SetMemoryValue(3, var_43D);
+                                await Vm.SetMemoryValue(3, var_43D);
                             }
                             else
                             {
@@ -1618,7 +1661,7 @@ namespace engine
                         }
                         else if (menu_selected == 2)
                         {
-                            await ovr008.vm_SetMemoryValue(2, var_43D);
+                            await Vm.SetMemoryValue(2, var_43D);
                         }
 
                         break;
@@ -1649,7 +1692,7 @@ namespace engine
 
             byte value = values[menu_selected];
 
-            await ovr008.vm_SetMemoryValue(value, location);
+            await Vm.SetMemoryValue(value, location);
 
             return true;
         }
@@ -1949,8 +1992,8 @@ namespace engine
             Vm.WriteLine("CMD_Spell: spell_id: {0} loc a: {1} val a: {2} loc b: {3} val b: {4}",
                 spell_id, new MemLoc(loc_a), spell_index, new MemLoc(loc_b), player_index);
 
-            await ovr008.vm_SetMemoryValue(spell_index, loc_a);
-            await ovr008.vm_SetMemoryValue(player_index, loc_b);
+            await Vm.SetMemoryValue(spell_index, loc_a);
+            await Vm.SetMemoryValue(player_index, loc_b);
 
             return true;
         }
@@ -1958,7 +2001,7 @@ namespace engine
 
         internal static async Task<bool> CMD_Call(ushort ecl_offset, string name)
         {
-            gbl.ecl_offset = Vm.LoadCmdSets(ref gbl.cmd_ops, gbl.ecl_offset, 1);
+            gbl.ecl_offset = Vm.LoadCmdSets(ref gbl.cmd_ops, gbl.ecl_offset, 1); // POR: sub_2FD
 
             ushort addr = gbl.cmd_ops[1].Word;
 
@@ -1967,26 +2010,26 @@ namespace engine
 
             if (gbl.game.CallRedraw == addr)
             {
-                gbl.mapWallRoof = ovr031.get_wall_x2(gbl.mapPosY, gbl.mapPosX);
+                gbl.mapWallRoof = ovr031.get_wall_x2(gbl.mapPosY, gbl.mapPosX); // POR: byte_13271 = sub_3D84(byte_1326D, byte_1326E)
 
-                if (gbl.byte_1AB0B == true)
+                if (gbl.byte_1AB0B == true) // POR: byte_10BF1
                 {
-                    if (gbl.spriteChanged == true ||
-                        gbl.displayPlayerSprite ||
-                        gbl.byte_1EE91 == true ||
-                        gbl.positionChanged == true ||
-                        gbl.byte_1EE94 == true)
+                    if (gbl.spriteChanged == true ||   // POR: byte_14CA0
+                        gbl.displayPlayerSprite ||     // POR: byte_14CA3
+                        gbl.paletteChanged == true ||      // POR: byte_14CA5
+                        gbl.positionChanged == true || // POR: byte_14CA6
+                        gbl.skyColorChanged == true)        // POR: byte_14CA8
                     {
-                        gbl.can_draw_bigpic = true;
-                        await ovr029.RedrawView();
-                        ovr025.display_map_position_time();
-                        gbl.byte_1EE94 = false;
-                        gbl.byte_1EE91 = false;
+                        gbl.can_draw_bigpic = true;           // POR: nope?
+                        await ovr029.RedrawView();            // POR: sub_3CC5
+                        ovr025.display_map_position_time();   // POR: sub_34AB
+                        gbl.skyColorChanged = false;
+                        gbl.paletteChanged = false;
                         gbl.positionChanged = false;
                         gbl.spriteChanged = false;
                         gbl.displayPlayerSprite = false;
 
-                        gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
+                        gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX); // POR: nope?
                     }
                 }
             }
@@ -2023,8 +2066,8 @@ namespace engine
             }
             else if (gbl.game.CallWall == addr)
             {
-
-                if (gbl.area_ptr.inDungeon == 0)
+                if ((gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.wilderness_area == 1) ||
+                    (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds && gbl.area_ptr.inDungeon == 0))
                 {
                     gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
                 }
@@ -2340,7 +2383,7 @@ namespace engine
 
             //System.Console.Out.WriteLine("RunEclVm {0,4:X} start", offset);
 
-            while (gbl.Exit == false &&
+            while (gbl.Token.IsCancellationRequested == false &&
                    gbl.stopVM == false &&
                    gbl.party_killed == false)
             {
@@ -2371,7 +2414,7 @@ namespace engine
         }
 
 
-        internal static async Task<bool> sub_29677()
+        internal static async Task<bool> sub_29677() // POR: sub_1CD04
         {
             do
             {
@@ -2385,7 +2428,41 @@ namespace engine
 
                 gbl.LastSelectedPlayer = gbl.SelectedPlayer;
 
+                gbl.last_wilderness_area = gbl.wilderness_area;
+                gbl.wilderness_area = 1;
+
                 await RunEclVm(gbl.ecl_initial_entryPoint);
+
+                gbl.game_state = GameState.DungeonMap;
+
+                if (gbl.area_ptr.inDungeon == 0)
+                {
+                    if (gbl.EclBlockId == 0x19)
+                    {
+                        gbl.wilderness_area = 2;
+                        gbl.game_state = GameState.WildernessMap;
+                    }
+                    else if (gbl.EclBlockId == 0x1A)
+                    {
+                        gbl.wilderness_area = 3;
+                        gbl.game_state = GameState.WildernessMap;
+
+                        if (gbl.area_ptr.field_366 == 0x00FE && gbl.area_ptr.field_344 == 0)
+                        {
+                            //sub_84A(1); TODO fixme
+                        }
+                    }
+                    else if (gbl.EclBlockId == 0x1B)
+                    {
+                        gbl.wilderness_area = 4;
+                        gbl.game_state = GameState.WildernessMap;
+                    }
+                }
+
+                if (gbl.last_wilderness_area > 1 && gbl.wilderness_area == 1)
+                {
+                    // Map 3, 3, 0x0D, 0x0D, 0, 0x0A, ???);
+                }
 
                 if (gbl.vmFlag01 == false)
                 {
@@ -2606,7 +2683,7 @@ namespace engine
                             }
                         }
                     }
-                } while (gbl.Exit == false && gbl.party_killed == false);
+                } while (gbl.Token.IsCancellationRequested == false && gbl.party_killed == false);
 
                 gbl.party_killed = false;
             }

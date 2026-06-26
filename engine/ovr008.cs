@@ -21,9 +21,12 @@ namespace engine
         internal static void vm_init_ecl() // sub_301E8
         {
             gbl.spriteChanged = false;
+            gbl.byte_1EE8E = false;
             gbl.redrawPartySummary1 = false;
             gbl.redrawPartySummary2 = false;
-            gbl.byte_1EE91 = true;
+            gbl.byte_1D912 = 0x41;
+            gbl.byte_1D913 = 9;
+            gbl.paletteChanged = true;
 
             gbl.encounter_flags[0] = false;
             gbl.encounter_flags[1] = false;
@@ -63,6 +66,10 @@ namespace engine
             {
                 gbl.area_ptr.RestField200Values();
                 gbl.area2_ptr.RestField6F2Values();
+            }
+            else
+            {
+                gbl.reload_ecl_and_pictures = false;
             }
         }
 
@@ -142,8 +149,8 @@ namespace engine
 
 
         internal static async Task<bool> set_and_draw_head_body(byte area, byte body_id, byte head_id, byte rowY, byte colX) /* sub_30543 */
-        {
-            gbl.byte_1EE8D = false;
+            {
+                gbl.byte_1EE8D = false;
 
             gbl.head_block_id = head_id;
             gbl.body_block_id = body_id;
@@ -224,286 +231,6 @@ namespace engine
                 output -= 0x40;
             }
             return output;
-        }
-
-        internal static async Task<bool> alter_character(ushort set_value, ushort switch_var)
-        {
-            //switch_var -= 0x7c00;
-
-            if (switch_var == 0)
-            {
-                if (set_value == 0)
-                {
-                    gbl.redrawPartySummary2 = true;
-                }
-            }
-            else if (switch_var >= 0x20 && switch_var <= 0x70)
-            {
-                int var_1 = switch_var - 0x1f;
-                Logger.DebugWrite("Set Spell for: {0} slot: {1} to: {2}", gbl.SelectedPlayer, var_1, (byte)set_value);
-                gbl.SelectedPlayer.spellList.AddLearnt(set_value & 0x0ff);
-                //gbl.SelectedPlayer.spell_list[var_1] = (byte)(set_value);
-            }
-            else if (switch_var == 0xb8)
-            {
-                if (set_value > 0xb2)
-                {
-                    set_value -= 0x32;
-                }
-
-                gbl.SelectedPlayer.control_morale = (byte)(set_value);
-            }
-            else if (switch_var == 0xbb)
-            {
-                gbl.SelectedPlayer.Money.SetCoins(Money.Copper, set_value);
-            }
-            else if (switch_var == 0xbd)
-            {
-                gbl.SelectedPlayer.Money.SetCoins(Money.Electrum, set_value);
-            }
-            else if (switch_var == 0xbf)
-            {
-                gbl.SelectedPlayer.Money.SetCoins(Money.Silver, set_value);
-            }
-            else if (switch_var == 0xc1)
-            {
-                gbl.SelectedPlayer.Money.SetCoins(Money.Gold, set_value);
-            }
-            else if (switch_var == 0xc3)
-            {
-                gbl.SelectedPlayer.Money.SetCoins(Money.Platinum, set_value);
-            }
-            else if (switch_var == 0xf7)
-            {
-                gbl.SelectedPlayer.field_13C = (short)(set_value);
-            }
-            else if (switch_var == 0xf9)
-            {
-                gbl.SelectedPlayer.field_13E = (byte)(set_value);
-            }
-            else if (switch_var == 0x100)
-            {
-                if (set_value >= 0x80)
-                {
-                    gbl.SelectedPlayer.in_combat = false;
-                    if (set_value == 0x87)
-                    {
-                        gbl.SelectedPlayer.health_status = Status.stoned;
-                    }
-                }
-
-                if (set_value == 0)
-                {
-                    gbl.redrawPartySummary1 = true;
-                }
-            }
-            else if (switch_var == 0x10c)
-            {
-                switch (set_value)
-                {
-                    case 0:
-                        gbl.SelectedPlayer.combat_team = CombatTeam.Ours;
-                        gbl.SelectedPlayer.quick_fight = QuickFight.False;
-                        break;
-
-                    case 0x80:
-                        gbl.SelectedPlayer.combat_team = CombatTeam.Ours;
-                        gbl.SelectedPlayer.quick_fight = QuickFight.True;
-                        break;
-
-                    case 0x81:
-                        gbl.SelectedPlayer.combat_team = CombatTeam.Enemy;
-                        gbl.SelectedPlayer.quick_fight = QuickFight.True;
-                        break;
-                }
-            }
-            else if (switch_var == 0x312)
-            {
-                seg042.set_game_area((byte)(set_value));
-            }
-            else if (switch_var == 0x322)
-            {
-                if (set_value > 0x80)
-                {
-                    set_value &= 0x7f;
-
-                    await ovr031.LoadWalldef(1, (short)(set_value & 0xFF));
-                }
-            }
-            else if (switch_var == 0x324)
-            {
-                if (set_value > 0x80)
-                {
-                    set_value &= 0x7f;
-
-                    await ovr031.LoadWalldef(2, (short)(set_value & 0xFF));
-                }
-            }
-            else if (switch_var == 0x326)
-            {
-                if (set_value > 0x80)
-                {
-                    set_value &= 0x7f;
-
-                    await ovr031.LoadWalldef(3, (short)(set_value & 0xFF));
-                }
-            }
-            else
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-
-        internal static async Task<bool> vm_SetMemoryValue(ushort value, ushort location) // cmd_table01
-        {
-            Classes.Debug.OnMemoryWrite(location, value);
-
-            byte var_2;
-
-            int memType = Vm.GetMemoryValueType(location);
-
-            //System.Console.WriteLine("  vm_SetMemoryValue: value: {0:X} loc: {1:X} type: {2:X}",
-            //    value, location, memType);
-
-            if (memType == 0)
-            {
-                if ((location - gbl.vm_mem0_offset) == 0x0FD || (location - gbl.vm_mem0_offset) == 0x0FE)
-                {
-                    //System.Console.WriteLine("    gbl.byte_1EE94 = 1");
-                    gbl.byte_1EE94 = true;
-                }
-                else if ((location - gbl.vm_mem0_offset) == 0x0E6 && gbl.area_ptr.inDungeon != value)
-                {
-                    gbl.last_game_state = gbl.game_state;
-                    if (value == 0)
-                    {
-                        gbl.game_state = GameState.WildernessMap;
-                    }
-                    else
-                    {
-                        gbl.game_state = GameState.DungeonMap;
-                    }
-                }
-
-                gbl.area_ptr.field_6A00_Set((location - gbl.vm_mem0_offset) * 2, value);
-            }
-            else if (memType == 1)
-            {
-                gbl.area2_ptr.field_800_Set((location - gbl.vm_mem1_offset) * 2, value);
-                await alter_character(value, (ushort)(location - gbl.vm_mem1_offset));
-            }
-            else if (memType == 2)
-            {
-                gbl.stru_1B2CA[(location - gbl.vm_mem2_offset) << 1] = value;
-            }
-            else if (memType == 3)
-            {
-                gbl.ecl_ptr[location - gbl.initial_ecl_offset] = (byte)value;
-            }
-            else if (memType == 4)
-            {
-                if (location < 0xBF68)
-                {
-                    switch (location)
-                    {
-                        case 0xFB:
-                            gbl.word_1D914 = (short)value;
-                            break;
-
-                        case 0xFC:
-                            gbl.word_1D916 = (short)value;
-                            break;
-
-                        case 0xB1:
-                            gbl.word_1D918 = (short)value;
-                            break;
-
-                        case 0x3DE:
-                            gbl.word_1EE76 = value;
-                            break;
-
-                        case 0xB8:
-                            gbl.word_1EE78 = value;
-                            break;
-
-                        case 0xB9:
-                            gbl.word_1EE7A = value;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    location -= 0xBF68;
-
-                    switch (location)
-                    {
-                        case 0xE3:
-                            gbl.positionChanged = true;
-                            gbl.mapPosX = (sbyte)(value);
-                            break;
-
-                        case 0xE4:
-                            gbl.mapPosY = (sbyte)(value);
-                            gbl.positionChanged = true;
-                            break;
-
-                        case 0xE5:
-                            do
-                            {
-                                var_2 = 1;
-                                switch (value)
-                                {
-                                    case 0:
-                                        gbl.mapDirection = 0;
-                                        break;
-
-                                    case 1:
-                                        gbl.mapDirection = 2;
-                                        break;
-
-                                    case 2:
-                                        gbl.mapDirection = 4;
-                                        break;
-
-                                    case 3:
-                                        gbl.mapDirection = 6;
-                                        break;
-
-                                    default:
-                                        var_2 = 0;
-                                        value -= 4;
-                                        break;
-                                }
-                            } while (var_2 != 1);
-
-                            gbl.positionChanged = true;
-                            break;
-
-                        case 0xF1:
-                            gbl.byte_1EE91 = true;
-                            break;
-
-                        case 0xF7:
-                            gbl.byte_1EE91 = true;
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-            }
-            else
-            {
-                return false;
-            }
-
-            return true;
         }
 
         internal static void vm_WriteStringToMemory(string text, ushort loc) // sub_3105D
@@ -678,7 +405,7 @@ namespace engine
                     ovr025.PartySummary(gbl.SelectedPlayer);
                     key_pressed = '\0';
                 }
-            } while (gbl.Exit == false && validkeys.MemberOf(key_pressed) == false && (key_pressed != '\r' || acceptReturn == false));
+            } while (gbl.Token.IsCancellationRequested == false && validkeys.MemberOf(key_pressed) == false && (key_pressed != '\r' || acceptReturn == false));
 
             if (key_pressed == '\r')
             {

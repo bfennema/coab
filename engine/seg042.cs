@@ -9,7 +9,7 @@ namespace engine
         static void debug_display(string text)
         {
             Logging.Logger.Log(text);
-            seg043.GetInputKey();
+            Input.GetInputKey();
         }
 
         internal static async System.Threading.Tasks.Task<System.IO.Stream> find_and_open_file(bool noError, string dir_path, string file_name)

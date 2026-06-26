@@ -555,7 +555,7 @@ namespace engine
                  gbl.timeToRest.field_2 > 0))
             {
                 if (interactive_resting == true &&
-                    seg049.KEYPRESSED() == true)
+                    Input.KEYPRESSED() == true)
                 {
                     display_resting_time(0);
 

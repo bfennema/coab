@@ -198,10 +198,7 @@ namespace engine
                     player.health_status = Status.okey;
                     player.in_combat = true;
 
-                    if (player.stats.Con.full <= 0)
-                    {
-                        player.stats.Con.full--;
-                    }
+                    player.stats.Con.Dec();
 
                     int var_107;
                     if (player.hit_point_max > player.hit_point_rolled)
@@ -215,7 +212,7 @@ namespace engine
 
                     int var_108 = 0;
 
-                    if (player.stats.Con.full >= 14)
+                    if (player.stats.Con.Current >= 14)
                     {
                         for (SkillType skill = SkillType.Cleric; skill <= SkillType.Monk; skill++)
                         {
@@ -223,9 +220,9 @@ namespace engine
                             {
                                 if (skill == SkillType.Fighter)
                                 {
-                                    var_108 += (player.stats.Con.full - 14) * player.fighter_lvl;
+                                    var_108 += (player.stats.Con.Current - 14) * player.fighter_lvl;
                                 }
-                                else if (player.stats.Con.full > 15)
+                                else if (player.stats.Con.Current > 15)
                                 {
                                     var_108 += player.ClassLevel[(byte)skill] * 2;
                                 }
@@ -241,7 +238,7 @@ namespace engine
                             var_107 /= var_108;
                         }
 
-                        if (player.stats.Con.full < 17 ||
+                        if (player.stats.Con.Current < 17 ||
                             player.fighter_lvl > 0 ||
                             player.fighter_lvl > player.multiclassLevel)
                         {
@@ -525,7 +522,7 @@ namespace engine
                 }
 
                 ovr025.PartySummary(gbl.SelectedPlayer);
-            } while (gbl.Exit == false && stop_loop == false);
+            } while (gbl.Token.IsCancellationRequested == false && stop_loop == false);
 
             return true;
         }

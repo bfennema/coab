@@ -6,28 +6,6 @@ namespace engine
 {
     class ovr038
     {
-        internal static async Task<bool> Load8x8D(int symbolSet, int block_id)
-        {
-            if (symbolSet >= 0 && symbolSet < 5)
-            {
-                gbl.symbol_8x8_set[symbolSet] = await seg040.LoadDax(13, 1, block_id, string.Format("8X8D{0}", gbl.game_area));
-
-                if (gbl.symbol_8x8_set[symbolSet] == null)
-                {
-                    Logger.LogAndExit("Unable to load {0} from 8x8D{1}", block_id, gbl.game_area);
-                }
-
-                seg043.clear_keyboard();
-
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-
         internal static void Put8x8Symbol(byte arg_0, bool use_overlay, int symbol_id, int rowY, int colX)
         {
             byte symbol_set = 0; /*HACK to make compiler happy*/

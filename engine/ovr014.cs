@@ -857,7 +857,7 @@ namespace engine
 
                             seg044.PlaySound(Sound.sound_attackHeld);
                             hit = true;
-                            sub_3E192(attackIdx, target, attacker);
+                            await sub_3E192(attackIdx, target, attacker);
                             await DisplayAttackMessage(true, gbl.damage, gbl.damage, attack_type, target, attacker);
 
                             if (target.in_combat == true)
@@ -1925,7 +1925,7 @@ namespace engine
                 int playerAtXY;
 
                 ovr033.AtMapXY(out groundTile, out playerAtXY, pos);
-                seg043.clear_keyboard();
+                Input.ClearKeyboard();
                 bool can_target = false;
                 int range = 255;
 

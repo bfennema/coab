@@ -126,7 +126,7 @@ namespace engine
 
             ovr034.ReleaseCombatIcon(11);
             seg042.restore_game_area();
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
             return true;
         }
 
@@ -234,37 +234,37 @@ namespace engine
 
         internal static void TransferHillsFarCharacter(HillsFarPlayer hf_player, Player player, Player previousSelectPlayer) // sub_48F35
         {
-            if (player.stats.Str.cur < hf_player.stat_str)
+            if (player.stats.Str.Base < hf_player.stat_str)
             {
                 player.stats.Str.Load(hf_player.stat_str);
             }
 
-            if (player.stats.Str00.cur < hf_player.stat_str00)
+            if (player.stats.Str00.Base < hf_player.stat_str00)
             {
                 player.stats.Str00.Load(hf_player.stat_str00);
             }
 
-            if (player.stats.Int.cur < hf_player.stat_int)
+            if (player.stats.Int.Base < hf_player.stat_int)
             {
                 player.stats.Int.Load(hf_player.stat_int);
             }
 
-            if (player.stats.Wis.cur < hf_player.stat_wis)
+            if (player.stats.Wis.Base < hf_player.stat_wis)
             {
                 player.stats.Wis.Load(hf_player.stat_wis);
             }
 
-            if (player.stats.Dex.cur < hf_player.stat_dex)
+            if (player.stats.Dex.Base < hf_player.stat_dex)
             {
                 player.stats.Dex.Load(hf_player.stat_dex);
             }
 
-            if (player.stats.Con.cur < hf_player.stat_con)
+            if (player.stats.Con.Base < hf_player.stat_con)
             {
                 player.stats.Con.Load(hf_player.stat_con);
             }
 
-            if (player.stats.Cha.cur < hf_player.stat_cha)
+            if (player.stats.Cha.Base < hf_player.stat_cha)
             {
                 player.stats.Cha.Load(hf_player.stat_cha);
             }
@@ -374,7 +374,7 @@ namespace engine
                 player = await gbl.import_func[(int)gbl.import_from](player_stream, path, System.IO.Path.GetFileNameWithoutExtension(filename));
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
             ovr025.reclac_player_values(player);
             ovr026.ReclacClassBonuses(player);
 
@@ -611,7 +611,7 @@ namespace engine
 
             var player = gbl.game.LoadPlayer(player_data, item_data, item_len, affect_data, affect_len);
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
 
             return player;
         }
@@ -804,7 +804,7 @@ namespace engine
                 }
                 else
                 {
-                    LoadPlayerCombatIcon(true);
+                    await LoadPlayerCombatIcon(true);
                 }
             }
 
@@ -837,7 +837,7 @@ namespace engine
                 await ovr030.load_bigpic(gbl.game.WildernessImage);
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
             ovr027.ClearPromptArea();
 
             var game_state = gbl.game_state;
@@ -911,7 +911,14 @@ namespace engine
                 data[4] = gbl.mapWallRoof;
                 gbl.file.BlockWrite(5, data, save_file);
 
-                data[0] = gbl.game.GameState(gbl.last_game_state);
+                if (gbl.game.HasLastGameState)
+                {
+                    data[0] = gbl.game.GameState(gbl.last_game_state);
+                }
+                else
+                {
+                    data[0] = gbl.wilderness_area;
+                }
                 gbl.file.BlockWrite(1, data, save_file);
                 data[0] = gbl.game.GameState(gbl.game_state);
                 gbl.file.BlockWrite(1, data, save_file);

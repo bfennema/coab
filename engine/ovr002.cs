@@ -8,18 +8,18 @@ namespace engine
     {
         static void delay_or_key(int seconds)
         {
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
 
             var timeEnd = DateTime.Now.AddSeconds(seconds);
 
-            while (gbl.Exit == false &&
-                seg049.KEYPRESSED() == false &&
+            while (gbl.Token.IsCancellationRequested == false &&
+                Input.KEYPRESSED() == false &&
                 DateTime.Now < timeEnd)
             {
                 seg049.SysDelay(100);
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
         }
 
 

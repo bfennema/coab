@@ -100,7 +100,7 @@ namespace engine
                     yield return output_player;
                 }
 
-            } while (gbl.Exit == false && output_player != null);
+            } while (gbl.Token.IsCancellationRequested == false && output_player != null);
         }
 
 
@@ -176,7 +176,7 @@ namespace engine
                 {
                     bool var_2 = false;
 
-                    while (gbl.Exit == false && var_2 == false)
+                    while (gbl.Token.IsCancellationRequested == false && var_2 == false)
                     {
                         var_1 = await combat_menu(player);
 
@@ -187,7 +187,7 @@ namespace engine
                                 case 'Q':
                                     SetPlayerQuickFight(player);
                                     ovr027.ClearPromptArea();
-                                    seg043.clear_keyboard();
+                                    Input.ClearKeyboard();
                                     seg049.SysDelay(0x0C8);
                                     var_2 = true;
                                     await ovr010.PlayerQuickFight(player);
@@ -368,7 +368,7 @@ namespace engine
                     arg_0 = '\0';
                 }
 
-            } while (gbl.Exit == false && unk_33768.MemberOf(arg_0) == false);
+            } while (gbl.Token.IsCancellationRequested == false && unk_33768.MemberOf(arg_0) == false);
 
             ovr027.ClearPromptArea();
 
@@ -411,7 +411,7 @@ namespace engine
 
             bool battleOver = false;
 
-            if (gbl.Exit == true ||
+            if (gbl.Token.IsCancellationRequested == true ||
                 gbl.friends_count == 0 ||
                 gbl.foe_count == 0 ||
                 gbl.combat_round >= gbl.combat_round_no_action_limit)

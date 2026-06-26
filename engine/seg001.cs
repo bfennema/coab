@@ -1,5 +1,7 @@
 using Classes;
 using Classes.Combat;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace engine
@@ -14,8 +16,10 @@ namespace engine
         internal static void EngineStop()
         {
             EngineStoppedCallback();
-            gbl.Exit = true;
-            seg049.AddKey('Q');
+
+            throw new OperationCanceledException(gbl.Token);
+            //gbl.Exit = true;
+            //Input.AddKey('Q');
 
             //EngineThread.Abort();
         }
@@ -35,8 +39,9 @@ namespace engine
             seg044.SoundInit(resourceName);
         }
 
-        public static async Task<bool> PROGRAM()
+        public static async Task<bool> PROGRAM(CancellationToken token)
         {
+            gbl.Token = token;
             /* Memory Init - Start */
             gbl.CombatMap = new CombatantMap[gbl.MaxCombatantCount + 1]; /* God damm 1-n arrays */
             for (int i = 0; i <= gbl.MaxCombatantCount; i++)
@@ -49,10 +54,7 @@ namespace engine
 
             while (Logging.Config.DataPath.Length == 0)
             {
-                if (gbl.Exit == true)
-                {
-                    return false;
-                }
+                gbl.Token.ThrowIfCancellationRequested();
                 seg041.GameDelay();
             }
             gbl.DataPath = Logging.Config.DataPath;
@@ -154,7 +156,7 @@ namespace engine
                 ovr004.copy_protection();
             }
 
-            while (gbl.Exit == false)
+            while (gbl.Token.IsCancellationRequested == false)
             {
                 if (gbl.inDemo == true)
                 {
@@ -176,10 +178,7 @@ namespace engine
                 if (gbl.inDemo == false)
                 {
                     await ovr018.startGameMenu();
-                    if (gbl.Exit == true)
-                    {
-                        return false;
-                    }
+                    gbl.Token.ThrowIfCancellationRequested();
                 }
 
                 await ovr003.sub_29758();
@@ -189,7 +188,7 @@ namespace engine
                 if (gbl.inDemo == true)
                 {
                     await ovr002.title_screen();
-                    seg043.clear_keyboard();
+                    Input.ClearKeyboard();
 
                     demoString = gbl.game.DemoString;
 
@@ -221,7 +220,7 @@ namespace engine
                 }
             }
 
-            return true;
+            throw new OperationCanceledException(token);
         }
 
         static async Task<bool> InitFirst() /* sub_39054 */
@@ -259,10 +258,10 @@ namespace engine
             gbl.symbol_8x8_set[3] = null;
             gbl.symbol_8x8_set[4] = null;
 
-            gbl.dax24x24Set = null;
-            gbl.dword_1C8FC = null;
+            //gbl.primary_dax24x24Set = null;
+            //gbl.secondary_dax24x24Set = null;
 
-            gbl.dax24x24Set = new DaxBlock(0, 0x80, 3, 24);
+            //gbl.primary_dax24x24Set = new DaxBlock(0, 0x80, 3, 24);
 
             //gbl.area_ptr.Clear();
 
@@ -366,8 +365,11 @@ namespace engine
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-            await ovr038.Load8x8D(4, 202);
-            await ovr038.Load8x8D(0, 203);
+            await ThreeD.Load8x8D(4, 202);
+            await ThreeD.Load8x8D(0, 203);
+
+            gbl.primary_dax24x24Set = await seg040.LoadDax(0, 0, 1, "SQRPACI");
+            gbl.secondary_dax24x24Set = await seg040.LoadDax(0, 0, 2, "SQRPACI");
 
             for (gbl.byte_1AD44 = 0; gbl.byte_1AD44 <= 0x0b; gbl.byte_1AD44++)
             {

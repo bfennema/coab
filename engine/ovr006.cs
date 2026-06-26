@@ -77,45 +77,45 @@ namespace engine
                     switch (player._class)
                     {
                         case ClassId.cleric:
-                            if (player.stats.Wis.full > 15)
+                            if (player.stats.Wis.Current > 15)
                             {
                                 new_exp = exp_to_add + (exp_to_add / 10);
                             }
                             break;
 
                         case ClassId.fighter:
-                            if (player.stats.Str.full > 15)
+                            if (player.stats.Str.Current > 15)
                             {
                                 new_exp = exp_to_add + (exp_to_add / 10);
                             }
                             break;
 
                         case ClassId.paladin:
-                            if (player.stats.Str.full > 15 &&
-                                player.stats.Wis.full > 15)
+                            if (player.stats.Str.Current > 15 &&
+                                player.stats.Wis.Current > 15)
                             {
                                 new_exp = exp_to_add + (exp_to_add / 10);
                             }
                             break;
 
                         case ClassId.ranger:
-                            if (player.stats.Str.full > 15 &&
-                                player.stats.Int.full > 15 &&
-                                player.stats.Wis.full > 15)
+                            if (player.stats.Str.Current > 15 &&
+                                player.stats.Int.Current > 15 &&
+                                player.stats.Wis.Current > 15)
                             {
                                 new_exp = exp_to_add + (exp_to_add / 10);
                             }
                             break;
 
                         case ClassId.magic_user:
-                            if (player.stats.Int.full > 15)
+                            if (player.stats.Int.Current > 15)
                             {
                                 new_exp = exp_to_add + (exp_to_add / 10);
                             }
                             break;
 
                         case ClassId.thief:
-                            if (player.stats.Dex.full > 15)
+                            if (player.stats.Dex.Current > 15)
                             {
                                 new_exp = exp_to_add + (exp_to_add / 10);
                             }
@@ -676,7 +676,7 @@ namespace engine
                         ovr025.PartySummary(gbl.SelectedPlayer);
                         break;
                 }
-            } while (gbl.Exit == false && done == false);
+            } while (gbl.Token.IsCancellationRequested == false && done == false);
 
             return true;
         }

@@ -900,7 +900,7 @@ namespace engine
                             break;
 
                         case 'I':
-                            ovr018.icon_builder();
+                            await ovr018.icon_builder();
                             await ovr025.LoadPic();
                             break;
                     }

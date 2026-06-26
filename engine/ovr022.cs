@@ -1,5 +1,9 @@
+using Avalonia.Data;
+using Avalonia.Platform;
 using Classes;
+using System;
 using System.Collections.Generic;
+using System.Reflection.PortableExecutable;
 
 namespace engine
 {
@@ -69,7 +73,7 @@ namespace engine
 
             do
             {
-                inputKey = (char)seg043.GetInputKey();
+                inputKey = (char)Input.GetInputKey();
 
                 if (inputKey >= 0x30 &&
                     inputKey <= 0x39)
@@ -423,22 +427,117 @@ namespace engine
             {
                 bonus = 1;
             }
-            else if (roll >= 15 && roll <= 20)
+            else if (roll >= 15 && roll <= 19)
             {
                 bonus = 2;
+            }
+            else if (roll == 20)
+            {
+                if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                {
+                    bonus = 3;
+                }
+                else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                {
+                    bonus = 2;
+                }
             }
 
             return bonus;
         }
 
-        static short[,] /*seg600:082E unk_16B3E */	preconfiguredItems = {
-            {(short)Item.Names.Healing,        (short)Item.Names.Extra, (short)Item.Names.Potion,         1,   800,  3, 99,   0}, // potion extra healing
-            {(short)Item.Names.Giant_Strength, (short)Item.Names.of,    (short)Item.Names.Potion,         1,  1100,  1, 59,   0}, // potion of giant strength
-            {(short)Item.Names.Healing,        (short)Item.Names.of,    (short)Item.Names.Potion,         1,   400,  1,  3,   0}, // potion of healing
-            {(short)Item.Names.Speed,          (short)Item.Names.of,    (short)Item.Names.Potion,         1,   450,  1, 48,   0}, // potion of speed (unused)
-            {(short)Item.Names.Magic_Missiles, (short)Item.Names.of,    (short)Item.Names.Wand,           1, 11000, 30, 15,   0}, // wand of magic missile
-            {(short)Item.Names.Ogre_Power,     (short)Item.Names.of,    (short)Item.Names.Gauntlets,     10, 15000,  0, 38, 131}, // gauntlets of ogre power (unused)
-            {(short)Item.Names.Javelin,        (short)Item.Names.of,    (short)Item.Names.WEAPONJavelin, 20,  3000,  1, 51,   0}, // javelin of lightning
+        /*
+Potion of Extra [0]
+0C7C:0970  00 00 BB 00 A7 00 40 00  01 00 20 03 03 00 03 00  ..+.º.@.. ..
+
+Potion of Giant Strength [1]: EF, A7, 40, 01, 044C, 01 00 52
+0C7C:0980  00 00 EF 00 A7 00 40 00  01 00 4C 04 01 00 52 00  ..n.º.@..L.R.
+
+Potion of Healing [2]: B9, A7, 40, 01, 0190 01 00 55
+0C7C:0990  00 00 B9 00 A7 00 40 00  01 00 90 01 01 00 55 00  ..¦.º.@..É.U.
+
+ Potion of Speed [3]: AD, A7, 40, 01, 450, 01, 80
+0C7C:09A0  00 00 AD 00 A7 00 40 00  01 00 C2 01 01 00 50 00  ..¡.º.@..-.P.
+
+Scroll of Restoration? [4] F0, A7, 41, 1, 2100, 56, 56, 0
+0C7C:09B0  00 00 F0 00 A7 00 41 00  01 00 34 08 38 00 38 00  ..=.º.A..48.8.
+
+Ring of Feather Fall [5] EE A7 42, 1, 5000, 0, 27, 128
+0C7C:09C0  00 00 EE 00 A7 00 42 00  01 00 88 13 00 00 1B 00  ..e.º.B..ê...
+
+Wand of Lightning [6] 9D A7 45, 1, 6000, 20, 51, 0
+0C7C:09D0  80 00 9D 00 A7 00 45 00  01 00 70 17 14 00 33 00  Ç.¥.º.E..p¶.3.
+
+Wand of Magic Missile [7], 1, 11000, 30, 88, 0
+0C7C:09E0  00 00 CE 00 A7 00 45 00  01 00 F8 2A 1E 00 58 00  ..+.º.E..°*.X.
+
+Wand of Paralyzation [8], 1, 5000, 20, 84, 0
+0C7C:09F0  00 00 E1 00 A7 00 45 00  01 00 88 13 14 00 54 00  ..ß.º.E..ê¶.T.
+
+Gauntlets of Ogre Power [9], 10, 15000, 0, 38, 131
+0C7C:0A00  00 00 E2 00 A7 00 64 00  0A 00 98 3A 00 00 26 00  ..G.º.d..ÿ:..&.
+
+Keoghtum's Ointment [10], 1, 10000, 5, 81, 0
+0C7C:0A10  83 00 00 00 6F 00 B6 00  01 00 10 27 05 00 51 00  â...o.¦..'.Q.
+
+Necklace of Missiles [11], 1, 16000, 20, 87, 0
+0C7C:0A20  00 00 E4 00 A7 00 77 00  01 00 80 3E 14 00 57 00  ..S.º.w..Ç>¶.W.
+
+Cloak of Displacement [12], 25, 17500, 0, 89, 133
+0C7C:0A30  00 00 AA 00 A7 00 58 00  19 00 5C 44 00 00 59 00  ..¬.º.X..\D..Y.
+
+Javelin of Lightning [13], 20, 3000, 1, 83, 0
+0C7C:0A40  85 00 9D 00 A7 00 15 00  14 00 B8 0B 01 00 53 00  à.¥.º.§.¶.+.S.
+
+Wand of Fireballs [14], 1, 5000, 20, 47, 0
+0C7C:0A50  00 00 F2 00 A7 00 45 00  01 00 88 13 14 00 2F 00  ..=.º.E..ê¶./.
+
+Ring of Fire Resistance [15], 1, 5000, 0, 61, 0
+0C7C:0A60  00 00 CD 00 A7 00 42 00  01 00 88 13 00 00 3D 00  ..-.º.B..ê..=.
+
+Ring of Invisibility [16], 1, 7500, 0, 56, 139
+0C7C:0A70  81 00 E3 00 A7 00 42 00  01 00 4C 1D 00 00 38 00  ü.p.º.B..L..8.
+
+Bag of Holding [17], 150, 25000, 0, 0, 0
+0C7C:0A80  8B 00 BA 00 A7 00 49 00  96 00 A8 61 00 00 00 00  ï.¦.º.I.û.¿a....
+
+Cloak of Elvenkind [18], 25, 6000, 0, 72, 134
+0C7C:0A90  00 00 E5 00 A7 00 58 00  19 00 70 17 00 00 48 00  ..s.º.X..p..H.
+0C7C:0AA0  86 00
+
+        */
+        static short[,]
+        preconfiguredItems_Pool =
+        {
+            {(short)Item.Names.Extra,          (short)Item.Names.of,    (short)Item.Names.Potion,           1,   600,  3,  3,   0}, // potion extra healing
+            {(short)Item.Names.Giant_Strength, (short)Item.Names.of,    (short)Item.Names.Potion,           1,  1100,  1, 82,   0}, // potion of giant strength
+            {(short)Item.Names.Healing,        (short)Item.Names.of,    (short)Item.Names.Potion,           1,   400,  1, 85,   0}, // potion of healing
+            {(short)Item.Names.Speed,          (short)Item.Names.of,    (short)Item.Names.Potion,           1,   450,  1, 80,   0}, // potion of speed
+            {(short)Item.Names.Restoring_LevelOPsCP, (short)Item.Names.of, (short)Item.Names.Scroll,        1,  2100, 56, 56,   0}, // scroll of restoring level's
+            {(short)Item.Names.Feather_Falling, (short)Item.Names.of,   (short)Item.Names.Ring,             1,  5000,  0, 27, 128}, // Ring of feather falling
+            {(short)Item.Names.Lightning, (short)Item.Names.of,         (short)Item.Names.Wand,             1,  6000, 20, 51,   0}, // Wand of lightning
+            {(short)Item.Names.Magic_Missiles, (short)Item.Names.of,    (short)Item.Names.Wand,             1, 11000, 30, 88,   0}, // Wand of magic missile
+            {(short)Item.Names.Paralyzation,   (short)Item.Names.of,    (short)Item.Names.Wand,             1,  5000, 20, 84,   0}, // Wand of paralyzation
+            {(short)Item.Names.Ogre_Power,     (short)Item.Names.of,    (short)Item.Names.Gauntlets,       10, 15000,  0, 38, 131}, // Gauntlets of ogre power
+            {(short)Item.Names.empty,          (short)Item.Names.Ointment, (short)Item.Names.KeoghtumAPOSs, 1, 10000,  5, 81,   0}, // Koeghtum's Ointment
+            {(short)Item.Names.Missiles,       (short)Item.Names.of,    (short)Item.Names.Necklace,         1, 16000, 20, 87,   0}, // Necklace of Missiles
+            {(short)Item.Names.Displacement,   (short)Item.Names.of,    (short)Item.Names.Cloak,           25, 17500,  0, 89, 133}, // Cloak of Displacement
+            {(short)Item.Names.Javelin,        (short)Item.Names.of,    (short)Item.Names.WEAPONJavelin,   20,  3000,  1, 83,   0}, // Javelin of lightning
+            {(short)Item.Names.Fireballs,      (short)Item.Names.of,    (short)Item.Names.Wand,             1,  5000, 20, 47,   0}, // Wand of Fireballs
+            {(short)Item.Names.Fire_Resistance,(short)Item.Names.of,    (short)Item.Names.Ring,             1,  5000,  0, 61, 129}, // Ring of Fire Resistance
+            {(short)Item.Names.Invisibility,   (short)Item.Names.of,    (short)Item.Names.Ring,             1,  7500,  0, 56, 139}, // Ring of Invisibility
+            {(short)Item.Names.Holding,        (short)Item.Names.of,    (short)Item.Names.Bag,            150, 25000,  0,  0,   0}, // Bag of Holding
+            {(short)Item.Names.Elvenkind,      (short)Item.Names.of,    (short)Item.Names.Cloak,           25,  6000,  0, 72, 134}, // Cloak of Elvenkind
+        };
+        static short[,] /*seg600:082E unk_16B3E */
+        preconfiguredItems_Curse = {
+            {(short)Item.Names.Healing,        (short)Item.Names.Extra, (short)Item.Names.Potion,           1,   800,  3, 99,   0}, // potion extra healing
+            {(short)Item.Names.Giant_Strength, (short)Item.Names.of,    (short)Item.Names.Potion,           1,  1100,  1, 59,   0}, // potion of giant strength
+            {(short)Item.Names.Healing,        (short)Item.Names.of,    (short)Item.Names.Potion,           1,   400,  1,  3,   0}, // potion of healing
+            {(short)Item.Names.Speed,          (short)Item.Names.of,    (short)Item.Names.Potion,           1,   450,  1, 48,   0}, // potion of speed (unused)
+            {(short)Item.Names.Magic_Missiles, (short)Item.Names.of,    (short)Item.Names.Wand,             1, 11000, 30, 15,   0}, // wand of magic missile
+            {(short)Item.Names.Ogre_Power,     (short)Item.Names.of,    (short)Item.Names.Gauntlets,       10, 15000,  0, 38, 131}, // gauntlets of ogre power (unused)
+            {(short)Item.Names.Javelin,        (short)Item.Names.of,    (short)Item.Names.WEAPONJavelin,   20,  3000,  1, 51,   0}, // javelin of lightning
         };
 
         internal static Item create_item(Item.Type item_type) /* sub_5A007 */
@@ -461,12 +560,19 @@ namespace engine
                     int roll = ovr024.roll_dice(5, 1);
                     if (roll == 5)
                     {
-                        preconfig = 6;
+                        if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                        {
+                            preconfig = 13; // Javelin of Lightning
+                        }
+                        else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                        {
+                            preconfig = 6;
+                        }
                     }
                     else
                     {
                         item.namenum[2] = (Item.Names)item.type;
-                        item.namenum[1] = (Item.Names)(item.plus + 161);
+                        item.namenum[1] = Item.GetNamesPlus(item.plus);
                     }
                 }
                 else if (item.type == Item.Type.Quarrel)
@@ -726,8 +832,16 @@ namespace engine
 
                 for (int affect = 1; affect <= spellsCount; affect++)
                 {
-                    int roll = ovr024.roll_dice(5, 1);
-                    Spells spell;
+                    int roll = 0;
+                    if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                    {
+                        ovr024.roll_dice(3, 1);
+                    }
+                    else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                    {
+                        ovr024.roll_dice(5, 1);
+                    }
+                    Spells spell = 0;
 
                     if (item.type == Item.Type.MUScroll)
                     {
@@ -749,7 +863,7 @@ namespace engine
                                 spell = Spells.charm_monsters + ovr024.roll_dice(9, 1) - 1;
                                 break;
 
-                            default: // 5
+                            case 5:
                                 spell = Spells.cloud_kill + ovr024.roll_dice(4, 1) - 1;
                                 break;
                         }
@@ -767,14 +881,21 @@ namespace engine
                                 break;
 
                             case 3:
-                                spell = Spells.cure_blindness + ovr024.roll_dice(8, 1) - 1;
+                                if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                                {
+                                    spell = Spells.animate_dead + ovr024.roll_dice(9, 1) - 1;
+                                }
+                                else
+                                {
+                                    spell = Spells.cure_blindness + ovr024.roll_dice(8, 1) - 1;
+                                }
                                 break;
 
                             case 4:
                                 spell = Spells.cause_serious_wounds_CL + ovr024.roll_dice(5, 1) - 1;
                                 break;
 
-                            default: // 5
+                            case 5:
                                 spell = Spells.cure_critical_wounds + ovr024.roll_dice(6, 1) - 1;
                                 break;
                         }
@@ -784,33 +905,139 @@ namespace engine
                     item._value += (short)(roll * 300);
                 }
             }
-            else if (type == Item.Type.Gauntlets || type == Item.Type.Cloak) // Gauntlets and CloakOfProt unused
+            else if (type == Item.Type.Gauntlets)
             {
-                preconfig = 5;
+                if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                {
+                    preconfig = 9; // Gauntlets of Ogre Power
+                }
+                else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                {
+                    preconfig = 5; // Gauntlets of Ogre Power
+                }
             }
-            else if (type == Item.Type.WandA || type == Item.Type.WandB) // WandA unused
+            else if (type == Item.Type.Cloak)
             {
-                preconfig = 4;
+                preconfig = 18; // Cloak of Elvenkind
             }
-            else if (type == Item.Type.PotionOfGiantStr || type == Item.Type.Cloak) // Cloak unused
+            else if (type == Item.Type.Ring) // Ring unused to CoAB
             {
-                preconfig = 1;
+                int roll = ovr024.roll_dice(10, 1);
+
+                if (roll == 1)
+                {
+                    preconfig = 5; // Ring of Feather Falling
+                }
+                else if (roll >= 2 && roll <= 6)
+                {
+                    preconfig = 15; // Ring of Fire Resistance
+                }
+                else if (roll >= 7 && roll <= 10)
+                {
+                    preconfig = 16; // Ring of Invisibility;
+                }
+            }
+            else if (type == Item.Type.WandA) // WandA unused in CoAB
+            {
+                int roll = ovr024.roll_dice(3, 1);
+                if (roll == 1)
+                {
+                    preconfig = 6; // Wand of Lightning
+                }
+                else if (roll == 2)
+                {
+                    preconfig = 8; // Wand of Paralyzation
+                }
+                else if (roll == 3)
+                {
+                    preconfig = 14; // Wand of Fireballs
+                }
+            }
+            else if (type == Item.Type.WandB) // WandA unused
+            {
+                if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                {
+                    preconfig = 7; // Wand of Magic Missiles
+                }
+                else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+                {
+                    preconfig = 4; // Wand of Magic Missiles
+                }
+            }
+            else if (type == Item.Type.PotionOfGiantStr)
+            {
+                preconfig = 1; // Potion of Giant Strength
+            }
+            else if (type == Item.Type.CloakOfDisplacement)
+            {
+                preconfig = 12; // Cloak of Displacement
             }
             else if (type == Item.Type.Potion)
             {
-                int roll = ovr024.roll_dice(8, 1);
+                if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+                {
+                    int roll = ovr024.roll_dice(11, 1);
 
-                if (roll >= 1 && roll <= 5)
-                {
-                    preconfig = 2;
+                    if (roll >= 1 && roll <= 5)
+                    {
+                        preconfig = 2; // Potion of Healing
+                    }
+                    else if (roll >= 6 && roll <= 8)
+                    {
+                        preconfig = 0; // Potion of Extra
+                    }
+                    else if (roll == 9)
+                    {
+                        preconfig = 3; // Potion of Speed;
+                    }
+                    else if (roll == 10)
+                    {
+                        preconfig = 10; // Keoghtum's Ointment
+                    }
+                    else // 11 
+                    {
+                        // missed
+                    }
                 }
-                else if (roll >= 6 && roll <= 8)
+                else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
                 {
-                    preconfig = 0;
+                    int roll = ovr024.roll_dice(8, 1);
+
+                    if (roll >= 1 && roll <= 5)
+                    {
+                        preconfig = 2; // Potion of Healing
+                    }
+                    else if (roll >= 6 && roll <= 8)
+                    {
+                        preconfig = 0; // Potion of Extra
+                    }
+                }
+            }
+            else if (type == Item.Type.GemsJewelry)
+            {
+                int roll = ovr024.roll_dice(10, 1);
+
+                if (roll >= 1 && roll <= 7)
+                {
+                    preconfig = 11; // Necklace of Missiles
+                }
+                else if (roll >= 8 && roll <= 10)
+                {
+                    preconfig = 17; // Bag of Holding
                 }
             }
 
-            if (preconfig > -1)
+            short[,] preconfiguredItems = { { } };
+            if (gbl.game.Name == Logging.Game.PoolOfRadiance)
+            {
+                preconfiguredItems = preconfiguredItems_Pool;
+            }
+            else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
+            {
+                preconfiguredItems = preconfiguredItems_Curse;
+            }
+
+            if (preconfig > -1 && preconfiguredItems.Length > preconfig)
             {
                 item.namenum[0] = (Item.Names)preconfiguredItems[preconfig, 0];
                 item.namenum[1] = (Item.Names)preconfiguredItems[preconfig, 1];

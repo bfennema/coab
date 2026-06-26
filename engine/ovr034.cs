@@ -19,12 +19,12 @@ namespace engine
             int dateLength = cellCount * tmp_block.bpp;
             int destByteOffset = destCellOffset * tmp_block.bpp;
 
-            if (gbl.dax24x24Set != null)
+            if (gbl.primary_dax24x24Set != null)
             {
-                System.Array.Copy(tmp_block.data, 0, gbl.dax24x24Set.data, destByteOffset, dateLength);
+                System.Array.Copy(tmp_block.data, 0, gbl.primary_dax24x24Set.data, destByteOffset, dateLength);
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
 
             return true;
         }
@@ -34,11 +34,11 @@ namespace engine
         {
             if (tileIndex > 0x7f)
             {
-                seg040.OverlayUnbounded(gbl.dword_1C8FC, tileIndex, tileIndex & 0x7F, rowY, colX);
+                seg040.OverlayUnbounded(gbl.secondary_dax24x24Set, tileIndex, tileIndex & 0x7F, rowY, colX);
             }
             else
             {
-                seg040.OverlayUnbounded(gbl.dax24x24Set, 0, tileIndex, rowY, colX);
+                seg040.OverlayUnbounded(gbl.primary_dax24x24Set, 0, tileIndex, rowY, colX);
             }
         }
 
@@ -86,7 +86,7 @@ namespace engine
                 gbl.combat_icons[combat_icon_index].Recolor(false, unk_16E40, unk_16E30);
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
 
             return true;
         }

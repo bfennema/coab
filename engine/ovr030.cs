@@ -135,7 +135,7 @@ namespace engine
                         daxArray.numFrames = frames_count; // also pointless
 
                         uncompressed_data = null;
-                        seg043.clear_keyboard();
+                        Input.ClearKeyboard();
 
                         if (gbl.AnimationsOn)
                         {
@@ -199,7 +199,7 @@ namespace engine
                 gbl.current_body_id = body_id;
             }
 
-            seg043.clear_keyboard();
+            Input.ClearKeyboard();
 
             return true;
         }

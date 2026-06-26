@@ -1,5 +1,7 @@
 using Classes;
 using Logging;
+using System;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace engine
@@ -23,48 +25,6 @@ namespace engine
             }
         }
 
-
-        internal static byte GetInputKey()
-        {
-            byte key;
-
-            if (gbl.inDemo == true)
-            {
-                if (seg049.KEYPRESSED() == true)
-                {
-                    key = seg049.READKEY();
-                }
-                else
-                {
-                    key = 0;
-                }
-            }
-            else
-            {
-                key = seg049.READKEY();
-            }
-
-            if (key == 0x13)
-            {
-                seg044.PlaySound(Sound.sound_0);
-            }
-
-            if (Cheats.allow_keyboard_exit && key == 3)
-            {
-                print_and_exit();
-            }
-
-            if (key != 0)
-            {
-                while (seg049.KEYPRESSED() == true)
-                {
-                    key = seg049.READKEY();
-                }
-            }
-
-            return key;
-        }
-
         public static void DumpPlayerAffects()
         {
             foreach (Player player in gbl.TeamList)
@@ -86,20 +46,11 @@ namespace engine
             }
         }
 
-        internal static void clear_keyboard()
-        {
-            while (seg049.KEYPRESSED() == true)
-            {
-                GetInputKey();
-            }
-        }
-
-
         internal static void clear_one_keypress()
         {
-            if (seg049.KEYPRESSED() == true)
+            if (Input.KEYPRESSED() == true)
             {
-                GetInputKey();
+                Input.GetInputKey();
             }
         }
 
@@ -130,9 +81,9 @@ namespace engine
 
         static void TxtDumpPlayer(Player p, int area, int id)
         {
-            string str100 = p.stats.Str.full == 18 ? string.Format("({0})", p.stats.Str00.full) : "";
+            string str100 = p.stats.Str.Current == 18 ? string.Format("({0})", p.stats.Str00.Current) : "";
             Logger.Debug("Area {0} Id {1} {2} exp: {3} hp: {4} ac: {5} thac0: {6}", area, id, p.name, p.exp, p.hit_point_max, p.DisplayAc, 0x3c - p.hitBonus);
-            Logger.Debug("   S: {0}{1} D: {2} C: {3} I: {4} W: {5} Ch: {6}", p.stats.Str.full, str100, p.stats.Dex.full, p.stats.Con.full, p.stats.Int.full, p.stats.Wis.full, p.stats.Cha.full);
+            Logger.Debug("   S: {0}{1} D: {2} C: {3} I: {4} W: {5} Ch: {6}", p.stats.Str.Current, str100, p.stats.Dex.Current, p.stats.Con.Current, p.stats.Int.Current, p.stats.Wis.Current, p.stats.Cha.Current);
             Logger.Debug("   Lvls: {0} {1} {2} {3} {4} {5} {6} {7}", p.ClassLevel[0], p.ClassLevel[1], p.ClassLevel[2], p.ClassLevel[3], p.ClassLevel[4], p.ClassLevel[5], p.ClassLevel[6], p.ClassLevel[7]);
             if (p.activeItems.primaryWeapon != null)
                 Logger.Debug("   Weapon: {0}", p.activeItems.primaryWeapon.GenerateName(0));
@@ -164,13 +115,13 @@ namespace engine
             dw.Write("<td>{0}</td>", p.hit_point_max);
             dw.Write("<td>{0}</td>", 0x3c - p.ac);
             dw.Write("<td>{0}</td>", 0x3c - p.hitBonus);
-            string str100 = p.stats.Str.full == 18 ? string.Format("({0})", p.stats.Str00.full) : "";
-            dw.Write("<td>{0}{1}</td>", p.stats.Str.full, str100);
-            dw.Write("<td>{0}</td>", p.stats.Dex.full);
-            dw.Write("<td>{0}</td>", p.stats.Con.full);
-            dw.Write("<td>{0}</td>", p.stats.Int.full);
-            dw.Write("<td>{0}</td>", p.stats.Wis.full);
-            dw.Write("<td>{0}</td>", p.stats.Cha.full);
+            string str100 = p.stats.Str.Current == 18 ? string.Format("({0})", p.stats.Str00.Current) : "";
+            dw.Write("<td>{0}{1}</td>", p.stats.Str.Current, str100);
+            dw.Write("<td>{0}</td>", p.stats.Dex.Current);
+            dw.Write("<td>{0}</td>", p.stats.Con.Current);
+            dw.Write("<td>{0}</td>", p.stats.Int.Current);
+            dw.Write("<td>{0}</td>", p.stats.Wis.Current);
+            dw.Write("<td>{0}</td>", p.stats.Cha.Current);
             dw.Write("<td>{0}</td>", p.ClassLevel[0]);
             dw.Write("<td>{0}</td>", p.ClassLevel[1]);
             dw.Write("<td>{0}</td>", p.ClassLevel[2]);

@@ -207,7 +207,7 @@ namespace engine
                             gbl.textYCol = yStart;
 
                             DisplayAndPause("Press any key to continue", 13);
-                            seg043.clear_keyboard();
+                            Input.ClearKeyboard();
 
                             seg037.draw8x8_clear_area(yEnd, xEnd, yStart, xStart);
 
@@ -243,7 +243,7 @@ namespace engine
 
             do
             {
-                ch = (char)seg043.GetInputKey();
+                ch = (char)Input.GetInputKey();
 
                 if (ch >= 0x20 && ch <= 0x7A)
                 {
@@ -264,7 +264,7 @@ namespace engine
                     //xPos -= 1;
                 }
 
-            } while (gbl.Exit == false && ch != 0x0d && ch != 0x1B && gbl.inDemo == false);
+            } while (gbl.Token.IsCancellationRequested == false && ch != 0x0d && ch != 0x1B && gbl.inDemo == false);
 
             ovr027.ClearPromptAreaNoUpdate();
 
@@ -299,7 +299,7 @@ namespace engine
 
             displayString(txt, 0, fgColor, 0x18, 0);
             Display.ForceUpdate();
-            seg043.GetInputKey();
+            Input.GetInputKey();
         }
 
 

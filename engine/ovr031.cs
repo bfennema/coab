@@ -1,5 +1,6 @@
 using Classes;
 using Logging;
+using System;
 using System.Linq;
 using System.Runtime.ExceptionServices;
 using System.Threading.Tasks;
@@ -93,19 +94,20 @@ namespace engine
         }
 
 
-        internal static void Draw3dWorldBackground()
+        internal static void Draw3dWorldBackground() // sub_71184
         {
-            seg040.DrawColorBlock(gbl.sky_colour, 0x2c, 11, 16, 2);
             if (gbl.game.Name == Logging.Game.PoolOfRadiance)
             {
-                seg040.DrawColorBlock(15, 2, 11, 0x3b, 2);
-                seg040.DrawColorBlock(7, 3, 11, 0x3c, 2);
-                seg040.DrawColorBlock(6, 0x2a, 11, 0x3e, 2);
+                seg040.DrawColorBlock(gbl.sky_colour, 0x2b, 11, 16, 2);
+                seg040.DrawColorBlock(gbl.byte_1D535, 1, 11, 0x3b, 2);
+                seg040.DrawColorBlock(gbl.byte_1D536, 2, 11, 0x3c, 2);
+                seg040.DrawColorBlock(gbl.byte_1D537, 0x2a, 11, 0x3e, 2);
             }
             else // if (gbl.game == Game.CurseOfTheAzureBonds)
             {
-                seg040.DrawColorBlock(0, 2, 11, 0x3c, 2);
-                seg040.DrawColorBlock(8, 0x2a, 11, 0x3e, 2);
+                seg040.DrawColorBlock(gbl.sky_colour, 0x2c, 11, 16, 2);
+                seg040.DrawColorBlock(gbl.byte_1D536, 2, 11, 0x3c, 2);
+                seg040.DrawColorBlock(gbl.byte_1D537, 0x2a, 11, 0x3e, 2);
                 if (get_wall_x2(gbl.mapPosY, gbl.mapPosY) < 0x80 &&
                     gbl.sky_colour == 11)
                 {
@@ -679,16 +681,16 @@ namespace engine
                         {
                             if (block_id == 0)
                             {
-                                await ovr038.Load8x8D(idx, (10 * 10) + block + 1);
+                                await ThreeD.Load8x8D(idx, (10 * 10) + block + 1);
                             }
                             else
                             {
-                                await ovr038.Load8x8D(idx, (block_id * 10) + block + 1);
+                                await ThreeD.Load8x8D(idx, (block_id * 10) + block + 1);
                             }
                         }
                         else
                         {
-                            await ovr038.Load8x8D(idx, block_id);
+                            await ThreeD.Load8x8D(idx, block_id);
                         }
                     }
                 }
@@ -770,6 +772,20 @@ namespace engine
             { 0x36, 0x62, 0x32, 0x2C, 0x47, 0x42, 0x34, 0x62, 0x64, 0x35, 0x9B, 0x9A, 0x9C, 0x2C, 0x61, 0x62, 0x63, 0x62, 0x64, 0x35, 0x9A, 0x9D, 0x43, 0x42, 0x34, 0xB1, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D, 0x4D }, // 43
         };
 
+        internal static short[,] wilderness_remap =
+        {
+            { 0x000A, 0x0009, 0x00EF },
+            { 0x0003, 0x0020, 0x0001 },
+            { 0x000C, 0x001F, 0x0001 },
+            { 0x0019, 0x000B, 0x0000 },
+            { 0x0020, 0x000F, 0x00A4 },
+            { 0x0021, 0x0017, 0x009C },
+            { 0x0025, 0x0008, 0x0092 },
+            { 0x0013, 0x0010, 0x00F6 },
+            { 0x0019, 0x001B, 0x00FF },
+
+        };
+
         internal static byte[] wilderness_impassable =
         {
             0x4D, 0x7D, 0x7E, 0x7F, 0x81, 0x82, 0x83, 0xA7, 0xA8, 0xA9, 0xAA, 0xAB, 0xAE, 0xAF, 0xB0, 0xB1, 0xBB, 0xDC, 0xDD, 0xE0, 0xE1, 0xE2, 0xE3, 0xE4, 0xE5, 0xE6, 0xE8, 0xF4
@@ -804,11 +820,77 @@ namespace engine
                 return false;
             }
         }
-
-        internal static async Task<bool> DrawWildernessMap()
+        internal static void sub_44EC0(short base_x, short base_y)
         {
-            byte x = gbl.area_ptr.field_186;
-            byte y = gbl.area_ptr.field_188;
+            byte screen_row = 0;
+            byte screen_col = 0;
+
+            short tile_x, tile_y;
+            short raw_tile_id;
+
+            for (screen_row = 0; screen_row <= 4; screen_row++)
+            {
+                for (screen_col = 0; screen_col <= 4; screen_col ++)
+                {
+                    tile_y = (short)(screen_col + base_y);
+                    tile_x = (short)(screen_row + base_x);
+
+                    raw_tile_id = wilderness[tile_x, tile_y];
+                    for (int i=0; i<9; i++)
+                    {
+                        if (tile_x == wilderness_remap[i,0] && tile_y == wilderness_remap[i,1])
+                        {
+                            bool update_tile = false;
+                            switch (i)
+                            {
+                                case 2:
+                                    if (gbl.area_ptr.field_318 != 0xFF)
+                                    {
+                                        update_tile = true;
+                                    }
+                                    break;
+                                case 3:
+                                    if (((gbl.area_ptr.field_3A4) != 0) ||
+                                        ((gbl.area_ptr.field_2F8) & 8) != 0)
+                                    {
+                                        update_tile = true;
+                                    }
+                                    break;
+                                case 4:
+                                    if (((gbl.area_ptr.field_340) & 2) == 0)
+                                    {
+                                        update_tile = true;
+                                    }
+                                    break;
+                                case 5:
+                                    update_tile = true;
+                                    break;
+                                case 6:
+                                    if (((gbl.area_ptr.field_340) & 1) == 0)
+                                    {
+                                        update_tile = true;
+                                    }
+                                    break;
+                                case 7:
+                                case 8:
+                                    if ((gbl.area_ptr.field_366) > 0xFD) {
+                                        update_tile = true;
+                                    }
+                                    break;
+                            }
+                            if (update_tile == true)
+                            {
+                                raw_tile_id = wilderness_remap[i, 2];
+                            }
+                        }
+                    }
+                    ovr034.DrawIsoTile(raw_tile_id, screen_col * 3, screen_row * 3);
+                    //sub_3EBA(1, raw_tile_id, screen_row * 3, screen_col * 3);
+                }
+            }
+        }
+        internal static async Task<bool> DrawWildernessMap(short x, short y)
+        {
             DaxBlock sqrpaci = new DaxBlock(0, 256, 3, 24);
             Display.UpdateStop();
             gbl.game.DrawFrame_Wilderness();
@@ -828,19 +910,6 @@ namespace engine
             for (int i = 0; i < 3; i++)
             {
                 await ovr034.chead_cbody_comspr_icon((byte)(26 + i), i, "ICON");
-            }
-
-            if (gbl.EclBlockId == 25)
-            {
-                x += 0;
-            }
-            else if (gbl.EclBlockId == 26)
-            {
-                x += 13;
-            }
-            else if (gbl.EclBlockId == 27)
-            {
-                x += 26;
             }
 
             if (gbl.area_ptr.field_340 > 0)
