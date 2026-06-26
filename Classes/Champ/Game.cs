@@ -78,13 +78,13 @@ namespace Classes.Champ
         public override byte WildernessImage { get => 121; }
         public override byte EndGameImage { get => 120; }
         public override byte BigpicImage { get => 112; }
-        public override ushort CallRedraw { get => 0x2E10; }
-        public override ushort CallDuelPlayer { get => 0x8000; }
-        public override ushort CallDuelMonster { get => 0x8001; }
-        public override ushort CallSound { get => 0xB200; }
-        public override ushort CallMove { get => 0xC01E; }
-        public override ushort CallWall { get => 0xC018; }
-        public override ushort CallDemo { get => 0x6803; }
+        public override ushort? CallRedraw { get => 0x2E10; }
+        public override ushort? CallDuelPlayer { get => 0x8000; }
+        public override ushort? CallDuelMonster { get => 0x8001; }
+        public override ushort? CallSound { get => 0xB200; }
+        public override ushort? CallMove { get => 0xC01E; }
+        public override ushort? CallWall { get => 0xC018; }
+        public override ushort? CallDemo { get => 0x6803; }
         public override void DrawFrame_Outer() { Draw.Frame_Outer(); }
         public override void DrawCredits() { Draw.Credits(); }
         public override void DrawFrame_Dungeon() { Draw.Frame_Dungeon(); }
@@ -101,6 +101,7 @@ namespace Classes.Champ
         public override bool SetBlocksInArea1 { get => false; }
         public override int EclClockArguments { get => 2; }
         public override bool StoreEclBlock { get => false; }
+        public override bool HasLastGameState { get => true; }
         public override byte[] PortraitBody { get => []; }
         public override byte[] PortraitHead { get => []; }
         public override string[] TempleSpells { get => [ "Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Heal", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" ]; }

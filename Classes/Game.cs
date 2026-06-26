@@ -39,13 +39,13 @@ namespace Classes
         public abstract byte WildernessImage { get; }
         public abstract byte EndGameImage { get; }
         public abstract byte BigpicImage { get; }
-        public abstract ushort CallRedraw { get; }
-        public abstract ushort CallDuelPlayer { get; }
-        public abstract ushort CallDuelMonster { get; }
-        public abstract ushort CallSound { get; }
-        public abstract ushort CallMove { get; }
-        public abstract ushort CallWall { get; }
-        public abstract ushort CallDemo { get; }
+        public abstract ushort? CallRedraw { get; }
+        public abstract ushort? CallDuelPlayer { get; }
+        public abstract ushort? CallDuelMonster { get; }
+        public abstract ushort? CallSound { get; }
+        public abstract ushort? CallMove { get; }
+        public abstract ushort? CallWall { get; }
+        public abstract ushort? CallDemo { get; }
         public abstract void DrawFrame_Outer();
         public abstract void DrawCredits();
         public abstract void DrawFrame_Dungeon();
@@ -62,6 +62,7 @@ namespace Classes
         public abstract bool SetBlocksInArea1 { get; }
         public abstract int EclClockArguments { get; }
         public abstract bool StoreEclBlock { get; }
+        public abstract bool HasLastGameState { get; }
         public abstract byte[] PortraitBody { get; }
         public abstract byte[] PortraitHead { get; }
         public abstract string[] TempleSpells { get; }

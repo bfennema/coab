@@ -70,13 +70,13 @@ namespace Classes.PoolRad
         public override byte WildernessImage { get => 255; }
         public override byte EndGameImage { get => 255; }
         public override byte BigpicImage { get => 255; }
-        public override ushort CallRedraw { get => 0x2C90; }
-        public override ushort CallDuelPlayer { get => 0x8000; }
-        public override ushort CallDuelMonster { get => 0x8001; }
-        public override ushort CallSound { get => 0xBA03; }
-        public override ushort CallMove { get => 0xC01E; }
-        public override ushort CallWall { get => 0xC018; }
-        public override ushort CallDemo { get => 0x6803; }
+        public override ushort? CallRedraw { get => 0x2C90; } 
+        public override ushort? CallDuelPlayer { get => 0x8000; }
+        public override ushort? CallDuelMonster { get => 0x8001; }
+        public override ushort? CallSound { get => 0xBA03; }
+        public override ushort? CallMove { get => 0xC01E; }
+        public override ushort? CallWall { get => 0xC018; }
+        public override ushort? CallDemo { get => null; }
         public override void DrawFrame_Outer() { Draw.Frame_Outer(); }
         public override void DrawCredits() { Draw.Credits(); }
         public override void DrawFrame_Dungeon() { Draw.Frame_Dungeon(); }
@@ -93,6 +93,7 @@ namespace Classes.PoolRad
         public override bool SetBlocksInArea1 { get => true; }
         public override int EclClockArguments { get => 1; }
         public override bool StoreEclBlock { get => true; }
+        public override bool HasLastGameState { get => false; }
         public override byte[] PortraitBody { get => [ 1, 2, 3, 4, 7, 8, 18, 24, 26, 33, 35, 37 ]; }
         public override byte[] PortraitHead { get => [ 0, 8, 9, 13, 16, 18, 22, 34, 45, 51, 53, 57, 67, 68 ]; }
         public override string[] TempleSpells { get => ["Cure Blindness", "Cure Disease", "Cure Light Wounds", "Cure Serious Wounds", "Cure Critical Wounds", "Neutralize Poison", "Raise Dead", "Remove Curse", "Stone to Flesh" ]; }

@@ -1,3 +1,4 @@
+using Avalonia.Controls;
 using System;
 
 namespace Classes.PoolRad
@@ -183,18 +184,18 @@ namespace Classes.PoolRad
                 minutes = affect.minutes;
                 if (type == Affects.enlarge)
                 {
-                    if (player.stats.Str.cur == 18)
+                    if (player.stats.Str.Base == 18)
                     {
-                        affect_data = (byte)(player.stats.Str00.cur + 1);
+                        affect_data = (byte)(player.stats.Str00.Base + 1);
                     }
                     else
                     {
-                        affect_data = (byte)(player.stats.Str.cur + 100);
+                        affect_data = (byte)(player.stats.Str.Base + 100);
                     }
                 }
                 else if (type == Affects.friends)
                 {
-                    affect_data = (byte)player.stats.Cha.cur;
+                    affect_data = (byte)player.stats.Cha.Base;
                 }
                 affect_data = affect.affect_data;
                 callAffectTable = affect.callAffectTable;
@@ -219,8 +220,12 @@ namespace Classes.PoolRad
                     str_00 = 0;
                 }
 
-                player.stats.Str.cur = str;
-                player.stats.Str00.cur = str_00;
+                var current = player.stats.Str.Current;
+                var current_00 = player.stats.Str00.Current;
+                player.stats.Str.Load(str);
+                player.stats.Str00.Load(str_00);
+                player.stats.Str.Current = current;
+                player.stats.Str00.Current = current_00;
             }
             else if (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds)
             {
@@ -237,7 +242,9 @@ namespace Classes.PoolRad
                 }
                 else if (type == Affects.friends)
                 {
-                    player.stats.Cha.cur = affect_data;
+                    int current = player.stats.Cha.Current;
+                    player.stats.Cha.Load(affect_data);
+                    player.stats.Cha.Current = current;
                 }
                 else if (type == Affects.enlarge)
                 {
@@ -255,8 +262,12 @@ namespace Classes.PoolRad
                         str_00 = 0;
                     }
 
-                    player.stats.Str.cur = str;
-                    player.stats.Str00.cur = str_00;
+                    var current = player.stats.Str.Current;
+                    var current_00 = player.stats.Str00.Current;
+                    player.stats.Str.Load(str);
+                    player.stats.Str00.Load(str_00);
+                    player.stats.Str.Current = current;
+                    player.stats.Str00.Current = current_00;
                 }
             }
             else if (mapping[type].Count == 1)

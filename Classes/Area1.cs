@@ -152,6 +152,11 @@ namespace Classes
         [DataOffset(0x2CA, DataType.Word)]
         public ushort field_2CA;
 
+        [DataOffset(0x2F8, DataType.Word)]
+        public ushort field_2F8;
+
+        [DataOffset(0x318, DataType.Word)]
+        public ushort field_318;
 
         [DataOffset(0x336, DataType.Byte)]
         public byte field_336;
@@ -175,6 +180,9 @@ namespace Classes
 
         [DataOffset(0x366, DataType.Byte)]
         public byte field_366;
+
+        [DataOffset(0x3A4, DataType.Word)]
+        public ushort field_3A4;
 
         [DataOffset(0x3C2, DataType.Word)]
         public ushort field_3C2;
@@ -259,42 +267,44 @@ namespace Classes
                     field_198 = value;
                     break;
 
-                case 0x1CC:
+                case 0x1CC: // 0xE6
                     inDungeon = (short)value;
                     break;
 
-                case 0x1CE:
+                case 0x1CE: // 0xE7
                     field_1CE = (short)value;
                     break;
 
-                case 0x1D0:
+                case 0x1D0: // 0xE8
                     field_1D0 = (short)value;
                     break;
 
-                case 0x1E0:
+                case 0x1E0: // 0xF0
                     lastXPos = (short)value;
                     break;
-                case 0x1E2:
+                case 0x1E2: // 0xF1
                     lastYPos = (short)value;
                     break;
 
-                case 0x1E4:
+                case 0x1E4: // 0xF2
                     LastEclBlockId = value;
                     break;
 
-                case 0x1F6:
+                case 0x1F6: // 0xFB
                     block_area_view = (short)value;
                     break;
 
-                case 0x1F8:
+                case 0x1F8: // 0xFC
                     game_speed = (byte)value;
                     break;
 
-                case 0x1FA:
+                case 0x1FA: // 0xFD
+                    gbl.skyColorChanged = true;
                     outdoor_sky_colour = value;
                     break;
 
-                case 0x1FC:
+                case 0x1FC: // 0xFE
+                    gbl.skyColorChanged = true;
                     indoor_sky_colour = value;
                     break;
 

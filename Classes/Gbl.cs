@@ -228,6 +228,7 @@ namespace Classes
             setBlocks[2] = new SetBlock();
 
             game_area = 1;
+            wilderness_area = 1;
             game_state = GameState.DungeonMap;
             last_game_state = GameState.StartGameMenu;
         }
@@ -265,10 +266,25 @@ namespace Classes
             mapWallRoof = data[4];
 
             gbl.file.BlockRead(1, data, file);
-            last_game_state = gbl.game.GameState(data[0]);
+            if (gbl.game.HasLastGameState)
+            {
+                last_game_state = gbl.game.GameState(data[0]);
+            }
+            else
+            {
+                wilderness_area = data[0];
+            }
 
             gbl.file.BlockRead(1, data, file);
             game_state = gbl.game.GameState(data[0]);
+            if (gbl.game.HasLastGameState)
+            {
+                wilderness_area = 1;
+            }
+            else
+            {
+                last_game_state = game_state;
+            }
 
             if (gbl.game.SetBlocksInArea1)
             {
@@ -292,6 +308,7 @@ namespace Classes
         }
 
         public byte game_area;
+        public byte wilderness_area; // POR: byte_111BA
         public Area1 area_ptr;
         public Area2 area2_ptr;
         public Struct_1B2CA stru_1B2CA;
@@ -303,7 +320,6 @@ namespace Classes
         public byte mapWallRoof; // byte_1D53D
         public GameState game_state; // 1- shop, 5 - combat
         public GameState last_game_state; // byte_1B2E4
-
         public SetBlock[] setBlocks = new SetBlock[3];
     }
 
@@ -348,7 +364,7 @@ namespace Classes
         public static SaveData? saveData;
 
         public static bool stopVM = false; //byte_1AB08
-        public static bool vmFlag01; // byte_1AB09 
+        public static bool vmFlag01; // byte_1AB09 POR: byte_10BEF
         public static bool restore_player_ptr; // byte_1AB0A
         public static bool byte_1AB0B;
         public static bool byte_1AB0C;
@@ -376,6 +392,7 @@ namespace Classes
         public static bool[] affects_timed_out = new bool[0x48]; /* unk_1AE24 */
 
         public static bool reload_ecl_and_pictures; // byte_1B2EB
+        public static byte last_wilderness_area; // POR: byte_111B9
         public static byte head_block_id; // byte_1B2EE
         public static byte body_block_id; // byte_1B2EF
         public static bool party_killed; // byte_1B2F0
@@ -409,6 +426,9 @@ namespace Classes
         public static byte[] attacksHit = new byte[3]; // byte_1D2CA = bytes_1D2C9[1] & byte_1D2CB = bytes_1D2C9[2]
         public static int monster_morale; // byte_1D2CC
         public static int sky_colour; // byte_1D534
+        public static byte byte_1D535;
+        public static byte byte_1D536;
+        public static byte byte_1D537;
 
         public static bool mapAreaDisplay; //byte_1D538, Show Area Map
         public static int mapPosX { get => saveData.mapPosX; set => saveData.mapPosX = value; }
@@ -443,6 +463,8 @@ namespace Classes
         public static bool byte_1D90E; // byte_1D90E
         public static bool display_hitpoints_ac; /* byte_1D90F */
         public static bool focusCombatAreaOnPlayer; // byte_1D910
+        public static byte byte_1D912;
+        public static byte byte_1D913;
         public static byte sprite_block_id; /* byte_1D92B */
         public static byte pic_block_id; /* byte_1D92C */
         public static byte monster_icon_id; // byte_1D92D
@@ -459,12 +481,13 @@ namespace Classes
         public static int search_flag_bkup; // byte_1EE89
         public static bool spriteChanged; // byte_1EE8C
         public static bool byte_1EE8D;
+        public static bool byte_1EE8E;
         public static bool displayPlayerSprite; /* byte_1EE8F */
         public static bool bottomTextHasBeenCleared; // byte_1EE90
-        public static bool byte_1EE91;
+        public static bool paletteChanged; // byte_11E91
         public static bool positionChanged; // byte_1EE92 
         public static bool monstersLoaded; // byte_1EE93 
-        public static bool byte_1EE94;
+        public static bool skyColorChanged; // byte_11E94
         public static bool byte_1EE95;
         public static byte byte_1EE96;
         public static bool player_not_found; // byte_1EE97
@@ -491,7 +514,7 @@ namespace Classes
         public static ushort CampInterruptedAddr; // word_1B2D9 vm_run_addr_4
         public static ushort ecl_initial_entryPoint; // word_1B2DB
         public static short rest_incounter_count;
-        public static DaxBlock dword_1C8FC; //TODO - overlay dax block, not currently used.
+        public static DaxBlock secondary_dax24x24Set; // word_1C8FE << 16 | word_1C8FC
         public static DaxBlock bigpic_dax; /* word_1D5B6 */
         public static int menuScreenIndex;
         public static int displayInputSecondsToWait; // word_1D5C0 & word_1D5C2 - was centiseconds
@@ -521,7 +544,7 @@ namespace Classes
         public static Struct_1ADF6[] dword_1ADF6;
         public static List<MenuItem> spell_string_list = new List<MenuItem>(); // dword_1AE6C
         public static DaxBlock cursor_bkup; // dword_1C8F4
-        public static DaxBlock dax24x24Set; //dword_1C8F8;
+        public static DaxBlock primary_dax24x24Set; //dword_1C8F8;
         public static Item currentScroll; // dword_1D5C6
         public static spellDelegate SpellCastFunction;
         public static DaxBlock missile_dax; /* */
@@ -536,6 +559,7 @@ namespace Classes
 
         public static GameState game_state { get => saveData.game_state; set => saveData.game_state = value; }
         public static GameState last_game_state { get => saveData.last_game_state; set => saveData.last_game_state = value; }
+        public static byte wilderness_area { get => saveData.wilderness_area; set => saveData.wilderness_area = value; }
 
         public static CombatType combat_type;
         public static ushort ecl_offset;
@@ -601,7 +625,8 @@ namespace Classes
         public static int game_speed_var;
 
         public static bool inDemo;
-        public static bool Exit = false;
+        //public static bool Exit = false;
+        public static System.Threading.CancellationToken Token;
         public static bool AnimationsOn = true;
         public static bool PicsOn = true;
 

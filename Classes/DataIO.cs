@@ -343,8 +343,8 @@ namespace Classes
                             StatValue[] sv = (StatValue[])o;
                             foreach (StatValue v in sv)
                             {
-                                data[i++] = (byte)v.cur;
-                                data[i++] = (byte)v.full;
+                                data[i++] = (byte)v.Base;
+                                data[i++] = (byte)v.Current;
                             }
                         }
                         break;
@@ -447,8 +447,10 @@ namespace Classes
                             StatValue[] sv = new StatValue[attr.Size];
                             for (int i = 0; i < attr.Size; i++)
                             {
-                                sv[i].cur = data[offset++];
-                                sv[i].full = data[offset++];
+                                sv[i].Read(data, offset, 2);
+                                offset += 2;
+                                //sv[i].Base = data[offset++];
+                                //sv[i].full = data[offset++];
                             }
                             fInfo.SetValue(obj, sv);
                         }

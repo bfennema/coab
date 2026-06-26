@@ -136,93 +136,107 @@ namespace Classes
             return (ushort)index;
         }
 
-        internal static ushort get_player_values(ref bool arg_0, ushort arg_4)
+        internal static ushort get_player_values(ref bool found, ushort addr)
         {
             ushort return_val;
 
-            arg_0 = true;
+            found = true;
 
             //arg_4 -= 0x7c00;
 
-            if (arg_4 == 0x15)
+            if (addr == 0x14)
             {
-                return_val = (byte)gbl.SelectedPlayer.stats.Int.full;
+                return_val = (byte)gbl.SelectedPlayer.stats.Str.Current;
             }
-            else if (arg_4 == 0x18)
+            if (addr == 0x15)
             {
-                return_val = (byte)gbl.SelectedPlayer.stats.Con.full;
+                return_val = (byte)gbl.SelectedPlayer.stats.Int.Current;
             }
-            else if (arg_4 == 0x72)
+            else if (addr == 0x16)
+            {
+                return_val = (byte)gbl.SelectedPlayer.stats.Wis.Current;
+            }
+            else if (addr == 0x17)
+            {
+                return_val = (byte)gbl.SelectedPlayer.stats.Dex.Current;
+            }
+            else if (addr == 0x18)
+            {
+                return_val = (byte)gbl.SelectedPlayer.stats.Con.Current;
+            }
+            else if (addr == 0x19)
+            {
+                return_val = (byte)gbl.SelectedPlayer.stats.Cha.Current;
+            }
+            else if (addr == 0x72)
             {
                 return_val = (ushort)gbl.SelectedPlayer.race;
             }
-            else if (arg_4 == 0x73)
+            else if (addr == 0x73)
             {
                 return_val = (ushort)gbl.SelectedPlayer._class;
             }
-            else if (arg_4 == 0x9b)
+            else if (addr == 0x9b)
             {
                 return_val = gbl.SelectedPlayer.saveVerse[(int)SaveVerseType.Petrification];
             }
-            else if (arg_4 == 0xa0)
+            else if (addr == 0xa0)
             {
                 return_val = gbl.SelectedPlayer.HitDice;
             }
-            else if (arg_4 >= 0xA5 && arg_4 <= 0xAC)
+            else if (addr >= 0xA5 && addr <= 0xAC)
             {
-                int var_3 = arg_4 - 0xA5;
-
-                return_val = gbl.SelectedPlayer.thief_skills[var_3];
+                return_val = gbl.SelectedPlayer.thief_skills[addr - 0xA5];
             }
-            else if (arg_4 == 0xb8)
+            else if (addr == 0xb8)
             {
                 return_val = gbl.SelectedPlayer.control_morale;
             }
-            else if (arg_4 == 0xBB)
+            else if (addr == 0xBB)
             {
                 return_val = (ushort)gbl.SelectedPlayer.Money.GetCoins(Money.Copper);
             }
-            else if (arg_4 == 0xBD)
+            else if (addr == 0xBD)
             {
                 return_val = (ushort)gbl.SelectedPlayer.Money.GetCoins(Money.Electrum);
             }
-            else if (arg_4 == 0xBF)
+            else if (addr == 0xBF)
             {
                 return_val = (ushort)gbl.SelectedPlayer.Money.GetCoins(Money.Silver);
             }
-            else if (arg_4 == 0xC1)
+            else if (addr == 0xC1)
             {
                 return_val = (ushort)gbl.SelectedPlayer.Money.GetCoins(Money.Gold);
             }
-            else if (arg_4 == 0xC3)
+            else if (addr == 0xC3)
             {
                 return_val = (ushort)gbl.SelectedPlayer.Money.GetCoins(Money.Platinum);
             }
-            else if (arg_4 == 0xC9)
+            else if (addr == 0xC9)
             {
                 return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.MagicUser);
             }
-            else if (arg_4 == 0xD6)
+            else if (addr == 0xD6)
             {
                 return_val = gbl.SelectedPlayer.sex;
             }
-            else if (arg_4 == 0xD8)
+            else if (addr == 0xD8)
             {
                 return_val = gbl.SelectedPlayer.alignment;
             }
-            else if (arg_4 == 0xE4)
+            else if (addr == 0xE4)
             {
                 return_val = (ushort)(gbl.SelectedPlayer.field_192 & 1);
             }
-            else if (arg_4 == 0xF7)
+            else if (addr == 0xF7)
             {
                 return_val = (ushort)gbl.SelectedPlayer.field_13C;
             }
-            else if (arg_4 == 0xF9)
+            else if (addr == 0xF9)
             {
                 return_val = gbl.SelectedPlayer.field_13E;
             }
-            else if (arg_4 == 0x100)
+            else if (addr == 0x100)
             {
                 if (gbl.SelectedPlayer.in_combat == true)
                 {
@@ -240,7 +254,7 @@ namespace Classes
 
                 gbl.player_not_found = false;
             }
-            else if (arg_4 == 0x10C)
+            else if (addr == 0x10C)
             {
                 if (gbl.SelectedPlayer.combat_team == CombatTeam.Ours &&
                     gbl.SelectedPlayer.quick_fight == QuickFight.True)
@@ -256,27 +270,27 @@ namespace Classes
                     return_val = 0;
                 }
             }
-            else if (arg_4 == 0x10D)
+            else if (addr == 0x10D)
             {
                 return_val = 0; /* Simeon */
                 throw new System.NotImplementedException("Not sure what should happening this case");
                 //jmp	func_end
             }
-            else if (arg_4 == 0x11B)
+            else if (addr == 0x11B)
             {
                 return_val = gbl.SelectedPlayer.movement;
             }
-            else if (arg_4 == 0x2B1)
+            else if (addr == 0x2B1)
             {
                 return_val = find_gbl_player_index(gbl.SelectedPlayer);
             }
-            else if (arg_4 == 0x2B4)
+            else if (addr == 0x2B4)
             {
                 return_val = find_gbl_player_index(gbl.SelectedPlayer);
             }
-            else if (arg_4 == 0x2CF)
+            else if (addr == 0x2CF)
             {
-                switch (gbl.SelectedPlayer.stats.Cha.full)
+                switch (gbl.SelectedPlayer.stats.Cha.Current)
                 {
                     case 3:
                         return_val = 0;
@@ -287,54 +301,44 @@ namespace Classes
                         break;
 
                     case 5:
-                        return_val = 0x0A;
+                        return_val = 10;
                         break;
 
                     case 6:
-                        return_val = 0x0F;
+                        return_val = 15;
                         break;
 
                     case 7:
-                        return_val = 0x14;
+                        return_val = 20;
                         break;
 
-                    case 8:
-                    case 9:
-                    case 0x0a:
-                    case 0x0b:
-                    case 0x0c:
-                        return_val = 0x19;
+                    case 8: case 9: case 10: case 11: case 12:
+                        return_val = 25;
                         break;
 
-                    case 0x0d:
-                        return_val = 0x1E;
+                    case 13:
+                        return_val = 30;
                         break;
 
-                    case 0x0e:
-                        return_val = 0x23;
+                    case 14:
+                        return_val = 35;
                         break;
 
-                    case 0x0f:
-                        return_val = 0x28;
+                    case 15:
+                        return_val = 40;
                         break;
 
-                    case 0x10:
-                        return_val = 0x32;
+                    case 16:
+                        return_val = 50;
                         break;
 
-                    case 0x11:
-                        return_val = 0x37;
+                    case 17:
+                        return_val = 65;
                         break;
 
-                    case 0x12:
-                    case 0x13:
-                    case 0x14:
-                    case 0x15:
-                    case 0x16:
-                    case 0x17:
-                    case 0x18:
-                    case 0x19:
-                        return_val = 0x3C;
+                    case 18: case 19: case 20: case 21:
+                    case 22: case 23: case 24: case 25:
+                        return_val = 60;
                         break;
 
                     default:
@@ -342,18 +346,18 @@ namespace Classes
                         break;
                 }
             }
-            else if (arg_4 == 0x312)
+            else if (addr == 0x312)
             {
                 return_val = gbl.game_area;
             }
-            else if (arg_4 == 0x33E)
+            else if (addr == 0x33E)
             {
                 return_val = gbl.area2_ptr.party_size;
             }
             else
             {
                 return_val = 0; /* value not read if arg_0 is false */
-                arg_0 = false;
+                found = false;
             }
 
             return return_val;
@@ -382,7 +386,7 @@ namespace Classes
                     break;
 
                 case 2:
-                    val = gbl.stru_1B2CA[(loc - gbl.vm_mem2_offset) << 1];
+                    val = gbl.stru_1B2CA[(loc - gbl.vm_mem2_offset) << 1]; // dword_1119E
                     break;
 
                 case 3:
@@ -395,15 +399,15 @@ namespace Classes
                         switch (loc)
                         {
                             case 0x00B1:
-                                val = (ushort)gbl.word_1D918;
+                                val = (ushort)gbl.word_1D918; // POR: word_1372E
                                 break;
 
                             case 0x00FB:
-                                val = (ushort)gbl.word_1D914;
+                                val = (ushort)gbl.word_1D914; // POR: word_1372A
                                 break;
 
                             case 0x00FC:
-                                val = (ushort)gbl.word_1D916;
+                                val = (ushort)gbl.word_1D916; // POR: word_1372C
                                 break;
 
                             case 0x033D:
@@ -555,6 +559,292 @@ namespace Classes
             }
 
             op.String = sb.ToString();
+        }
+
+        internal static async Task<bool> set_player_values(ushort set_value, ushort switch_var)
+        {
+            //switch_var -= 0x7c00;
+
+            if (switch_var == 0)
+            {
+                if (set_value == 0)
+                {
+                    gbl.redrawPartySummary2 = true;
+                }
+            }
+            else if (switch_var >= 0x20 && switch_var <= 0x70)
+            {
+                int var_1 = switch_var - 0x1f;
+                Logger.DebugWrite("Set Spell for: {0} slot: {1} to: {2}", gbl.SelectedPlayer, var_1, (byte)set_value);
+                gbl.SelectedPlayer.spellList.AddLearnt(set_value & 0x0ff);
+                //gbl.SelectedPlayer.spell_list[var_1] = (byte)(set_value);
+            }
+            else if (switch_var == 0xb8)
+            {
+                if (set_value > 0xb2)
+                {
+                    set_value -= 0x32;
+                }
+
+                gbl.SelectedPlayer.control_morale = (byte)(set_value);
+            }
+            else if (switch_var == 0xbb)
+            {
+                gbl.SelectedPlayer.Money.SetCoins(Money.Copper, set_value);
+            }
+            else if (switch_var == 0xbd)
+            {
+                gbl.SelectedPlayer.Money.SetCoins(Money.Electrum, set_value);
+            }
+            else if (switch_var == 0xbf)
+            {
+                gbl.SelectedPlayer.Money.SetCoins(Money.Silver, set_value);
+            }
+            else if (switch_var == 0xc1)
+            {
+                gbl.SelectedPlayer.Money.SetCoins(Money.Gold, set_value);
+            }
+            else if (switch_var == 0xc3)
+            {
+                gbl.SelectedPlayer.Money.SetCoins(Money.Platinum, set_value);
+            }
+            else if (switch_var == 0xf7)
+            {
+                gbl.SelectedPlayer.field_13C = (short)(set_value);
+            }
+            else if (switch_var == 0xf9)
+            {
+                gbl.SelectedPlayer.field_13E = (byte)(set_value);
+            }
+            else if (switch_var == 0x100)
+            {
+                if (set_value >= 0x80)
+                {
+                    gbl.SelectedPlayer.in_combat = false;
+                    if (set_value == 0x87)
+                    {
+                        gbl.SelectedPlayer.health_status = Status.stoned;
+                    }
+                }
+
+                if (set_value == 0)
+                {
+                    gbl.redrawPartySummary1 = true;
+                }
+            }
+            else if (switch_var == 0x10c)
+            {
+                switch (set_value)
+                {
+                    case 0:
+                        gbl.SelectedPlayer.combat_team = CombatTeam.Ours;
+                        gbl.SelectedPlayer.quick_fight = QuickFight.False;
+                        break;
+
+                    case 0x80:
+                        gbl.SelectedPlayer.combat_team = CombatTeam.Ours;
+                        gbl.SelectedPlayer.quick_fight = QuickFight.True;
+                        break;
+
+                    case 0x81:
+                        gbl.SelectedPlayer.combat_team = CombatTeam.Enemy;
+                        gbl.SelectedPlayer.quick_fight = QuickFight.True;
+                        break;
+                }
+            }
+            else if (switch_var == 0x312)
+            {
+                //seg042.set_game_area((byte)(set_value));
+                gbl.game_area_backup = gbl.game_area;
+                gbl.game_area = (byte)set_value;
+            }
+            else if (switch_var == 0x322)
+            {
+                if (set_value > 0x80)
+                {
+                    set_value &= 0x7f;
+
+                    await ThreeD.LoadWalldef(1, (short)(set_value & 0xFF));
+                }
+            }
+            else if (switch_var == 0x324)
+            {
+                if (set_value > 0x80)
+                {
+                    set_value &= 0x7f;
+
+                    await ThreeD.LoadWalldef(2, (short)(set_value & 0xFF));
+                }
+            }
+            else if (switch_var == 0x326)
+            {
+                if (set_value > 0x80)
+                {
+                    set_value &= 0x7f;
+
+                    await ThreeD.LoadWalldef(3, (short)(set_value & 0xFF));
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public static async Task<bool> SetMemoryValue(ushort value, ushort location) // cmd_table01
+        {
+            Classes.Debug.OnMemoryWrite(location, value);
+
+            byte var_2;
+
+            int memType = GetMemoryValueType(location);
+
+            //System.Console.WriteLine("  vm_SetMemoryValue: value: {0:X} loc: {1:X} type: {2:X}",
+            //    value, location, memType);
+
+            if (memType == 0)
+            {
+                if ((location - gbl.vm_mem0_offset) == 0x0FD || (location - gbl.vm_mem0_offset) == 0x0FE)
+                {
+                    //System.Console.WriteLine("    gbl.
+                    //= 1");
+                    gbl.skyColorChanged = true;
+                }
+                else if ((location - gbl.vm_mem0_offset) == 0x0E6 && gbl.area_ptr.inDungeon != value)
+                {
+                    gbl.last_game_state = gbl.game_state;
+                    if (value == 0)
+                    {
+                        gbl.game_state = GameState.WildernessMap;
+                    }
+                    else
+                    {
+                        gbl.game_state = GameState.DungeonMap;
+                    }
+                }
+
+                gbl.area_ptr.field_6A00_Set((location - gbl.vm_mem0_offset) * 2, value);
+            }
+            else if (memType == 1)
+            {
+                gbl.area2_ptr.field_800_Set((location - gbl.vm_mem1_offset) * 2, value);
+                await set_player_values(value, (ushort)(location - gbl.vm_mem1_offset));
+            }
+            else if (memType == 2)
+            {
+                gbl.stru_1B2CA[(location - gbl.vm_mem2_offset) << 1] = value;
+            }
+            else if (memType == 3)
+            {
+                gbl.ecl_ptr[location - gbl.initial_ecl_offset] = (byte)value;
+            }
+            else if (memType == 4)
+            {
+                if (location < 0xBF68)
+                {
+                    switch (location)
+                    {
+                        case 0xFB:
+                            gbl.word_1D914 = (short)value;
+                            break;
+
+                        case 0xFC:
+                            gbl.word_1D916 = (short)value;
+                            break;
+
+                        case 0xB1:
+                            gbl.word_1D918 = (short)value;
+                            break;
+
+                        case 0x3DE:
+                            gbl.word_1EE76 = value;
+                            break;
+
+                        case 0xB8:
+                            gbl.word_1EE78 = value;
+                            break;
+
+                        case 0xB9:
+                            gbl.word_1EE7A = value;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    location -= 0xBF68;
+
+                    switch (location)
+                    {
+                        case 0xE3:
+                            gbl.mapPosX = (sbyte)(value);
+                            gbl.positionChanged = true;
+                            break;
+
+                        case 0xE4:
+                            gbl.mapPosY = (sbyte)(value);
+                            gbl.positionChanged = true;
+                            break;
+
+                        case 0xE5:
+                            do
+                            {
+                                var_2 = 1;
+                                switch (value)
+                                {
+                                    case 0:
+                                        gbl.mapDirection = 0;
+                                        break;
+
+                                    case 1:
+                                        gbl.mapDirection = 2;
+                                        break;
+
+                                    case 2:
+                                        gbl.mapDirection = 4;
+                                        break;
+
+                                    case 3:
+                                        gbl.mapDirection = 6;
+                                        break;
+
+                                    default:
+                                        var_2 = 0;
+                                        value -= 4;
+                                        break;
+                                }
+                            } while (var_2 != 1);
+
+                            gbl.positionChanged = true;
+                            break;
+
+                        case 0xF1:
+                            // POR: byte_13728 = (byte)value;
+                            gbl.byte_1D912 = (byte)value;
+                            gbl.paletteChanged = true; // POR: byte_14CA5
+                            break;
+
+                        case 0xF7:
+                            // POR: byte_13729 = (byte)value;
+                            gbl.byte_1D913 = (byte)value;
+                            gbl.paletteChanged = true; // POR: byte_14CA5
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

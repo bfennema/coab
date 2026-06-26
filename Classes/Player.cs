@@ -12,107 +12,111 @@ namespace Classes
         readonly int min;
         readonly int max;
 
-        public StatValue(Dictionary<Race, int[,]> _raceSexMinMax, Dictionary<ClassId, int> _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
+        public StatValue(Dictionary<Race, int[,]> _raceSexMinMax, Dictionary<ClassId, int> _classMin, int[] _ageEffects, int _base_offset = 0, int _current_offset = 1, int _min = 3, int _max = 25)
         {
             raceSexMinMax = _raceSexMinMax;
             classMin = _classMin;
             ageEffects = _ageEffects;
-            cur = full = 0;
-            cur_offset = _cur_offset;
-            full_offset = _full_offset;
+            Base = Current = 0;
+            base_offset = _base_offset;
+            current_offset = _current_offset;
             min = _min;
             max = _max;
         }
 
-        public StatValue(StatValue old, Dictionary<Race, int[,]> _raceSexMinMax, Dictionary<ClassId, int> _classMin, int[] _ageEffects, int _cur_offset = 0, int _full_offset = 1, int _min = 3, int _max = 25)
-            : this(_raceSexMinMax, _classMin, _ageEffects, _cur_offset, _full_offset, _min, _max)
+        public StatValue(StatValue old, Dictionary<Race, int[,]> _raceSexMinMax, Dictionary<ClassId, int> _classMin, int[] _ageEffects, int _base_offset = 0, int _current_offset = 1, int _min = 3, int _max = 25)
+            : this(_raceSexMinMax, _classMin, _ageEffects, _base_offset, _current_offset, _min, _max)
         {
-            cur = old.cur;
-            full = old.full;
+            Base = old.Base;
+            Current = old.Current;
         }
 
-        public int cur;
-        public int full;
-        readonly int cur_offset;
-        readonly int full_offset;
+        [XmlIgnore]
+        public int Base { get; private set; }
+        [XmlIgnore]
+        public int Current { get; set; }
+        public int curr { get => Base; set => Base = value; }
+        public int full { get => Current; set => Current = value; }
+        readonly int base_offset;
+        readonly int current_offset;
 
         public void Load(int val)
         {
-            full = cur = val;
+            Current = Base = val;
         }
 
         public void Assign(StatValue sv)
         {
-            full = sv.full;
-            cur = sv.cur;
+            Current = sv.Current;
+            Base = sv.Base;
         }
 
         public void Inc()
         {
-            if (cur < max)
+            if (Base < max)
             {
-                cur += 1;
-                full += 1;
+                Base += 1;
+                Current += 1;
             }
         }
 
         public void Dec()
         {
-            if (cur > min)
+            if (Base > min)
             {
-                cur -= 1;
-                full -= 1;
+                Base -= 1;
+                Current -= 1;
             }
         }
 
         public void EnforceRaceSexLimits(Race race, int sex)
         {
-            int delta = full - cur;
+            int delta = Current - Base;
             if( raceSexMinMax != null )
             {
-                cur = Math.Min(raceSexMinMax[race][1, sex], cur);
-                cur = Math.Max(raceSexMinMax[race][0, sex], cur);
+                Base = Math.Min(raceSexMinMax[race][1, sex], Base);
+                Base = Math.Max(raceSexMinMax[race][0, sex], Base);
             }
-            full = cur + delta;
+            Current = Base + delta;
         }
 
         public void EnforceClassLimits(ClassId _class)
         {
-            int delta = full - cur;
+            int delta = Current - Base;
             if (classMin != null)
             {
                 if (!classMin.TryGetValue(_class, out int min))
                 {
                     min = 0;
                 }
-                cur = Math.Max(min, cur);
+                Base = Math.Max(min, Base);
             }
-            full = cur + delta;
+            Current = Base + delta;
         }
 
         public void AgeEffects(Race race, int age)
         {
-            int delta = full - cur;
+            int delta = Current - Base;
             for (int i = 0; i < 5; i++)
             {
                 if (Limits.RaceAgeBrackets[race][i] < age)
                 {
-                    cur += ageEffects[i];
+                    Base += ageEffects[i];
                 }
             }
-            full = cur + delta;
+            Current = Base + delta;
         }
 
         public void Write(byte[] data, int offset, int len)
         {
             if (len == 1)
             {
-                data[offset] = (byte)full;
+                data[offset] = (byte)Current;
             }
             else
             {
-                data[offset + cur_offset] = (byte)cur;
-                data[offset + full_offset] = (byte)full;
+                data[offset + base_offset] = (byte)Base;
+                data[offset + current_offset] = (byte)Current;
             }
         }
 
@@ -121,18 +125,18 @@ namespace Classes
             // enforce values in valid range
             if (len == 1)
             {
-                full = cur = Math.Max(Math.Min((int)data[offset], max), min);
+                Current = Base = Math.Max(Math.Min((int)data[offset], max), min);
             }
             else
             {
-                cur = Math.Max(Math.Min((int)data[offset + cur_offset], max), min);
-                full = Math.Max(Math.Min((int)data[offset + full_offset], max), min);
+                Base = Math.Max(Math.Min((int)data[offset + base_offset], max), min);
+                Current = Math.Max(Math.Min((int)data[offset + current_offset], max), min);
             }
         }
 
         public override string ToString()
         {
-            return string.Format("{0}/{1}", cur, full);
+            return string.Format("{0}/{1}", Base, Current);
         }
     }
 

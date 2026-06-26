@@ -235,8 +235,8 @@ namespace Classes
                     if (skill == SkillType.Fighter)
                     {
                         if (class_lvl == 9 ||
-                            (class_lvl == 8 && player.stats.Str.full == 17) ||
-                            (class_lvl == 7 && player.stats.Str.full < 17))
+                            (class_lvl == 8 && player.stats.Str.Current == 17) ||
+                            (class_lvl == 7 && player.stats.Str.Current < 17))
                         {
                             race_limited = true;
                         }
@@ -279,8 +279,8 @@ namespace Classes
                     if (skill == SkillType.Fighter)
                     {
                         if (class_lvl == 7 ||
-                            (class_lvl == 6 && player.stats.Str.full == 17) ||
-                            (class_lvl == 5 && player.stats.Str.full < 17))
+                            (class_lvl == 6 && player.stats.Str.Current == 17) ||
+                            (class_lvl == 5 && player.stats.Str.Current < 17))
                         {
                             race_limited = true;
                         }
@@ -289,8 +289,8 @@ namespace Classes
                     if (skill == SkillType.MagicUser)
                     {
                         if (class_lvl == 11 ||
-                            (class_lvl == 9 && player.stats.Int.full < 17) ||
-                            (class_lvl == 10 && player.stats.Int.full == 17))
+                            (class_lvl == 9 && player.stats.Int.Current < 17) ||
+                            (class_lvl == 10 && player.stats.Int.Current == 17))
                         {
                             race_limited = true;
                         }
@@ -319,7 +319,7 @@ namespace Classes
                     if (skill == SkillType.Fighter)
                     {
                         if (class_lvl == 6 ||
-                            (class_lvl == 5 && player.stats.Str.full < 18))
+                            (class_lvl == 5 && player.stats.Str.Current < 18))
                         {
                             race_limited = true;
                         }
@@ -340,8 +340,8 @@ namespace Classes
                         if (skill == SkillType.Fighter || skill == SkillType.Ranger)
                         {
                             if (class_lvl == 8 ||
-                                (class_lvl == 7 && player.stats.Str.full == 17) ||
-                                (class_lvl == 6 && player.stats.Str.full < 17))
+                                (class_lvl == 7 && player.stats.Str.Current == 17) ||
+                                (class_lvl == 6 && player.stats.Str.Current < 17))
                             {
                                 race_limited = true;
                             }
@@ -350,8 +350,8 @@ namespace Classes
                         if (skill == SkillType.MagicUser)
                         {
                             if (class_lvl == 8 ||
-                                (class_lvl == 7 && player.stats.Int.full == 17) ||
-                                (class_lvl == 6 && player.stats.Int.full < 17))
+                                (class_lvl == 7 && player.stats.Int.Current == 17) ||
+                                (class_lvl == 6 && player.stats.Int.Current < 17))
                             {
                                 race_limited = true;
                             }
@@ -363,8 +363,8 @@ namespace Classes
                     if (skill == SkillType.Fighter)
                     {
                         if (class_lvl == 6 ||
-                            (class_lvl == 5 && player.stats.Str.full == 17) ||
-                            (class_lvl == 4 && player.stats.Str.full < 17))
+                            (class_lvl == 5 && player.stats.Str.Current == 17) ||
+                            (class_lvl == 4 && player.stats.Str.Current < 17))
                         {
                             race_limited = true;
                         }
@@ -375,8 +375,8 @@ namespace Classes
                     if (skill == SkillType.Fighter || skill == SkillType.Ranger)
                     {
                         if (class_lvl == 7 ||
-                            (class_lvl == 6 && player.stats.Str.full == 17) ||
-                            (class_lvl == 5 && player.stats.Str.full < 17))
+                            (class_lvl == 6 && player.stats.Str.Current == 17) ||
+                            (class_lvl == 5 && player.stats.Str.Current < 17))
                         {
                             race_limited = true;
                         }

@@ -79,7 +79,6 @@
         {
             if (gbl.area_ptr.inDungeon != 0)
             {
-
                 gbl.Load24x24Set(25, 0, 1, "DungCom");
             }
             else
@@ -87,7 +86,7 @@
                 gbl.Load24x24Set(34, 0, 1, "WildCom");
             }
 
-            gbl.Load24x24Set(6, 25, 1, "RandCom");
+            gbl.Load24x24Set(6, 34, 1, "RandCom");
 
             gbl.mapToBackGroundTile = new Struct_1D1BC();
 
