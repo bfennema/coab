@@ -17,6 +17,19 @@ public partial class MainView : UserControl
     {
         InitializeComponent();
         MainViewModel.MapWindowRefreshed += () => _mapWindow?.RefreshMap();
+        Loaded += OnLoaded;
+    }
+
+    private async void OnLoaded(object? sender, RoutedEventArgs e)
+    {
+        // Unsubscribe immediately so it only runs once when the app opens
+        Loaded -= OnLoaded;
+
+        // Access the ViewModel from the DataContext and start the task safely
+        if (DataContext is MainViewModel vm)
+        {
+            await vm.StartEngineAsync();
+        }
     }
 
     public void UpdateMenuIsChecked(Settings _settings)
@@ -326,7 +339,7 @@ public partial class MainView : UserControl
 
     private void MainViewImage_KeyDown(object? sender, KeyEventArgs e)
     {
-         engine.seg049.AddKey(KeyToIBMKey(e.Key));
+        global::Classes.Input.AddKey(KeyToIBMKey(e.Key));
     }
 
     public static ushort KeyToIBMKey(Key key)

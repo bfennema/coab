@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -14,7 +15,7 @@ namespace GoldBoxPlayer;
 
 public partial class App : Application
 {
-    static Thread? engineThread;
+    //static Thread? engineThread;
 
     public override void Initialize()
     {
@@ -65,12 +66,14 @@ public partial class App : Application
 
         base.OnFrameworkInitializationCompleted();
 
-        if (!Design.IsDesignMode)
-        {
-            engineThread = new Thread(() => EngineThread(model));
-            engineThread.Name = "Engine";
-            engineThread.Start();
-        }
+
+
+        //if (!Design.IsDesignMode)
+        //{
+        //    engineThread = new Thread(() => EngineThread(model));
+        //    engineThread.Name = "Engine";
+        //    engineThread.Start();
+        //}
     }
 
     public new static App? Current => Application.Current as App;
@@ -78,15 +81,13 @@ public partial class App : Application
     public IServiceProvider? Services { get; private set; }
 
 
-    static void EngineThread(MainViewModel model)
+    public static async Task<bool> EngineThread(MainViewModel model, CancellationToken token)
     {
-        engine.seg001.__SystemInit(model.EngineStopped, "GoldBoxPlayer.Desktop.Properties.Resources");
+        engine.seg001.__SystemInit(model.StopEngine, "GoldBoxPlayer.Desktop.Properties.Resources");
         Classes.gbl.games[(int)Logging.Game.PoolOfRadiance] = new Classes.PoolRad.Game();
         Classes.gbl.games[(int)Logging.Game.CurseOfTheAzureBonds] = new Classes.Curse.Game();
         Classes.gbl.games[(int)Logging.Game.SecretOfTheSilverBlades] = new Classes.Secret.Game();
         Classes.gbl.games[(int)Logging.Game.ChampionsOfKrynn] = new Classes.Champ.Game();
-        engine.seg001.PROGRAM();
-
-        model.EngineStopped();
+        return await engine.seg001.PROGRAM(token);
     }
 }

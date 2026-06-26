@@ -8,33 +8,50 @@ namespace GoldBoxPlayer.Views
 {
     public class MapView : Avalonia.Controls.Control
     {
+        // ── Zoom / cell‑size property ──────────────────────────────────────
+        public static readonly StyledProperty<double> CellSizeProperty =
+            AvaloniaProperty.Register<MapView, double>(nameof(CellSize), defaultValue: 25.0);
+
+        public double CellSize
+        {
+            get => GetValue(CellSizeProperty);
+            set => SetValue(CellSizeProperty, Math.Max(20.0, value));
+        }
+
         static MapView()
         {
             AffectsRender<MapView>(BoundsProperty);
+            AffectsRender<MapView>(CellSizeProperty);
+            AffectsMeasure<MapView>(CellSizeProperty);
+        }
+
+        protected override Size MeasureOverride(Size availableSize)
+        {
+            if (gbl.geo_ptr?.maps == null)
+                return new Size(200, 200);
+
+            int mapRows = gbl.geo_ptr.maps.GetLength(0);
+            int mapCols = gbl.geo_ptr.maps.GetLength(1);
+            const double padding = 12.0;
+            double cs = CellSize;
+            return new Size(mapCols * cs + 2 * padding, mapRows * cs + 2 * padding);
         }
 
         public override void Render(DrawingContext context)
         {
             base.Render(context);
 
-            var bounds = Bounds;
-            double width = bounds.Width;
-            double height = bounds.Height;
-
             // Define padding to keep edge squares away from window border
-            const double padding = 12.0; // enough to accommodate thick border and visual margin
+            const double padding = 12.0;
 
-            // Adjust drawing area to account for padding
-            double drawWidth = width - 2 * padding;
-            double drawHeight = height - 2 * padding;
+            double cs = CellSize;
 
             // Fill background within padded area
             var unexploredBrush = new SolidColorBrush(Color.Parse("#8c7653"));
-            // Fill full background with border color (unexplored area)
-            context.FillRectangle(unexploredBrush, new Rect(0, 0, width, height));
 
             if (gbl.geo_ptr?.maps == null)
             {
+                context.FillRectangle(unexploredBrush, new Rect(0, 0, 200, 200));
                 var promptBrush = new SolidColorBrush(Colors.White);
                 var text = new FormattedText(
                     "No Map Loaded",
@@ -43,16 +60,22 @@ namespace GoldBoxPlayer.Views
                     new Typeface("Arial"),
                     16,
                     promptBrush);
-                context.DrawText(text, new Avalonia.Point((width - text.Width) / 2, (height - text.Height) / 2));
+                context.DrawText(text, new Avalonia.Point((200 - text.Width) / 2, (200 - text.Height) / 2));
                 return;
             }
 
             int mapRows = gbl.geo_ptr.maps.GetLength(0);
             int mapCols = gbl.geo_ptr.maps.GetLength(1);
 
-            // Compute cell size based on padded drawing area
-            double cellWidth = drawWidth / mapCols;
-            double cellHeight = drawHeight / mapRows;
+            double totalWidth  = mapCols * cs + 2 * padding;
+            double totalHeight = mapRows * cs + 2 * padding;
+
+            // Fill full background
+            context.FillRectangle(unexploredBrush, new Rect(0, 0, totalWidth, totalHeight));
+
+            // Cell dimensions equal CellSize
+            double cellWidth  = cs;
+            double cellHeight = cs;
 
             int gameArea = gbl.game_area;
             int blockId = gbl.area_ptr != null ? gbl.area_ptr.current_3DMap_block_id : 0;
@@ -75,12 +98,12 @@ namespace GoldBoxPlayer.Views
             for (int r = 0; r < mapRows; r++)
             {
                 double yPos = padding + r * cellHeight;
-                context.DrawLine(gridPen, new Avalonia.Point(padding, yPos), new Avalonia.Point(padding + drawWidth, yPos));
+                context.DrawLine(gridPen, new Avalonia.Point(padding, yPos), new Avalonia.Point(padding + mapCols * cellWidth, yPos));
             }
             for (int c = 0; c < mapCols; c++)
             {
                 double xPos = padding + c * cellWidth;
-                context.DrawLine(gridPen, new Avalonia.Point(xPos, padding), new Avalonia.Point(xPos, padding + drawHeight));
+                context.DrawLine(gridPen, new Avalonia.Point(xPos, padding), new Avalonia.Point(xPos, padding + mapRows * cellHeight));
             }
 
             // Draw walls and doors.

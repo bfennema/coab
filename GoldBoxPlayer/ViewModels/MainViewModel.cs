@@ -1,14 +1,15 @@
-using System.Reactive;
-using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Media.Imaging;
-using GoldBoxPlayer.Services;
-using ReactiveUI;
-using Microsoft.Extensions.DependencyInjection;
-using System;
 using Avalonia.Platform.Storage;
 using Avalonia.Threading;
-using Avalonia.Controls.ApplicationLifetimes;
+using GoldBoxPlayer.Services;
+using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
+using System;
+using System.Reactive;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace GoldBoxPlayer.ViewModels;
 
@@ -16,6 +17,7 @@ public class MainViewModel : ViewModelBase
 {
     private WriteableBitmap _bitmap;
     private Image? _image;
+    private CancellationTokenSource? _cts;
     IStorageFolder? _PoolRadData;
     IStorageFolder? _PoolRadSave;
     IStorageFolder? _CurseData;
@@ -196,8 +198,9 @@ public class MainViewModel : ViewModelBase
 
     public void Close()
     {
-        Classes.gbl.Exit = true;
-        engine.seg049.AddKey('Q');
+        StopEngine();
+        //Classes.gbl.Exit = true;
+        //Classes.Input.AddKey('Q');
     }
 
     public void UpdateDisplayCallback(byte[] videoRam, int videoRamSize)
@@ -214,6 +217,27 @@ public class MainViewModel : ViewModelBase
         {
         }
     }
+
+    public async Task StartEngineAsync()
+    {
+        _cts = new CancellationTokenSource();
+
+        try
+        {
+            await Task.Run(() => App.EngineThread(this, _cts.Token), _cts.Token);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        finally
+        {
+            _cts.Dispose();
+            _cts = null;
+            EngineStopped();
+        }
+    }
+
+    public void StopEngine() => _cts?.Cancel();
 
     public void EngineStopped()
     {
