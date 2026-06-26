@@ -6,6 +6,24 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.7.6 — Fixed TryEmitSingleIf and TryEmitBlockIf absorbing IF instructions
+//            that have labels (are GOTO targets from other code paths). When an IF
+//            is labeled, other code jumps directly to it to reuse its flag test
+//            from their own preceding COMPARE. Absorbing it into a COMPARE+IF+action
+//            triple removes the label from the output, making any GOTO targeting it
+//            unresolvable at compile time. Both Try* methods now return false when
+//            the IF instruction is in _labelNames, leaving it to be emitted as a
+//            raw flag-reuse IF with its label intact.
+//   1.7.5 — Fixed ON GOTO/ON GOSUB fall-through vs data table handling: both
+//            cases are valid — fall-through when a real instruction follows, no
+//            fall-through when a data table immediately follows. Added
+//            PreScanTableBases() which linear-scans for GETTABLE/SAVETABLE before
+//            the CFG traversal and pre-populates _dataAddrs with table bases.
+//            TraverseCfg then suppresses ON GOTO/GOSUB fall-through only when
+//            a data table starts at the fall-through address, leaving it enabled
+//            for all other cases. Previously the fall-through was always enqueued,
+//            causing the first data table byte (0x00 = EXIT) to be decoded as an
+//            instruction and blocking the table base from being added to _dataAddrs.
 //   1.7.4 — Fixed _flagReuseIfs look-back regression from v1.7.3: the new
 //            backward walk was skipping block-if guard GOTOs (which jump forward
 //            past the current IF) as if they were single-action-if actions. Added
@@ -321,7 +339,7 @@ namespace Eclh
 
         // CFG traversal results
         private readonly SortedDictionary<ushort, Instruction> _instructions = new();
-        private readonly HashSet<ushort> _codeBytes  = new();
+        private readonly HashSet<ushort> _codeBytes      = new();
         private readonly HashSet<ushort> _visited    = new();
 
         // Labelling
@@ -421,10 +439,48 @@ namespace Eclh
         public string Decompile()
         {
             var entryPoints = ParseHeader();
+            PreScanTableBases();
             TraverseCfg(entryPoints);
             AnalyseReferences();
             AssignNames();
             return EmitSource(entryPoints);
+        }
+
+        /// <summary>
+        /// Linear pre-scan to find all GETTABLE/SAVETABLE base addresses before
+        /// the CFG traversal. Used to suppress ON GOTO/GOSUB fall-through when a
+        /// data table immediately follows the dispatch instruction — the original
+        /// code deliberately omits a fall-through instruction in that case.
+        /// This scan may produce false positives (treating non-table addresses as
+        /// tables) but that's conservative: it only suppresses fall-through.
+        /// </summary>
+        private void PreScanTableBases()
+        {
+            for (int fo = 2; fo < _fileSize - 5; fo++)
+            {
+                byte opc = _data[fo];
+                int baseOpIdx = -1;
+
+                if (opc == 0x2A)  // GETTABLE: op0=base, op1=idx, op2=dest
+                    baseOpIdx = fo + 1;
+                else if (opc == 0x35)  // SAVETABLE: op0=val, op1=base, op2=idx
+                {
+                    // Skip op0 (always 2 or 3 bytes depending on code byte)
+                    if (fo + 1 >= _fileSize) continue;
+                    byte op0code = _data[fo + 1];
+                    int op0size = op0code == 0x00 ? 2 : (op0code is 0x01 or 0x03 ? 3 : -1);
+                    if (op0size < 0) continue;
+                    baseOpIdx = fo + 1 + op0size;
+                }
+
+                if (baseOpIdx < 0 || baseOpIdx + 2 >= _fileSize) continue;
+                byte code = _data[baseOpIdx];
+                if (code != 0x01 && code != 0x03) continue;
+                ushort tableBase = (ushort)(_data[baseOpIdx + 1] | (_data[baseOpIdx + 2] << 8));
+                int tableFo = FileOffset(tableBase);
+                if (tableFo >= 2 && tableFo < _fileSize)
+                    _dataAddrs.Add(tableBase);
+            }
         }
 
         /// <summary>
@@ -543,13 +599,18 @@ namespace Eclh
                 }
                 else if (instr.IsOnGoto || instr.IsOnGosub)
                 {
-                    // All address operands beyond op1 and op2 are jump targets.
-                    // Op1 = index value, op2..opN = target addresses.
+                    // All address operands beyond op1 are jump targets.
                     for (int i = 1; i < instr.Operands.Count; i++)
                         if (instr.Operands[i].IsAddress)
                             Enqueue(instr.Operands[i].Word);
-                    // Fall-through for out-of-range index
-                    Enqueue(fallThrough);
+                    // Enqueue fall-through unless a data table starts there.
+                    // When a data table immediately follows the dispatch instruction,
+                    // the original code deliberately omits a fall-through instruction
+                    // (the table's first byte handles the out-of-range case).
+                    // PreScanTableBases() populated _dataAddrs with table bases
+                    // before this traversal so we can check here.
+                    if (!_dataAddrs.Contains(fallThrough))
+                        Enqueue(fallThrough);
                 }
                 else if (instr.IsIf)
                 {
@@ -700,7 +761,7 @@ namespace Eclh
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.7.4";
+        public const string Version = "1.7.5";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -956,6 +1017,13 @@ namespace Eclh
             if (!ifInstr.IsIf)        return false;
             if (_flagReuseIfs.Contains(ifInstr.Address)) return false;
 
+            // If the IF instruction has a label, other code jumps directly to it
+            // (reusing flags from their own preceding COMPARE on the jump path).
+            // Absorbing it into this COMPARE+IF+action triple would remove the
+            // labeled entry point from the emitted output, making any GOTO that
+            // targets it unresolvable at compile time.
+            if (_labelNames.ContainsKey(ifInstr.Address)) return false;
+
             // Don't fuse if the action is itself a COMPARE — it would be confusing
             if (actionInstr.IsCompare) return false;
 
@@ -1007,6 +1075,8 @@ namespace Eclh
             if (!cmpInstr.IsCompare)  return false;
             if (!ifInstr.IsIf)        return false;
             if (_flagReuseIfs.Contains(ifInstr.Address)) return false; // emit raw
+            // If the IF has a label, it's independently reachable — don't absorb it
+            if (_labelNames.ContainsKey(ifInstr.Address)) return false;
             if (!gotoInstr.IsGoto)    return false;
             if (gotoInstr.Operands.Count == 0) return false;
 

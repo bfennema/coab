@@ -12,6 +12,17 @@ using System.Text;
 // round-trip — decompile(x) |> compile == x, byte for byte.
 //
 // Changelog:
+//   0.2.3 — Added RawCompareNode case to LayoutStatement. A bare compare/
+//            compare_and statement (not lifted into an if block) was parsed
+//            correctly but had no codegen path, causing "Unhandled statement
+//            type RawCompareNode". Emits COMPARE (0x03) or COMPARE AND (0x14)
+//            directly, setting flags for a subsequent flag-reuse IF or leaving
+//            them set at a return instruction.
+//   0.2.2 — Fixed tablename[idx] parse ambiguity: the check fired for any
+//            identifier followed by '[', including command mnemonics like
+//            "protection" whose operand starts with '[' (e.g. protection [$AAEE]).
+//            Added guard: table-assignment path only taken when the identifier is
+//            not a known command mnemonic or compare/compare_and.
 //   0.2.1 — Re-added dead-code-gap zero-padding for label-pin mismatches caused
 //            by unreachable bytes after genuinely terminal instructions (NEWECL,
 //            and potentially others). A positive gap between natural layout cursor
@@ -865,9 +876,7 @@ namespace Eclh
         {
             int line = Cur.Line;
 
-            // ##name()  -> sub/engine call with a WordImm-encoded target, mirroring
-            // the plain "name()" form. Must check before ParseOperand() consumes the
-            // ## as a generic operand, since call syntax needs the LParen lookahead.
+            // ##name()  -> sub/engine call with a WordImm-encoded target
             if (IsAt(1, TokenKind.Identifier) && IsAt(2, TokenKind.LParen) && IsAt(3, TokenKind.RParen))
             {
                 Advance(); // ##
@@ -973,8 +982,11 @@ namespace Eclh
                 return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
             }
 
-            // tablename[idx] = value
-            if (IsAt(1, TokenKind.LBracket))
+            // tablename[idx] = value — only when name is not a known command mnemonic.
+            // Commands like "protection [$AAEE]" have an operand that starts with [
+            // and would otherwise be misread as a table assignment.
+            if (IsAt(1, TokenKind.LBracket) && !CmdOpcodes.ContainsKey(name)
+                && name != "compare" && name != "compare_and")
             {
                 Advance(); // table name
                 Advance(); // [
@@ -1374,7 +1386,7 @@ namespace Eclh
     /// </summary>
     public class EclhCompiler
     {
-        public const string Version = "0.2.1";
+        public const string Version = "0.2.2";
 
         private readonly CompilationUnit _unit;
         private readonly ushort _base;
@@ -1615,6 +1627,19 @@ namespace Eclh
                     EmitPseudo(0x13, new List<OperandExpr>(), ref cursor);
                     break;
 
+                case RawCompareNode rc:
+                    // Bare compare/compare_and not lifted into an if — emits the
+                    // COMPARE or COMPARE AND instruction directly, setting flags
+                    // for a subsequent flag-reuse IF or leaving them set at return.
+                    EmitCompare(new ConditionExpr
+                    {
+                        IsCompoundAnd = rc.IsAnd,
+                        A = rc.A, B = rc.B, C = rc.C, D = rc.D,
+                        Op = "==",   // op field unused for bare COMPARE; EmitCompare only uses IsCompoundAnd
+                        CompoundIsOr = false
+                    }, ref cursor);
+                    break;
+
                 case OnGotoNode og:
                     {
                         var ops = new List<OperandExpr> { og.Index, OperandExpr.Imm8((byte)og.Targets.Count) };
@@ -1652,12 +1677,7 @@ namespace Eclh
             }
         }
 
-        private OperandExpr TableRefOperand(string tableName)
-        {
-            // Table base is always emitted with code 0x01 (address reference,
-            // used directly — see decompiler §13.4/GETTABLE notes).
-            return OperandExpr.Ref(tableName);
-        }
+        private OperandExpr TableRefOperand(string tableName) => OperandExpr.Ref(tableName);
 
         /// <summary>
         /// Produces a label-reference operand for GOTO/GOSUB/CALL/ON-GOTO/ON-GOSUB
