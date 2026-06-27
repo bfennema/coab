@@ -28,12 +28,60 @@ namespace GoldBoxPlayer.Views
             set => SetValue(ShowEventNumbersProperty, value);
         }
 
+        private int _selectedX = -1;
+        private int _selectedY = -1;
+
         static MapView()
         {
             AffectsRender<MapView>(BoundsProperty);
             AffectsRender<MapView>(CellSizeProperty);
             AffectsMeasure<MapView>(CellSizeProperty);
             AffectsRender<MapView>(ShowEventNumbersProperty);
+        }
+
+        protected override async void OnPointerPressed(Avalonia.Input.PointerPressedEventArgs e)
+        {
+            base.OnPointerPressed(e);
+
+            if (!ShowEventNumbers || gbl.geo_ptr?.maps == null)
+                return;
+
+            int mapRows = gbl.geo_ptr.maps.GetLength(0);
+            int mapCols = gbl.geo_ptr.maps.GetLength(1);
+            const double padding = 12.0;
+            double cs = CellSize;
+
+            var pos = e.GetPosition(this);
+            int x = (int)((pos.X - padding) / cs);
+            int y = (int)((pos.Y - padding) / cs);
+
+            if (x >= 0 && x < mapCols && y >= 0 && y < mapRows)
+            {
+                var mi = gbl.geo_ptr.maps[y, x];
+                if (mi != null)
+                {
+                    _selectedX = x;
+                    _selectedY = y;
+                    InvalidateVisual();
+
+                    var visualRoot = this.VisualRoot as Window;
+                    if (visualRoot != null)
+                    {
+                        int currentVal = mi.x2 & 0x7F;
+                        var dialog = new EditEventWindow(currentVal);
+                        await dialog.ShowDialog(visualRoot);
+                        if (dialog.IsOk)
+                        {
+                            // Keep structural flags from the upper bits (e.g. 0x80) intact
+                            byte upperFlags = (byte)(mi.x2 & 0x80);
+                            mi.x2 = (byte)(upperFlags | (dialog.EventNumber & 0x7F));
+                        }
+                    }
+                    _selectedX = -1;
+                    _selectedY = -1;
+                    InvalidateVisual();
+                }
+            }
         }
 
         protected override Size MeasureOverride(Size availableSize)
@@ -307,6 +355,17 @@ namespace GoldBoxPlayer.Views
 
                         context.DrawText(formattedText, new Avalonia.Point(tx, ty));
                     }
+                }
+
+                // Draw border around the selected square if one is active
+                if (_selectedX >= 0 && _selectedX < mapCols && _selectedY >= 0 && _selectedY < mapRows)
+                {
+                    var selectPen = new Pen(Brushes.Yellow, 2.0);
+                    double cellLeft = padding + _selectedX * cellWidth;
+                    double cellTop = padding + _selectedY * cellHeight;
+                    // Slightly inset the border so it's fully visible inside the grid cell
+                    var rect = new Rect(cellLeft + 1.0, cellTop + 1.0, cellWidth - 2.0, cellHeight - 2.0);
+                    context.DrawRectangle(null, selectPen, rect);
                 }
             }
         }
