@@ -18,11 +18,22 @@ namespace GoldBoxPlayer.Views
             set => SetValue(CellSizeProperty, Math.Max(20.0, value));
         }
 
+        // ── Debug Show Event Numbers Property ──────────────────────────────
+        public static readonly StyledProperty<bool> ShowEventNumbersProperty =
+            AvaloniaProperty.Register<MapView, bool>(nameof(ShowEventNumbers), defaultValue: false);
+
+        public bool ShowEventNumbers
+        {
+            get => GetValue(ShowEventNumbersProperty);
+            set => SetValue(ShowEventNumbersProperty, value);
+        }
+
         static MapView()
         {
             AffectsRender<MapView>(BoundsProperty);
             AffectsRender<MapView>(CellSizeProperty);
             AffectsMeasure<MapView>(CellSizeProperty);
+            AffectsRender<MapView>(ShowEventNumbersProperty);
         }
 
         protected override Size MeasureOverride(Size availableSize)
@@ -261,6 +272,42 @@ namespace GoldBoxPlayer.Views
                 };
 
                 context.DrawGeometry(playerBrush, playerPen, playerGeometry);
+            }
+
+            // Draw event numbers if Debug option is checked
+            if (ShowEventNumbers)
+            {
+                var eventBrush = new SolidColorBrush(Colors.Red);
+                var textTypeface = new Typeface("Arial", FontStyle.Normal, FontWeight.Bold);
+
+                for (int y = 0; y < mapRows; y++)
+                {
+                    for (int x = 0; x < mapCols; x++)
+                    {
+                        MapInfo mi = gbl.geo_ptr.maps[y, x];
+                        if (mi == null) continue;
+                        int eventNum = mi.x2 & 0x7F;
+                        if (eventNum == 0) continue;
+
+                        string textVal = eventNum.ToString();
+                        var formattedText = new FormattedText(
+                            textVal,
+                            System.Globalization.CultureInfo.InvariantCulture,
+                            FlowDirection.LeftToRight,
+                            textTypeface,
+                            Math.Max(10.0, cellHeight * 0.45),
+                            eventBrush);
+
+                        double cellLeft = padding + x * cellWidth;
+                        double cellTop = padding + y * cellHeight;
+
+                        // Center the text slightly to the top-left or centered inside the square
+                        double tx = cellLeft + (cellWidth - formattedText.Width) / 2;
+                        double ty = cellTop + (cellHeight - formattedText.Height) / 2;
+
+                        context.DrawText(formattedText, new Avalonia.Point(tx, ty));
+                    }
+                }
             }
         }
 
