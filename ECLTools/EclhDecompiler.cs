@@ -6,6 +6,75 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.8.6 — Removed separate @tail emission; FindDeadCodeGaps now scans the
+//            full file (not stopping at contentEnd), so trailing padding bytes
+//            are emitted as @dead blocks like any other unreachable gap. This
+//            also fixes the ComputeContentEnd out-of-bounds issue more robustly
+//            since contentEnd is no longer used as a scan boundary. @tail and
+//            ComputeContentEnd are kept internally but no longer drive output.
+//   1.8.5 — Fixed ComputeContentEnd() and FindDeadCodeGaps() crash when a data
+//            table address (from GETTABLE/SAVETABLE) lies outside the ECL file
+//            bounds — e.g. tbl_D000 @ 0xD000 referencing a hardware-register
+//            address past the ECL image. ComputeContentEnd now skips any table
+//            whose FileOffset is outside [0, _fileSize). FindDeadCodeGaps clamps
+//            contentEnd to _fileSize and also skips out-of-file tables when
+//            building the covered bitmap, preventing index-out-of-bounds crashes.
+//   1.8.4 — Fixed TryEmitSingleIf COMPARE-as-action: changed emission from
+//            "if (cond) compare ... vs ..." (which caused the COMPARE to be
+//            emitted twice — once as the if-action and again as the leading
+//            COMPARE of the next single-if) to "if (cond)   // gates next compare"
+//            (consumed=2, bare no-action form). The action COMPARE is left
+//            unconsumed for the next iteration to emit naturally, and the compiler
+//            parses the bare "if (cond)" via the new IsStatementTerminator check
+//            that returns true when followed by a "compare" keyword, producing a
+//            SingleIfNode with null Action that emits COMPARE+IF only.
+//   1.8.3 — Fixed TryEmitSingleIf: when the action instruction is itself a
+//            COMPARE, emit "if (cond) compare ... vs ..." (consumed=2: the
+//            COMPARE+IF pair; the action COMPARE is left for the next iteration).
+//            Previously returned false, causing the IF to fall to the raw [IF op]
+//            formatter which produced an unparseable "[IF ==]" literal. This
+//            pattern occurs in gating sequences: COMPARE A vs B, IF op, COMPARE
+//            C vs D, IF op2, action — where the first IF gates whether the second
+//            COMPARE's result is used. The compiler parses the action as a
+//            RawCompareNode and emits it via LayoutStatement's existing case.
+//   1.8.2 — Fixed duplicate label emission in do-while loops: EmitLabels was
+//            called for the loop-top address both by the outer EmitRange (before
+//            TryEmitDoWhile fires) and again by the inner EmitRange over the
+//            do-while body (starting at the same loop-top address). Added
+//            _emittedLabels tracking set; EmitLabels is now idempotent — the
+//            second call for any already-emitted address is a no-op.
+//   1.8.1 — Added TryEmitChainedSingleIf for non-adjacent single-action ifs that
+//            reuse a COMPARE from earlier in a chain of prior single-action-if
+//            IF/GOTO pairs (e.g. COMPARE, IF==, GOTO, IF> (this one), action —
+//            where IF> has no adjacent COMPARE but isn't flag-reuse either, since
+//            a real COMPARE exists in the look-back chain). Previously fell
+//            through to the raw [IF op] fallback since TryEmitSingleIf only
+//            checks direct adjacency and TryEmitFlagReuseIf doesn't apply (the
+//            IF genuinely has an originating COMPARE, just not an adjacent one).
+//            Uses the same look-back logic as the flag-reuse classification pass.
+//   1.8.0 — Added @dead 0xADDR { bytes } directive for mid-file unreachable byte
+//            ranges (generalizes the @tail mechanism, which only handled trailing
+//            bytes at end-of-file). Occurs when a terminal instruction (EXIT,
+//            RETURN, NEWECL) is followed by bytes that nothing in the file
+//            references via GOTO/GOSUB/ON-GOTO/ON-GOSUB, before reachable content
+//            resumes (e.g. ECL5_3 has an 8-byte unreferenced COMPARE+IF+EXIT
+//            sequence right after an EXIT at 0xA898). Added FindDeadCodeGaps(),
+//            which scans the address space for byte ranges not covered by any
+//            decoded instruction (_codeBytes) or data table (_dataAddrs ∪
+//            ReadDataBytes), excluding the trailing region already handled by
+//            @tail. Each gap is emitted as its own @dead block pinned to its
+//            start address.
+//   1.7.7 — Fixed labeled IF handling (companion to v1.7.6):
+//            1. Any IF instruction with a label is now always classified as
+//               flag-reuse, since it's independently reachable via GOTO from
+//               paths that have their own COMPARE — the address-order look-back
+//               was finding the wrong preceding COMPARE via sequential adjacency.
+//            2. TryEmitFlagReuseIf now handles the action-less case: when a
+//               labeled flag-reuse IF is the last instruction in its range (no
+//               action follows), it emits "if (op)  // flag-reuse, no action"
+//               as a bare standalone statement (consumed=1). The compiler emits
+//               just the IF opcode; the branch is never taken at runtime since
+//               there is no following instruction to branch to in this context.
 //   1.7.6 — Fixed TryEmitSingleIf and TryEmitBlockIf absorbing IF instructions
 //            that have labels (are GOTO targets from other code paths). When an IF
 //            is labeled, other code jumps directly to it to reuse its flag test
@@ -340,6 +409,7 @@ namespace Eclh
         // CFG traversal results
         private readonly SortedDictionary<ushort, Instruction> _instructions = new();
         private readonly HashSet<ushort> _codeBytes      = new();
+        private readonly HashSet<ushort> _emittedLabels  = new();  // guards against duplicate label emission
         private readonly HashSet<ushort> _visited    = new();
 
         // Labelling
@@ -693,22 +763,22 @@ namespace Eclh
 
             // Walk instructions in order to detect flag-reuse IFs.
             // An IF is flag-reuse if there is no COMPARE instruction immediately
-            // before it in sequential code flow. "Immediately before" means
-            // looking back past GOTO instructions that are actions of prior
-            // single-action ifs (COMPARE+IF+GOTO triples), since those GOTOs
-            // don't reset the comparison flags.
-            //
-            // Key rule: only skip an IF/GOTO pair when the GOTO's target is at
-            // or before the address of the IF we're currently testing. If the
-            // GOTO's target is past the current IF, that GOTO jumps OVER it —
-            // it's a block-if guard, not a single-action-if action — which is
-            // a genuine control-flow break that resets what "preceding COMPARE"
-            // means for the current IF.
+            // before it in sequential code flow. Additionally, any IF that has a
+            // label is independently reachable via GOTO from other paths that have
+            // their own COMPARE — from those paths' perspective it IS flag-reuse.
+            // Always classify labeled IFs as flag-reuse regardless of address order.
             var ordered = _instructions.Values.OrderBy(i => i.Address).ToList();
             for (int i = 0; i < ordered.Count; i++)
             {
                 var instr = ordered[i];
                 if (!instr.IsIf) continue;
+
+                // Labeled IFs are always flag-reuse.
+                if (_labelNames.ContainsKey(instr.Address))
+                {
+                    _flagReuseIfs.Add(instr.Address);
+                    continue;
+                }
 
                 bool preceded_by_compare = false;
                 int k = i - 1;
@@ -761,7 +831,7 @@ namespace Eclh
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.7.5";
+        public const string Version = "1.8.6";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -833,19 +903,69 @@ namespace Eclh
             var allAddrs = _instructions.Keys.OrderBy(a => a).ToList();
             EmitRange(sb, allAddrs, 0, allAddrs.Count, indent: "");
 
-            // Tail bytes — any bytes past the last known content (instruction or
-            // data table) that are unreachable and not part of any named structure.
-            // Stored verbatim so the compiler can reproduce the file byte-exactly.
-            int tailStart = ComputeContentEnd();
-            if (tailStart < _fileSize)
+            // Dead code blocks — unreachable byte ranges anywhere in the file,
+            // including mid-file gaps (after terminal instructions) and trailing
+            // padding bytes at end-of-file. FindDeadCodeGaps now scans the full
+            // file, superseding the former separate @tail mechanism.
+            foreach (var (gapStart, gapBytes) in FindDeadCodeGaps())
             {
-                var tailBytes = Enumerable.Range(tailStart, _fileSize - tailStart)
-                                          .Select(i => $"0x{_data[i]:X2}");
+                var hexBytes = gapBytes.Select(b => $"0x{b:X2}");
                 sb.AppendLine();
-                sb.AppendLine($"@tail {{ {string.Join(", ", tailBytes)} }}");
+                sb.AppendLine($"@dead 0x{gapStart:X4} {{ {string.Join(", ", hexBytes)} }}");
             }
 
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// Scans the address space between Base+20 and the last reachable content
+        /// for byte ranges not covered by any decoded instruction or data table.
+        /// Each contiguous uncovered range becomes one (startAddr, bytes) entry.
+        /// Trailing bytes past all content are excluded — those are handled by
+        /// the separate @tail mechanism, not @dead.
+        /// </summary>
+        private List<(ushort Start, byte[] Bytes)> FindDeadCodeGaps()
+        {
+            var gaps = new List<(ushort, byte[])>();
+
+            // Build covered bitmap for file offsets in [0, _fileSize).
+            var covered = new bool[_fileSize];
+            foreach (ushort codeAddr in _codeBytes)
+            {
+                int fo = FileOffset(codeAddr);
+                if (fo >= 0 && fo < _fileSize) covered[fo] = true;
+            }
+            foreach (ushort tableBase in _dataAddrs)
+            {
+                int fo = FileOffset(tableBase);
+                if (fo < 0 || fo >= _fileSize) continue;  // skip out-of-file tables
+                string bytesStr = ReadDataBytes(tableBase);
+                int count = string.IsNullOrEmpty(bytesStr) ? 0 : bytesStr.Split(',').Length;
+                for (int k = 0; k < count && fo + k < _fileSize; k++)
+                    covered[fo + k] = true;
+            }
+
+            // Scan the full file (not just up to contentEnd) — any uncovered byte
+            // range is either mid-file dead code or trailing padding; both are
+            // emitted as @dead blocks. This supersedes the separate @tail mechanism.
+            int scanStart = FileOffset((ushort)(Base + 20));
+            int i = scanStart;
+            while (i < _fileSize)
+            {
+                if (covered[i]) { i++; continue; }
+
+                int gapStartFo = i;
+                while (i < _fileSize && !covered[i]) i++;
+                int gapLen = i - gapStartFo;
+
+                var bytes = new byte[gapLen];
+                for (int k = 0; k < gapLen; k++)
+                    bytes[k] = _data[gapStartFo + k];
+
+                gaps.Add(((ushort)(Base + gapStartFo - 2), bytes));
+            }
+
+            return gaps;
         }
 
         /// <summary>
@@ -875,10 +995,13 @@ namespace Eclh
                 if (instrEnd > end) end = instrEnd;
             }
 
-            // High-water mark from data tables
+            // High-water mark from data tables — skip any whose FileOffset is
+            // outside the file (e.g. hardware-register addresses like 0xD000 that
+            // are referenced by GETTABLE but live outside the ECL image).
             foreach (ushort tableBase in _dataAddrs)
             {
                 int tblOff = FileOffset(tableBase);
+                if (tblOff < 0 || tblOff >= _fileSize) continue;
                 int scan = tblOff;
                 while (scan < _fileSize && !_codeBytes.Contains((ushort)(Base + scan - 2)))
                     scan++;
@@ -934,6 +1057,15 @@ namespace Eclh
                     continue;
                 }
 
+                // ── Chained single-action if: IF<op> reusing a non-adjacent ───
+                // COMPARE found via look-back through prior single-action-if
+                // IF/GOTO pairs, + one instruction.
+                if (TryEmitChainedSingleIf(sb, allAddrs, i, end, indent, out int chainedConsumed))
+                {
+                    i += chainedConsumed;
+                    continue;
+                }
+
                 // ── Flag-reuse single-action if: IF<op> + one instruction ─────
                 if (TryEmitFlagReuseIf(sb, allAddrs, i, end, indent, out int frConsumed))
                 {
@@ -977,6 +1109,7 @@ namespace Eclh
         private void EmitLabels(StringBuilder sb, ushort addr, string indent)
         {
             if (!_labelNames.TryGetValue(addr, out string? lname)) return;
+            if (!_emittedLabels.Add(addr)) return;  // already emitted — do-while body re-entry guard
 
             // Labels always at column 0 regardless of nesting depth —
             // they are jump targets reachable from anywhere in the file.
@@ -1024,8 +1157,22 @@ namespace Eclh
             // targets it unresolvable at compile time.
             if (_labelNames.ContainsKey(ifInstr.Address)) return false;
 
-            // Don't fuse if the action is itself a COMPARE — it would be confusing
-            if (actionInstr.IsCompare) return false;
+            // When the action is itself a COMPARE, this is a gating pattern:
+            // the IF guards whether the next COMPARE's result matters to a later IF.
+            // Emit COMPARE+IF as a bare "if (cond)   // gates next compare" with
+            // consumed=2, leaving the action COMPARE for the next iteration.
+            // Do NOT include the COMPARE in the if-statement text — the parser would
+            // emit it as the SingleIfNode's action AND the next single-if would
+            // re-emit it as its own leading COMPARE, doubling the byte count.
+            // The bare "if (cond)" form is handled by FlagReuseIfNode with null Action
+            // in the compiler (same as the action-less flag-reuse case, v0.2.4).
+            if (actionInstr.IsCompare)
+            {
+                string condition0 = FormatCondition(cmpInstr, ifInstr.IfOp);
+                sb.AppendLine($"{indent}    if ({condition0})   // gates next compare");
+                consumed = 2;
+                return true;
+            }
 
             // Use the IF operator directly (no negation for single-action form)
             string condition = FormatCondition(cmpInstr, ifInstr.IfOp);
@@ -1033,6 +1180,62 @@ namespace Eclh
 
             sb.AppendLine($"{indent}    if ({condition}) {action}");
             consumed = 3;
+            return true;
+        }
+
+        /// <summary>
+        /// Fuse a non-adjacent single-action if: an IF whose originating COMPARE
+        /// is not immediately before it (TryEmitSingleIf's adjacency requirement),
+        /// but is reachable by looking back through a chain of prior single-
+        /// action-if IF/GOTO pairs — the same look-back used to classify an IF as
+        /// flag-reuse or not in the symbol-analysis pass. This covers chains like
+        /// COMPARE, IF, GOTO, IF (this one), action — where the first IF/GOTO pair
+        /// is itself a single-action if and the second IF reuses the same COMPARE.
+        /// Must be tried after TryEmitSingleIf (adjacent case) and before
+        /// TryEmitFlagReuseIf, and only applies when the IF is NOT in
+        /// _flagReuseIfs (a real COMPARE exists somewhere in the look-back chain).
+        /// </summary>
+        private bool TryEmitChainedSingleIf(StringBuilder sb, List<ushort> allAddrs,
+                                            int i, int end, string indent, out int consumed)
+        {
+            consumed = 0;
+            if (i + 1 >= end) return false;
+
+            var ifInstr = _instructions[allAddrs[i]];
+            if (!ifInstr.IsIf) return false;
+            if (_flagReuseIfs.Contains(ifInstr.Address)) return false;
+            if (_labelNames.ContainsKey(ifInstr.Address)) return false;
+
+            var actionInstr = _instructions[allAddrs[i + 1]];
+            if (actionInstr.IsCompare) return false;
+
+            // Find allAddrs index of ifInstr to search backward through the full
+            // instruction list (not just the current emission range) — the
+            // originating COMPARE may lie before the start of this range if it
+            // was already emitted as part of an earlier single-action if.
+            int globalIdx = allAddrs.BinarySearch(ifInstr.Address);
+            if (globalIdx < 0) return false;
+
+            Instruction? cmpInstr = null;
+            int k = globalIdx - 1;
+            while (k >= 0)
+            {
+                var prev = _instructions[allAddrs[k]];
+                if (prev.IsCompare) { cmpInstr = prev; break; }
+                if (prev.IsGoto && k >= 1 && _instructions[allAddrs[k - 1]].IsIf)
+                {
+                    ushort gotoTarget = prev.Operands.Count > 0 ? prev.Operands[0].Word : (ushort)0;
+                    if (gotoTarget <= ifInstr.Address) { k -= 2; continue; }
+                }
+                break;
+            }
+            if (cmpInstr == null) return false;
+
+            string condition = FormatCondition(cmpInstr, ifInstr.IfOp);
+            string action     = FormatInstruction(actionInstr);
+
+            sb.AppendLine($"{indent}    if ({condition}) {action}");
+            consumed = 2;
             return true;
         }
 
@@ -1047,14 +1250,24 @@ namespace Eclh
                                         int i, int end, string indent, out int consumed)
         {
             consumed = 0;
-            if (i + 1 >= end) return false;
 
-            var ifInstr     = _instructions[allAddrs[i]];
-            var actionInstr = _instructions[allAddrs[i + 1]];
-
+            var ifInstr = _instructions[allAddrs[i]];
             if (!ifInstr.IsIf)                              return false;
             if (!_flagReuseIfs.Contains(ifInstr.Address))   return false;
-            if (actionInstr.IsCompare)                      return false;
+
+            // No action available — the IF is the last instruction in range or the
+            // next instruction is a COMPARE (which belongs to a new comparison chain).
+            // Emit as a bare "if (op)" with no action; the compiler emits just the
+            // IF opcode, leaving flags set for whatever follows at runtime.
+            if (i + 1 >= end || _instructions[allAddrs[i + 1]].IsCompare)
+            {
+                sb.AppendLine($"{indent}    if ({ifInstr.IfOp})   // flag-reuse, no action");
+                consumed = 1;
+                return true;
+            }
+
+            var actionInstr = _instructions[allAddrs[i + 1]];
+            if (actionInstr.IsCompare) return false;
 
             string action = FormatInstruction(actionInstr);
             sb.AppendLine($"{indent}    if ({ifInstr.IfOp}) {action}   // flag-reuse");

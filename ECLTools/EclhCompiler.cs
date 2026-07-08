@@ -12,6 +12,112 @@ using System.Text;
 // round-trip — decompile(x) |> compile == x, byte for byte.
 //
 // Changelog:
+//   0.3.7 — Removed @tail support entirely: the decompiler no longer emits @tail
+//            (superseded by @dead since v1.8.6), so the parser block, TailBytes
+//            field, and legacy @tail→@dead conversion code are all removed.
+//   0.3.6 — Unified @tail into @dead: fileSize is now extended to cover any
+//            @dead block that ends past cursor (including trailing-padding blocks
+//            formerly emitted as @tail). The withTail append logic is removed.
+//            Legacy @tail directives in old ECLH files are converted to a @dead
+//            block pinned at the post-layout cursor address for backwards compat.
+//   0.3.5 — Fixed tablename[idx] rvalue false-positive in ParseAssignmentRvalue:
+//            "name[" was matched even when the "[" was the start of a [$XXXX]
+//            bracket-led statement on the NEXT line (e.g. "[$00FB] = area_49C3"
+//            followed by "[$00FC] = area_49C4" — the "area_49C3[$00FC]" was
+//            consumed as a table-index rvalue, leaving a stray "=" that caused
+//            "Unexpected token Equals at start of statement"). Fixed by also
+//            requiring !IsAt(2, HexNumber): genuine table indices are never raw
+//            $XXXX addresses, only named variables or #N immediates.
+//   0.3.4 — Fixed "Unexpected token Equals '=' at start of statement" for
+//            "call [$C01B]" (direct CALL 0x2D with raw address operand). Added
+//            "call" to CmdOpcodes (opcode 0x2D, 1 operand) and added a fallback
+//            in ParseStatement: KwCall not followed by '(' routes to
+//            ParseCmdStatement. This disambiguates "call [$XXXX]" (direct CALL)
+//            from "call(idx){...}" (ON GOSUB, still handled first).
+//   0.3.3 — Fixed incorrect GOTO target when a @dead block (unreachable assembler
+//            padding, e.g. 0x00 after NEWECL) immediately follows a block-if body.
+//            AdvancePastDataTables now also advances past @dead blocks, so
+//            PinLabel and EmitPseudo correctly skip dead-padding bytes when
+//            computing synthetic guard-label addresses. Previously the block-if
+//            guard GOTO landed on the @dead block's address rather than the next
+//            real instruction after it.
+//   0.3.2 — Companion to EclhDecompiler v1.8.4's gating-pattern fix: added
+//            IsStatementTerminator check for "compare"/"compare_and" identifiers,
+//            so "if (A op B)" immediately before a compare statement is parsed as
+//            SingleIfNode with null Action (COMPARE+IF only, no action). Made
+//            SingleIfNode.Action nullable; LayoutSingleIf skips action layout and
+//            clears _lastCompareOperands when Action is null.
+//   0.3.1 — Fixed name++/name--/name+=/name-= firing for known command mnemonics
+//            when the immediately following token on the next line happens to be
+//            ++, --, +=, or -=. A 0-operand command like "combat" followed by a
+//            separate "++area_4A10" statement was misparsed as "combat++"
+//            (incrementing a variable named combat), desynchronising the parser
+//            and producing "Expected =, got KwExit" several lines later. Same
+//            class of bug as the tablename[idx] guard added in v0.2.2. Fixed by
+//            adding !CmdOpcodes.ContainsKey(name) guards to all four checks.
+//   0.3.0 — Fixed "Unexpected token LBracket '[' at start of statement":
+//            [$XXXX] (a plain WordRef-kind destination, unnamed because the
+//            address isn't classified as a variable, mem-region symbol, hardware
+//            register, or label) can appear as a statement destination, e.g.
+//            "[$C059] = area_4A16". Same pattern as ## (WordImm) and @[ (StringPtr)
+//            led-statements fixed earlier. Added ParseBracketLedStatement and a
+//            dispatch entry in ParseStatement for TokenKind.LBracket, handling
+//            assignment, +=/-=, ++/--.
+//   0.2.9 — Fixed a chain-clearing ordering bug in LayoutSingleIf: setting
+//            _lastCompareOperands then immediately calling LayoutStatement(
+//            sif.Action, ...) caused the recursive call's generic clearing guard
+//            (GotoNode is not SingleIfNode/LabelDeclNode) to wipe the state
+//            before LayoutSingleIf's own "is the action a GOTO" restoration logic
+//            ever ran — so the reuse chain was cleared on every single-action-if,
+//            even ones ending in GOTO, and a second chained if always re-emitted
+//            its own COMPARE. This caused "layout already passed X — overlapping
+//            instructions" pin errors whenever two consecutive single-action ifs
+//            shared a COMPARE (the extra 6 bytes from the redundant COMPARE
+//            pushed the cursor past the next pinned label). Fixed by capturing
+//            _lastCompareOperands into a local BEFORE the recursive call, then
+//            restoring it afterward if the action was a GOTO.
+//   0.2.8 — Companion fix to EclhDecompiler v1.8.1's TryEmitChainedSingleIf:
+//            LayoutSingleIf now detects when a single-action if's condition has
+//            the same operands as the most recently emitted COMPARE and skips
+//            re-emitting COMPARE, just emitting IF+action (reusing existing
+//            flags). The reuse chain persists only through GOTO actions
+//            (matching the decompiler's look-back rule, which only skips prior
+//            IF/GOTO pairs) and is cleared by any other statement type. Added
+//            _lastCompareOperands tracking field and OperandsEqual helper.
+//   0.2.7 — Added @dead 0xADDR { bytes } parsing and compilation, companion to
+//            EclhDecompiler v1.8.0's mid-file dead code detection. New
+//            DeadBlockDecl class and CompilationUnit.DeadBlocks list. Dead blocks
+//            are written verbatim at their pinned address during Compile(),
+//            independent of the normal instruction layout/cursor mechanism —
+//            they don't participate in control flow, so they're simply restored
+//            to the exact address they originally occupied.
+//   0.2.6 — Fixed fileSize double-counting data table bytes, producing an
+//            oversized output array padded with trailing zeros past the real end
+//            of file (e.g. 7630 bytes instead of 7473 for ECL3_0 — 157 extra
+//            zero bytes). fileSize was computed as 2 + 20 + codeBytes + dataBytes,
+//            but codeBytes (derived from cursor) already spans every data table's
+//            byte extent since v0.2.5's AdvancePastDataTables/PinLabel changes —
+//            adding dataBytes again double-counted them. Removed the dataBytes
+//            term entirely. Also added a final AdvancePastDataTables call after
+//            all top-level statements are laid out, to cover a trailing data
+//            table with no instruction or label after it (EmitPseudo/PinLabel
+//            only trigger the advance when something follows). Removed the
+//            unused dataCursor variable.
+//   0.2.5 — Fixed synthetic label addresses when data tables are interleaved with
+//            code. The layout pass previously didn't account for data table byte
+//            extents — cursor stopped at the table's start address instead of
+//            advancing past it, causing synthetic block-if/while guard labels to
+//            be pinned inside the table (e.g. goto 0x9AA6 instead of 0x9AAA when
+//            tbl_9AA6 is 4 bytes). Fixed by: (1) calling AdvancePastDataTables
+//            after every EmitPseudo so cursor skips any table that starts there;
+//            (2) replacing all direct _labelAddrs[x]=cursor synthetic-label pins
+//            with PinLabel(x, ref cursor) which also advances past tables first.
+//   0.2.4 — Support for bare flag-reuse IF with no action: FlagReuseIfNode.Action
+//            is now nullable; ParseIf emits a FlagReuseIfNode with null Action when
+//            the flag-reuse if is followed by a statement terminator; LayoutFlagReuseIf
+//            skips the action layout when Action is null, emitting just the IF opcode.
+//            Companion to EclhDecompiler v1.7.7 which emits this form for labeled
+//            flag-reuse IFs with no following action.
 //   0.2.3 — Added RawCompareNode case to LayoutStatement. A bare compare/
 //            compare_and statement (not lifted into an if block) was parsed
 //            correctly but had no codegen path, causing "Unhandled statement
@@ -505,14 +611,14 @@ namespace Eclh
     public class SingleIfNode : StmtNode
     {
         public ConditionExpr Condition = null!;
-        public StmtNode Action = null!;
+        public StmtNode? Action;   // null = bare if(cond) with no action — emits COMPARE+IF only
     }
 
     /// <summary>if (op) action  — flag-reuse, bare operator, no comparands.</summary>
     public class FlagReuseIfNode : StmtNode
     {
         public string Op = "";
-        public StmtNode Action = null!;
+        public StmtNode? Action;   // null = bare IF with no action (just emits the IF opcode)
     }
 
     public class BlockIfNode : StmtNode
@@ -545,6 +651,11 @@ namespace Eclh
     public class VarDecl { public string Name = ""; public ushort Address; public bool IsWord = true; }
     public class DataTableDecl { public string Name = ""; public ushort Address; public List<byte> Bytes = new(); public bool IsWord; }
 
+    /// <summary>A mid-file unreachable byte range, pinned to a specific address —
+    /// emitted by the decompiler's @dead directive for dead code that lies between
+    /// two regions of reachable content (not at end-of-file, which uses @tail).</summary>
+    public class DeadBlockDecl { public ushort Address; public List<byte> Bytes = new(); }
+
     public class CompilationUnit
     {
         public ushort Base;
@@ -553,7 +664,7 @@ namespace Eclh
         public List<VarDecl> Vars = new();
         public List<DataTableDecl> DataTables = new();
         public List<StmtNode> Statements = new();   // top-level statement/label stream
-        public List<byte> TailBytes = new();         // verbatim bytes past last instruction
+        public List<DeadBlockDecl> DeadBlocks = new(); // verbatim mid-file and trailing unreachable byte ranges
     }
 
     // ════════════════════════════════════════════════════════════════════════
@@ -615,6 +726,10 @@ namespace Eclh
             ["delay"] = (0x3A, 0),
             ["spell"] = (0x3B, 3),
             ["protection"] = (0x3C, 1),
+            // Direct CALL instruction (0x2D) with 1 address operand — distinct from
+            // ON GOSUB "call(idx){...}" which is parsed separately. Occurs when the
+            // callee is a raw address not in the named engine-function table.
+            ["call"] = (0x2D, 1),
             ["clear_box"] = (0x3D, 0),
             ["dump"] = (0x3E, 0),
             ["find_special"] = (0x3F, 1),
@@ -663,16 +778,19 @@ namespace Eclh
                     Advance(); Advance();
                     unit.GameProfile = Expect(TokenKind.Identifier, "game profile name").Text;
                 }
-                else if (Is(TokenKind.At) && IsAt(1, TokenKind.Identifier) && PeekAt(1).Text == "tail")
+                else if (Is(TokenKind.At) && IsAt(1, TokenKind.Identifier) && PeekAt(1).Text == "dead")
                 {
-                    Advance(); Advance(); // @ tail
+                    Advance(); Advance(); // @ dead
+                    ushort addr = (ushort)ExpectHexOrDec();
                     Expect(TokenKind.LBrace, "{");
+                    var bytes = new List<byte>();
                     while (!Is(TokenKind.RBrace) && !Is(TokenKind.EOF))
                     {
-                        unit.TailBytes.Add((byte)ExpectHexOrDec());
+                        bytes.Add((byte)ExpectHexOrDec());
                         Match(TokenKind.Comma);
                     }
                     Expect(TokenKind.RBrace, "}");
+                    unit.DeadBlocks.Add(new DeadBlockDecl { Address = addr, Bytes = bytes });
                 }
                 else if (TryParseEntryPoint(unit)) { /* consumed */ }
                 else if (Is(TokenKind.KwVar)) { ParseVarBlock(unit); }
@@ -832,6 +950,13 @@ namespace Eclh
                 return ParseOnGoto();
 
             if (Is(TokenKind.KwGoto)) return ParseGoto();
+
+            // call [$XXXX] or call name — direct CALL instruction (opcode 0x2D)
+            // with a single address operand. "call" is in CmdOpcodes so route
+            // through ParseCmdStatement which handles the operand generically.
+            if (Is(TokenKind.KwCall))
+                return ParseCmdStatement();
+
             if (Is(TokenKind.KwExit)) { Advance(); return new ExitNode { Line = line }; }
             if (Is(TokenKind.KwReturn)) { Advance(); return new ReturnNode { Line = line }; }
 
@@ -850,6 +975,17 @@ namespace Eclh
             if (Is(TokenKind.AtBracket))
             {
                 return ParseAtBracketLedStatement();
+            }
+
+            // [$XXXX]-led statement: an unnamed WordRef destination — the
+            // decompiler falls back to this raw bracket form when an address is
+            // not classified as a named variable, mem-region symbol, hardware
+            // register, or label (see EclhDecompiler FormatOp's unclassified-
+            // address fallback). Only assignment and increment/decrement forms
+            // make sense here, mirroring the ##/@[ led-statement handlers.
+            if (Is(TokenKind.LBracket))
+            {
+                return ParseBracketLedStatement();
             }
 
             // identifier-led statement: assignment, x++, x--, x+=n, table[idx]=v, call(), sub()
@@ -944,6 +1080,37 @@ namespace Eclh
             return ParseAssignmentRvalue(target, line);
         }
 
+        private StmtNode ParseBracketLedStatement()
+        {
+            int line = Cur.Line;
+            var target = ParseOperand();   // consumes "[$XXXX]" -> WordRef-kind operand (unnamed address)
+
+            // [$XXXX]++ / [$XXXX]--
+            if (Is(TokenKind.PlusPlus))
+            {
+                Advance();
+                return new IncDecNode { Target = target, IsIncrement = true, IsPrefix = false, Line = line };
+            }
+            if (Is(TokenKind.MinusMinus))
+            {
+                Advance();
+                return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
+            }
+
+            // [$XXXX] += n / [$XXXX] -= n
+            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals))
+            {
+                string op = Is(TokenKind.PlusEquals) ? "+" : "-";
+                Advance();
+                var amt = ParseOperand();
+                return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
+            }
+
+            // [$XXXX] = rvalue
+            Expect(TokenKind.Equals, "=");
+            return ParseAssignmentRvalue(target, line);
+        }
+
         private StmtNode ParseIdentifierLedStatement()
         {
             int line = Cur.Line;
@@ -956,15 +1123,18 @@ namespace Eclh
                 return new CallSubNode { Name = name, Line = line };   // codegen resolves engine vs sub
             }
 
-            // name++ / name--
-            if (IsAt(1, TokenKind.PlusPlus))
+            // name++ / name-- — only when name is not a known command mnemonic.
+            // A 0-operand command like "combat" immediately followed by an
+            // unrelated "++area_4A10" statement on the next line would otherwise
+            // be misparsed as "combat++" (incrementing a variable named combat).
+            if (IsAt(1, TokenKind.PlusPlus) && !CmdOpcodes.ContainsKey(name))
             {
                 Advance();
                 var target = OperandExpr.Ref(name);
                 Advance(); // ++
                 return new IncDecNode { Target = target, IsIncrement = true, IsPrefix = false, Line = line };
             }
-            if (IsAt(1, TokenKind.MinusMinus))
+            if (IsAt(1, TokenKind.MinusMinus) && !CmdOpcodes.ContainsKey(name))
             {
                 Advance();
                 var target = OperandExpr.Ref(name);
@@ -972,8 +1142,9 @@ namespace Eclh
                 return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
             }
 
-            // name += n / name -= n
-            if (IsAt(1, TokenKind.PlusEquals) || IsAt(1, TokenKind.MinusEquals))
+            // name += n / name -= n — only when name is not a known command mnemonic.
+            if ((IsAt(1, TokenKind.PlusEquals) || IsAt(1, TokenKind.MinusEquals))
+                && !CmdOpcodes.ContainsKey(name))
             {
                 var target = ParseOperand();
                 string op = Is(TokenKind.PlusEquals) ? "+" : "-";
@@ -1052,8 +1223,12 @@ namespace Eclh
                 return new AssignNode { Dest = dest, Value = new RandomRvalue { Max = max }, Line = line };
             }
 
-            // tablename[idx]
-            if (Is(TokenKind.Identifier) && IsAt(1, TokenKind.LBracket))
+            // tablename[idx] — only when the bracket content looks like a real
+            // table index (not a raw $XXXX address), to avoid mistaking
+            // "area_49C3\n[$00FC] = ..." for "area_49C3[$00FC]" (the next line's
+            // bracket-led statement being consumed as a table-index rvalue).
+            if (Is(TokenKind.Identifier) && IsAt(1, TokenKind.LBracket)
+                && !IsAt(2, TokenKind.HexNumber))
             {
                 string tname = Advance().Text;
                 Advance(); // [
@@ -1114,7 +1289,11 @@ namespace Eclh
 
         private bool IsStatementTerminator() =>
             Is(TokenKind.RBrace) || Is(TokenKind.EOF) ||
-            (Is(TokenKind.Identifier) && IsAt(1, TokenKind.Colon));
+            (Is(TokenKind.Identifier) && IsAt(1, TokenKind.Colon)) ||
+            // "compare"/"compare_and" immediately after "if (cond)" signals a
+            // gating pattern (COMPARE+IF gating the next COMPARE's flags) — the
+            // compare is its own separate statement, not this if's action.
+            (Is(TokenKind.Identifier) && (Cur.Text == "compare" || Cur.Text == "compare_and"));
 
         private StmtNode ParseGoto()
         {
@@ -1166,14 +1345,28 @@ namespace Eclh
             {
                 string op = TokenToOp(Advance().Kind);
                 Expect(TokenKind.RParen, ")");
+
+                // Bare form: if (op) with no action — emits just the IF opcode.
+                // Occurs when a labeled IF is the last instruction in a range and
+                // there is no fused action (e.g. loc_9F56: if (!=)  // flag-reuse, no action).
+                if (IsStatementTerminator())
+                    return new FlagReuseIfNode { Op = op, Action = null, Line = line };
+
                 var action = ParseActionOrBlock(out bool isBlock, out List<StmtNode>? thenBody, out List<StmtNode>? elseBody);
                 if (isBlock)
                     throw new ParseError("Flag-reuse if cannot have a block body", Cur.Line, Cur.Col);
-                return new FlagReuseIfNode { Op = op, Action = action!, Line = line };
+                return new FlagReuseIfNode { Op = op, Action = action, Line = line };
             }
 
             var cond = ParseCondition();
             Expect(TokenKind.RParen, ")");
+
+            // Bare form with full condition: if (A op B) with no action —
+            // occurs in the COMPARE-gating pattern where the IF gates whether
+            // the next COMPARE's flags matter. Emit COMPARE+IF only; the next
+            // statement emits the COMPARE that the gate controls.
+            if (IsStatementTerminator())
+                return new SingleIfNode { Condition = cond, Action = null, Line = line };
 
             var act = ParseActionOrBlock(out bool blockForm, out List<StmtNode>? thenB, out List<StmtNode>? elseB);
             if (blockForm)
@@ -1386,7 +1579,7 @@ namespace Eclh
     /// </summary>
     public class EclhCompiler
     {
-        public const string Version = "0.2.2";
+        public const string Version = "0.3.7";
 
         private readonly CompilationUnit _unit;
         private readonly ushort _base;
@@ -1451,6 +1644,11 @@ namespace Eclh
 
             LayoutStatements(_unit.Statements, ref cursor);
 
+            // Cover the case of a trailing data table with no instruction or label
+            // after it — AdvancePastDataTables is otherwise only triggered by
+            // EmitPseudo/PinLabel, neither of which fires after the very last table.
+            AdvancePastDataTables(ref cursor);
+
             // Now every label has a final address. Resolve entry points.
             ushort onMove = ResolveLabelAddr(_unit.OnMove);
             ushort onSearch = ResolveLabelAddr(_unit.OnSearch);
@@ -1458,18 +1656,27 @@ namespace Eclh
             ushort onCampInterrupted = ResolveLabelAddr(_unit.OnCampInterrupted);
             ushort onEnter = ResolveLabelAddr(_unit.OnEnter);
 
-            // Compute total file size: 2 (DAX prefix) + 20 (header) + code + data tables
+            // Compute total file size: 2 (DAX prefix) + 20 (header) + code.
+            // codeBytes already spans every data table's byte extent — cursor was
+            // advanced past each table by AdvancePastDataTables/PinLabel during
+            // layout (see v0.2.5), so adding data table sizes again here would
+            // double-count them and produce a buffer padded with trailing zeros
+            // past the real end of file.
             int codeBytes = cursor - (_base + 20);
-            int dataBytes = _unit.DataTables.Sum(t => t.Bytes.Count);
-            int fileSize = 2 + 20 + codeBytes + dataBytes;
+            int fileSize = 2 + 20 + codeBytes;
+
+            // Extend fileSize to cover any @dead block that ends past cursor —
+            // this includes trailing-padding blocks (formerly @tail) that lie past
+            // all compiled code and are never reached by the layout cursor.
+            foreach (var dead in _unit.DeadBlocks)
+            {
+                int deadEnd = FileOffset(dead.Address) + dead.Bytes.Count;
+                if (deadEnd > fileSize) fileSize = deadEnd;
+            }
 
             var outBytes = new byte[fileSize];
 
-            // DAX prefix — 2 bytes. The decompiler treats these as opaque/skipped;
-            // we emit zeros since the real value is DAX-container metadata, not
-            // something derivable from the ECLH source. Callers that need a specific
-            // prefix (e.g. for byte-exact round-trip against an original file)
-            // should patch outBytes[0..1] themselves after calling Compile().
+            // DAX prefix — 2 bytes.
             outBytes[0] = 0x00;
             outBytes[1] = 0x00;
 
@@ -1492,8 +1699,7 @@ namespace Eclh
                     outBytes[gapOff + gi] = 0x00;
             }
 
-            // Emit data tables, placed immediately after code in declaration order
-            ushort dataCursor = cursor;
+            // Emit data tables — each written at its own declared address.
             foreach (var table in _unit.DataTables)
             {
                 int off = FileOffset(table.Address);
@@ -1501,15 +1707,14 @@ namespace Eclh
                     outBytes[off + i] = table.Bytes[i];
             }
 
-            // Append tail bytes verbatim at the end of the file —
-            // unreachable padding past the last instruction/data table,
-            // preserved from the original file for byte-exact round-trip.
-            if (_unit.TailBytes.Count > 0)
+            // Emit dead code blocks verbatim at their pinned addresses — covers
+            // both mid-file unreachable gaps and trailing padding bytes (formerly
+            // @tail). outBytes is now sized to accommodate all dead blocks.
+            foreach (var dead in _unit.DeadBlocks)
             {
-                var withTail = new byte[outBytes.Length + _unit.TailBytes.Count];
-                Array.Copy(outBytes, withTail, outBytes.Length);
-                _unit.TailBytes.CopyTo(withTail, outBytes.Length);
-                return withTail;
+                int off = FileOffset(dead.Address);
+                for (int i = 0; i < dead.Bytes.Count; i++)
+                    outBytes[off + i] = dead.Bytes[i];
             }
 
             return outBytes;
@@ -1553,6 +1758,17 @@ namespace Eclh
 
         private void LayoutStatement(StmtNode stmt, ref ushort cursor)
         {
+            // Clear the chained-compare-reuse state for any statement type that
+            // doesn't manage it itself. SingleIfNode is the only statement that
+            // can both consume and extend the chain (see LayoutSingleIf), so it's
+            // excluded here and handles clearing internally based on whether its
+            // action is a GOTO. A LabelDeclNode does NOT clear the chain — labels
+            // are zero-width markers, not actual instructions, so a sequence like
+            // "if (cond) goto X \n loc_Y: \n if (cond) goto Z" should still be
+            // allowed to reuse the COMPARE since no real instruction intervened.
+            if (stmt is not SingleIfNode && stmt is not LabelDeclNode)
+                _lastCompareOperands = null;
+
             switch (stmt)
             {
                 case LabelDeclNode lbl:
@@ -1824,19 +2040,79 @@ namespace Eclh
         // These are the precise inverses of EclhDecompiler's TryEmitSingleIf,
         // TryEmitFlagReuseIf, TryEmitBlockIf, TryEmitWhile, TryEmitDoWhile.
 
+        // Tracks the operand pair of the most recently emitted COMPARE (not
+        // COMPARE AND), so a chained single-action if with identical comparands
+        // can skip re-emitting COMPARE — matching EclhDecompiler v1.8.1's
+        // TryEmitChainedSingleIf, which detects this exact pattern when
+        // decompiling. Cleared whenever any non-IF/non-GOTO instruction is
+        // emitted, since that breaks the flag-reuse chain.
+        private (OperandExpr A, OperandExpr B)? _lastCompareOperands;
+
         private void LayoutSingleIf(SingleIfNode sif, ref ushort cursor)
         {
-            // COMPARE + IF<op> + action  — operator used directly, no negation.
-            EmitCompare(sif.Condition, ref cursor);
+            // If this condition's operands exactly match the most recently
+            // emitted COMPARE (same A and B, by structural equality), and no
+            // intervening instruction has broken the flag-reuse chain, skip
+            // re-emitting COMPARE — just emit IF<op> + action, reusing the
+            // existing flags. This mirrors the decompiler's chained single-
+            // action-if pattern (COMPARE, IF, GOTO, IF, action) where the
+            // second IF has no adjacent COMPARE of its own.
+            bool reuseFlags = !sif.Condition.IsCompoundAnd
+                && _lastCompareOperands.HasValue
+                && OperandsEqual(_lastCompareOperands.Value.A, sif.Condition.A)
+                && OperandsEqual(_lastCompareOperands.Value.B, sif.Condition.B);
+
+            if (!reuseFlags)
+            {
+                EmitCompare(sif.Condition, ref cursor);
+                if (!sif.Condition.IsCompoundAnd)
+                    _lastCompareOperands = (sif.Condition.A, sif.Condition.B);
+                else
+                    _lastCompareOperands = null;
+            }
+
             EmitIfOpcode(sif.Condition, negate: false, ref cursor);
-            LayoutStatement(sif.Action, ref cursor);
+
+            // Capture the compare-operands state before laying out the action
+            var preservedCompare = _lastCompareOperands;
+
+            if (sif.Action != null)
+            {
+                LayoutStatement(sif.Action, ref cursor);
+                if (sif.Action is GotoNode)
+                    _lastCompareOperands = preservedCompare;
+                else
+                    _lastCompareOperands = null;
+            }
+            // null action: COMPARE+IF only (gating pattern) — flags remain set
+            // for the next statement's COMPARE to use. _lastCompareOperands is
+            // cleared since the next thing will be an independent COMPARE statement
+            // that sets its own fresh flags.
+            else
+            {
+                _lastCompareOperands = null;
+            }
+        }
+
+        /// <summary>Structural equality for two OperandExpr — same Kind and same
+        /// resolved identity (SymbolName if present, else Word/ByteVal).</summary>
+        private static bool OperandsEqual(OperandExpr a, OperandExpr b)
+        {
+            if (a.Kind != b.Kind) return false;
+            if (a.SymbolName != null || b.SymbolName != null)
+                return a.SymbolName == b.SymbolName;
+            return a.Kind == OperandKind.ByteImm ? a.ByteVal == b.ByteVal : a.Word == b.Word;
         }
 
         private void LayoutFlagReuseIf(FlagReuseIfNode frif, ref ushort cursor)
         {
-            // IF<op> + action — no COMPARE emitted; relies on prior flags.
+            // IF<op> — no COMPARE emitted; relies on prior flags.
             EmitPseudo(OpForCmpOp(frif.Op), new List<OperandExpr>(), ref cursor);
-            LayoutStatement(frif.Action, ref cursor);
+            // Action is null for bare flag-reuse IFs (labeled entry points with no
+            // fused action — just emits the IF opcode, leaving the branch unresolved
+            // at runtime since execution falls through unconditionally).
+            if (frif.Action != null)
+                LayoutStatement(frif.Action, ref cursor);
         }
 
         private void LayoutBlockIf(BlockIfNode bif, ref ushort cursor)
@@ -1859,14 +2135,14 @@ namespace Eclh
                 string afterLabel = NewSyntheticLabel("if_after");
                 EmitPseudo(0x01, new List<OperandExpr> { OperandExpr.Ref(afterLabel) }, ref cursor);
 
-                _labelAddrs[guardLabel] = cursor;
+                PinLabel(guardLabel, ref cursor);
                 LayoutStatements(bif.ElseBody, ref cursor);
 
-                _labelAddrs[afterLabel] = cursor;
+                PinLabel(afterLabel, ref cursor);
             }
             else
             {
-                _labelAddrs[guardLabel] = cursor;
+                PinLabel(guardLabel, ref cursor);
             }
         }
 
@@ -1878,7 +2154,7 @@ namespace Eclh
             // GOTO _top
             // _after:
             string topLabel = NewSyntheticLabel("while_top");
-            _labelAddrs[topLabel] = cursor;
+            PinLabel(topLabel, ref cursor);
 
             EmitCompare(wn.Condition, ref cursor);
             EmitIfOpcode(wn.Condition, negate: true, ref cursor);
@@ -1890,7 +2166,7 @@ namespace Eclh
 
             EmitPseudo(0x01, new List<OperandExpr> { OperandExpr.Ref(topLabel) }, ref cursor);
 
-            _labelAddrs[afterLabel] = cursor;
+            PinLabel(afterLabel, ref cursor);
         }
 
         private void LayoutDoWhile(DoWhileNode dwn, ref ushort cursor)
@@ -1899,7 +2175,7 @@ namespace Eclh
             // body
             // COMPARE + IF<op> + GOTO _top   (condition NOT negated)
             string topLabel = NewSyntheticLabel("do_top");
-            _labelAddrs[topLabel] = cursor;
+            PinLabel(topLabel, ref cursor);
 
             LayoutStatements(dwn.Body, ref cursor);
 
@@ -1966,6 +2242,61 @@ namespace Eclh
             pi.Size = 1 + operands.Sum(OperandSize);
             cursor = (ushort)(cursor + pi.Size);
             _flat.Add(pi);
+
+            // Advance past any data tables that start exactly at the new cursor
+            // position — tables are interspersed with code in address space and
+            // the layout pass must account for their byte extent so synthetic
+            // labels (e.g. block-if guard targets) are assigned the correct
+            // address rather than landing inside the table data.
+            AdvancePastDataTables(ref cursor);
+        }
+
+        /// <summary>
+        /// If <paramref name="cursor"/> is at the start of a data table, advances it
+        /// past the table (and any further adjacent tables). Called after each
+        /// pseudo-instruction emit so that synthetic guard labels computed during
+        /// layout land at the correct post-table address.
+        /// </summary>
+        private void AdvancePastDataTables(ref ushort cursor)
+        {
+            bool advanced;
+            do
+            {
+                advanced = false;
+                foreach (var t in _unit.DataTables)
+                {
+                    if (t.Address == cursor)
+                    {
+                        cursor = (ushort)(cursor + t.Bytes.Count);
+                        advanced = true;
+                        break;
+                    }
+                }
+                // Also skip @dead blocks — unreachable assembler-padding bytes
+                // (e.g. 0x00 after NEWECL) that lie between two reachable regions.
+                // Without this, the block-if guard GOTO target lands on the dead
+                // byte address rather than the next real instruction after it.
+                foreach (var d in _unit.DeadBlocks)
+                {
+                    if (d.Address == cursor)
+                    {
+                        cursor = (ushort)(cursor + d.Bytes.Count);
+                        advanced = true;
+                        break;
+                    }
+                }
+            } while (advanced);
+        }
+
+        /// <summary>
+        /// Advance past any data tables at the current cursor, then pin the
+        /// synthetic label. Use this instead of direct _labelAddrs assignment
+        /// wherever a label is pinned to the current layout position.
+        /// </summary>
+        private void PinLabel(string label, ref ushort cursor)
+        {
+            AdvancePastDataTables(ref cursor);
+            _labelAddrs[label] = cursor;
         }
 
         /// <summary>Byte size of one operand as it will be encoded — must match
