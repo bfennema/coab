@@ -12,6 +12,14 @@ using System.Text;
 // round-trip — decompile(x) |> compile == x, byte for byte.
 //
 // Changelog:
+//   0.3.8 — Added C-style switch statement syntax for ON GOTO/ON GOSUB, replacing
+//            goto(idx){targets}/call(idx){targets}. Supports fall-through case
+//            groups ("case 0: case 1: goto loc_X;") for consecutive identical
+//            targets, matching EclhDecompiler v1.8.7's switch emission. Added
+//            SwitchNode AST node, KwSwitch token, ParseSwitch parser (validates
+//            case indices are sequential starting at 0), and codegen identical
+//            to OnGotoNode's ON GOTO/ON GOSUB lowering. goto(idx){}/call(idx){}
+//            (OnGotoNode) is retained for parsing older decompiled files.
 //   0.3.7 — Removed @tail support entirely: the decompiler no longer emits @tail
 //            (superseded by @dead since v1.8.6), so the parser block, TailBytes
 //            field, and legacy @tail→@dead conversion code are all removed.
@@ -239,7 +247,7 @@ namespace Eclh
         DotDot, Arrow,
         // Keywords
         KwVar, KwData, KwByte, KwWord, KwIf, KwElse, KwWhile, KwDo,
-        KwGoto, KwCall, KwReturn, KwExit, KwRandom, KwBase, KwGame,
+        KwGoto, KwCall, KwReturn, KwExit, KwRandom, KwBase, KwGame, KwSwitch,
         EOF
     }
 
@@ -282,6 +290,7 @@ namespace Eclh
             ["return"] = TokenKind.KwReturn,
             ["exit"] = TokenKind.KwExit,
             ["random"] = TokenKind.KwRandom,
+            ["switch"] = TokenKind.KwSwitch,
         };
 
         public Lexer(string source) { _src = source; }
@@ -595,6 +604,19 @@ namespace Eclh
         public OperandExpr Index = null!;
         public List<(string Name, bool IsWordImm)> Targets = new();
         public bool IsGosub;   // true = ON GOSUB (call), false = ON GOTO (goto)
+    }
+
+    /// <summary>C-style switch dispatching to goto/gosub targets by index.
+    /// Compiles to ON GOTO (0x25) or ON GOSUB (0x26). Each case entry maps a
+    /// 0-based index to a target; consecutive identical targets produce
+    /// fall-through case groups in the source but a single target in the flat list.</summary>
+    public class SwitchNode : StmtNode
+    {
+        public OperandExpr Index = null!;
+        /// <summary>Flat target list in case order (0, 1, 2, ...).
+        /// Multiple consecutive identical entries represent fall-through cases.</summary>
+        public List<(string Name, bool IsWordImm)> Targets = new();
+        public bool IsGosub;   // false = goto targets, true = call (gosub) targets
     }
 
     /// <summary>Condition as parsed: either a simple compare or a COMPARE AND form.</summary>
@@ -948,6 +970,8 @@ namespace Eclh
             // before plain "goto label", since both start with the same keyword.
             if ((Is(TokenKind.KwGoto) || Is(TokenKind.KwCall)) && IsAt(1, TokenKind.LParen))
                 return ParseOnGoto();
+
+            if (Is(TokenKind.KwSwitch)) return ParseSwitch();
 
             if (Is(TokenKind.KwGoto)) return ParseGoto();
 
@@ -1334,6 +1358,89 @@ namespace Eclh
             return new OnGotoNode { Index = idx, Targets = targets, IsGosub = isGosub, Line = line };
         }
 
+        private StmtNode ParseSwitch()
+        {
+            int line = Cur.Line;
+            Advance(); // switch
+            Expect(TokenKind.LParen, "(");
+            var idx = ParseOperand();
+            Expect(TokenKind.RParen, ")");
+            Expect(TokenKind.LBrace, "{");
+
+            // Case indices may appear in any order in the source (the decompiler
+            // groups all indices sharing a target together, regardless of where
+            // they fall in the original binary's target table), but every index
+            // from 0..maxIndex must be covered exactly once. Collect into a
+            // sparse map keyed by index, then validate and flatten at the end.
+            var byIndex = new Dictionary<int, (string Name, bool IsWordImm)>();
+            bool? isGosub = null;
+
+            while (!Is(TokenKind.RBrace) && !Is(TokenKind.EOF))
+            {
+                // case N:
+                if (!Is(TokenKind.Identifier) || Cur.Text != "case")
+                    throw new ParseError($"Expected 'case', got {Cur.Kind} '{Cur.Text}'", Cur.Line, Cur.Col);
+                Advance();
+                int caseIdx = (int)ExpectHexOrDec();
+                Expect(TokenKind.Colon, ":");
+
+                // If another "case" follows, this is a fall-through entry — collect
+                // all fall-through indices first, then read the shared action.
+                var pendingIndices = new List<int> { caseIdx };
+                while (Is(TokenKind.Identifier) && Cur.Text == "case")
+                {
+                    Advance(); // case
+                    pendingIndices.Add((int)ExpectHexOrDec());
+                    Expect(TokenKind.Colon, ":");
+                }
+
+                // Now read the action: "goto label;" or "label();"
+                (string name, bool isWI) target;
+                if (Is(TokenKind.KwGoto))
+                {
+                    Advance();
+                    target = ParseLabelRef();
+                    if (isGosub == null) isGosub = false;
+                    Match(TokenKind.Semicolon);
+                }
+                else if ((Is(TokenKind.Identifier) && IsAt(1, TokenKind.LParen) && IsAt(2, TokenKind.RParen)) ||
+                         (Is(TokenKind.HashHash) && IsAt(1, TokenKind.Identifier) && IsAt(2, TokenKind.LParen) && IsAt(3, TokenKind.RParen)))
+                {
+                    var (n, wi) = ParseLabelRef();
+                    Advance(); Advance(); // ( )
+                    target = (n, wi);
+                    if (isGosub == null) isGosub = true;
+                    Match(TokenKind.Semicolon);
+                }
+                else
+                    throw new ParseError($"Expected goto or call in switch case", Cur.Line, Cur.Col);
+
+                foreach (var pi in pendingIndices)
+                {
+                    if (pi < 0)
+                        throw new ParseError($"Switch case index {pi} cannot be negative", line, 0);
+                    if (byIndex.ContainsKey(pi))
+                        throw new ParseError($"Switch case {pi} declared more than once", line, 0);
+                    byIndex[pi] = target;
+                }
+            }
+
+            Expect(TokenKind.RBrace, "}");
+
+            // Validate every index in [0, maxIndex] is covered exactly once, then
+            // flatten into the ordered target list the binary format requires.
+            int count = byIndex.Count == 0 ? 0 : byIndex.Keys.Max() + 1;
+            var targets = new List<(string Name, bool IsWordImm)>(count);
+            for (int i = 0; i < count; i++)
+            {
+                if (!byIndex.TryGetValue(i, out var t))
+                    throw new ParseError($"Switch is missing case {i} (cases must cover 0..{count - 1} with no gaps)", line, 0);
+                targets.Add(t);
+            }
+
+            return new SwitchNode { Index = idx, Targets = targets, IsGosub = isGosub ?? false, Line = line };
+        }
+
         private StmtNode ParseIf()
         {
             int line = Cur.Line;
@@ -1579,7 +1686,7 @@ namespace Eclh
     /// </summary>
     public class EclhCompiler
     {
-        public const string Version = "0.3.7";
+        public const string Version = "0.3.8";
 
         private readonly CompilationUnit _unit;
         private readonly ushort _base;
@@ -1861,6 +1968,14 @@ namespace Eclh
                         var ops = new List<OperandExpr> { og.Index, OperandExpr.Imm8((byte)og.Targets.Count) };
                         ops.AddRange(og.Targets.Select(t => LabelOperand(t.Name, t.IsWordImm)));
                         EmitPseudo(og.IsGosub ? (byte)0x26 : (byte)0x25, ops, ref cursor);
+                    }
+                    break;
+
+                case SwitchNode sw:
+                    {
+                        var ops = new List<OperandExpr> { sw.Index, OperandExpr.Imm8((byte)sw.Targets.Count) };
+                        ops.AddRange(sw.Targets.Select(t => LabelOperand(t.Name, t.IsWordImm)));
+                        EmitPseudo(sw.IsGosub ? (byte)0x26 : (byte)0x25, ops, ref cursor);
                     }
                     break;
 

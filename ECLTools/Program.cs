@@ -38,7 +38,7 @@ namespace ECLTools
             if (bytes != null)
             {
                 var input_hex = HexDump(bytes);
-                System.IO.File.WriteAllText($"input_{Eclh.EclhCompiler.Version}_{filename}_{block_id}.txt", input_hex);
+                System.IO.File.WriteAllText($"input_{filename}_{block_id}.txt", input_hex);
                 string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, 0x9900);
                 System.IO.File.WriteAllText($"output_decompiler_{Eclh.EclhDecompiler.Version}_{filename}_{block_id}.txt", output_decompiler);
                 Eclh.Lexer lexer = new(output_decompiler);
@@ -73,6 +73,14 @@ namespace ECLTools
                 else
                 {
                     Console.Write("Length failed!\n");
+                    for (var i = 0; i < Math.Min(output_compiler.Length, bytes.Length); i++)
+                    {
+                        if (bytes[i] != output_compiler[i])
+                        {
+                            Console.Write("Failure at byte {i}");
+                            return false;
+                        }
+                    }
                     return false;
                 }
             }

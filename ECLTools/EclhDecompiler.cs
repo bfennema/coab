@@ -6,6 +6,20 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.8.8 — Switch case grouping now merges ALL indices sharing a target, not
+//            just consecutive ones. E.g. indices 11-16 and 18 both going to
+//            loc_AE6D are now one case group even though index 17 (a different
+//            target) falls between them in the binary's target table. Groups
+//            are emitted in order of each target's first occurrence, so index
+//            17's case (loc_A230) is emitted after the merged 11-16-18 group.
+//            This is valid because case order in ECLH source doesn't need to
+//            match index order — only the compiled binary's flat table does.
+//   1.8.7 — ON GOTO/ON GOSUB now emitted as C-style switch statements with
+//            fall-through case groups for consecutive identical targets (e.g.
+//            "case 0: case 1: goto loc_X;" instead of "goto(idx){loc_X, loc_X}").
+//            Multi-line FormatInstruction output (switch blocks) is now correctly
+//            re-indented in EmitRange — each line gets the same indent prefix as
+//            the surrounding code, fixing misaligned case/} lines.
 //   1.8.6 — Removed separate @tail emission; FindDeadCodeGaps now scans the
 //            full file (not stopping at contentEnd), so trailing padding bytes
 //            are emitted as @dead blocks like any other unreachable gap. This
@@ -831,7 +845,7 @@ namespace Eclh
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.8.6";
+        public const string Version = "1.8.8";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -1085,7 +1099,18 @@ namespace Eclh
                 // compiler emitted them deliberately (e.g. as a stable jump target
                 // for code shared across multiple paths) — they are not actually
                 // meaningless even though they look like no-ops in isolation.
-                sb.AppendLine($"{indent}    {FormatInstruction(instr)}");
+                // Each line of FormatInstruction output gets the same indent prefix —
+                // switch statements produce multi-line output that would otherwise
+                // only have the first line indented.
+                string instrText = FormatInstruction(instr);
+                foreach (var instrLine in instrText.Split('\n'))
+                {
+                    string trimmed = instrLine.TrimEnd('\r');
+                    if (trimmed.Length > 0)
+                        sb.AppendLine($"{indent}    {trimmed}");
+                    else
+                        sb.AppendLine();
+                }
                 i++;
 
                 // After an unconditional terminal (standalone GOTO, EXIT, RETURN,
@@ -1705,12 +1730,48 @@ namespace Eclh
             // ON GOTO / ON GOSUB
             if (instr.IsOnGoto || instr.IsOnGosub)
             {
-                string verb = instr.IsOnGoto ? "goto" : "call";
+                bool isGoto = instr.IsOnGoto;
                 string idx  = FormatOp(instr.Operands[0]);
-                var targets  = instr.Operands.Skip(1)
-                                    .Where(o => o.IsAddress)
-                                    .Select(o => ResolveLabel(o));
-                return $"{verb}({idx}) {{ {string.Join(", ", targets)} }}";
+                var targets = instr.Operands.Skip(1)
+                                   .Where(o => o.IsAddress)
+                                   .Select(o => ResolveLabel(o))
+                                   .ToList();
+
+                var sb2 = new System.Text.StringBuilder();
+                sb2.AppendLine($"switch ({idx}) {{");
+
+                // Group ALL indices sharing a target together, not just
+                // consecutive runs — e.g. indices 11-16 and 18 both going to
+                // loc_AE6D are one case group even though index 17 (a different
+                // target) sits between them. Groups are emitted in order of each
+                // target's first occurrence, so the source reads top-to-bottom
+                // in the same order the binary's target table does.
+                var groups = new List<(string Target, List<int> Indices)>();
+                var groupByTarget = new Dictionary<string, int>();
+                for (int i = 0; i < targets.Count; i++)
+                {
+                    string target = targets[i];
+                    if (groupByTarget.TryGetValue(target, out int gi))
+                    {
+                        groups[gi].Indices.Add(i);
+                    }
+                    else
+                    {
+                        groupByTarget[target] = groups.Count;
+                        groups.Add((target, new List<int> { i }));
+                    }
+                }
+
+                foreach (var (target, indices) in groups)
+                {
+                    foreach (int idxVal in indices)
+                        sb2.AppendLine($"    case {idxVal}:");
+                    string action = isGoto ? $"goto {target};" : $"{target}();";
+                    sb2.AppendLine($"        {action}");
+                }
+
+                sb2.Append("}");
+                return sb2.ToString();
             }
 
             // Generic fallback: mnemonic + operands
