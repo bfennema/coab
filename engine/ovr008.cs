@@ -233,7 +233,7 @@ namespace engine
             return output;
         }
 
-        internal static void vm_WriteStringToMemory(string text, ushort loc) // sub_3105D
+        internal static void vm_WriteStringToMemory(string text, ushort loc) // sub_3105D, POR: sub_20D13
         {
             byte var_104;
 

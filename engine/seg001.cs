@@ -223,7 +223,7 @@ namespace engine
             throw new OperationCanceledException(token);
         }
 
-        static async Task<bool> InitFirst() /* sub_39054 */
+        static async Task<bool> InitFirst() /* sub_39054 POR: sub_26B5D */
         {
             seg051.Randomize();
 
