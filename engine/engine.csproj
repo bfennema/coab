@@ -66,6 +66,9 @@
     <ProjectReference Include="..\Classes\Classes.csproj" />
     <ProjectReference Include="..\Logging\Logging.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="JAJ.Packages.MiniAudioEx" Version="3.3.5" />
+  </ItemGroup>
   <PropertyGroup>
     <AssemblyTitle>Engine</AssemblyTitle>
     <Product>Curse of the Azure Bonds</Product>

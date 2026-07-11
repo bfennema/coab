@@ -2058,7 +2058,7 @@ namespace engine
             }
             else if (gbl.game.CallMove == addr)
             {
-                ovr008.MovePositionForward();
+                ovr008.MovePositionForward(); // POR: sub_32F
             }
             else if (addr == 0xC01B)
             {
@@ -2069,7 +2069,7 @@ namespace engine
                 if ((gbl.game.Name == Logging.Game.PoolOfRadiance && gbl.wilderness_area == 1) ||
                     (gbl.game.Name == Logging.Game.CurseOfTheAzureBonds && gbl.area_ptr.inDungeon == 0))
                 {
-                    gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
+                    gbl.mapWallType = ovr031.getMap_wall_type(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX); // POR: sub_3D7A
                 }
                 else
                 {
@@ -2668,7 +2668,7 @@ namespace engine
                                 if (gbl.area_ptr.lastXPos != gbl.mapPosX ||
                                     gbl.area_ptr.lastYPos != gbl.mapPosY)
                                 {
-                                    seg044.PlaySound(Sound.sound_a);
+                                    //seg044.PlaySound(Sound.sound_a);
                                 }
                             }
                             await ovr029.RedrawView();

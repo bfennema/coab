@@ -1,4 +1,8 @@
+using Avalonia.Rendering;
 using Classes;
+using MiniAudioEx.Core.StandardAPI;
+using System;
+using System.IO;
 
 namespace engine
 {
@@ -29,7 +33,8 @@ namespace engine
                     {
                         if (sp != null)
                         {
-                            sp.Stop();
+                            //source.Stop();
+                            //sp.Stop();
                         }
                     }
                 }
@@ -42,7 +47,8 @@ namespace engine
                     {
                         if (sp != null)
                         {
-                            sp.Stop();
+                            //source.Stop();
+                            //sp.Stop();
                         }
                     }
                 }
@@ -51,7 +57,9 @@ namespace engine
                     int sampleId = (int)arg_0 - 1;
                     if (sounds[sampleId] != null)
                     {
-                        sounds[sampleId].Play();
+                        source2.PlayOneShot(sounds[sampleId]);
+                        //source2.Cursor = 0;
+                        //source2.Play();
                     }
                     else
                     {
@@ -63,7 +71,12 @@ namespace engine
             }
         }
 
-        static System.Media.SoundPlayer[] sounds;
+        static AudioClip sound;
+        static AudioClip[] sounds;
+        //static AudioApp app;
+        static AudioSource source1;
+        static AudioSource source2;
+        //static System.Media.SoundPlayer[] sounds;
 
         internal static void SoundInit(string resourceName)
         {
@@ -71,17 +84,55 @@ namespace engine
             {
                 var resources = new System.Resources.ResourceManager(resourceName, System.Reflection.Assembly.GetEntryAssembly());
 
-                sounds = new System.Media.SoundPlayer[13];
+                AudioContext.Initialize(44100, 2, 64);
+                //app = new AudioApp(44100, 2);
+                //app.Run();
 
-                sounds[1] = new System.Media.SoundPlayer(resources.GetStream("missle"));
-                sounds[2] = new System.Media.SoundPlayer(resources.GetStream("magic_hit"));
-                sounds[4] = new System.Media.SoundPlayer(resources.GetStream("death"));
-                sounds[5] = new System.Media.SoundPlayer(resources.GetStream("sound_5"));
-                sounds[6] = new System.Media.SoundPlayer(resources.GetStream("hit"));
-                sounds[8] = new System.Media.SoundPlayer(resources.GetStream("miss"));
-                sounds[9] = new System.Media.SoundPlayer(resources.GetStream("step"));
-                sounds[10] = new System.Media.SoundPlayer(resources.GetStream("sound_10"));
-                sounds[12] = new System.Media.SoundPlayer(resources.GetStream("start_sound"));
+                source1 = new AudioSource(1);
+                byte[] data = [0x00];
+                sound = StreamToClip(resources.GetStream("death"));
+                source1.Loop = true;
+                source1.Play(sound);
+
+                source2 = new AudioSource(16);
+
+                sounds = new AudioClip[13];
+
+                sounds[1] = StreamToClip(resources.GetStream("missle"));
+                sounds[2] = StreamToClip(resources.GetStream("magic_hit"));
+                sounds[4] = StreamToClip(resources.GetStream("death"));
+                sounds[5] = StreamToClip(resources.GetStream("sound_5"));
+                sounds[6] = StreamToClip(resources.GetStream("hit"));
+                sounds[8] = StreamToClip(resources.GetStream("miss"));
+                //string dir = Directory.GetCurrentDirectory();
+                sounds[9] = new AudioClip("step.wav", false);
+                //sounds[9] = StreamToClip(resources.GetStream("step"));
+                sounds[10] = StreamToClip(resources.GetStream("sound_10"));
+                sounds[12] = StreamToClip(resources.GetStream("start_sound"));
+                //sounds = new System.Media.SoundPlayer[13];
+
+                //sounds[1] = new System.Media.SoundPlayer(resources.GetStream("missle"));
+                //sounds[2] = new System.Media.SoundPlayer(resources.GetStream("magic_hit"));
+                //sounds[4] = new System.Media.SoundPlayer(resources.GetStream("death"));
+                //sounds[5] = new System.Media.SoundPlayer(resources.GetStream("sound_5"));
+                //sounds[6] = new System.Media.SoundPlayer(resources.GetStream("hit"));
+                //sounds[8] = new System.Media.SoundPlayer(resources.GetStream("miss"));
+                //sounds[9] = new System.Media.SoundPlayer(resources.GetStream("step"));
+                //sounds[10] = new System.Media.SoundPlayer(resources.GetStream("sound_10"));
+                //sounds[12] = new System.Media.SoundPlayer(resources.GetStream("start_sound"));
+            }
+        }
+
+        internal static AudioClip StreamToClip(Stream audioStream)
+        {
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                audioStream.CopyTo(memoryStream);
+                byte[] data = memoryStream.ToArray();
+
+                AudioClip clip = new(data, false);
+
+                return clip;
             }
         }
     }
