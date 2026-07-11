@@ -30,12 +30,6 @@ namespace GoldBoxPlayer.Views
             // Ctrl+Scroll on the ScrollViewer
             MapScroller.PointerWheelChanged += OnScrollerWheel;
 
-            // Show Event Numbers CheckBox
-            ShowEventNumbersCheckBox.IsCheckedChanged += (s, e) =>
-            {
-                MapViewControl.ShowEventNumbers = ShowEventNumbersCheckBox.IsChecked ?? false;
-            };
-
             UpdateZoomLabel();
         }
 

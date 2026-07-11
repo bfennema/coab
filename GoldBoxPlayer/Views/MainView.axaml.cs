@@ -168,6 +168,12 @@ public partial class MainView : UserControl
         {
             engine.seg043.DumpTreasureItems();
         }
+        else if (ShowMapEventNumbers == menu)
+        {
+            bool newState = !ShowMapEventNumbers.IsChecked;
+            if (_mapWindow != null)
+                _mapWindow.MapViewControl.ShowEventNumbers = newState;
+        }
         else if (CompareSaveA == menu)
         {
             file_name = "SAVGAMA.DAT";
@@ -310,6 +316,7 @@ public partial class MainView : UserControl
             if (desktop?.MainWindow != null)
             {
                 _mapWindow = new MapWindow();
+                _mapWindow.MapViewControl.ShowEventNumbers = ShowMapEventNumbers.IsChecked;
                 _mapWindow.Closed += (s, e) =>
                 {
                     _mapWindow = null;

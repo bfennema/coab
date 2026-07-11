@@ -49,9 +49,6 @@
         <Button x:Name="ZoomResetButton" Classes="toolbtn" Content="Reset" Height="28"
                 FontSize="12" Background="#3a3530" Padding="8,0"
                 ToolTip.Tip="Reset zoom to 100%"/>
-        <Separator Width="1" Height="20" Background="#3a3530" Margin="4,0" />
-        <CheckBox x:Name="ShowEventNumbersCheckBox" Content="Show Event Numbers" 
-                  Foreground="#bfa374" VerticalAlignment="Center" FontSize="12" />
       </StackPanel>
     </Border>
 
