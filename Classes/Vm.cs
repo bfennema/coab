@@ -386,11 +386,11 @@ namespace Classes
                     break;
 
                 case 2:
-                    val = gbl.stru_1B2CA[(loc - gbl.vm_mem2_offset) << 1]; // dword_1119E
+                    val = gbl.stru_1B2CA[(loc - gbl.vm_mem2_offset) << 1]; // dword_1119E POR: dword_1119A
                     break;
 
                 case 3:
-                    val = gbl.ecl_ptr[loc - gbl.initial_ecl_offset]; // Read from tables in ecl
+                    val = gbl.ecl_ptr[loc - gbl.initial_ecl_offset]; // Read from tables in ecl POR: dword_1119E
                     break;
 
                 case 4:
@@ -511,7 +511,7 @@ namespace Classes
             return ecl_offset;
         }
 
-        internal static void CopyStringFromMemory(ushort location, ref CmdOperation.Operation op) // sub_31421
+        internal static void CopyStringFromMemory(ushort location, ref CmdOperation.Operation op) // sub_31421, POR: sub_210BB
         {
             int offset = 0;
             var sb = new System.Text.StringBuilder();
