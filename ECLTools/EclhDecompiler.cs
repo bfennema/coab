@@ -6,6 +6,53 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.8.12 — CRITICAL FIX: default-case collapsing is now restricted to ON GOTO
+//            (0x25) only — never ON GOSUB (0x26). A target equal to the
+//            fall-through address is behaviourally identical to a true
+//            out-of-range index for ON GOTO (both just continue execution
+//            there), but NOT for ON GOSUB: GOSUB always pushes a return
+//            address (itself the fall-through address, for every index)
+//            before jumping, so an explicit GOSUB entry pointing at the
+//            fall-through address still pushes that extra return address onto
+//            the call stack — something true out-of-range fallthrough (no
+//            GOSUB at all) never does. Collapsing such a group into `default:`
+//            previously mislabeled it as behaviourally equivalent to
+//            fallthrough when it isn't. Every ON GOSUB case is now always
+//            listed explicitly, however many indices share a target.
+//   1.8.11 — Switch emission now always places `default:` last, after every
+//            explicit `case` group, regardless of where the default group
+//            first occurs in the binary's flat target table. Purely a
+//            readability change — case→target mapping is unaffected, and
+//            EclhCompiler already derives indices from the `case N:` labels
+//            themselves rather than source position, so this doesn't require
+//            a compiler change.
+//   1.8.10 — Fixed default: table-size ambiguity: when a default group's own
+//            elided index range extends past the highest explicit case index
+//            (e.g. case 0 explicit, index 1 collapsed into default — the
+//            highest case index alone under-counts the real 2-entry table),
+//            the compiler had no way to recover the true table size from the
+//            case list. Switch emission now detects this situation and emits
+//            an explicit table-size annotation, "switch (idx, N) {", where N
+//            is the real operand[1] count read from the binary. Omitted when
+//            unnecessary (default only fills gaps below the highest explicit
+//            case, which is unambiguous without it) to keep ordinary switches
+//            unchanged. Companion fix: EclhCompiler v0.3.10 parses the
+//            optional ", N" and treats it as authoritative over the inferred
+//            (highest-case+1) count when present.
+//   1.8.9 — ON GOTO/ON GOSUB switch emission now collapses a case group into
+//            `default:` when that group's target address equals the natural
+//            out-of-range fall-through address (instr.Address + ByteLength) —
+//            i.e. the instruction immediately after the switch. Such groups are
+//            functionally redundant with what an out-of-range index already
+//            does, so long explicit case lists (e.g. "case 0: case 1: ...
+//            case 3:") that all point at the very next instruction are now
+//            written once as `default: goto loc_X;`. Grouping itself is now
+//            keyed by resolved target ADDRESS rather than the formatted label
+//            string, so the fall-through comparison is exact regardless of any
+//            ## marker. Companion fix: EclhCompiler v0.3.9 adds `default:`
+//            parsing, filling any index in [0, maxExplicitIndex] not covered
+//            by an explicit `case` with the default target — byte-identical to
+//            the fully-enumerated form.
 //   1.8.8 — Switch case grouping now merges ALL indices sharing a target, not
 //            just consecutive ones. E.g. indices 11-16 and 18 both going to
 //            loc_AE6D are now one case group even though index 17 (a different
@@ -845,7 +892,7 @@ namespace Eclh
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.8.8";
+        public const string Version = "1.8.12";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -1732,13 +1779,29 @@ namespace Eclh
             {
                 bool isGoto = instr.IsOnGoto;
                 string idx  = FormatOp(instr.Operands[0]);
-                var targets = instr.Operands.Skip(1)
-                                   .Where(o => o.IsAddress)
-                                   .Select(o => ResolveLabel(o))
-                                   .ToList();
+                var targetOps = instr.Operands.Skip(1).Where(o => o.IsAddress).ToList();
+
+                // The address execution resumes at when the index is out of range
+                // is the instruction immediately following this ON GOTO/GOSUB.
+                //
+                // For ON GOTO, an explicit target equal to that address is
+                // byte-for-byte equivalent to true out-of-range fallthrough —
+                // both just continue execution there — so such a case group is
+                // safely collapsed into `default:`.
+                //
+                // For ON GOSUB, it is NOT equivalent: GOSUB always pushes a
+                // return address (= fallThroughAddr, regardless of index) before
+                // jumping to the target. If the target itself also equals
+                // fallThroughAddr, execution still lands there, but with an
+                // extra return address pushed onto the call stack that true
+                // fallthrough (no GOSUB at all) would never push — a later
+                // RETURN somewhere down that path would behave differently.
+                // So `default:` is never auto-emitted for ON GOSUB; every case
+                // is always listed explicitly, however many indices share it.
+                ushort fallThroughAddr = (ushort)(instr.Address + instr.ByteLength);
+                bool defaultEligible = isGoto;
 
                 var sb2 = new System.Text.StringBuilder();
-                sb2.AppendLine($"switch ({idx}) {{");
 
                 // Group ALL indices sharing a target together, not just
                 // consecutive runs — e.g. indices 11-16 and 18 both going to
@@ -1746,27 +1809,61 @@ namespace Eclh
                 // target) sits between them. Groups are emitted in order of each
                 // target's first occurrence, so the source reads top-to-bottom
                 // in the same order the binary's target table does.
-                var groups = new List<(string Target, List<int> Indices)>();
-                var groupByTarget = new Dictionary<string, int>();
-                for (int i = 0; i < targets.Count; i++)
+                var groups = new List<(ushort Addr, string Label, List<int> Indices)>();
+                var groupByAddr = new Dictionary<ushort, int>();
+                for (int i = 0; i < targetOps.Count; i++)
                 {
-                    string target = targets[i];
-                    if (groupByTarget.TryGetValue(target, out int gi))
+                    ushort addr = targetOps[i].Word;
+                    if (groupByAddr.TryGetValue(addr, out int gi))
                     {
                         groups[gi].Indices.Add(i);
                     }
                     else
                     {
-                        groupByTarget[target] = groups.Count;
-                        groups.Add((target, new List<int> { i }));
+                        groupByAddr[addr] = groups.Count;
+                        groups.Add((addr, ResolveLabel(targetOps[i]), new List<int> { i }));
                     }
                 }
 
-                foreach (var (target, indices) in groups)
+                // Whether any group will be collapsed into `default:`, and if so
+                // whether that group's indices extend past the highest index NOT
+                // in the default group (i.e. past the highest explicit case).
+                // In that situation the compiler cannot recover the true table
+                // size from the case indices alone (default's own index range is
+                // exactly what's being elided), so the table size must be stated
+                // explicitly via "switch (idx, N) {" — the same total the decoder
+                // read from operand[1] of this instruction.
+                bool hasDefault = defaultEligible && groups.Any(g => g.Addr == fallThroughAddr);
+                int highestNonDefaultIndex = groups.Where(g => !(hasDefault && g.Addr == fallThroughAddr))
+                                                     .SelectMany(g => g.Indices)
+                                                     .DefaultIfEmpty(-1)
+                                                     .Max();
+                bool needsExplicitCount = hasDefault && targetOps.Count - 1 > highestNonDefaultIndex;
+
+                sb2.AppendLine(needsExplicitCount
+                    ? $"switch ({idx}, {targetOps.Count}) {{"
+                    : $"switch ({idx}) {{");
+
+                // Explicit cases first (in order of each target's first
+                // occurrence), default last — regardless of where the default
+                // group actually falls in the binary's flat target table. This
+                // is purely a readability ordering; it doesn't affect the
+                // compiled bytes, since ParseSwitch derives index->target from
+                // the "case N:" labels themselves, not from source position.
+                foreach (var (addr, label, indices) in groups)
                 {
+                    if (hasDefault && addr == fallThroughAddr) continue;
+                    string action = isGoto ? $"goto {label};" : $"{label}();";
                     foreach (int idxVal in indices)
                         sb2.AppendLine($"    case {idxVal}:");
-                    string action = isGoto ? $"goto {target};" : $"{target}();";
+                    sb2.AppendLine($"        {action}");
+                }
+
+                if (hasDefault)
+                {
+                    var defaultGroup = groups.First(g => g.Addr == fallThroughAddr);
+                    string action = isGoto ? $"goto {defaultGroup.Label};" : $"{defaultGroup.Label}();";
+                    sb2.AppendLine($"    default:");
                     sb2.AppendLine($"        {action}");
                 }
 

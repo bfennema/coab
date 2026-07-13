@@ -12,6 +12,29 @@ using System.Text;
 // round-trip — decompile(x) |> compile == x, byte for byte.
 //
 // Changelog:
+//   0.3.10 — Companion fix to EclhDecompiler v1.8.10: ParseSwitch now accepts
+//            an optional explicit table size, "switch (idx, N) { ... }", and
+//            treats it as authoritative over the inferred (highest explicit
+//            case + 1) count whenever present — fixing a table-size ambiguity
+//            when a default group's own elided indices extend past the
+//            highest explicit case (e.g. "case 0: ...; default: ...;" where
+//            the real table has 2 entries but the highest explicit case index
+//            is 0). Also relaxed: a switch containing only "default" is now
+//            legal as long as an explicit count is given (previously an error
+//            in all cases, since no case existed to imply a size).
+//   0.3.9 — Added `default:` case support to switch statement parsing, companion
+//            to EclhDecompiler v1.8.9's collapsing of fall-through-equivalent
+//            case groups into `default:`. ParseSwitch now recognizes a bare
+//            "default:" entry (at most one per switch) and, when flattening the
+//            sparse case map into the ordered target list, fills any index in
+//            [0, maxExplicitIndex] that has no explicit "case" with the default
+//            target. This is purely a source-level convenience — it produces
+//            the exact same flat target list, and therefore identical bytes, as
+//            writing out every covered index explicitly. Table size is still
+//            determined solely by explicit case indices; "default" cannot by
+//            itself imply a table size (a switch with only "default" and no
+//            case is a compile error, since the original count is unrecoverable
+//            from source alone).
 //   0.3.8 — Added C-style switch statement syntax for ON GOTO/ON GOSUB, replacing
 //            goto(idx){targets}/call(idx){targets}. Supports fall-through case
 //            groups ("case 0: case 1: goto loc_X;") for consecutive identical
@@ -1364,6 +1387,18 @@ namespace Eclh
             Advance(); // switch
             Expect(TokenKind.LParen, "(");
             var idx = ParseOperand();
+
+            // Optional explicit table size: "switch (idx, N) { ... }". Required
+            // whenever a `default:` case's own (elided) index range extends past
+            // the highest explicit `case` index — otherwise the true original
+            // table size (operand[1] of the ON GOTO/GOSUB instruction) can't be
+            // recovered from the case list alone. EclhDecompiler only emits this
+            // form when that situation applies; it's optional here for backward
+            // compatibility with switches that don't need it.
+            int? explicitCount = null;
+            if (Match(TokenKind.Comma))
+                explicitCount = (int)ExpectHexOrDec();
+
             Expect(TokenKind.RParen, ")");
             Expect(TokenKind.LBrace, "{");
 
@@ -1373,25 +1408,43 @@ namespace Eclh
             // from 0..maxIndex must be covered exactly once. Collect into a
             // sparse map keyed by index, then validate and flatten at the end.
             var byIndex = new Dictionary<int, (string Name, bool IsWordImm)>();
+            (string Name, bool IsWordImm)? defaultTarget = null;
             bool? isGosub = null;
 
             while (!Is(TokenKind.RBrace) && !Is(TokenKind.EOF))
             {
-                // case N:
-                if (!Is(TokenKind.Identifier) || Cur.Text != "case")
-                    throw new ParseError($"Expected 'case', got {Cur.Kind} '{Cur.Text}'", Cur.Line, Cur.Col);
-                Advance();
-                int caseIdx = (int)ExpectHexOrDec();
-                Expect(TokenKind.Colon, ":");
+                bool isDefault = false;
+                var pendingIndices = new List<int>();
 
-                // If another "case" follows, this is a fall-through entry — collect
-                // all fall-through indices first, then read the shared action.
-                var pendingIndices = new List<int> { caseIdx };
-                while (Is(TokenKind.Identifier) && Cur.Text == "case")
+                if (Is(TokenKind.Identifier) && Cur.Text == "default")
                 {
-                    Advance(); // case
-                    pendingIndices.Add((int)ExpectHexOrDec());
+                    // default: — collapses whatever indices aren't given an
+                    // explicit "case" (up to the highest explicit case index)
+                    // into this one target. Mirrors EclhDecompiler's collapsing
+                    // of case groups whose target is the natural out-of-range
+                    // fall-through address.
+                    Advance();
                     Expect(TokenKind.Colon, ":");
+                    isDefault = true;
+                }
+                else
+                {
+                    // case N:
+                    if (!Is(TokenKind.Identifier) || Cur.Text != "case")
+                        throw new ParseError($"Expected 'case' or 'default', got {Cur.Kind} '{Cur.Text}'", Cur.Line, Cur.Col);
+                    Advance();
+                    int caseIdx = (int)ExpectHexOrDec();
+                    Expect(TokenKind.Colon, ":");
+
+                    // If another "case" follows, this is a fall-through entry — collect
+                    // all fall-through indices first, then read the shared action.
+                    pendingIndices.Add(caseIdx);
+                    while (Is(TokenKind.Identifier) && Cur.Text == "case")
+                    {
+                        Advance(); // case
+                        pendingIndices.Add((int)ExpectHexOrDec());
+                        Expect(TokenKind.Colon, ":");
+                    }
                 }
 
                 // Now read the action: "goto label;" or "label();"
@@ -1415,27 +1468,59 @@ namespace Eclh
                 else
                     throw new ParseError($"Expected goto or call in switch case", Cur.Line, Cur.Col);
 
-                foreach (var pi in pendingIndices)
+                if (isDefault)
                 {
-                    if (pi < 0)
-                        throw new ParseError($"Switch case index {pi} cannot be negative", line, 0);
-                    if (byIndex.ContainsKey(pi))
-                        throw new ParseError($"Switch case {pi} declared more than once", line, 0);
-                    byIndex[pi] = target;
+                    if (defaultTarget != null)
+                        throw new ParseError("Switch cannot have more than one 'default' case", line, 0);
+                    defaultTarget = target;
+                }
+                else
+                {
+                    foreach (var pi in pendingIndices)
+                    {
+                        if (pi < 0)
+                            throw new ParseError($"Switch case index {pi} cannot be negative", line, 0);
+                        if (byIndex.ContainsKey(pi))
+                            throw new ParseError($"Switch case {pi} declared more than once", line, 0);
+                        byIndex[pi] = target;
+                    }
                 }
             }
 
             Expect(TokenKind.RBrace, "}");
 
-            // Validate every index in [0, maxIndex] is covered exactly once, then
-            // flatten into the ordered target list the binary format requires.
-            int count = byIndex.Count == 0 ? 0 : byIndex.Keys.Max() + 1;
+            // Validate every index in [0, count) is covered, then flatten into
+            // the ordered target list the binary format requires. Any index not
+            // given an explicit "case" falls back to "default" when present —
+            // this reproduces exactly the same flat target list as writing out
+            // every index individually would, so it's byte-identical, just less
+            // verbose.
+            //
+            // Table size: an explicit "switch (idx, N)" count is authoritative
+            // when given — it's required whenever default's own elided indices
+            // extend past the highest explicit case, since in that situation the
+            // highest explicit case index alone under-counts the real table.
+            // Without an explicit count, size falls back to (highest explicit
+            // case index + 1), which is correct whenever default only fills
+            // gaps below that index (the only case where omitting the count is
+            // unambiguous).
+            int inferredCount = byIndex.Count == 0 ? 0 : byIndex.Keys.Max() + 1;
+            if (defaultTarget != null && byIndex.Count == 0 && explicitCount == null)
+                throw new ParseError("Switch with only 'default' has no explicit case or count to establish the table size", line, 0);
+
+            int count = explicitCount ?? inferredCount;
+            if (explicitCount != null && explicitCount.Value <= (byIndex.Count == 0 ? -1 : byIndex.Keys.Max()))
+                throw new ParseError($"Switch explicit count {explicitCount} is not large enough to cover case {byIndex.Keys.Max()}", line, 0);
+
             var targets = new List<(string Name, bool IsWordImm)>(count);
             for (int i = 0; i < count; i++)
             {
-                if (!byIndex.TryGetValue(i, out var t))
-                    throw new ParseError($"Switch is missing case {i} (cases must cover 0..{count - 1} with no gaps)", line, 0);
-                targets.Add(t);
+                if (byIndex.TryGetValue(i, out var t))
+                    targets.Add(t);
+                else if (defaultTarget != null)
+                    targets.Add(defaultTarget.Value);
+                else
+                    throw new ParseError($"Switch is missing case {i} (cases must cover 0..{count - 1} with no gaps, or use 'default')", line, 0);
             }
 
             return new SwitchNode { Index = idx, Targets = targets, IsGosub = isGosub ?? false, Line = line };
@@ -1686,7 +1771,7 @@ namespace Eclh
     /// </summary>
     public class EclhCompiler
     {
-        public const string Version = "0.3.8";
+        public const string Version = "0.3.10";
 
         private readonly CompilationUnit _unit;
         private readonly ushort _base;

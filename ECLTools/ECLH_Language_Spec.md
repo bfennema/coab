@@ -439,6 +439,87 @@ variable; control transfers to the Nth target. Out-of-range indices fall through
 original ECL typically ensures indices are always in range, so no fall-through instruction
 is needed).
 
+The decompiler emits this dispatch as a C-style `switch` statement (§5.12.1) rather than
+the `goto(idx){…}`/`call(idx){…}` form above; the latter is retained by the compiler only
+for parsing older decompiled files.
+
+### 5.12.1 Switch (ON GOTO / ON GOSUB dispatch)
+
+```eclh
+switch (area_4AC4) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+        goto loc_9D25;
+    case 4:
+        goto loc_AE6D;
+}
+```
+
+Compiles to ON GOTO (0x25) / ON GOSUB (0x26), identically to §5.12. Indices sharing a
+target are grouped into fall-through case labels; groups are emitted in order of each
+target's first occurrence in the binary's flat target table, not necessarily in index
+order. Case indices must cover `0..N-1` with no gaps, where `N` is the table size
+(one more than the highest case index).
+
+**`default:`** — When a case group's target address equals the address of the
+instruction immediately following the switch (i.e. the same address execution would
+reach anyway via an out-of-range index), the decompiler collapses that group into a
+single `default:` entry instead of an explicit case list:
+
+```eclh
+switch (area_4AC4) {
+    case 4:
+        goto loc_AE6D;
+    default:
+        goto loc_9D25;
+}
+
+loc_9D25 @ 0x9D25:
+```
+
+This collapsing only ever happens for `goto(idx){…}`-style dispatch (ON GOTO, `switch`
+with `goto` actions), never for `call(idx){…}`-style dispatch (ON GOSUB, `switch` with
+`name()` actions). The two are not equivalent: an ON GOTO target equal to the
+fall-through address behaves identically to a true out-of-range index — both simply
+continue execution there. An ON GOSUB target equal to the fall-through address does
+not — GOSUB always pushes a return address (itself the fall-through address, for every
+index) before jumping, so an explicit GOSUB entry pointing at the fall-through address
+still pushes that extra return address onto the call stack, which true out-of-range
+fallthrough (no GOSUB at all) never does. A later `return` reached through that path
+would behave differently. The decompiler therefore always lists every ON GOSUB case
+explicitly, however many indices share a target. (`default:` remains syntactically legal
+in a hand-authored ON GOSUB switch — it compiles to the same explicit table entries as
+spelling out every index — but authors should be aware it carries no special "same as
+out-of-range" meaning there, only "fill remaining indices with this target".)
+
+`default:` is purely a source-level convenience: at most one is allowed per switch, and
+it fills every index in `0..N-1` that has no explicit `case`, where `N` is the table size.
+It compiles to exactly the same flat target-table bytes as writing out every covered
+index explicitly — it cannot shrink the table, only avoid spelling out indices redundant
+with the out-of-range fall-through behavior.
+
+Table size `N` is normally inferred as `(highest explicit case index) + 1`, which is
+unambiguous as long as `default` only fills gaps *below* the highest explicit case. When
+`default`'s own (elided) index range extends *past* the highest explicit case — e.g. the
+table has 2 entries, `case 0` is explicit, and index 1 is the default — the highest
+explicit case index alone under-counts the table, so the size must be stated explicitly:
+
+```eclh
+switch (player_6E79, 2) {
+    case 0:
+        goto loc_AD85;
+    default:
+        goto loc_99E4;
+}
+```
+
+The decompiler emits this `switch (idx, N)` form only when it's actually needed; ordinary
+switches (including ones using `default` only to collapse gaps below the last case, as in
+the first example above) are unaffected. A switch consisting only of `default` (no `case`
+at all) requires the explicit count, since no case exists to imply a size otherwise.
+
 ### 5.13 Raw Compare
 
 ```eclh
