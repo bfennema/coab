@@ -12,7 +12,7 @@ namespace ECLTools
         static async Task Main(string[] args)
         {
             Classes.gbl.file = new File();
-            Classes.gbl.DataPath = "Data";
+            Classes.gbl.DataPath = "Curse";
             if (args.Length == 2)
             {
                 if (int.TryParse(args[1], out var block_id) == true)
@@ -22,7 +22,7 @@ namespace ECLTools
             }
             else
             {
-                for (int j = 0; j <= 29; j++)
+                for (int j = 0; j <= 82; j++)
                 {
                     for (int i = 1; i <= 8; i++ )
                     {
@@ -39,15 +39,17 @@ namespace ECLTools
             {
                 var input_hex = HexDump(bytes);
                 System.IO.File.WriteAllText($"input_{filename}_{block_id}.txt", input_hex);
-                string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, 0x9900);
+                //string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, 0x9900);
+                //string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "pool_of_radiance");
+                string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "curse_of_azure_bonds");
                 System.IO.File.WriteAllText($"output_decompiler_{Eclh.EclhDecompiler.Version}_{filename}_{block_id}.txt", output_decompiler);
                 Eclh.Lexer lexer = new(output_decompiler);
                 var list = lexer.Tokenize();
                 Eclh.Parser parser = new(list);
                 var unit = parser.ParseUnit();
                 Eclh.EclhCompiler compiler = new(unit);
-                compiler.SetEngineFunctions(Eclh.EclhDecompiler.EngineFunctions);
-                compiler.SetHardwareRegisters(Eclh.EclhDecompiler.HardwareRegisters);
+                //compiler.SetEngineFunctions(Eclh.EclhDecompiler.EngineFunctions);
+                //compiler.SetHardwareRegisters(Eclh.EclhDecompiler.HardwareRegisters);
                 byte[] output_compiler = compiler.Compile();
                 output_compiler[0] = bytes[0];
                 output_compiler[1] = bytes[1];

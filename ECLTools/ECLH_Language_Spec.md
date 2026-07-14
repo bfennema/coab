@@ -194,8 +194,23 @@ Required, must come first.
 @game pool_of_radiance
 ```
 
-Selects game-specific constants (memory map regions, engine function table, `ecl_clock`
-operand count). Required.
+Selects game-specific constants (memory map regions, engine function table, hardware
+register table, `ecl_clock` operand count). Required.
+
+Supported games, and their default ECL base address (`@base`):
+
+| `@game` value          | Default base | Notes |
+|-------------------------|--------------|-------|
+| `pool_of_radiance`      | `0x9900`     | Full engine-function / hardware-register / memory-region tables |
+| `curse_of_azure_bonds`  | `0x8000`     | Full engine-function / hardware-register / memory-region tables |
+
+Both the decompiler and compiler read game profiles from a single shared registry
+(`EclhDecompiler.GameProfiles`), so a file's `@game` line determines both how the
+decompiler names addresses when producing source and how the compiler resolves those
+same names back to addresses when recompiling — the two can never disagree about what a
+given game's tables are. The decompiler also accepts a game profile name directly at
+construction time (`new EclhDecompiler(bytes, "curse_of_azure_bonds")`), which supplies
+the correct default base address without it needing to be specified separately.
 
 ### 4.3 Entry Points
 

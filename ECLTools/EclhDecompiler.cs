@@ -6,6 +6,40 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.9.1 — Populated curse_of_azure_bonds' EngineFunctions, HardwareRegisters,
+//            and MemRegions (previously left empty pending reverse
+//            engineering). redraw/play_sound addresses differ from Pool of
+//            Radiance (0x2E10/0xB200 vs 0x2C90/0xBA03); move_forward/get_wall/
+//            demo_frame and the hardware register table are unchanged.
+//            MemRegions shift down to match COAB's own memory map: area
+//            0x4B00-0x4EFF, player 0x7C00-0x7FFF, shared 0x7A00-0x7BFF.
+//   1.9.0 — Added multi-game support via a new GameProfile class and static
+//            EclhDecompiler.GameProfiles registry (keyed by the same name used
+//            in the @game directive), replacing the old pool_of_radiance-only
+//            static EngineFunctions/HardwareRegisters tables. Added
+//            "curse_of_azure_bonds" (base 0x8000; engine-function/hardware-
+//            register/mem-region tables intentionally left empty pending
+//            reverse engineering — better to fall back to raw [$XXXX]
+//            addresses than guess wrong ones). EngineFunctions/HardwareRegisters/
+//            MemRegions are now per-instance (copied from the selected
+//            profile at construction) rather than shared static state, so
+//            multiple decompiler instances for different games can coexist in
+//            the same process. Added new constructor overloads:
+//            EclhDecompiler(bytes, baseAddress, gameProfile = "pool_of_radiance")
+//            and EclhDecompiler(bytes, gameProfile) (uses the profile's
+//            DefaultBase). The original 2-argument (bytes, baseAddress)
+//            constructor still compiles unchanged (gameProfile defaults to
+//            "pool_of_radiance"). EclhDecompilerProgram.Run/DumpRaw gained
+//            matching (bytes, gameProfile[, baseAddress]) overloads; the old
+//            (bytes, ushort baseAddress) overloads are preserved for existing
+//            call sites. Also fixed a latent bug: EmitSource always wrote the
+//            literal "@game pool_of_radiance" regardless of which game the
+//            instance was actually constructed for — it now writes the real
+//            GameName. Companion change: EclhCompiler v0.3.11 auto-selects a
+//            profile's EngineFunctions/HardwareRegisters from the parsed
+//            @game directive via the same registry, instead of requiring the
+//            caller to wire them up manually with SetEngineFunctions/
+//            SetHardwareRegisters.
 //   1.8.12 — CRITICAL FIX: default-case collapsing is now restricted to ON GOTO
 //            (0x25) only — never ON GOSUB (0x26). A target equal to the
 //            fall-through address is behaviourally identical to a true
@@ -397,6 +431,25 @@ namespace Eclh
         public int    FixedOperands;   // -1 = variable (see VariableArityRules)
     }
 
+    // ── Game profile ──────────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Per-game configuration: the default ECL base address, and the three
+    /// address→name lookup tables (engine functions, hardware registers, memory
+    /// regions) used to produce symbolic names instead of raw hex addresses.
+    /// Different Gold Box games load their ECL files at different base
+    /// addresses and have their own memory maps, so this data cannot be shared
+    /// across games the way it could when only Pool of Radiance was supported.
+    /// </summary>
+    public class GameProfile
+    {
+        public string Name = "";
+        public ushort DefaultBase;
+        public Dictionary<ushort, string> EngineFunctions = new();
+        public Dictionary<ushort, string> HardwareRegisters = new();
+        public List<(ushort Start, ushort End, string Label)> MemRegions = new();
+    }
+
     // ── Decompiler ────────────────────────────────────────────────────────────
 
     /// <summary>
@@ -415,52 +468,134 @@ namespace Eclh
         public ushort Base { get; }
 
         /// <summary>
-        /// Pool of Radiance engine function addresses. Static — shared across all
-        /// decompiler instances and directly referenceable by EclhCompiler via
-        /// Eclh.EclhDecompiler.EngineFunctions, so the compiler's game profile can
-        /// never drift out of sync with the decompiler's.
+        /// The game profile name this instance was constructed with (e.g.
+        /// "pool_of_radiance", "curse_of_azure_bonds"). Written out as the
+        /// @game directive in decompiled source.
         /// </summary>
-        public static Dictionary<ushort, string> EngineFunctions { get; set; } = new()
+        public string GameName { get; }
+
+        /// <summary>
+        /// Known game profiles, keyed by the same lowercase_underscore name
+        /// used in the ECLH @game directive. This is the single source of
+        /// truth both EclhDecompiler and EclhCompiler read from — the compiler
+        /// selects a profile's EngineFunctions/HardwareRegisters based on the
+        /// @game directive parsed from source, so the two can never drift out
+        /// of sync for a given game the way per-class static tables could.
+        ///
+        /// Add new games here. Curse of the Azure Bonds' engine-function and
+        /// hardware-register addresses have not been reverse-engineered yet —
+        /// its EngineFunctions/HardwareRegisters/MemRegions are intentionally
+        /// left empty rather than guessed, so the decompiler falls back to raw
+        /// [$XXXX] addresses for those until real data is filled in here.
+        /// </summary>
+        public static readonly Dictionary<string, GameProfile> GameProfiles = new()
         {
-            [0x2C90] = "redraw",
-            [0x8000] = "duel_player",
-            [0x8001] = "duel_monster",
-            [0xBA03] = "play_sound",
-            [0xC01E] = "move_forward",
-            [0xC018] = "get_wall",
-            [0x6803] = "demo_frame",
+            ["pool_of_radiance"] = new GameProfile
+            {
+                Name = "pool_of_radiance",
+                DefaultBase = 0x9900,
+                EngineFunctions = new()
+                {
+                    [0x2C90] = "redraw",
+                    [0x8000] = "duel_player",
+                    [0x8001] = "duel_monster",
+                    [0xBA03] = "play_sound",
+                    [0xC01E] = "move_forward",
+                    [0xC018] = "get_wall",
+                    [0x6803] = "demo_frame",
+                },
+                HardwareRegisters = new()
+                {
+                    // Map state (vm_GetMemoryValue case 4, offset from 0xC04B)
+                    [0xC04B] = "map_x",
+                    [0xC04C] = "map_y",
+                    [0xC04D] = "map_direction",
+                    [0xC04E] = "map_wall_type",
+                    [0xC04F] = "map_wall_roof",
+
+                    // Engine parameter registers (write before engine function call)
+                    [0x03DE] = "sound_param",  // 8 = sound_a, 10 = sound_b; written before play_sound()
+                    [0x00B8] = "engine_b8",    // word_1EE78 — internal engine state
+                    [0x00B9] = "engine_b9",    // word_1EE7A — internal engine state
+                },
+                MemRegions = new()
+                {
+                    (0x4900, 0x4CFF, "area"),
+                    (0x6B00, 0x6EFF, "player"),
+                    (0x9700, 0x98FF, "shared"),
+                },
+            },
+
+            ["curse_of_azure_bonds"] = new GameProfile
+            {
+                Name = "curse_of_azure_bonds",
+                DefaultBase = 0x8000,
+                EngineFunctions = new()
+                {
+                    [0x2E10] = "redraw",
+                    [0x8000] = "duel_player",
+                    [0x8001] = "duel_monster",
+                    [0xB200] = "play_sound",
+                    [0xC01E] = "move_forward",
+                    [0xC018] = "get_wall",
+                    [0x6803] = "demo_frame",
+                },
+                HardwareRegisters = new()
+                {
+                    // Map state (vm_GetMemoryValue case 4, offset from 0xC04B)
+                    [0xC04B] = "map_x",
+                    [0xC04C] = "map_y",
+                    [0xC04D] = "map_direction",
+                    [0xC04E] = "map_wall_type",
+                    [0xC04F] = "map_wall_roof",
+
+                    // Engine parameter registers (write before engine function call)
+                    [0x03DE] = "sound_param",  // 8 = sound_a, 10 = sound_b; written before play_sound()
+                    [0x00B8] = "engine_b8",    // word_1EE78 — internal engine state
+                    [0x00B9] = "engine_b9",    // word_1EE7A — internal engine state
+                },
+                MemRegions = new()
+                {
+                    (0x4B00, 0x4EFF, "area"),
+                    (0x7C00, 0x7FFF, "player"),
+                    (0x7A00, 0x7BFF, "shared"),
+                },
+            },
         };
 
         /// <summary>
-        /// Hardware register addresses (map position, wall type, engine params etc.)
-        /// Named separately from mem_regions since they are engine state, not ECL
-        /// variables. Static for the same reason as EngineFunctions above.
+        /// Resolves a game profile by name, throwing a clear error listing the
+        /// known profiles if the name isn't registered.
         /// </summary>
-        public static Dictionary<ushort, string> HardwareRegisters { get; set; } = new()
+        private static GameProfile ResolveProfile(string gameProfile)
         {
-            // Map state (vm_GetMemoryValue case 4, offset from 0xC04B)
-            [0xC04B] = "map_x",
-            [0xC04C] = "map_y",
-            [0xC04D] = "map_direction",
-            [0xC04E] = "map_wall_type",
-            [0xC04F] = "map_wall_roof",
-
-            // Engine parameter registers (write before engine function call)
-            [0x03DE] = "sound_param",    // 8 = sound_a, 10 = sound_b; written before play_sound()
-            [0x00B8] = "engine_b8",      // word_1EE78 — internal engine state
-            [0x00B9] = "engine_b9",      // word_1EE7A — internal engine state
-        };
+            if (GameProfiles.TryGetValue(gameProfile, out var profile))
+                return profile;
+            throw new ArgumentException(
+                $"Unknown game profile '{gameProfile}'. Known profiles: " +
+                string.Join(", ", GameProfiles.Keys));
+        }
 
         /// <summary>
-        /// Memory region classification for variable names.
+        /// Engine function addresses for this instance's game, initialised
+        /// from the selected GameProfile. A per-instance copy (not shared with
+        /// the GameProfile registry) so callers may customise it without
+        /// affecting other instances or GameProfiles itself.
+        /// </summary>
+        public Dictionary<ushort, string> EngineFunctions { get; set; }
+
+        /// <summary>
+        /// Hardware register addresses for this instance's game, initialised
+        /// from the selected GameProfile. See EngineFunctions for copy semantics.
+        /// </summary>
+        public Dictionary<ushort, string> HardwareRegisters { get; set; }
+
+        /// <summary>
+        /// Memory region classification for variable names, initialised from
+        /// the selected GameProfile. See EngineFunctions for copy semantics.
         /// Key = (start, end inclusive), Value = region label.
         /// </summary>
-        public List<(ushort Start, ushort End, string Label)> MemRegions { get; set; } = new()
-        {
-            (0x4900, 0x4CFF, "area"),
-            (0x6B00, 0x6EFF, "player"),
-            (0x9700, 0x98FF, "shared"),
-        };
+        public List<(ushort Start, ushort End, string Label)> MemRegions { get; set; }
 
         // ── Private state ─────────────────────────────────────────────────────
 
@@ -555,11 +690,34 @@ namespace Eclh
 
         // ── Constructor ───────────────────────────────────────────────────────
 
-        public EclhDecompiler(byte[] rawFileBytes, ushort baseAddress)
+        /// <summary>
+        /// Construct with an explicit base address and game profile. The
+        /// profile supplies EngineFunctions/HardwareRegisters/MemRegions;
+        /// baseAddress overrides the profile's DefaultBase (useful for ECL
+        /// files that don't follow their game's usual load address).
+        /// Defaults to "pool_of_radiance" so existing two-argument call sites
+        /// keep working unchanged.
+        /// </summary>
+        public EclhDecompiler(byte[] rawFileBytes, ushort baseAddress, string gameProfile = "pool_of_radiance")
         {
-            _data     = rawFileBytes;
-            _fileSize = rawFileBytes.Length;
-            Base      = baseAddress;
+            var profile = ResolveProfile(gameProfile);
+            _data             = rawFileBytes;
+            _fileSize         = rawFileBytes.Length;
+            Base              = baseAddress;
+            GameName          = gameProfile;
+            EngineFunctions   = new Dictionary<ushort, string>(profile.EngineFunctions);
+            HardwareRegisters = new Dictionary<ushort, string>(profile.HardwareRegisters);
+            MemRegions        = new List<(ushort, ushort, string)>(profile.MemRegions);
+        }
+
+        /// <summary>
+        /// Construct from a game profile alone, using its DefaultBase — e.g.
+        /// new EclhDecompiler(bytes, "curse_of_azure_bonds") loads at 0x8000
+        /// without having to spell out the base address at every call site.
+        /// </summary>
+        public EclhDecompiler(byte[] rawFileBytes, string gameProfile)
+            : this(rawFileBytes, ResolveProfile(gameProfile).DefaultBase, gameProfile)
+        {
         }
 
         // ── Public API ────────────────────────────────────────────────────────
@@ -892,7 +1050,7 @@ namespace Eclh
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.8.12";
+        public const string Version = "1.9.1";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -909,7 +1067,7 @@ namespace Eclh
             sb.AppendLine();
 
             sb.AppendLine($"@base   0x{Base:X4}");
-            sb.AppendLine($"@game   pool_of_radiance");
+            sb.AppendLine($"@game   {GameName}");
             sb.AppendLine();
 
             sb.AppendLine($"on_move              = {ResolveLabel(ep.onMove)}");
@@ -2172,24 +2330,50 @@ namespace Eclh
     {
         /// <summary>
         /// Decompile a raw ECL block (including 2-byte DAX prefix) and return
-        /// the ECLH source text.
+        /// the ECLH source text, at an explicit base address (pool_of_radiance
+        /// profile). Preserved for existing call sites; prefer the
+        /// (bytes, gameProfile) or (bytes, gameProfile, baseAddress) overloads
+        /// for anything other than Pool of Radiance.
         /// </summary>
-        public static string Run(byte[] rawBytes, ushort baseAddress = 0x9900)
+        public static string Run(byte[] rawBytes, ushort baseAddress)
+            => Run(rawBytes, "pool_of_radiance", baseAddress);
+
+        /// <summary>
+        /// Decompile a raw ECL block for the given game profile. baseAddress
+        /// defaults to null, meaning "use the profile's DefaultBase" (0x9900
+        /// for pool_of_radiance, 0x8000 for curse_of_azure_bonds); pass an
+        /// explicit value to override it.
+        /// </summary>
+        public static string Run(byte[] rawBytes, string gameProfile = "pool_of_radiance", ushort? baseAddress = null)
         {
-            var d = new EclhDecompiler(rawBytes, baseAddress);
+            var d = baseAddress.HasValue
+                ? new EclhDecompiler(rawBytes, baseAddress.Value, gameProfile)
+                : new EclhDecompiler(rawBytes, gameProfile);
             return d.Decompile();
         }
 
         /// <summary>
-        /// Dump a flat instruction listing to stdout for quick analysis.
-        /// Runs all CFG and analysis passes but skips structured emission.
+        /// Dump a flat instruction listing to stdout for quick analysis, at an
+        /// explicit base address (pool_of_radiance profile). Preserved for
+        /// existing call sites; prefer the (bytes, gameProfile[, baseAddress])
+        /// overload for anything other than Pool of Radiance.
         /// </summary>
-        public static void DumpRaw(byte[] rawBytes, ushort baseAddress = 0x9900)
+        public static void DumpRaw(byte[] rawBytes, ushort baseAddress)
+            => DumpRaw(rawBytes, "pool_of_radiance", baseAddress);
+
+        /// <summary>
+        /// Dump a flat instruction listing to stdout for the given game profile.
+        /// Runs all CFG and analysis passes but skips structured emission.
+        /// baseAddress defaults to null, meaning "use gameProfile's DefaultBase".
+        /// </summary>
+        public static void DumpRaw(byte[] rawBytes, string gameProfile = "pool_of_radiance", ushort? baseAddress = null)
         {
-            var d = new EclhDecompiler(rawBytes, baseAddress);
+            var d = baseAddress.HasValue
+                ? new EclhDecompiler(rawBytes, baseAddress.Value, gameProfile)
+                : new EclhDecompiler(rawBytes, gameProfile);
             d.Decompile();
 
-            Console.WriteLine($"Base: 0x{baseAddress:X4}   Instructions: {d.Instructions.Count}");
+            Console.WriteLine($"Game: {gameProfile}   Base: 0x{d.Base:X4}   Instructions: {d.Instructions.Count}");
             Console.WriteLine(new string('-', 80));
 
             foreach (var instr in d.Instructions.Values)

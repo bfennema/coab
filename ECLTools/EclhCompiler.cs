@@ -12,6 +12,15 @@ using System.Text;
 // round-trip — decompile(x) |> compile == x, byte for byte.
 //
 // Changelog:
+//   0.3.11 — Companion to EclhDecompiler v1.9.0's multi-game GameProfile
+//            support: EclhCompiler's constructor now auto-selects
+//            EngineFunctions/HardwareRegisters from the parsed @game
+//            directive via EclhDecompiler.GameProfiles, the same registry the
+//            decompiler reads from — so a decompiled file's @game line just
+//            works on recompile without the caller having to manually call
+//            SetEngineFunctions/SetHardwareRegisters. Unknown/custom game
+//            names are left with empty tables as before, and Set* can still
+//            be called afterward to override.
 //   0.3.10 — Companion fix to EclhDecompiler v1.8.10: ParseSwitch now accepts
 //            an optional explicit table size, "switch (idx, N) { ... }", and
 //            treats it as authoritative over the inferred (highest explicit
@@ -1771,7 +1780,7 @@ namespace Eclh
     /// </summary>
     public class EclhCompiler
     {
-        public const string Version = "0.3.10";
+        public const string Version = "0.3.11";
 
         private readonly CompilationUnit _unit;
         private readonly ushort _base;
@@ -1797,6 +1806,19 @@ namespace Eclh
         {
             _unit = unit;
             _base = unit.Base;
+
+            // Auto-select engine functions / hardware registers from the
+            // @game directive, using EclhDecompiler.GameProfiles as the single
+            // source of truth (so decompile→compile round trips always agree
+            // on which addresses are which without the caller having to wire
+            // it up manually). Unknown/custom game names are left with empty
+            // tables — SetEngineFunctions/SetHardwareRegisters can still be
+            // called afterward to override or supply a custom profile.
+            if (EclhDecompiler.GameProfiles.TryGetValue(unit.GameProfile, out var profile))
+            {
+                SetEngineFunctions(profile.EngineFunctions);
+                SetHardwareRegisters(profile.HardwareRegisters);
+            }
         }
 
         public void SetEngineFunctions(Dictionary<ushort, string> engineFuncs)
