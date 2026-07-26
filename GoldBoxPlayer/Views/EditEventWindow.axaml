@@ -2,7 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         x:Class="GoldBoxPlayer.Views.EditEventWindow"
         Title="Edit Event Number"
-        Width="320" Height="150"
+        Width="320" Height="180"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         Background="#1e1b17">
@@ -31,6 +31,27 @@
     <Style Selector="Button.toolbtn:pressed">
       <Setter Property="Background" Value="#7a6a58"/>
     </Style>
+    <Style Selector="CheckBox">
+      <Setter Property="Foreground" Value="#bfa374"/>
+    </Style>
+    <Style Selector="CheckBox:pointerover /template/ ContentPresenter">
+      <Setter Property="Foreground" Value="#bfa374" />
+    </Style>
+    <Style Selector="CheckBox:checked /template/ ContentPresenter">
+      <Setter Property="Foreground" Value="#bfa374" />
+    </Style>
+    <Style Selector="CheckBox:checked:pointerover /template/ ContentPresenter">
+      <Setter Property="Foreground" Value="#bfa374" />
+    </Style>
+    <Style Selector="CheckBox:unchecked /template/ Border#NormalRectangle">
+      <Setter Property="BorderBrush" Value="#bfa374" />
+      <Setter Property="BorderThickness" Value="2" />
+      <Setter Property="Background" Value="#5a5048" />
+    </Style>
+    <Style Selector="CheckBox:unchecked:pointerover /template/ Border#NormalRectangle">
+      <Setter Property="BorderBrush" Value="White" />
+      <Setter Property="Background" Value="#7a6a58" />
+    </Style>
   </Window.Styles>
 
   <StackPanel Margin="15" Spacing="15" VerticalAlignment="Center">
@@ -38,6 +59,8 @@
       <TextBlock Text="Event Number (0-127):" VerticalAlignment="Center" Foreground="#bfa374" FontSize="14"/>
       <NumericUpDown x:Name="EventNumberNumeric" Minimum="0" Maximum="127" FormatString="0" Width="120" HorizontalContentAlignment="Right" />
     </StackPanel>
+
+    <CheckBox x:Name="IndoorFlagCheckBox" Content="Indoor Flag (Roof/Ceiling)" Foreground="#bfa374" HorizontalAlignment="Center" FontSize="14" />
     
     <StackPanel Orientation="Horizontal" Spacing="15" HorizontalAlignment="Center">
       <Button x:Name="OkButton" Classes="toolbtn" Content="OK" Width="80" Height="28" Background="#3a3530" HotKey="Enter"/>

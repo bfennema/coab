@@ -68,12 +68,12 @@ namespace GoldBoxPlayer.Views
                     if (visualRoot != null)
                     {
                         int currentVal = mi.x2 & 0x7F;
-                        var dialog = new EditEventWindow(currentVal);
+                        bool isIndoor = (mi.x2 & 0x80) != 0;
+                        var dialog = new EditEventWindow(currentVal, isIndoor);
                         await dialog.ShowDialog(visualRoot);
                         if (dialog.IsOk)
                         {
-                            // Keep structural flags from the upper bits (e.g. 0x80) intact
-                            byte upperFlags = (byte)(mi.x2 & 0x80);
+                            byte upperFlags = (byte)(dialog.IsIndoor ? 0x80 : 0x00);
                             mi.x2 = (byte)(upperFlags | (dialog.EventNumber & 0x7F));
                         }
                     }

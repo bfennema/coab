@@ -263,7 +263,7 @@ public class MainViewModel : ViewModelBase
 
     public void UpdateDisplay()
     {
-        if (Classes.gbl.saveData != null && Classes.gbl.geo_ptr?.maps != null)
+        if (Classes.gbl.saveData != null && Classes.gbl.game_state != Classes.GameState.StartGameMenu && Classes.gbl.geo_ptr?.maps != null)
         {
             Classes.MapTracker.MarkExplored(Classes.gbl.game_area, Classes.gbl.area_ptr.current_3DMap_block_id, Classes.gbl.mapPosX, Classes.gbl.mapPosY);
             MapWindowRefreshed?.Invoke();
