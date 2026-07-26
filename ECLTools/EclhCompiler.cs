@@ -12,6 +12,176 @@ using System.Text;
 // round-trip — decompile(x) |> compile == x, byte for byte.
 //
 // Changelog:
+//   0.3.23 — load_monster/setup_monster now accept a two-argument form,
+//            "setup_monster(#63, #2)", as shorthand for the common case
+//            where the third argument repeats the first —
+//            "setup_monster(#63, #2, #63)". ParseCmdStatement special-cases
+//            these two mnemonics: reads arg1 and arg2 as usual, then either
+//            reads an explicit arg3 (if a comma follows) or synthesizes one
+//            as a copy of arg1 via the new CloneOperand helper. Companion to
+//            EclhDecompiler v1.9.20, which omits arg3 from source exactly
+//            when it repeats arg1 for that specific instance (arg3 isn't
+//            always redundant, so this isn't a blanket per-opcode omission
+//            the way horizontal_menu/vertical_menu's count is).
+//   0.3.22 — Added x *= n compound-assignment support, now that a cross-game
+//            survey confirmed MUL's real operand-order convention (see
+//            EclhDecompiler v1.9.19's changelog): new StarEquals ('*=')
+//            token in the lexer, wired into all four compound-assign parse
+//            sites alongside +=/-=//=, and LayoutCompoundAssign now emits
+//            MUL [x], n, [x] for it (x as op0, n as op1, x again as op2/
+//            dest) — matching the confirmed-dominant destIsLhs pattern
+//            (15/16 compound-assign-shaped MUL instances across both
+//            games). This is the OPPOSITE operand order from +=/-=, which
+//            put the amount first — MUL keeps the destination in its
+//            natural first position instead.
+//   0.3.21 — Added x /= n compound-assignment support: new SlashEquals ('/=')
+//            token in the lexer, wired into all four compound-assign parse
+//            sites (##name-led, @[name]-led, [$XXXX]-led, and the main
+//            dotted-name identifier-led path), and LayoutCompoundAssign now
+//            emits DIVIDE [x], n, [x] for it (x as op0/dividend, n as
+//            op1/divisor, x again as op2/dest) — the only valid encoding,
+//            since division isn't commutative and "x /= n" can only mean
+//            x = x / n. *= is intentionally NOT added: multiplication
+//            commutes, so unlike DIVIDE there are two different byte
+//            encodings that produce the identical numeric result, and which
+//            one the original ECL compiler actually used hasn't been
+//            confirmed (the same class of ambiguity ADD's compound-assign
+//            had before v1.6.8 pinned it down empirically). Companion to
+//            EclhDecompiler v1.9.17, which emits this shorthand.
+//   0.3.20 — horizontal_menu/vertical_menu's item-count operand is no longer
+//            written in ECLH source — it's fully redundant with the number
+//            of trailing item operands actually present (the decoder reads
+//            exactly that many, so count == item count always holds by
+//            construction). ParseCmdStatement now reads one fewer fixed
+//            operand for these two mnemonics (CmdOpcodes' stored
+//            FixedOperands still reflects the true binary count, including
+//            the count operand — ParseCmdStatement subtracts 1 locally), and
+//            LayoutCmd synthesizes the count as OperandExpr.Imm8 from
+//            cmd.Args.Count at codegen time — the same pattern already used
+//            for SwitchNode's table size. Companion to EclhDecompiler v1.9.16,
+//            which stops emitting this operand.
+//   0.3.19 — Added dotted variable name support (e.g. player.Int,
+//            player.levels.MagicUser), companion to EclhDecompiler v1.9.13's
+//            dotted KnownVariableOffsets names. Added ParseDottedName, which
+//            consumes Identifier ('.' Identifier)* and is now used
+//            everywhere a plain identifier name previously appeared:
+//            ParseOperand's bare-identifier, ##symbol, and @[symbol] cases;
+//            var {} block declaration names; and the tail of
+//            ParseIdentifierLedStatement (assignment, ++/--/+=/-=). The
+//            latter required restructuring: the old single-token lookahead
+//            (IsAt(1, PlusPlus) etc.) assumed a name was exactly one token,
+//            which breaks for a multi-segment name where the operator comes
+//            after the WHOLE dotted chain, not immediately after the first
+//            segment. The full name is now always consumed first via
+//            ParseDottedName, and the operator/'=' is checked against
+//            whatever token follows that — which also let the per-branch
+//            "!CmdOpcodes.ContainsKey(name)" guards be dropped, since
+//            CmdOpcodes mnemonics already return early via the function's
+//            first check before the dotted-name path is ever reached. Table
+//            names and command mnemonics are unaffected (never dotted, so
+//            their existing single-token lookahead is unchanged).
+//   0.3.18 — Added parsing for TypeName.Member enum-style command arguments
+//            (e.g. Spell.Knock), companion to EclhDecompiler v1.9.11's
+//            CommandArgEnums. Added the '.' token to the lexer (previously
+//            only '..' was recognized; a lone '.' threw a LexError). Added a
+//            new ParseOperand case: an identifier immediately followed by
+//            '.' and another identifier is resolved via
+//            EclhDecompiler.ArgEnumsByType — a shared reverse index (type
+//            name -> member name -> byte value) derived from
+//            CommandArgEnums — into a plain ByteImm operand, identical in
+//            shape to writing "#N" directly. Only recognized when the
+//            leading identifier actually names a registered enum type, so
+//            it can never misfire on an ordinary identifier that happens to
+//            be followed by punctuation elsewhere.
+//   0.3.17 — Reverted v0.3.16: exit/return are bare keywords like goto, not
+//            name(args) commands — both are zero-operand control-flow
+//            terminals, not callable engine operations, so parenthesizing
+//            them was the wrong fix for the underlying mismatch. The actual
+//            problem (decompiler emitting a form the compiler couldn't
+//            parse) is fixed on the decompiler side instead: EclhDecompiler
+//            v1.9.9 gives EXIT/RETURN their own dedicated FormatInstruction
+//            branch (bare "exit"/"return", matching goto) rather than
+//            falling through to the generic name(args) fallback. exit;/
+//            return; parsing here is back to its original bare form.
+//   0.3.16 — CRITICAL FIX: exit()/return() now require parens, matching what
+//            the decompiler actually emits. EXIT/RETURN have no dedicated
+//            branch in FormatInstruction, so they've fallen through to the
+//            generic name(args) fallback since v1.9.7 and been emitted as
+//            "exit();"/"return();" ever since — but ExitNode/ReturnNode
+//            parsing was never updated off its original bare "exit;"/
+//            "return;" keyword handling, since it doesn't go through
+//            ParseCmdStatement (exit/return are dedicated keyword tokens,
+//            not CmdOpcodes entries). Any decompiled file containing exit()
+//            or return() (i.e. every decompiled file since v1.9.7) failed to
+//            recompile with "Expected ';', got LParen '('". Fixed by
+//            requiring Expect(LParen)/Expect(RParen) in both branches.
+//   0.3.15 — Removed legacy goto(idx){targets}/call(idx){targets} ON GOTO/
+//            GOSUB dispatch parsing entirely: OnGotoNode, ParseOnGoto, its
+//            dispatch check in ParseStatement, and its codegen case in
+//            LayoutStatement are all gone. The decompiler stopped emitting
+//            this form back in v1.8.7 (superseded by the switch statement),
+//            and the compiler only needs to parse what the decompiler can
+//            currently produce, so there was no remaining reason to keep it.
+//            This also removes the "call" exception from v0.3.14's uniform
+//            command-call syntax: "call(" is no longer ambiguous with
+//            anything, so ParseCmdStatement now requires parens for "call"
+//            too, same as every other command. Companion to
+//            EclhDecompiler v1.9.8, which emits call(...) accordingly.
+//   0.3.14 — Unified command call syntax: every command mnemonic now uses
+//            name(args), including zero-arg commands ("combat()",
+//            "clearmonsters()"), matching the name() convention GOSUB/known-
+//            engine-function calls already used — previously commands used a
+//            bare "mnemonic arg1, arg2" form with no parens, an inconsistency
+//            with name()-style calls. ParseCmdStatement now wraps its operand
+//            list in Expect(LParen)/Expect(RParen), which also closes another
+//            sliver of the v0.3.12 silent-absorption risk: a stray token
+//            before the closing ')' is now caught immediately, on top of the
+//            trailing ';' every statement already requires. ParseIdentifierLedStatement
+//            now checks CmdOpcodes BEFORE the generic "name()" sub/engine-call
+//            check, since a zero-arg command like "combat()" has the exact
+//            same token shape as a bare subroutine call and would otherwise
+//            be misread as a GOSUB to a subroutine literally named "combat".
+//            Exception: "call" (direct CALL, opcode 0x2D, to an address not
+//            recognized as a named engine function) keeps its legacy
+//            space-separated "call target" form with no parens — "call(" would
+//            collide with the legacy call(idx){targets} ON GOSUB dispatch
+//            syntax still accepted for older decompiled files. Companion to
+//            EclhDecompiler v1.9.7, which now emits this syntax.
+//   0.3.13 — Extended the mandatory-';' rule from v0.3.12 to declarations, not
+//            just statements: @base, @game, entry-point declarations
+//            (on_move = sub_name;), var {} entries, data {} entries, and
+//            @dead blocks all now require a trailing ';'. Same rationale as
+//            v0.3.12 — TryParseEntryPoint's Expect(Identifier) for an
+//            entry-point target, and each var/data entry's fixed token
+//            sequence, had the identical "no boundary" shape as command
+//            operand lists: a missing/malformed value would silently
+//            swallow the next line's leading token instead of failing at
+//            the actual mistake. Companion to EclhDecompiler v1.9.6, which
+//            now emits ';' on all of these declaration forms.
+//   0.3.12 — CRITICAL FIX: trailing ';' is now REQUIRED after every simple
+//            statement (assignment, command, goto, return, exit, table
+//            assign, compare, inc/dec, compound-assign, sub/engine calls,
+//            and single-action if actions), not just switch case actions.
+//            Previously statement boundaries were inferred by lookahead
+//            (IsStatementTerminator) or, for most statement kinds, not
+//            marked at all — so a wrong FixedOperands arity for some opcode,
+//            or any other parser bug reading too few/many operands, would
+//            silently absorb the next statement's tokens as extra operands
+//            instead of failing. A mandatory ';' turns that into an
+//            immediate, precisely-located "Expected ';'" parse error at the
+//            point of the mistake. ParseStatement is now a thin wrapper:
+//            block-form constructs (if/while/do-while/switch/goto(idx){}/
+//            call(idx){}) are dispatched first and manage their own
+//            termination via braces (or, for ParseIf's bare-condition forms,
+//            an explicit ';' check replacing the old IsStatementTerminator
+//            lookahead); everything else routes through the new
+//            ParseSimpleStatement and then requires an explicit ';'.
+//            IsStatementTerminator and ParseActionOrBlock are removed
+//            (superseded by ParseIf's direct Match(Semicolon) checks).
+//            Switch case actions ("goto label;" / "label();") now REQUIRE
+//            their ';' (previously optional via Match) for the same
+//            consistency reason. Companion to EclhDecompiler v1.9.5, which
+//            now emits a trailing ';' on every simple statement it produces.
 //   0.3.11 — Companion to EclhDecompiler v1.9.0's multi-game GameProfile
 //            support: EclhCompiler's constructor now auto-selects
 //            EngineFunctions/HardwareRegisters from the parsed @game
@@ -273,10 +443,10 @@ namespace Eclh
         // Punctuation
         LParen, RParen, LBrace, RBrace, LBracket, RBracket,
         Comma, Colon, Semicolon, At, Hash, HashHash, AtBracket,
-        Equals, PlusEquals, MinusEquals, PlusPlus, MinusMinus, PlusPlusPrefix, MinusMinusPrefix,
+        Equals, PlusEquals, MinusEquals, SlashEquals, StarEquals, PlusPlus, MinusMinus, PlusPlusPrefix, MinusMinusPrefix,
         Plus, Minus, Star, Slash, Amp, Pipe,
         EqEq, NotEq, Lt, Gt, LtEq, GtEq, AndAnd, OrOr, Bang, Question,
-        DotDot, Arrow,
+        DotDot, Dot, Arrow,
         // Keywords
         KwVar, KwData, KwByte, KwWord, KwIf, KwElse, KwWhile, KwDo,
         KwGoto, KwCall, KwReturn, KwExit, KwRandom, KwBase, KwGame, KwSwitch,
@@ -492,8 +662,12 @@ namespace Eclh
                     if (n == '-') return Make(TokenKind.MinusMinus, 2, "--");
                     if (n == '=') return Make(TokenKind.MinusEquals, 2, "-=");
                     return Make(TokenKind.Minus, 1, "-");
-                case '*': return Make(TokenKind.Star, 1, "*");
-                case '/': return Make(TokenKind.Slash, 1, "/");
+                case '*':
+                    if (n == '=') return Make(TokenKind.StarEquals, 2, "*=");
+                    return Make(TokenKind.Star, 1, "*");
+                case '/':
+                    if (n == '=') return Make(TokenKind.SlashEquals, 2, "/=");
+                    return Make(TokenKind.Slash, 1, "/");
                 case '&':
                     if (n == '&') return Make(TokenKind.AndAnd, 2, "&&");
                     return Make(TokenKind.Amp, 1, "&");
@@ -514,7 +688,7 @@ namespace Eclh
                     return Make(TokenKind.Gt, 1, ">");
                 case '.':
                     if (n == '.') return Make(TokenKind.DotDot, 2, "..");
-                    throw new LexError($"Unexpected character '.'", line, col);
+                    return Make(TokenKind.Dot, 1, ".");
                 default:
                     throw new LexError($"Unexpected character '{c}'", line, col);
             }
@@ -631,13 +805,6 @@ namespace Eclh
 
     public class ReturnNode : StmtNode { }
 
-    public class OnGotoNode : StmtNode
-    {
-        public OperandExpr Index = null!;
-        public List<(string Name, bool IsWordImm)> Targets = new();
-        public bool IsGosub;   // true = ON GOSUB (call), false = ON GOTO (goto)
-    }
-
     /// <summary>C-style switch dispatching to goto/gosub targets by index.
     /// Compiles to ON GOTO (0x25) or ON GOSUB (0x26). Each case entry maps a
     /// 0-based index to a target; consecutive identical targets produce
@@ -742,8 +909,11 @@ namespace Eclh
         /// <summary>Mnemonic -> (opcode, fixed operand count). Counts are authoritative,
         /// copied from EclhDecompiler's Opcodes table, so ParseCmdStatement reads
         /// exactly the right number of operands instead of guessing via lookahead.
-        /// horizontal_menu/vertical_menu have variable arity (count embedded in the
-        /// arg list itself) and are handled specially in ParseCmdStatement.</summary>
+        /// horizontal_menu/vertical_menu are handled specially in ParseCmdStatement/
+        /// LayoutCmd: their FixedOperands value here includes the item-count operand
+        /// (matching the true binary layout), but that operand is omitted from ECLH
+        /// source entirely and synthesized at compile time from the actual number of
+        /// trailing items, since it's fully redundant with that count.</summary>
         internal static readonly Dictionary<string, (byte Opcode, int FixedOperands)> CmdOpcodes = new()
         {
             ["load_character"] = (0x0A, 1),
@@ -781,17 +951,19 @@ namespace Eclh
             ["spell"] = (0x3B, 3),
             ["protection"] = (0x3C, 1),
             // Direct CALL instruction (0x2D) with 1 address operand — distinct from
-            // ON GOSUB "call(idx){...}" which is parsed separately. Occurs when the
+            // name() GOSUB (0x02), which pushes a return address. Occurs when the
             // callee is a raw address not in the named engine-function table.
             ["call"] = (0x2D, 1),
             ["clear_box"] = (0x3D, 0),
             ["dump"] = (0x3E, 0),
             ["find_special"] = (0x3F, 1),
             ["destroy_items"] = (0x40, 1),
-            // Variable-arity: 2 (or 3 for vertical_menu) fixed operands, then N more
-            // where N is read from the count operand. ParseCmdStatement reads all
-            // comma-separated operands present (decompiler always emits exactly
-            // fixed+count operands), so the fixed count here is just the minimum.
+            // Variable-arity: FixedOperands here is the TRUE binary fixed-operand
+            // count (2 for horizontal_menu, 3 for vertical_menu), including the
+            // item-count operand — ParseCmdStatement subtracts 1 to get how many
+            // operands ECLH source actually specifies (the count itself is omitted
+            // from source and synthesized at compile time; see ParseCmdStatement
+            // and LayoutCmd).
             ["vertical_menu"] = (0x15, 3),
             ["horizontal_menu"] = (0x2B, 2),
         };
@@ -826,11 +998,13 @@ namespace Eclh
                 {
                     Advance(); Advance();
                     unit.Base = (ushort)ExpectHexOrDec();
+                    Expect(TokenKind.Semicolon, "';'");
                 }
                 else if (Is(TokenKind.At) && IsAt(1, TokenKind.Identifier) && PeekAt(1).Text == "game")
                 {
                     Advance(); Advance();
                     unit.GameProfile = Expect(TokenKind.Identifier, "game profile name").Text;
+                    Expect(TokenKind.Semicolon, "';'");
                 }
                 else if (Is(TokenKind.At) && IsAt(1, TokenKind.Identifier) && PeekAt(1).Text == "dead")
                 {
@@ -844,6 +1018,7 @@ namespace Eclh
                         Match(TokenKind.Comma);
                     }
                     Expect(TokenKind.RBrace, "}");
+                    Expect(TokenKind.Semicolon, "';'");
                     unit.DeadBlocks.Add(new DeadBlockDecl { Address = addr, Bytes = bytes });
                 }
                 else if (TryParseEntryPoint(unit)) { /* consumed */ }
@@ -888,6 +1063,7 @@ namespace Eclh
             string field = Advance().Text; // consume "on_move" etc
             Advance(); // consume '='
             string target = Expect(TokenKind.Identifier, "label name").Text;
+            Expect(TokenKind.Semicolon, "';'");
 
             switch (field)
             {
@@ -910,9 +1086,10 @@ namespace Eclh
                 if (Is(TokenKind.KwWord)) { Advance(); isWord = true; }
                 else if (Is(TokenKind.KwByte)) { Advance(); isWord = false; }
 
-                string name = Expect(TokenKind.Identifier, "variable name").Text;
+                string name = ParseDottedName();
                 Expect(TokenKind.At, "@");
                 ushort addr = (ushort)ExpectHexOrDec();
+                Expect(TokenKind.Semicolon, "';'");
                 unit.Vars.Add(new VarDecl { Name = name, Address = addr, IsWord = isWord });
             }
             Expect(TokenKind.RBrace, "}");
@@ -941,6 +1118,7 @@ namespace Eclh
                         bytes.Add((byte)ExpectHexOrDec());
                 }
                 Expect(TokenKind.RBrace, "}");
+                Expect(TokenKind.Semicolon, "';'");
                 unit.DataTables.Add(new DataTableDecl { Name = name, Address = addr, Bytes = bytes, IsWord = isWord });
             }
             Expect(TokenKind.RBrace, "}");
@@ -992,18 +1170,32 @@ namespace Eclh
 
         private StmtNode ParseStatement()
         {
-            int line = Cur.Line;
-
+            // Block-form / self-terminating constructs manage their own
+            // termination (braces, or in ParseIf's case an explicit ';'
+            // check for the bare-condition form) and must NOT go through the
+            // trailing-';' requirement below — a "}" or ParseIf's own ';'
+            // handling already unambiguously ends these.
             if (Is(TokenKind.KwIf)) return ParseIf();
             if (Is(TokenKind.KwWhile)) return ParseWhile();
             if (Is(TokenKind.KwDo)) return ParseDoWhile();
-
-            // goto(idx) { targets }  or  call(idx) { targets }  — must be checked
-            // before plain "goto label", since both start with the same keyword.
-            if ((Is(TokenKind.KwGoto) || Is(TokenKind.KwCall)) && IsAt(1, TokenKind.LParen))
-                return ParseOnGoto();
-
             if (Is(TokenKind.KwSwitch)) return ParseSwitch();
+
+            // Every other statement form is "simple" — a single instruction
+            // that must end with an explicit ';'. This is required (not
+            // optional/inferred via lookahead) so that any arity mismatch in
+            // a command's operand list — e.g. a wrong FixedOperands count for
+            // some opcode — produces an immediate, precisely-located parse
+            // error ("Expected ';', got ...") instead of silently absorbing
+            // the next statement's tokens as extra operands and producing a
+            // corrupted AST that compiles to the wrong bytes without warning.
+            var stmt = ParseSimpleStatement();
+            Expect(TokenKind.Semicolon, "';'");
+            return stmt;
+        }
+
+        private StmtNode ParseSimpleStatement()
+        {
+            int line = Cur.Line;
 
             if (Is(TokenKind.KwGoto)) return ParseGoto();
 
@@ -1013,6 +1205,10 @@ namespace Eclh
             if (Is(TokenKind.KwCall))
                 return ParseCmdStatement();
 
+            // exit/return — bare keywords like goto, not name(args) commands.
+            // Both are zero-operand control-flow terminals, not callable
+            // engine operations, so they're excluded from the uniform
+            // command-call convention and parsed the same way goto is.
             if (Is(TokenKind.KwExit)) { Advance(); return new ExitNode { Line = line }; }
             if (Is(TokenKind.KwReturn)) { Advance(); return new ReturnNode { Line = line }; }
 
@@ -1091,10 +1287,10 @@ namespace Eclh
                 return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
             }
 
-            // ##name += n / ##name -= n
-            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals))
+            // ##name += n / ##name -= n / ##name /= n / ##name *= n
+            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals) || Is(TokenKind.SlashEquals) || Is(TokenKind.StarEquals))
             {
-                string op = Is(TokenKind.PlusEquals) ? "+" : "-";
+                string op = Is(TokenKind.PlusEquals) ? "+" : Is(TokenKind.MinusEquals) ? "-" : Is(TokenKind.SlashEquals) ? "/" : "*";
                 Advance();
                 var amt = ParseOperand();
                 return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
@@ -1122,10 +1318,10 @@ namespace Eclh
                 return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
             }
 
-            // @[name] += n / @[name] -= n
-            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals))
+            // @[name] += n / @[name] -= n / @[name] /= n / @[name] *= n
+            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals) || Is(TokenKind.SlashEquals) || Is(TokenKind.StarEquals))
             {
-                string op = Is(TokenKind.PlusEquals) ? "+" : "-";
+                string op = Is(TokenKind.PlusEquals) ? "+" : Is(TokenKind.MinusEquals) ? "-" : Is(TokenKind.SlashEquals) ? "/" : "*";
                 Advance();
                 var amt = ParseOperand();
                 return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
@@ -1153,10 +1349,10 @@ namespace Eclh
                 return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
             }
 
-            // [$XXXX] += n / [$XXXX] -= n
-            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals))
+            // [$XXXX] += n / [$XXXX] -= n / [$XXXX] /= n / [$XXXX] *= n
+            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals) || Is(TokenKind.SlashEquals) || Is(TokenKind.StarEquals))
             {
-                string op = Is(TokenKind.PlusEquals) ? "+" : "-";
+                string op = Is(TokenKind.PlusEquals) ? "+" : Is(TokenKind.MinusEquals) ? "-" : Is(TokenKind.SlashEquals) ? "/" : "*";
                 Advance();
                 var amt = ParseOperand();
                 return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
@@ -1172,6 +1368,17 @@ namespace Eclh
             int line = Cur.Line;
             string name = Cur.Text;
 
+            // Known command mnemonics always route to ParseCmdStatement using
+            // uniform name(args) syntax — including zero-arg commands like
+            // "combat()"/"clearmonsters()". This MUST be checked before the
+            // generic "name()" sub/engine-call check just below: a zero-arg
+            // command written as "combat()" has exactly the same shape
+            // (identifier, '(', ')') as a bare subroutine call, and without
+            // this ordering it would be misread as a GOSUB/CALL to a
+            // subroutine named "combat" instead of the combat command.
+            if (CmdOpcodes.ContainsKey(name) && !IsAt(1, TokenKind.Equals))
+                return ParseCmdStatement();
+
             // name()  -> sub call or engine call (disambiguated in codegen via symbol table)
             if (IsAt(1, TokenKind.LParen) && IsAt(2, TokenKind.RParen))
             {
@@ -1179,39 +1386,11 @@ namespace Eclh
                 return new CallSubNode { Name = name, Line = line };   // codegen resolves engine vs sub
             }
 
-            // name++ / name-- — only when name is not a known command mnemonic.
-            // A 0-operand command like "combat" immediately followed by an
-            // unrelated "++area_4A10" statement on the next line would otherwise
-            // be misparsed as "combat++" (incrementing a variable named combat).
-            if (IsAt(1, TokenKind.PlusPlus) && !CmdOpcodes.ContainsKey(name))
-            {
-                Advance();
-                var target = OperandExpr.Ref(name);
-                Advance(); // ++
-                return new IncDecNode { Target = target, IsIncrement = true, IsPrefix = false, Line = line };
-            }
-            if (IsAt(1, TokenKind.MinusMinus) && !CmdOpcodes.ContainsKey(name))
-            {
-                Advance();
-                var target = OperandExpr.Ref(name);
-                Advance(); // --
-                return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
-            }
-
-            // name += n / name -= n — only when name is not a known command mnemonic.
-            if ((IsAt(1, TokenKind.PlusEquals) || IsAt(1, TokenKind.MinusEquals))
-                && !CmdOpcodes.ContainsKey(name))
-            {
-                var target = ParseOperand();
-                string op = Is(TokenKind.PlusEquals) ? "+" : "-";
-                Advance();
-                var amt = ParseOperand();
-                return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
-            }
-
             // tablename[idx] = value — only when name is not a known command mnemonic.
             // Commands like "protection [$AAEE]" have an operand that starts with [
-            // and would otherwise be misread as a table assignment.
+            // and would otherwise be misread as a table assignment. Table names are
+            // never dotted (always tbl_XXXX, or a plain variable used as a computed
+            // base — see FormatTableRef), so a single-token lookahead is enough.
             if (IsAt(1, TokenKind.LBracket) && !CmdOpcodes.ContainsKey(name)
                 && name != "compare" && name != "compare_and")
             {
@@ -1224,18 +1403,42 @@ namespace Eclh
                 return new TableAssignNode { TableName = name, Index = idx, Value = val, Line = line };
             }
 
-            // mnemonic-style command: identifier followed by operand list (no '=')
-            // compare and compare_and have special "vs" syntax handled separately.
+            // compare and compare_and have their own special "vs" syntax,
+            // distinct from the uniform name(args) command convention.
             if ((name == "compare" || name == "compare_and") && !IsAt(1, TokenKind.Equals))
                 return ParseRawCompare();
 
-            if (CmdOpcodes.ContainsKey(name) && !IsAt(1, TokenKind.Equals))
-                return ParseCmdStatement();
+            // Everything else may be a (possibly dotted) variable name — e.g.
+            // a known struct-field name like player.Int or
+            // player.levels.MagicUser (see EclhDecompiler.KnownVariableOffsets).
+            // The full name is consumed first — Identifier ('.' Identifier)*
+            // — and only then do we check what follows: a single-token
+            // lookahead (as used above, where dots never apply) isn't enough
+            // here, since the ++/--/+=/-=/= token comes after the WHOLE
+            // dotted chain, not immediately after the first segment.
+            var target = OperandExpr.Ref(ParseDottedName());
+
+            if (Is(TokenKind.PlusPlus))
+            {
+                Advance();
+                return new IncDecNode { Target = target, IsIncrement = true, IsPrefix = false, Line = line };
+            }
+            if (Is(TokenKind.MinusMinus))
+            {
+                Advance();
+                return new IncDecNode { Target = target, IsIncrement = false, IsPrefix = false, Line = line };
+            }
+            if (Is(TokenKind.PlusEquals) || Is(TokenKind.MinusEquals) || Is(TokenKind.SlashEquals) || Is(TokenKind.StarEquals))
+            {
+                string op = Is(TokenKind.PlusEquals) ? "+" : Is(TokenKind.MinusEquals) ? "-" : Is(TokenKind.SlashEquals) ? "/" : "*";
+                Advance();
+                var amt = ParseOperand();
+                return new CompoundAssignNode { Target = target, Op = op, Amount = amt, Line = line };
+            }
 
             // Otherwise: assignment   dest = rvalue
-            var dest = ParseOperand();
             Expect(TokenKind.Equals, "=");
-            return ParseAssignmentRvalue(dest, line);
+            return ParseAssignmentRvalue(target, line);
         }
 
         private StmtNode ParseRawCompare()
@@ -1322,34 +1525,91 @@ namespace Eclh
 
             var (opcode, fixedCount) = CmdOpcodes[mnem];
 
-            // Read exactly fixedCount operands — authoritative, no lookahead guessing.
-            for (int i = 0; i < fixedCount; i++)
+            // Every command uses uniform name(args) syntax, matching the
+            // name() convention GOSUB/engine calls already use — including
+            // "call" (direct CALL, opcode 0x2D, to an address not recognized
+            // as a named engine function), now that the legacy
+            // call(idx){targets} ON GOSUB dispatch syntax it used to collide
+            // with is no longer parsed (superseded by the switch statement;
+            // see SwitchNode/ParseSwitch).
+            Expect(TokenKind.LParen, "(");
+
+            // load_monster / setup_monster: arg3 frequently repeats arg1
+            // (e.g. "setup_monster(#63, #2, #63)"). When only two arguments
+            // are given, arg3 is synthesized as a copy of arg1 instead of
+            // requiring the redundant value to be written out — mirroring
+            // EclhDecompiler's FormatInstruction, which omits it from source
+            // exactly when it does repeat arg1 (and keeps writing it in full
+            // whenever it doesn't, since it isn't always redundant).
+            if (opcode == 0x0B || opcode == 0x0C)
+            {
+                args.Add(ParseOperand());
+                Expect(TokenKind.Comma, "','");
+                args.Add(ParseOperand());
+                if (Match(TokenKind.Comma))
+                    args.Add(ParseOperand());
+                else
+                    args.Add(CloneOperand(args[0]));
+
+                Expect(TokenKind.RParen, ")");
+                return new CmdNode { Mnemonic = mnem, Args = args, Line = line };
+            }
+
+            // horizontal_menu / vertical_menu: the item-count operand is
+            // omitted from source entirely — it's redundant with the number
+            // of trailing item operands actually written, so LayoutCmd
+            // synthesizes it at codegen time instead of requiring the
+            // author (or decompiler) to keep a "#N" in sync by hand, the
+            // same way SwitchNode's table size is computed from the case
+            // list rather than written explicitly. sourceFixedCount is the
+            // dict's true FixedOperands value (2/3, including the count
+            // operand) minus one — the count operand itself.
+            int sourceFixedCount = opcode switch
+            {
+                0x2B => fixedCount - 1,   // horizontal_menu: just the index variable
+                0x15 => fixedCount - 1,   // vertical_menu: its two leading fixed args
+                _ => fixedCount
+            };
+
+            // Read exactly sourceFixedCount operands — authoritative, no
+            // lookahead guessing. The parens themselves now also give an
+            // explicit boundary (a stray token before ')' is an immediate
+            // error), on top of the trailing ';' every statement already
+            // requires.
+            for (int i = 0; i < sourceFixedCount; i++)
             {
                 if (i > 0) Expect(TokenKind.Comma, "','");
                 args.Add(ParseOperand());
             }
 
-            // horizontal_menu / vertical_menu: variable arity. The decompiler always
-            // emits exactly (fixed + count) operands where count is the value of the
-            // last-read fixed operand (op2 for horizontal_menu, op3 for vertical_menu).
-            // Source always lists every string explicitly, comma-separated, so just
-            // keep consuming ", operand" while a comma follows.
+            // horizontal_menu / vertical_menu: variable arity. Source lists
+            // every item explicitly, comma-separated, with no count operand
+            // in between — just keep consuming ", operand" while a comma
+            // follows.
             if (opcode is 0x15 or 0x2B)
             {
                 while (Match(TokenKind.Comma))
                     args.Add(ParseOperand());
             }
 
+            Expect(TokenKind.RParen, ")");
             return new CmdNode { Mnemonic = mnem, Args = args, Line = line };
         }
 
-        private bool IsStatementTerminator() =>
-            Is(TokenKind.RBrace) || Is(TokenKind.EOF) ||
-            (Is(TokenKind.Identifier) && IsAt(1, TokenKind.Colon)) ||
-            // "compare"/"compare_and" immediately after "if (cond)" signals a
-            // gating pattern (COMPARE+IF gating the next COMPARE's flags) — the
-            // compare is its own separate statement, not this if's action.
-            (Is(TokenKind.Identifier) && (Cur.Text == "compare" || Cur.Text == "compare_and"));
+        /// <summary>
+        /// Shallow-copies an OperandExpr — used when a value needs to appear
+        /// twice in a lowered AST (e.g. load_monster/setup_monster's
+        /// synthesized arg3) without two call sites accidentally sharing (and
+        /// potentially mutating) the same instance.
+        /// </summary>
+        private static OperandExpr CloneOperand(OperandExpr o) => new()
+        {
+            Kind = o.Kind,
+            ByteVal = o.ByteVal,
+            Word = o.Word,
+            SymbolName = o.SymbolName,
+            StringVal = o.StringVal,
+        };
 
         private StmtNode ParseGoto()
         {
@@ -1368,26 +1628,6 @@ namespace Eclh
             bool isWordImm = Match(TokenKind.HashHash);
             string name = Expect(TokenKind.Identifier, "label name").Text;
             return (name, isWordImm);
-        }
-
-        private StmtNode ParseOnGoto()
-        {
-            int line = Cur.Line;
-            bool isGosub = Is(TokenKind.KwCall);
-            Advance(); // goto/call
-            Expect(TokenKind.LParen, "(");
-            var idx = ParseOperand();
-            Expect(TokenKind.RParen, ")");
-            Expect(TokenKind.LBrace, "{");
-            var targets = new List<(string, bool)>();
-            if (!Is(TokenKind.RBrace))
-            {
-                targets.Add(ParseLabelRef());
-                while (Match(TokenKind.Comma))
-                    targets.Add(ParseLabelRef());
-            }
-            Expect(TokenKind.RBrace, "}");
-            return new OnGotoNode { Index = idx, Targets = targets, IsGosub = isGosub, Line = line };
         }
 
         private StmtNode ParseSwitch()
@@ -1456,14 +1696,16 @@ namespace Eclh
                     }
                 }
 
-                // Now read the action: "goto label;" or "label();"
+                // Now read the action: "goto label;" or "label();" — the
+                // trailing ';' is required, matching every other statement
+                // form (see ParseStatement).
                 (string name, bool isWI) target;
                 if (Is(TokenKind.KwGoto))
                 {
                     Advance();
                     target = ParseLabelRef();
                     if (isGosub == null) isGosub = false;
-                    Match(TokenKind.Semicolon);
+                    Expect(TokenKind.Semicolon, "';'");
                 }
                 else if ((Is(TokenKind.Identifier) && IsAt(1, TokenKind.LParen) && IsAt(2, TokenKind.RParen)) ||
                          (Is(TokenKind.HashHash) && IsAt(1, TokenKind.Identifier) && IsAt(2, TokenKind.LParen) && IsAt(3, TokenKind.RParen)))
@@ -1472,7 +1714,7 @@ namespace Eclh
                     Advance(); Advance(); // ( )
                     target = (n, wi);
                     if (isGosub == null) isGosub = true;
-                    Match(TokenKind.Semicolon);
+                    Expect(TokenKind.Semicolon, "';'");
                 }
                 else
                     throw new ParseError($"Expected goto or call in switch case", Cur.Line, Cur.Col);
@@ -1547,50 +1789,42 @@ namespace Eclh
                 string op = TokenToOp(Advance().Kind);
                 Expect(TokenKind.RParen, ")");
 
-                // Bare form: if (op) with no action — emits just the IF opcode.
-                // Occurs when a labeled IF is the last instruction in a range and
-                // there is no fused action (e.g. loc_9F56: if (!=)  // flag-reuse, no action).
-                if (IsStatementTerminator())
+                // Bare form: "if (op);" with no action — emits just the IF
+                // opcode. Occurs when a labeled IF is the last instruction in
+                // a range and there is no fused action (e.g.
+                // "loc_9F56: if (!=);   // flag-reuse, no action").
+                if (Match(TokenKind.Semicolon))
                     return new FlagReuseIfNode { Op = op, Action = null, Line = line };
 
-                var action = ParseActionOrBlock(out bool isBlock, out List<StmtNode>? thenBody, out List<StmtNode>? elseBody);
-                if (isBlock)
-                    throw new ParseError("Flag-reuse if cannot have a block body", Cur.Line, Cur.Col);
+                // Single-action form: the action is itself a full statement
+                // parsed (and its trailing ';' consumed) via ParseStatement.
+                // A bare "{" here falls through to ParseSimpleStatement's
+                // "Unexpected token" error — a flag-reuse if never has a
+                // block body — which is exactly the right diagnostic.
+                var action = ParseStatement();
                 return new FlagReuseIfNode { Op = op, Action = action, Line = line };
             }
 
             var cond = ParseCondition();
             Expect(TokenKind.RParen, ")");
 
-            // Bare form with full condition: if (A op B) with no action —
+            // Bare form with full condition: "if (A op B);" with no action —
             // occurs in the COMPARE-gating pattern where the IF gates whether
-            // the next COMPARE's flags matter. Emit COMPARE+IF only; the next
+            // the next COMPARE's flags matter. Emits COMPARE+IF only; the next
             // statement emits the COMPARE that the gate controls.
-            if (IsStatementTerminator())
+            if (Match(TokenKind.Semicolon))
                 return new SingleIfNode { Condition = cond, Action = null, Line = line };
 
-            var act = ParseActionOrBlock(out bool blockForm, out List<StmtNode>? thenB, out List<StmtNode>? elseB);
-            if (blockForm)
-            {
-                return new BlockIfNode { Condition = cond, ThenBody = thenB!, ElseBody = elseB, Line = line };
-            }
-            return new SingleIfNode { Condition = cond, Action = act!, Line = line };
-        }
-
-        /// <summary>Parses either "{ block }" with optional "else { block }" / "else if",
-        /// or a single statement (no else allowed).</summary>
-        private StmtNode? ParseActionOrBlock(out bool isBlock, out List<StmtNode>? thenBody, out List<StmtNode>? elseBody)
-        {
+            // Block form: "if (cond) { ... } [else { ... } | else if ...]"
             if (Is(TokenKind.LBrace))
             {
-                isBlock = true;
-                thenBody = ParseBlock();
-                elseBody = null;
+                var thenBody = ParseBlock();
+                List<StmtNode>? elseBody = null;
                 if (Match(TokenKind.KwElse))
                 {
                     if (Is(TokenKind.KwIf))
                     {
-                        // else-if chain: wrap as a single-statement else body containing the nested if
+                        // else-if chain: wrap as a single-statement else body
                         var nested = ParseIf();
                         elseBody = new List<StmtNode> { nested };
                     }
@@ -1599,11 +1833,12 @@ namespace Eclh
                         elseBody = ParseBlock();
                     }
                 }
-                return null;
+                return new BlockIfNode { Condition = cond, ThenBody = thenBody, ElseBody = elseBody, Line = line };
             }
-            isBlock = false;
-            thenBody = null; elseBody = null;
-            return ParseStatement();
+
+            // Single-action form: as above, the action consumes its own ';'.
+            var act = ParseStatement();
+            return new SingleIfNode { Condition = cond, Action = act, Line = line };
         }
 
         private static bool IsComparisonOpToken(TokenKind k) =>
@@ -1664,10 +1899,35 @@ namespace Eclh
             Expect(TokenKind.LParen, "(");
             var cond = ParseCondition();
             Expect(TokenKind.RParen, ")");
+            Expect(TokenKind.Semicolon, "';'");
             return new DoWhileNode { Body = body, Condition = cond, Line = line };
         }
 
         // ── Operands ─────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Consumes a possibly-dotted name: Identifier ('.' Identifier)*,
+        /// joined with '.'. Assumes the cursor is at the leading identifier.
+        /// Used for variable references that may be dotted struct-field
+        /// names (e.g. "player.levels.MagicUser") — see
+        /// EclhDecompiler.KnownVariableOffsets, whose registered names may
+        /// contain dots to express nested-struct access (player.Int,
+        /// player.class, player.levels.MagicUser). This mirrors
+        /// TypeName.Member enum-argument parsing (see ParseOperand), but the
+        /// joined text becomes the variable name itself rather than being
+        /// resolved against a fixed enum registry — it's later resolved like
+        /// any other name, against the var {} block's declared address.
+        /// </summary>
+        private string ParseDottedName()
+        {
+            var sb = new StringBuilder(Expect(TokenKind.Identifier, "identifier").Text);
+            while (Is(TokenKind.Dot) && IsAt(1, TokenKind.Identifier))
+            {
+                Advance(); // .
+                sb.Append('.').Append(Advance().Text);
+            }
+            return sb.ToString();
+        }
 
         private OperandExpr ParseOperand()
         {
@@ -1683,7 +1943,7 @@ namespace Eclh
             {
                 Advance();
                 if (Is(TokenKind.Identifier))
-                    return OperandExpr.Imm16Sym(Advance().Text);
+                    return OperandExpr.Imm16Sym(ParseDottedName());
                 long v = ExpectHexOrDec();
                 return OperandExpr.Imm16((ushort)v);
             }
@@ -1710,7 +1970,7 @@ namespace Eclh
                 Advance();
                 if (Is(TokenKind.Identifier))
                 {
-                    string sym = Advance().Text;
+                    string sym = ParseDottedName();
                     Expect(TokenKind.RBracket, "]");
                     return OperandExpr.StrPtr(sym);
                 }
@@ -1729,10 +1989,29 @@ namespace Eclh
                 long v = Advance().IntValue;
                 return OperandExpr.Imm16((ushort)v);
             }
-            // identifier -> named reference (variable, label, engine func, hardware reg)
+            // TypeName.Member -> enum-style byte immediate (e.g. Spell.Knock),
+            // resolved via EclhDecompiler.ArgEnumsByType — a shared, cross-
+            // game registry of command-argument enums (see CommandArgEnums).
+            // Only recognized when the identifier actually names a known enum
+            // type; otherwise falls through to the plain identifier reference
+            // below (so an ordinary variable/label name is never mistaken for
+            // this form just because a '.' happens to follow it elsewhere).
+            if (Is(TokenKind.Identifier) && IsAt(1, TokenKind.Dot) && IsAt(2, TokenKind.Identifier)
+                && EclhDecompiler.ArgEnumsByType.ContainsKey(Cur.Text))
+            {
+                string typeName = Advance().Text;
+                Advance(); // .
+                string memberName = Advance().Text;
+                if (!EclhDecompiler.ArgEnumsByType[typeName].TryGetValue(memberName, out byte val))
+                    throw new ParseError($"Unknown {typeName} member '{memberName}'", Cur.Line, Cur.Col);
+                return OperandExpr.Imm8(val);
+            }
+            // identifier -> named reference (variable, label, engine func, hardware
+            // reg). May be a dotted struct-field name (player.Int,
+            // player.levels.MagicUser) — see ParseDottedName.
             if (Is(TokenKind.Identifier))
             {
-                return OperandExpr.Ref(Advance().Text);
+                return OperandExpr.Ref(ParseDottedName());
             }
 
             throw new ParseError($"Expected operand, got {Cur.Kind} '{Cur.Text}'", Cur.Line, Cur.Col);
@@ -1780,7 +2059,7 @@ namespace Eclh
     /// </summary>
     public class EclhCompiler
     {
-        public const string Version = "0.3.11";
+        public const string Version = "0.3.23";
 
         private readonly CompilationUnit _unit;
         private readonly ushort _base;
@@ -2070,14 +2349,6 @@ namespace Eclh
                     }, ref cursor);
                     break;
 
-                case OnGotoNode og:
-                    {
-                        var ops = new List<OperandExpr> { og.Index, OperandExpr.Imm8((byte)og.Targets.Count) };
-                        ops.AddRange(og.Targets.Select(t => LabelOperand(t.Name, t.IsWordImm)));
-                        EmitPseudo(og.IsGosub ? (byte)0x26 : (byte)0x25, ops, ref cursor);
-                    }
-                    break;
-
                 case SwitchNode sw:
                     {
                         var ops = new List<OperandExpr> { sw.Index, OperandExpr.Imm8((byte)sw.Targets.Count) };
@@ -2252,9 +2523,27 @@ namespace Eclh
                 // This is the form the original ECL compiler produces — the decompiler
                 // emits "x += n" for the destIsRhs case (ADD n, [x], [x]), not destIsLhs.
                 EmitPseudo(0x04, new List<OperandExpr> { ca.Amount, ca.Target, ca.Target }, ref cursor);
-            else
+            else if (ca.Op == "-")
                 // x -= n  ->  SUB n, [x], [x]   (rhs=n, lhs=x after SUBTRACT's unswap)
                 EmitPseudo(0x05, new List<OperandExpr> { ca.Amount, ca.Target, ca.Target }, ref cursor);
+            else if (ca.Op == "/")
+                // x /= n  ->  DIVIDE [x], n, [x]   (dividend=op0=x, divisor=op1=n, dest=op2=x)
+                // Unlike +=/-= (where either operand order gives the same numeric
+                // result and the actual encoding had to be confirmed empirically —
+                // see the note above), division isn't commutative: "x /= n" can
+                // only ever mean x = x / n, never n / x, so x must be the dividend
+                // (op0). There's no ambiguity to resolve here.
+                EmitPseudo(0x06, new List<OperandExpr> { ca.Target, ca.Amount, ca.Target }, ref cursor);
+            else
+                // x *= n  ->  MUL [x], n, [x]   (x is op0, amount is op1, x is dest/op2)
+                // Confirmed via a cross-game ADD/MUL operand-order survey (see
+                // EclhDecompiler.EclhDecompilerProgram.AnalyzeCompoundAssignPatterns):
+                // combined across Pool of Radiance and Curse of the Azure Bonds,
+                // 15/16 compound-assign-shaped MUL instances had dest == op0, vs
+                // 1/16 dest == op1. Note this runs OPPOSITE to ADD's convention —
+                // MUL keeps the destination in the natural first (op0) position
+                // rather than reordering to put the amount first.
+                EmitPseudo(0x07, new List<OperandExpr> { ca.Target, ca.Amount, ca.Target }, ref cursor);
         }
 
         // ── if/while/do-while lowering ───────────────────────────────────────
@@ -2453,7 +2742,30 @@ namespace Eclh
         {
             if (!Parser.CmdOpcodes.TryGetValue(cmd.Mnemonic, out var info))
                 throw new CompileError($"Unknown command mnemonic '{cmd.Mnemonic}'", cmd.Line);
-            EmitPseudo(info.Opcode, cmd.Args, ref cursor);
+
+            List<OperandExpr> operands = cmd.Args;
+
+            // horizontal_menu/vertical_menu: the item-count operand isn't in
+            // cmd.Args (ParseCmdStatement no longer parses it — see there),
+            // so it's synthesized here from the actual number of trailing
+            // item operands, the same way SwitchNode's table size is
+            // computed from its case list rather than carried in the AST.
+            if (info.Opcode == 0x2B)   // HORIZONTAL MENU: [indexVar, ...items] -> [indexVar, #count, ...items]
+            {
+                if (cmd.Args.Count < 1)
+                    throw new CompileError("horizontal_menu requires at least an index variable", cmd.Line);
+                operands = new List<OperandExpr> { cmd.Args[0], OperandExpr.Imm8((byte)(cmd.Args.Count - 1)) };
+                operands.AddRange(cmd.Args.Skip(1));
+            }
+            else if (info.Opcode == 0x15)   // VERTICAL MENU: [a, b, ...items] -> [a, b, #count, ...items]
+            {
+                if (cmd.Args.Count < 2)
+                    throw new CompileError("vertical_menu requires at least its two leading fixed arguments", cmd.Line);
+                operands = new List<OperandExpr> { cmd.Args[0], cmd.Args[1], OperandExpr.Imm8((byte)(cmd.Args.Count - 2)) };
+                operands.AddRange(cmd.Args.Skip(2));
+            }
+
+            EmitPseudo(info.Opcode, operands, ref cursor);
         }
 
         // ── Pseudo-instruction emission & sizing ─────────────────────────────

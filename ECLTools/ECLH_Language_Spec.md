@@ -112,8 +112,8 @@ Its precise semantics are context-dependent; ECLH preserves it verbatim as `?[$X
 | 0x22   | `party_surprise`   | 2        | |
 | 0x23   | `surprise`         | 4        | |
 | 0x24   | `combat`           | 0        | Falls through (not terminal) |
-| 0x25   | `goto(idx){…}`     | 2+N      | ON GOTO dispatch; N = op1 (count) |
-| 0x26   | `call(idx){…}`     | 2+N      | ON GOSUB dispatch; N = op1 (count) |
+| 0x25   | `switch {…}`       | 2+N      | ON GOTO dispatch; N = op1 (count) |
+| 0x26   | `switch {…}`       | 2+N      | ON GOSUB dispatch; N = op1 (count) |
 | 0x27   | `treasure`         | 8        | |
 | 0x28   | `rob`              | 3        | |
 | 0x29   | `encounter_menu`   | 14       | |
@@ -153,8 +153,8 @@ A complete ECLH file has this top-level structure (order matters for the header 
 flexible thereafter):
 
 ```eclh
-@base   0x9900
-@game   pool_of_radiance
+@base   0x9900;
+@game   pool_of_radiance;
 
 var {
     …
@@ -164,11 +164,11 @@ data {
     …
 }
 
-on_move             = sub_name
-on_search           = sub_name
-on_pre_camp         = sub_name
-on_camp_interrupted = sub_name
-on_enter            = sub_name
+on_move             = sub_name;
+on_search           = sub_name;
+on_pre_camp         = sub_name;
+on_camp_interrupted = sub_name;
+on_enter            = sub_name;
 
 // subroutines and code follow
 sub_name @ 0xXXXX:
@@ -179,10 +179,12 @@ sub_name @ 0xXXXX:
 
 ## 4. Directives
 
+Like statements (§5), every directive and declaration below ends with `;`.
+
 ### 4.1 `@base`
 
 ```eclh
-@base 0x9900
+@base 0x9900;
 ```
 
 The ECL base address for this file. All ECL addresses are in `[@base, @base + filesize)`.
@@ -191,7 +193,7 @@ Required, must come first.
 ### 4.2 `@game`
 
 ```eclh
-@game pool_of_radiance
+@game pool_of_radiance;
 ```
 
 Selects game-specific constants (memory map regions, engine function table, hardware
@@ -215,11 +217,11 @@ the correct default base address without it needing to be specified separately.
 ### 4.3 Entry Points
 
 ```eclh
-on_move             = sub_name
-on_search           = sub_name
-on_pre_camp         = sub_name
-on_camp_interrupted = sub_name
-on_enter            = sub_name
+on_move             = sub_name;
+on_search           = sub_name;
+on_pre_camp         = sub_name;
+on_camp_interrupted = sub_name;
+on_enter            = sub_name;
 ```
 
 Names the five ECL entry points compiled into the 5-GOTO header. All five must be present.
@@ -229,30 +231,105 @@ The named subroutines must be declared somewhere in the file.
 
 ```eclh
 var {
-    player_6E79    = 0x6E79
-    area_4A34      = 0x4A34
-    shared_9800    = 0x9800
-    map_direction  = [$C051]   // hardware register
+    word  player_6F2     @ 0x6E79;
+    word  area_134       @ 0x4A34;
+    word  shared_100     @ 0x9800;
+    word  map_direction  @ 0xC051;   // hardware register
     …
 }
 ```
 
 Declares symbolic names for ECL addresses (runtime variables, hardware registers, shared
 memory). These are purely aliases; the compiler substitutes the address wherever the name
-appears. No bytes are emitted for `var` declarations.
+appears, resolving strictly via the declared `@ 0xADDR` value rather than by parsing the
+name — so the naming convention below is a decompiler convention only, not something the
+compiler's correctness depends on. No bytes are emitted for `var` declarations. Each entry
+ends with `;`, same as any other declaration or statement.
 
-Memory region naming conventions (Pool of Radiance):
-- `player_XXXX` — player/character data (`0x6B00`–`0x6FFF`)  
-- `area_XXXX` — area-local variables (`0x4900`–`0x4FFF`)  
-- `shared_XXXX` — cross-area shared state (`0x9700`–`0x98FF`)  
-- `map_XXXX` — hardware/map registers (`0xC000`+)  
+**Naming convention:** mem-region variables are named by their **word offset into the
+region**, not the raw ECL address: `prefix_N`, where `N = (addr - region_start) * 2`, in
+hex with no leading zeros. For example, in Pool of Radiance's `player` region (starting
+at `0x6B00`), address `0x6E79` is `(0x6E79 - 0x6B00) * 2 = 0x6F2`, named `player_6F2`.
+Table (`tbl_`) and label (`loc_`/`sub_`/`on_`) names are **not** affected by this rule —
+those refer to positions in the ECL file itself rather than offsets into a memory struct,
+and always use the literal ECL address.
+
+Memory region prefixes:
+- `player_N` — player/character data
+- `area_N` — area-local variables
+- `shared_N` — cross-area shared state
+- `map_XXXX` — hardware/map registers, named by their literal address (not
+  region-relative — hardware registers aren't part of a per-region struct)
+
+**Known variables:** most mem-region addresses really are just scratch storage a
+subroutine uses transiently, and the `prefix_N` word-offset name is enough. Some,
+though, have a confirmed, specific meaning that directly affects engine behavior — e.g.
+area-region byte offset `0xFD` is the outdoor sky colour and `0xFE` is the indoor sky
+colour. These are registered in `EclhDecompiler.KnownVariableOffsets`, a single table
+**shared across all games** and keyed by `(region label, BYTE offset)` — not by absolute
+address, not per-game, and deliberately **not** the doubled word offset `prefix_N` uses
+(struct layouts are normally documented in byte offsets, so entries here are much easier
+to transcribe directly from that kind of source without mentally doubling every value).
+The Gold Box games' region structs share the same internal layout; only each game's
+region *start* address differs, so a given offset means the same thing everywhere, e.g.
+`outdoor_sky_colour` is address `0x4BFD` in Curse of the Azure Bonds (`area` starts
+`0x4B00`) but `0x49FD` in Pool of Radiance (`area` starts `0x4900`) — same offset,
+different address. `KnownVariableOffsets` is checked ahead of the generic `prefix_N`
+naming in every game, so an entry always wins once it's added:
+
+```eclh
+// Curse of the Azure Bonds (area starts 0x4B00)
+var {
+    word  outdoor_sky_colour  @ 0x4BFD;
+    word  indoor_sky_colour   @ 0x4BFE;
+}
+
+// Pool of Radiance (area starts 0x4900) — same offsets, different addresses
+var {
+    word  outdoor_sky_colour  @ 0x49FD;
+    word  indoor_sky_colour   @ 0x49FE;
+}
+```
+
+Add an offset here only once its purpose is actually confirmed — asserting a specific
+meaning for an offset that's really just scratch storage would be actively misleading.
+
+A registered name may be **dotted** to express nested-struct access, for fields read
+directly from a larger structure — e.g. player-struct fields read from the currently
+active player:
+
+```eclh
+var {
+    word  player.Int              @ 0x6B15;
+    word  player.class             @ 0x6B73;
+    word  player.levels.MagicUser  @ 0x6BC9;
+}
+```
+
+`player.levels.MagicUser` reads as "the `MagicUser` field of the `levels` sub-struct of
+`player`" — `levels` is itself a per-class sub-struct, so this is genuine nested access,
+not just a naming convention with literal dots in it. A dotted name is parsed back into a
+single variable reference (`Identifier ('.' Identifier)*`) wherever a plain name can
+appear — assignment, `var {}` declarations, `##`/`@[` forms, `++`/`--`/`+=`/`-=` — so it
+behaves exactly like any other variable name once declared.
+
+Adding a *flat* (non-dotted) name to `KnownVariableOffsets`, like `outdoor_sky_colour`
+above, requires no compiler change — the compiler resolves every name strictly from the
+`var {}` block's declared `@ 0xADDR`, never by parsing the name, so it's purely a
+decompiler naming convention with no effect on round-trip fidelity. Dotted names work the
+same way once parsed, but required a one-time grammar addition (already in place) to
+teach the parser to read `a.b.c` back as one name instead of three separate tokens.
+
+> Some examples elsewhere in this document (e.g. `player_6E79`, `area_4A34`) predate this
+> convention and name variables directly by address for illustrative brevity; they are
+> not meant to demonstrate the exact `prefix_N` offset formula above.
 
 ### 4.5 `data {}`
 
 ```eclh
 data {
-    byte  tbl_9B99  @ 0x9B99 = { 0x00, 0x01, 0x02, 0x03, 0x04 }
-    word  tbl_A400  @ 0xA400 = { 0x1234, 0x5678 }
+    byte  tbl_9B99  @ 0x9B99 = { 0x00, 0x01, 0x02, 0x03, 0x04 };
+    word  tbl_A400  @ 0xA400 = { 0x1234, 0x5678 };
 }
 ```
 
@@ -267,7 +344,7 @@ are declared with empty initialiser lists `= {}` and generate no output bytes.
 ### 4.6 `@dead`
 
 ```eclh
-@dead 0xA898 { 0x03, 0x01, 0x64, 0x4A, 0x00, 0x00, 0x16, 0x00 }
+@dead 0xA898 { 0x03, 0x01, 0x64, 0x4A, 0x00, 0x00, 0x16, 0x00 };
 ```
 
 Verbatim bytes at a specific address that are unreachable by any code path. This includes:
@@ -282,10 +359,20 @@ at the pinned address, independent of normal code layout.
 
 ## 5. Statements
 
+Every simple (single-line) statement — assignment, command, `goto`, `return`, `exit`,
+table assignment, raw `compare`, increment/decrement, compound assignment, `name()`
+calls, and single-action `if` actions — **must end with `;`**. This is required, not
+optional: the parser uses it as a hard statement boundary, so a mistaken operand count
+for some command produces an immediate, precisely-located parse error instead of
+silently absorbing the next statement's tokens as extra operands. Block constructs
+(`if { }`, `while { }`, `switch { }`) don't take a `;` after their closing `}` — the
+brace already unambiguously ends them — except `do { } while (cond);`, which does,
+matching C convention.
+
 ### 5.1 Assignment
 
 ```eclh
-dest = rvalue
+dest = rvalue;
 ```
 
 Compiles to `SAVE rvalue, dest` (opcode `0x09`). The operand order in the binary is
@@ -314,12 +401,14 @@ reversed from the source: `SAVE source, destination`.
 ### 5.2 Compound Assignment and Increment
 
 ```eclh
-x += #5       // x = #5 + x   (ADD #5, [x], [x] — amount first)
-x -= #3       // x = x - #3
-x++           // x = x + #1   (x is op1, #1 is op0)
-++x           // x = #1 + x   (x is op0, #1 is op1 — different bytes!)
-x--
---x
+x += #5;      // x = #5 + x   (ADD #5, [x], [x] — amount first)
+x -= #3;      // x = x - #3
+x /= #2;      // x = x / #2   (DIVIDE [x], #2, [x] — x is the dividend)
+x *= #4;      // x = x * #4   (MUL [x], #4, [x] — x stays first, unlike +=)
+x++;          // x = x + #1   (x is op1, #1 is op0)
+++x;          // x = #1 + x   (x is op0, #1 is op1 — different bytes!)
+x--;
+--x;
 ```
 
 The `++x`/`x++` and `x +=`/`-=` forms produce different byte sequences. The decompiler
@@ -328,10 +417,28 @@ preserves the original encoding; the compiler reproduces it faithfully.
 The original ECL compiler always uses **amount-first** (`ADD n, [x], [x]`) for `+=`, so
 `x += n` compiles to `ADD n, [x], [x]`.
 
+`x /= n` always compiles to `DIVIDE [x], n, [x]` (`x` as the dividend, op0). This is the
+only valid encoding — unlike `+=`/`-=`, where the amount-first convention had to be
+confirmed empirically since either operand order gives the same arithmetic result,
+division isn't commutative, so `x /= n` can only ever mean `x = x / n`.
+
+`x *= n` always compiles to `MUL [x], n, [x]` (`x` as op0, dest). Unlike `/=`,
+multiplication commutes, so this convention *did* need empirical confirmation the same
+way `+=`'s did — a cross-game operand-order survey (`EclhDecompilerProgram
+.AnalyzeCompoundAssignPatterns`) across every Pool of Radiance and Curse of the Azure
+Bonds ECL file found 15 of 16 compound-assign-shaped MUL instances had `dest == op0`,
+versus 1 with `dest == op1`. That's the dominant-direction evidence `*=` is built on;
+the decompiler only ever collapses the `dest == op0` case into `*=`, leaving the single
+observed `dest == op1` instance in full `dest = lhs * rhs` form rather than treating it
+as an equally valid alternate encoding — the same conservative handling already applied
+to ADD's rare direction. Note `*=`'s convention runs **opposite** to `+=`'s: `MUL` keeps
+the destination in its natural first position rather than reordering to put the amount
+first.
+
 ### 5.3 Table Assignment
 
 ```eclh
-tbl_XXXX[idx] = value    // SAVETABLE
+tbl_XXXX[idx] = value;    // SAVETABLE
 ```
 
 Compiles to `SAVETABLE value, tbl_XXXX, idx` (opcode `0x35`).
@@ -339,29 +446,30 @@ Compiles to `SAVETABLE value, tbl_XXXX, idx` (opcode `0x35`).
 ### 5.4 Control Flow
 
 ```eclh
-goto label              // GOTO
-label()                 // GOSUB (subroutine call)
-return                  // RETURN
-exit                    // EXIT
-newecl #N               // NEWECL — load new ECL file; terminal
+goto label;              // GOTO
+label();                 // GOSUB (subroutine call)
+return;                  // RETURN
+exit;                    // EXIT
+newecl(#N);               // NEWECL — load new ECL file; terminal
 ```
 
 Jump targets may carry `##` prefix if the original used WordImm encoding:
 ```eclh
-goto ##label
-##label()
+goto ##label;
+##label();
 ```
 
 ### 5.5 Single-Action If
 
 ```eclh
-if (area_4A34 == #5) goto loc_9B27
-if (player_6E79 != #0) player_6E79 = #1
-if (area_4A10 > #0) exit
+if (area_4A34 == #5) goto loc_9B27;
+if (player_6E79 != #0) player_6E79 = #1;
+if (area_4A10 > #0) exit;
 ```
 
 Compiles to `COMPARE op1 vs op2, IF<op>, action`. The IF operator is used directly
-(not negated). Action may be any single statement including goto, assignment, or exit.
+(not negated). Action may be any single statement including goto, assignment, or exit —
+and, like any simple statement, ends with `;`.
 
 ### 5.6 Chained Single-Action If
 
@@ -369,8 +477,8 @@ When two or more single-action ifs share the same originating COMPARE (the secon
 reuses flags set by the first COMPARE), they appear as:
 
 ```eclh
-if (area_4A00 == #1) goto loc_9D06
-if (area_4A00 > #1) goto loc_9DC6
+if (area_4A00 == #1) goto loc_9D06;
+if (area_4A00 > #1) goto loc_9DC6;
 ```
 
 The decompiler detects this pattern via look-back; the compiler skips re-emitting COMPARE
@@ -381,25 +489,28 @@ for the second if when the operands match the most recently emitted COMPARE.
 When a COMPARE+IF pair gates whether the NEXT COMPARE's flags matter to a later IF:
 
 ```eclh
-if (player_6DCA == #1)   // gates next compare
-if (player_6E79 > #16) goto loc_9B53
-goto loc_9E1E
+if (player_6DCA == #1);   // gates next compare
+if (player_6E79 > #16) goto loc_9B53;
+goto loc_9E1E;
 ```
 
-The bare `if (cond)` with no action emits only COMPARE+IF (no action instruction). The
-next statement emits the second COMPARE, which the IF gates.
+The bare `if (cond);` with no action emits only COMPARE+IF (no action instruction) — the
+`;` immediately after the `)` is what marks it as action-less rather than being followed
+by a single-action statement. The next statement emits the second COMPARE, which the IF
+gates.
 
 ### 5.8 Flag-Reuse If
 
 ```eclh
-if (==) action            // flag-reuse: reuses prior COMPARE's flags
-if (!=)   // flag-reuse, no action
+if (==) action;            // flag-reuse: reuses prior COMPARE's flags
+if (!=);                   // flag-reuse, no action
 ```
 
 Used when an IF reuses flags from a COMPARE that was set earlier in the control flow (not
 immediately preceding). This occurs for labeled IF targets reachable from multiple code
 paths. The decompiler identifies flag-reuse IFs during analysis; the compiler emits only
-the IF opcode (no COMPARE).
+the IF opcode (no COMPARE). As with the COMPARE-gating form, a `;` immediately after
+`if (op)` marks the action-less form.
 
 ### 5.9 Block If / If-Else
 
@@ -417,7 +528,7 @@ if (player_6E79 == #0) {
 
 Compiles to `COMPARE + IF<negated> + GOTO guard, body, [GOTO after, else body]`.
 The condition is **negated** in the binary (the guard GOTO fires when the condition is
-false), which is the opposite of single-action-if form.
+false), which is the opposite of single-action-if form. No `;` follows the closing `}`.
 
 ### 5.10 While Loop
 
@@ -428,35 +539,35 @@ while (area_4A00 != #0) {
 ```
 
 Compiles to: `COMPARE + IF<negated> + GOTO _after, body, GOTO _top`. The test is at
-the top; the body is skipped if the condition is initially false.
+the top; the body is skipped if the condition is initially false. No `;` follows the
+closing `}`.
 
 ### 5.11 Do-While Loop
 
 ```eclh
 do {
     …
-} while (shared_9802 < #8)
+} while (shared_9802 < #8);
 ```
 
 Compiles to: `body, COMPARE + IF<same-op> + GOTO _top`. The test is at the bottom; the
 GOTO fires when the condition is **true** (to loop), exits by falling through when false.
-This is the opposite convention from block-if (where the GOTO fires when false).
+This is the opposite convention from block-if (where the GOTO fires when false). Unlike
+`if`/`while`, the closing `} while (cond)` **does** take a trailing `;`, matching C
+convention.
 
 ### 5.12 ON GOTO / ON GOSUB
-
-```eclh
-goto(map_direction) { loc_A, loc_B, loc_C, loc_D }
-call(idx) { sub_A, sub_B, sub_C }
-```
 
 Compiles to ON GOTO (0x25) / ON GOSUB (0x26). The index operand is read from the named
 variable; control transfers to the Nth target. Out-of-range indices fall through (but the
 original ECL typically ensures indices are always in range, so no fall-through instruction
 is needed).
 
-The decompiler emits this dispatch as a C-style `switch` statement (§5.12.1) rather than
-the `goto(idx){…}`/`call(idx){…}` form above; the latter is retained by the compiler only
-for parsing older decompiled files.
+ECLH source expresses this dispatch as a C-style `switch` statement — see §5.12.1 for the
+syntax. (Earlier versions of this toolchain also accepted a `goto(idx){targets}`/
+`call(idx){targets}` form; neither the decompiler nor the compiler support it any longer,
+since the decompiler has emitted `switch` exclusively since it was introduced and the
+compiler only needs to parse what the decompiler can currently produce.)
 
 ### 5.12.1 Switch (ON GOTO / ON GOSUB dispatch)
 
@@ -494,9 +605,8 @@ switch (area_4AC4) {
 loc_9D25 @ 0x9D25:
 ```
 
-This collapsing only ever happens for `goto(idx){…}`-style dispatch (ON GOTO, `switch`
-with `goto` actions), never for `call(idx){…}`-style dispatch (ON GOSUB, `switch` with
-`name()` actions). The two are not equivalent: an ON GOTO target equal to the
+This collapsing only ever happens for ON GOTO dispatch (`switch` with `goto` actions),
+never for ON GOSUB dispatch (`switch` with `name()` actions). The two are not equivalent: an ON GOTO target equal to the
 fall-through address behaves identically to a true out-of-range index — both simply
 continue execution there. An ON GOSUB target equal to the fall-through address does
 not — GOSUB always pushes a return address (itself the fall-through address, for every
@@ -538,8 +648,8 @@ at all) requires the explicit count, since no case exists to imply a size otherw
 ### 5.13 Raw Compare
 
 ```eclh
-compare area_4A34 vs #5
-compare_and area_4A00 vs #1 && player_6E79 vs #3
+compare area_4A34 vs #5;
+compare_and area_4A00 vs #1 && player_6E79 vs #3;
 ```
 
 A bare COMPARE with no associated IF. Occurs when flags are set for a subsequent
@@ -548,29 +658,73 @@ flag-reuse IF, or at the end of a subroutine.
 ### 5.14 Direct CALL
 
 ```eclh
-call [$C01B]
-call move_forward
+call([$C01B]);
 ```
 
 Compiles to opcode `0x2D` (engine callback, no return address pushed). Distinct from
 `name()` GOSUB which pushes a return address and uses opcode `0x02`.
 
+`call(target);` is used **only** when `target` isn't a recognized engine function — an
+unclassified address the decompiler can't yet name. A call to a *known* engine function,
+even though it's the same opcode, is written as `name();` instead (see §5.12) — e.g.
+`move_forward();`, not `call(move_forward);`. `call` otherwise follows the same uniform
+`name(args)` command syntax as everything in §5.15 — it has no special-cased syntax of
+its own.
+
 ### 5.15 Commands
 
-All other instructions use mnemonic-style syntax:
+All other instructions use uniform function-call syntax, `name(args)` — including
+zero-argument commands, which still take empty parentheses. This excludes `goto`,
+`return`, and `exit` (§5.4): those are control-flow keywords, not callable engine
+operations, and are written bare like `goto` rather than as `name(args)`:
 
 ```eclh
-print "Hello"
-printclear "Message"
-approach
-combat
-load_monster #114, player_6E79, #114
-treasure #0, #0, #0, a, b, c, d, e
-clearmonsters
-picture #255
-protection [$AAEE]
-horizontal_menu shared_9800, #1, "Option A", "Option B"
+print("Hello");
+printclear("Message");
+approach();
+combat();
+load_monster(#114, player_6E79, #114);
+treasure(#0, #0, #0, a, b, c, d, e);
+clearmonsters();
+picture(#255);
+protection([$AAEE]);
+horizontal_menu(shared_9800, "Option A", "Option B");
 ```
+
+`horizontal_menu` and `vertical_menu` are a partial exception to "every operand is
+written": both carry an item-count operand in the binary (`op1` for `horizontal_menu`,
+`op2` for `vertical_menu`), but it's omitted from ECLH source entirely, since it's fully
+redundant with the number of trailing item operands actually written — the decoder reads
+exactly that many items, so `count == item count` always holds by construction. The
+compiler synthesizes it at compile time from the actual argument count, the same way a
+`switch`'s table size is computed from its case list rather than written explicitly
+(§5.12.1). So `horizontal_menu(shared_9800, "Option A", "Option B")` compiles with an
+item count of 2, without that `2` ever appearing in source.
+
+### 5.16 Enum-Style Command Arguments
+
+Some command arguments are always a byte immediate drawn from a small, known, named
+set — e.g. `spell()`'s first argument is always a spell ID. Rather than a bare `#N`,
+these are written as `TypeName.Member`:
+
+```eclh
+spell(Spell.Knock, player_6FA, player_6FC);
+```
+
+instead of:
+
+```eclh
+spell(#31, player_6FA, player_6FC);
+```
+
+Both forms compile to the exact same byte — `TypeName.Member` resolves to a plain `#N`
+byte immediate at compile time, so this is purely a decompiler naming convention with no
+effect on the compiled output, same as `prefix_N` variable naming or
+`KnownVariableOffsets`. Enum members are registered in
+`EclhDecompiler.CommandArgEnums`, keyed by `(command mnemonic, 0-based argument index)`,
+and shared across all games — these IDs (spell numbers, and similar small fixed sets)
+are part of the underlying ruleset/engine convention rather than a per-game detail. Add
+an entry only once a value's meaning is actually confirmed.
 
 ---
 
@@ -745,3 +899,10 @@ round-trip:
 7. **ADD compound-assign convention**: `x += n` always compiles to `ADD n, [x], [x]`
    (amount as op0, variable as op1/dest) — the form the original ECL always uses.
 
+8. **DIVIDE compound-assign convention**: `x /= n` always compiles to `DIVIDE [x], n, [x]`
+   (`x` as op0/dividend) — the only valid encoding, since division isn't commutative.
+
+9. **MUL compound-assign convention**: `x *= n` always compiles to `MUL [x], n, [x]`
+   (`x` as op0/dest) — confirmed via a cross-game operand-order survey (§5.2), and
+   notably the opposite convention from ADD's (`x` stays first rather than the amount
+   being reordered to first).

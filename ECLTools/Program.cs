@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+//using static Eclh.EclhDecompilerProgram;
 
 namespace ECLTools
 {
@@ -12,37 +13,68 @@ namespace ECLTools
         static async Task Main(string[] args)
         {
             Classes.gbl.file = new File();
-            Classes.gbl.DataPath = "Curse";
-            if (args.Length == 2)
+
+            if (args.Length == 3)
             {
-                if (int.TryParse(args[1], out var block_id) == true)
+                var stats = new Eclh.EclhDecompilerProgram.CompoundAssignStats();
+                Classes.gbl.DataPath = args[0];
+                if (int.TryParse(args[2], out var block_id) == true)
                 {
-                    await ProcessFile(args[0], block_id);
+                    await ProcessFile(args[1], block_id, stats);
                 }
+                stats.Print(args[0]);
             }
             else
             {
-                for (int j = 0; j <= 82; j++)
+                string[] games;
+                if (args.Length == 1)
                 {
-                    for (int i = 1; i <= 8; i++ )
+                    games = [ args[0] ];
+                }
+                else
+                {
+                    games = [ "Poolrad", "Curse" ];
+                }
+
+                foreach (var game in games)
+                {
+                    var stats = new Eclh.EclhDecompilerProgram.CompoundAssignStats();
+                    Classes.gbl.DataPath = game;
+                    Classes.DaxFiles.DaxCache.ClearCache();
+                    for (int j = 0; j <= 82; j++)
                     {
-                        await ProcessFile($"ECL{i}", j);
+                        for (int i = 1; i <= 8; i++)
+                        {
+                            await ProcessFile($"ECL{i}", j, stats);
+                        }
                     }
+                    stats.Print(game);
                 }
             }
         }
 
-        static async Task<bool> ProcessFile(string filename, int block_id)
+        static async Task<bool> ProcessFile(string filename, int block_id, Eclh.EclhDecompilerProgram.CompoundAssignStats stats)
         {
             var bytes = await Classes.DaxFiles.DaxCache.LoadDax(filename, block_id);
             if (bytes != null)
             {
                 var input_hex = HexDump(bytes);
-                System.IO.File.WriteAllText($"input_{filename}_{block_id}.txt", input_hex);
+                System.IO.File.WriteAllText($"{Classes.gbl.DataPath}/input_{filename}_{block_id}.txt", input_hex);
                 //string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, 0x9900);
                 //string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "pool_of_radiance");
-                string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "curse_of_azure_bonds");
-                System.IO.File.WriteAllText($"output_decompiler_{Eclh.EclhDecompiler.Version}_{filename}_{block_id}.txt", output_decompiler);
+                //string output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "curse_of_azure_bonds");
+                string output_decompiler;
+                if (Classes.gbl.DataPath == "Poolrad")
+                {
+                    output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "pool_of_radiance");
+                    stats.Merge(Eclh.EclhDecompilerProgram.AnalyzeCompoundAssignPatterns(bytes, "pool_of_radiance"));
+                }
+                else
+                {
+                    output_decompiler = Eclh.EclhDecompilerProgram.Run(bytes, "curse_of_azure_bonds");
+                    stats.Merge(Eclh.EclhDecompilerProgram.AnalyzeCompoundAssignPatterns(bytes, "curse_of_azure_bonds"));
+                }
+                System.IO.File.WriteAllText($"{Classes.gbl.DataPath}/output_decompiler_{Eclh.EclhDecompiler.Version}_{filename}_{block_id}.txt", output_decompiler);
                 Eclh.Lexer lexer = new(output_decompiler);
                 var list = lexer.Tokenize();
                 Eclh.Parser parser = new(list);
@@ -53,10 +85,10 @@ namespace ECLTools
                 byte[] output_compiler = compiler.Compile();
                 output_compiler[0] = bytes[0];
                 output_compiler[1] = bytes[1];
-                System.IO.File.WriteAllBytes($"output_compiler_{Eclh.EclhCompiler.Version}_{filename}_{block_id}.bin", output_compiler);
+                System.IO.File.WriteAllBytes($"{Classes.gbl.DataPath}/output_compiler_{Eclh.EclhCompiler.Version}_{filename}_{block_id}.bin", output_compiler);
 
                 var output_hex = HexDump(output_compiler);
-                System.IO.File.WriteAllText($"output_compiler_{Eclh.EclhCompiler.Version}_{filename}_{block_id}.txt", output_hex);
+                System.IO.File.WriteAllText($"{Classes.gbl.DataPath}/output_compiler_{Eclh.EclhCompiler.Version}_{filename}_{block_id}.txt", output_hex);
                 if (bytes.Length == output_compiler.Length)
                 {
                     if (ByteArrayEqual(bytes, output_compiler) == false)
@@ -86,7 +118,7 @@ namespace ECLTools
                     return false;
                 }
             }
-            Console.Write("Success\n");
+            //Console.Write("Success\n");
             return true;
         }
 

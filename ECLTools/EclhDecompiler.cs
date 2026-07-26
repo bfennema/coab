@@ -6,6 +6,261 @@ using System.Text;
 // ECLH Decompiler — ECL bytecode to ECLH source
 //
 // Changelog:
+//   1.9.21 — CRITICAL FIX: SameOperand compared only .Word, which is unset
+//            (always 0) for ByteImm operands — their actual value lives in
+//            .ByteVal. This made any two ByteImm operands compare as
+//            "equal" regardless of their real values (e.g. #16 and #1 both
+//            looked identical). Concretely: setup_monster(#16, #0, #1) —
+//            arg1 and arg3 genuinely differ — was wrongly detected as
+//            "arg3 repeats arg1" and had arg3 omitted from source; on
+//            recompile, arg3 was synthesized back as a copy of arg1 (#16)
+//            instead of the real #1, corrupting that byte. Only
+//            load_monster/setup_monster's v1.9.20 two-argument shorthand
+//            was actually affected in practice — AnalyzeCompoundAssignPatterns
+//            and the +=/-=/*=//= shorthand logic were not: a SAVE/ADD/MUL
+//            destination is always WordRef/WordImm, never ByteImm, so the
+//            Kind-mismatch check already correctly excluded false positives
+//            for those before this bug could trigger, and the compound-
+//            assign shorthand logic compares FormatOp'd text, not raw
+//            operands, via an entirely separate code path. SameOperand now
+//            compares ByteVal for ByteImm and StringVal for StringInline,
+//            falling back to Word only for the address-based kinds
+//            (WordRef/Code02/WordImm/StringPtr) where it's actually the
+//            right field. Any file decompiled with v1.9.20 must be
+//            RE-DECOMPILED from the original ECL binary, not just
+//            recompiled — the bug corrupted the .eclh source itself, so
+//            recompiling the already-wrong source cannot recover the
+//            original bytes.
+//   1.9.20 — load_monster (0x0B) / setup_monster (0x0C) omit their third
+//            argument from source when it repeats the first — e.g.
+//            "setup_monster(#63, #2)" instead of "setup_monster(#63, #2,
+//            #63)" — a pattern that occurs frequently for both commands.
+//            Unlike horizontal_menu/vertical_menu's count (always
+//            redundant, so always omitted), arg3 sometimes genuinely
+//            differs from arg1, so it's only skipped per-instance when
+//            SameOperand(op0, op2) actually holds, not unconditionally by
+//            opcode. Added a reusable SameOperand helper (promoted from a
+//            local function in AnalyzeCompoundAssignPatterns, now internal
+//            so EclhDecompilerProgram — a separate class — can use it too).
+//            Companion to EclhCompiler v0.3.23, which accepts either the
+//            two- or three-argument form and synthesizes arg3 from arg1
+//            when omitted.
+//   1.9.19 — Added x *= n shorthand for MUL, based on real evidence: a
+//            cross-game ADD/MUL operand-order survey (see
+//            EclhDecompilerProgram.AnalyzeCompoundAssignPatterns, added in
+//            v1.9.18) run across all Pool of Radiance and Curse of the
+//            Azure Bonds ECL files found 15/16 compound-assign-shaped MUL
+//            instances had dest == op0 (lhs), vs 1/16 dest == op1 — strong
+//            enough to add the shorthand for the dominant direction. Only
+//            the dest == op0 case collapses to "x *= n"; the single
+//            dest == op1 outlier is left in full "dest = lhs * rhs" form
+//            rather than assumed to be an equally valid alternate encoding
+//            — the same conservative treatment already applied to ADD's
+//            rare direction. Notably MUL's convention runs OPPOSITE to
+//            ADD's: MUL keeps the destination in its natural first (op0)
+//            position rather than reordering to put the amount first.
+//            Companion to EclhCompiler v0.3.22, which adds *= parsing and
+//            MUL codegen (also op0=dest, matching this same convention).
+//   1.9.18 — Added a diagnostic ADD/MUL operand-order survey utility
+//            (EclhDecompilerProgram.AnalyzeCompoundAssignPatterns /
+//            RunCompoundAssignSurvey), for empirically determining MUL's
+//            real compound-assign convention across a game's whole ECL file
+//            set — the same kind of evidence that pinned down ADD's
+//            amount-first convention in v1.6.8, needed here since MUL's
+//            "x = x*y" vs "x = y*x" convention is still unconfirmed (see
+//            EclhCompiler v0.3.21's changelog on why *= has no shorthand
+//            yet). Not part of normal decompile/compile — a standalone tool
+//            to run across a file set and inspect the results.
+//   1.9.17 — Added x /= n shorthand for DIVIDE where the dividend (op0)
+//            equals the destination (op2) — unlike MUL, which stays in full
+//            "dest = lhs * rhs" form, division is unambiguous: since
+//            division isn't commutative, "x /= n" can only ever mean
+//            x = x / n, so there's exactly one valid encoding (x as op0,
+//            the dividend) and no risk of guessing the wrong operand order
+//            the way MUL's compound-assign would carry (multiplication
+//            commutes, so MUL x,n,x and MUL n,x,x give the same result but
+//            different bytes, and the real convention hasn't been confirmed
+//            the way ADD's was in v1.6.8 — so MUL intentionally still has no
+//            shorthand). Also removed a vestigial dead branch in this same
+//            block that checked for opcode 0x05 (SUB) — SUB is already
+//            handled earlier and always returns before reaching this code,
+//            so the check could never fire. Companion to EclhCompiler
+//            v0.3.21, which adds /= parsing and DIVIDE codegen.
+//   1.9.16 — horizontal_menu/vertical_menu no longer emit their item-count
+//            operand in source — it's fully redundant with the number of
+//            trailing item operands FormatInstruction already writes (the
+//            decoder itself reads exactly that many, so count == item count
+//            always holds by construction). FormatInstruction's generic
+//            command fallback now skips op1 (horizontal_menu) / op2
+//            (vertical_menu) when building the argument list. Companion to
+//            EclhCompiler v0.3.20, which synthesizes the count back from the
+//            trailing item count at compile time — the same pattern already
+//            used for SwitchNode's table size.
+//   1.9.15 — Var block column alignment is now computed from the longest
+//            name actually present in the file, instead of a fixed -20 width
+//            that breaks (stops lining up) once any name exceeds it — routine
+//            now that KnownVariableOffsets names can be long dotted paths
+//            like player.levels.MagicUser (24 chars).
+//   1.9.14 — KnownVariableOffsets is now keyed by BYTE offset (addr -
+//            regionStart) instead of the doubled word offset the generic
+//            region_N auto-naming uses. Struct layouts are normally
+//            documented in byte offsets, so curated entries are now much
+//            easier to transcribe directly (0xFD, not 0x1FA) without having
+//            to double every value by hand. Existing entries converted:
+//            outdoor_sky_colour 0x1FA->0xFD, indoor_sky_colour 0x1FC->0xFE,
+//            player.Int 0x2A->0x15, player.class 0xE6->0x73,
+//            player.levels.MagicUser 0x192->0xC9 — same addresses, just
+//            re-keyed. The two schemes intentionally coexist: region_N
+//            (auto-generated) stays word-offset, KnownVariableOffsets
+//            (curated) is now byte-offset, and KnownVariableOffsets always
+//            wins when both apply. No compiler change needed — this only
+//            affects how AssignNames looks up an already-computed address,
+//            not the var {} block's declared "@ 0xADDR" the compiler
+//            actually resolves against.
+//   1.9.13 — KnownVariableOffsets names may now be dotted to express nested-
+//            struct access — e.g. player-struct fields read directly from
+//            the currently active player: player_2A is now "player.Int",
+//            player_E6 is "player.class", player_192 is
+//            "player.levels.MagicUser" (levels being itself a per-class
+//            sub-struct). No decompiler formatting change was needed —
+//            KnownVariableOffsets values were already used as opaque display
+//            strings — but this required teaching EclhCompiler's parser to
+//            read a dotted name back as a single variable reference
+//            wherever a name currently appears (assignment, var {}
+//            declarations, ##/@[ forms, ++/--/+=/-=), not just as a
+//            standalone operand; see EclhCompiler v0.3.19.
+//   1.9.12 — Added confirmed spell ID: Spell.FindTraps = #22.
+//   1.9.11 — Added CommandArgEnums: symbolic enum-style names for specific
+//            byte-immediate command arguments whose value is drawn from a
+//            small, known, named set — e.g. spell()'s first argument (a
+//            spell ID) now renders as Spell.Knock instead of #31 once an
+//            entry is registered. Keyed by (command mnemonic, 0-based
+//            argument index); shared across all games, like
+//            KnownVariableOffsets, since these are AD&D-ruleset/engine IDs,
+//            not a per-game memory detail. FormatInstruction's generic
+//            command fallback now formats each argument via the new
+//            FormatArgOp helper, which checks CommandArgEnums before falling
+//            back to the plain #N form via FormatOp. Added ArgEnumsByType, a
+//            reverse index (type name -> member name -> byte value) derived
+//            from CommandArgEnums, used by EclhCompiler's parser to resolve
+//            "TypeName.Member" syntax. Seeded with one confirmed value:
+//            spell arg 0, Spell.Knock = #31. Purely a decompiler naming
+//            convention: the parsed operand is an ordinary ByteImm
+//            identical in shape to "#31", so it compiles to the exact same
+//            byte regardless of which form was written — no round-trip risk.
+//            Companion to EclhCompiler v0.3.18, which parses this syntax and
+//            adds the '.' token needed for it.
+//   1.9.10 — CRITICAL FIX: a GETTABLE/SAVETABLE base address that falls
+//            inside a classified mem region (player/area/shared) was being
+//            tracked as a data table and rendered as "tbl_XXXX" — even
+//            though AssignNames independently (and correctly) also assigned
+//            it a region_N variable name, since it scans every operand of
+//            every instruction regardless of position. The address ended up
+//            with two conflicting identities: a correct "word player_40 @
+//            0x6B20;" in the var block, and a bogus, always-empty "byte
+//            tbl_6B20 @ 0x6B20 = {  };" in the data block (empty because
+//            mem-region addresses are external runtime RAM outside the ECL
+//            file's own byte range — there was never any real content for
+//            it to read). FormatTableRef then preferred the tbl_ form,
+//            producing "tbl_6B20[player_6FA] = #0;" instead of
+//            "player_40[player_6FA] = #0;". Fixed by excluding mem-region-
+//            classified addresses from data-table tracking in both
+//            AnalyseReferences and PreScanTableBases — such addresses always
+//            have a more meaningful variable name available, and (per the
+//            reasoning above) could never have real table content anyway.
+//            No compiler change needed: FormatTableRef already fell back to
+//            the normal named-variable resolution via FormatOp whenever an
+//            address isn't in _dataAddrs, so removing the false-positive
+//            entries was sufficient.
+//   1.9.9 — EXIT/RETURN now get their own dedicated FormatInstruction branch,
+//            emitting bare "exit"/"return" (matching goto's style) instead of
+//            falling through to the generic name(args) fallback added in
+//            v1.9.7 (which had been unintentionally emitting "exit()"/
+//            "return()" since then). Both are zero-operand control-flow
+//            terminals, not callable engine operations, so they're excluded
+//            from the uniform command-call convention on the same grounds
+//            goto already was. Companion to EclhCompiler v0.3.17, which
+//            reverts exit/return parsing back to bare-keyword form.
+//   1.9.8 — Removed the "call" exception from v1.9.7's uniform command-call
+//            syntax: direct CALL (to an address not in EngineFunctions) now
+//            also emits call(target) instead of the space-separated
+//            "call target" form. This was only kept space-separated to avoid
+//            colliding with the legacy call(idx){targets} ON GOSUB dispatch
+//            syntax, which EclhCompiler v0.3.15 no longer parses at all (the
+//            decompiler itself stopped emitting it back in v1.8.7, superseded
+//            by the switch statement) — so there's nothing left for it to
+//            collide with.
+//   1.9.7 — Unified command call syntax: FormatInstruction's generic fallback
+//            now emits name(args) for every command, including zero-arg ones
+//            ("combat()", "clearmonsters()"), instead of the old bare
+//            "mnemonic arg1, arg2" form — matching the name() convention
+//            already used for GOSUB and known-engine-function CALL above it.
+//            Exception: direct CALL to an address NOT in EngineFunctions
+//            keeps the legacy space-separated "call target" form, since
+//            "call(" would collide with the legacy call(idx){targets} ON
+//            GOSUB dispatch syntax the compiler still parses for older
+//            files. Companion to EclhCompiler v0.3.14, which now requires
+//            this syntax (parenthesized args, including empty parens for
+//            zero-arg commands) rather than the old bare form.
+//   1.9.6 — Companion to EclhCompiler v0.3.13: @base, @game, entry-point
+//            declarations, var {} entries, data {} entries, and @dead blocks
+//            now all get a trailing ';' in emitted source, matching the
+//            newly-mandatory grammar for these declaration forms. Hardware
+//            register comment lines are unaffected (they're comments, not
+//            parsed declarations).
+//   1.9.5 — Companion to EclhCompiler v0.3.12's mandatory statement-terminating
+//            ';': every simple (single-line) statement the decompiler emits
+//            now gets a trailing ';' — the generic plain-instruction fallback
+//            in EmitRange, both TryEmitSingleIf forms (action and the bare
+//            COMPARE-gating form), TryEmitChainedSingleIf, both
+//            TryEmitFlagReuseIf forms (bare no-action and with action), and
+//            the do-while closing "} while (cond)" (now "} while (cond);",
+//            matching C convention). Block constructs (if/while braces, the
+//            switch statement) are unaffected — their closing "}" already
+//            unambiguously ends them and getting an extra ';' there would be
+//            a parse error under the new compiler grammar. The multi-line
+//            switch's own case actions already had ';' since v1.8.7; nothing
+//            further needed there beyond making them mandatory
+//            compiler-side.
+//   1.9.4 — CORRECTED v1.9.3's design: KnownVariables is no longer part of
+//            GameProfile (per-game, keyed by absolute address). Replaced with
+//            EclhDecompiler.KnownVariableOffsets — a single table SHARED
+//            across all games, keyed by (region label, word offset) instead.
+//            The Gold Box games' region structs share the same internal
+//            layout; only each game's region START address differs, so a
+//            given offset means the same thing in every game (e.g.
+//            "outdoor_sky_colour" is always area-region offset 0x1FA: address
+//            0x4BFD in Curse of the Azure Bonds, but 0x49FD in Pool of
+//            Radiance — same offset, different address). The old per-game
+//            absolute-address table required duplicating every entry in each
+//            GameProfile and got the actual invariant backwards. Still
+//            checked in AssignNames ahead of the region_N fallback, so an
+//            entry always wins, for any game. Same two confirmed offsets
+//            carried over: 0x1FA "outdoor_sky_colour", 0x1FC
+//            "indoor_sky_colour". No compiler change needed, as in v1.9.3.
+//   1.9.3 — Added GameProfile.KnownVariables: a per-game address→name table for
+//            mem-region variables whose purpose is actually confirmed (e.g. a
+//            byte that directly drives engine behavior), distinct from the
+//            generic region_N word-offset name every other mem-region address
+//            gets. Checked in AssignNames ahead of the region_N fallback, so
+//            an entry here always wins. Populated curse_of_azure_bonds with
+//            two confirmed addresses: 0x4BFD "outdoor_sky_colour" and 0x4BFE
+//            "indoor_sky_colour" (area_1FA/area_1FC under the generic
+//            naming). No compiler change needed — KnownVariables only affects
+//            what name the decompiler writes into the var block; the
+//            compiler still resolves purely from that block's declared
+//            "= 0xADDR", never by parsing the name itself.
+//   1.9.2 — Mem-region variable names are now based on word offset into the
+//            region rather than the raw ECL address — e.g. for a region
+//            starting at 0x4B00, address 0x4BE7 is now named area_1CE
+//            ((0x4BE7-0x4B00)*2 = 0x1CE) instead of area_4BE7. Table (tbl_)
+//            and label (loc_/sub_/on_) names are unaffected — those refer to
+//            positions in the ECL file itself, not offsets into a memory
+//            struct, so they still use the literal ECL address. Purely
+//            cosmetic: the var block still declares each name's exact pinned
+//            address ("word area_1CE @ 0x4BE7"), so EclhCompiler resolves by
+//            that declared address regardless of naming scheme — no compiler
+//            change needed, round-trip fidelity is unaffected.
 //   1.9.1 — Populated curse_of_azure_bonds' EngineFunctions, HardwareRegisters,
 //            and MemRegions (previously left empty pending reverse
 //            engineering). redraw/play_sound addresses differ from Pool of
@@ -434,12 +689,13 @@ namespace Eclh
     // ── Game profile ──────────────────────────────────────────────────────────
 
     /// <summary>
-    /// Per-game configuration: the default ECL base address, and the three
+    /// Per-game configuration: the default ECL base address, and the four
     /// address→name lookup tables (engine functions, hardware registers, memory
-    /// regions) used to produce symbolic names instead of raw hex addresses.
-    /// Different Gold Box games load their ECL files at different base
-    /// addresses and have their own memory maps, so this data cannot be shared
-    /// across games the way it could when only Pool of Radiance was supported.
+    /// regions, known variables) used to produce symbolic names instead of raw
+    /// hex addresses. Different Gold Box games load their ECL files at
+    /// different base addresses and have their own memory maps, so this data
+    /// cannot be shared across games the way it could when only Pool of
+    /// Radiance was supported.
     /// </summary>
     public class GameProfile
     {
@@ -575,6 +831,119 @@ namespace Eclh
                 $"Unknown game profile '{gameProfile}'. Known profiles: " +
                 string.Join(", ", GameProfiles.Keys));
         }
+
+        /// <summary>
+        /// Explicit, semantically-meaningful names for specific mem-region
+        /// byte offsets that are known to mean something beyond generic
+        /// scratch storage — e.g. a byte that directly drives engine behavior
+        /// (a sky colour, a flag the interpreter checks by name, etc).
+        ///
+        /// Keyed by (region label, BYTE offset — i.e. addr - regionStart)
+        /// rather than absolute address, and shared across ALL games (not
+        /// part of GameProfile) — the Gold Box games' region structs have the
+        /// same internal layout, so a given offset means the same thing
+        /// everywhere, but each game's region starts at a different base
+        /// address. E.g. "outdoor_sky_colour" is always area-region byte
+        /// offset 0xFD, which is address 0x4BFD in Curse of the Azure Bonds
+        /// (area starts 0x4B00) but 0x49FD in Pool of Radiance (area starts
+        /// 0x4900) — same offset, different address.
+        ///
+        /// Note this is a BYTE offset, deliberately not the doubled word
+        /// offset the generic region_N auto-naming below uses (e.g. area_1FA
+        /// for the same address) — struct layouts are normally documented in
+        /// byte offsets, so entries here are much easier to transcribe
+        /// directly from that kind of source (0xFD, not 0x1FA) without
+        /// mentally doubling every value. The two schemes coexist
+        /// deliberately: KnownVariableOffsets (curated, byte offset) always
+        /// takes priority over region_N (auto-generated, word offset) in
+        /// AssignNames — see there for the actual lookup.
+        ///
+        /// Not every offset needs an entry — most mem-region addresses
+        /// really are just scratch storage a subroutine uses transiently,
+        /// and those are fine left as region_N. Add an entry only once an
+        /// offset's purpose is actually confirmed, to avoid asserting
+        /// meaning that hasn't been verified.
+        /// </summary>
+        public static readonly Dictionary<(string Region, int ByteOffset), string> KnownVariableOffsets = new()
+        {
+            [("area", 0xFD)] = "outdoor_sky_colour",
+            [("area", 0xFE)] = "indoor_sky_colour",
+
+            // player-struct fields read directly from the currently active
+            // player. Dotted names express nested-struct access — e.g.
+            // "levels" is itself a per-class sub-struct — but are otherwise
+            // ordinary registered names like any other KnownVariableOffsets
+            // entry; see EclhCompiler's ParseDottedName for how these parse
+            // back into a single variable reference.
+            [("player", 0x15)] = "player.Int",
+            [("player", 0x73)] = "player.class",
+            [("player", 0xC9)] = "player.levels.MagicUser",
+            // Add further confirmed player-struct offsets here as they're
+            // identified — most player_N addresses are ordinary scratch
+            // storage and don't need an entry.
+        };
+
+        /// <summary>
+        /// One enum-style type for a command argument: a display name
+        /// ("Spell") plus its byte value -> member name mapping.
+        /// </summary>
+        public class ArgEnum
+        {
+            public string TypeName = "";
+            public Dictionary<byte, string> Members = new();
+        }
+
+        /// <summary>
+        /// Symbolic enum-style names for specific byte-immediate command
+        /// arguments whose value is drawn from a small, known, named set —
+        /// e.g. spell()'s first argument is always a spell ID, so it's much
+        /// more readable as Spell.Knock than #31. Keyed by (command mnemonic,
+        /// 0-based argument index).
+        ///
+        /// Shared across ALL games (not part of GameProfile) — these IDs are
+        /// part of the underlying AD&D ruleset / engine convention, not a
+        /// per-game memory-layout detail, so the same enum applies everywhere
+        /// the command itself exists.
+        ///
+        /// Checked by FormatInstruction's generic command fallback for every
+        /// ByteImm argument; an entry here always wins over the plain "#N"
+        /// form. Add entries only once a value's meaning is confirmed — most
+        /// arguments don't have (and don't need) an enum here, and asserting
+        /// a name for a value that hasn't actually been verified would be
+        /// misleading. Multiple argument slots may share the same TypeName
+        /// (e.g. two different commands that both take a spell ID) — the
+        /// compiler's reverse lookup (see ArgEnumsByType) is grouped by
+        /// TypeName, not by which command/slot it came from.
+        /// </summary>
+        public static readonly Dictionary<(string Mnemonic, int ArgIndex), ArgEnum> CommandArgEnums = new()
+        {
+            [("spell", 0)] = new ArgEnum
+            {
+                TypeName = "Spell",
+                Members = new()
+                {
+                    [22] = "FindTraps",
+                    [31] = "Knock",
+                    // Add further confirmed spell IDs here as they're identified.
+                },
+            },
+        };
+
+        /// <summary>
+        /// Reverse index derived from CommandArgEnums: enum type name ->
+        /// (member name -> byte value). Lets EclhCompiler's parser resolve
+        /// "TypeName.Member" syntax (e.g. "Spell.Knock") without needing to
+        /// know which command/argument position it appears at — the type
+        /// name alone is enough, since TypeName is unique across
+        /// CommandArgEnums regardless of how many (mnemonic, argIndex) slots
+        /// reference it.
+        /// </summary>
+        public static readonly Dictionary<string, Dictionary<string, byte>> ArgEnumsByType =
+            CommandArgEnums.Values
+                .GroupBy(e => e.TypeName)
+                .ToDictionary(
+                    g => g.Key,
+                    g => g.SelectMany(e => e.Members).ToDictionary(kv => kv.Value, kv => kv.Key));
 
         /// <summary>
         /// Engine function addresses for this instance's game, initialised
@@ -767,7 +1136,13 @@ namespace Eclh
                 if (code != 0x01 && code != 0x03) continue;
                 ushort tableBase = (ushort)(_data[baseOpIdx + 1] | (_data[baseOpIdx + 2] << 8));
                 int tableFo = FileOffset(tableBase);
-                if (tableFo >= 2 && tableFo < _fileSize)
+                // Excludes mem-region-classified addresses for the same reason
+                // as the equivalent check in AnalyseReferences: those always
+                // have a more meaningful variable name available. In practice
+                // mem-region addresses (external runtime RAM) essentially never
+                // land inside the ECL file's own byte range anyway, so this is
+                // mostly defense-in-depth for unusual base-address configurations.
+                if (tableFo >= 2 && tableFo < _fileSize && ClassifyMemAddr(tableBase) == null)
                     _dataAddrs.Add(tableBase);
             }
         }
@@ -947,13 +1322,24 @@ namespace Eclh
                             set.Add(instr.Operands[i].Word);
                 }
 
-                // Identify GETTABLE / SAVETABLE base addresses as data tables
+                // Identify GETTABLE / SAVETABLE base addresses as data tables.
+                // Excludes addresses that fall inside a classified mem region
+                // (player/area/shared): those always have a more meaningful
+                // word-offset variable name available (see AssignNames), and
+                // since mem-region addresses are external runtime RAM outside
+                // the ECL file's own byte range, a "tbl_" declaration for one
+                // could never have real content backing it anyway — it would
+                // just be an empty, redundant duplicate of the variable name
+                // (e.g. "byte tbl_6B20 @ 0x6B20 = {  };" alongside
+                // "word player_40 @ 0x6B20;" for the very same address).
                 if (instr.Opcode == 0x2A && instr.Operands.Count > 0)   // GETTABLE
-                    if (instr.Operands[0].IsAddress && !_codeBytes.Contains(instr.Operands[0].Word))
+                    if (instr.Operands[0].IsAddress && !_codeBytes.Contains(instr.Operands[0].Word)
+                        && ClassifyMemAddr(instr.Operands[0].Word) == null)
                         _dataAddrs.Add(instr.Operands[0].Word);
 
                 if (instr.Opcode == 0x35 && instr.Operands.Count > 1)   // SAVE TABLE
-                    if (instr.Operands[1].IsAddress && !_codeBytes.Contains(instr.Operands[1].Word))
+                    if (instr.Operands[1].IsAddress && !_codeBytes.Contains(instr.Operands[1].Word)
+                        && ClassifyMemAddr(instr.Operands[1].Word) == null)
                         _dataAddrs.Add(instr.Operands[1].Word);
             }
         }
@@ -1041,16 +1427,38 @@ namespace Eclh
                     if (HardwareRegisters.ContainsKey(addr)) continue;
                     if (_varNames.ContainsKey(addr))          continue;
 
-                    string? regionLabel = ClassifyMemAddr(addr);
-                    if (regionLabel != null)
-                        _varNames[addr] = $"{regionLabel}_{addr:X4}";
+                    // Variables (mem-region addresses) are named by their word
+                    // offset into the region's struct, not the raw ECL address —
+                    // e.g. area starting at 0x4B00, address 0x4BE7 is offset
+                    // 0xE7 bytes in, named area_1CE ((0x4BE7-0x4B00)*2 = 0x1CE).
+                    // This is distinct from tbl_/loc_/sub_ names, which are
+                    // always the literal ECL address since those refer to
+                    // positions in the ECL file itself, not a memory struct.
+                    var classified = ClassifyMemAddr(addr);
+                    if (classified is { } c)
+                    {
+                        int byteOffset = addr - c.RegionStart;
+                        int wordOffset = byteOffset * 2;
+
+                        // A confirmed semantic name (e.g. a byte that directly
+                        // drives engine behavior like a sky colour) always wins
+                        // over the generic region_N name. KnownVariableOffsets
+                        // is keyed by BYTE offset (not the doubled word offset
+                        // region_N uses) — see its own doc comment for why —
+                        // shared across games since the struct layout is the
+                        // same everywhere even though each game's region
+                        // starts at a different base address.
+                        _varNames[addr] = KnownVariableOffsets.TryGetValue((c.Label, byteOffset), out string? knownName)
+                            ? knownName
+                            : $"{c.Label}_{wordOffset:X}";
+                    }
                 }
             }
         }
 
         // ── Version ───────────────────────────────────────────────────────────
 
-        public const string Version = "1.9.1";
+        public const string Version = "1.9.21";
 
         // ── Pass 4: Source emission ───────────────────────────────────────────
 
@@ -1066,24 +1474,30 @@ namespace Eclh
             sb.AppendLine($"// Instructions decoded: {_instructions.Count}");
             sb.AppendLine();
 
-            sb.AppendLine($"@base   0x{Base:X4}");
-            sb.AppendLine($"@game   {GameName}");
+            sb.AppendLine($"@base   0x{Base:X4};");
+            sb.AppendLine($"@game   {GameName};");
             sb.AppendLine();
 
-            sb.AppendLine($"on_move              = {ResolveLabel(ep.onMove)}");
-            sb.AppendLine($"on_search            = {ResolveLabel(ep.onSearch)}");
-            sb.AppendLine($"on_pre_camp          = {ResolveLabel(ep.onPreCamp)}");
-            sb.AppendLine($"on_camp_interrupted  = {ResolveLabel(ep.onCampInterrupted)}");
-            sb.AppendLine($"on_enter             = {ResolveLabel(ep.onEnter)}");
+            sb.AppendLine($"on_move              = {ResolveLabel(ep.onMove)};");
+            sb.AppendLine($"on_search            = {ResolveLabel(ep.onSearch)};");
+            sb.AppendLine($"on_pre_camp          = {ResolveLabel(ep.onPreCamp)};");
+            sb.AppendLine($"on_camp_interrupted  = {ResolveLabel(ep.onCampInterrupted)};");
+            sb.AppendLine($"on_enter             = {ResolveLabel(ep.onEnter)};");
             sb.AppendLine();
 
             // Var block
             var sortedVars = _varNames.OrderBy(kv => kv.Key).ToList();
             if (sortedVars.Count > 0)
             {
+                // Column width is the longest name actually present in this
+                // file, not a fixed constant — a fixed width breaks (columns
+                // stop lining up) once any name exceeds it, which happens
+                // routinely now that KnownVariableOffsets names can be long
+                // dotted struct-field paths like player.levels.MagicUser.
+                int nameWidth = sortedVars.Max(kv => kv.Value.Length);
                 sb.AppendLine("var {");
                 foreach (var (addr, name) in sortedVars)
-                    sb.AppendLine($"    word  {name,-20} @ 0x{addr:X4}");
+                    sb.AppendLine($"    word  {name.PadRight(nameWidth)} @ 0x{addr:X4};");
                 sb.AppendLine("}");
                 sb.AppendLine();
             }
@@ -1112,7 +1526,7 @@ namespace Eclh
                 {
                     string tname = $"tbl_{tableBase:X4}";
                     string bytes = ReadDataBytes(tableBase);
-                    sb.AppendLine($"    byte  {tname,-20} @ 0x{tableBase:X4} = {{ {bytes} }}");
+                    sb.AppendLine($"    byte  {tname,-20} @ 0x{tableBase:X4} = {{ {bytes} }};");
                 }
                 sb.AppendLine("}");
                 sb.AppendLine();
@@ -1130,7 +1544,7 @@ namespace Eclh
             {
                 var hexBytes = gapBytes.Select(b => $"0x{b:X2}");
                 sb.AppendLine();
-                sb.AppendLine($"@dead 0x{gapStart:X4} {{ {string.Join(", ", hexBytes)} }}");
+                sb.AppendLine($"@dead 0x{gapStart:X4} {{ {string.Join(", ", hexBytes)} }};");
             }
 
             return sb.ToString();
@@ -1307,7 +1721,16 @@ namespace Eclh
                 // Each line of FormatInstruction output gets the same indent prefix —
                 // switch statements produce multi-line output that would otherwise
                 // only have the first line indented.
+                //
+                // A trailing ';' is required by EclhCompiler for every simple
+                // (single-line) statement — see ParseStatement. Multi-line
+                // output (currently only the ON GOTO/GOSUB switch form) is a
+                // block construct that already carries its own internal
+                // semicolons on each case action and needs none after its
+                // closing "}", so only single-line text gets one appended here.
                 string instrText = FormatInstruction(instr);
+                if (!instrText.Contains('\n'))
+                    instrText += ";";
                 foreach (var instrLine in instrText.Split('\n'))
                 {
                     string trimmed = instrLine.TrimEnd('\r');
@@ -1399,7 +1822,7 @@ namespace Eclh
             if (actionInstr.IsCompare)
             {
                 string condition0 = FormatCondition(cmpInstr, ifInstr.IfOp);
-                sb.AppendLine($"{indent}    if ({condition0})   // gates next compare");
+                sb.AppendLine($"{indent}    if ({condition0});   // gates next compare");
                 consumed = 2;
                 return true;
             }
@@ -1408,7 +1831,7 @@ namespace Eclh
             string condition = FormatCondition(cmpInstr, ifInstr.IfOp);
             string action    = FormatInstruction(actionInstr);
 
-            sb.AppendLine($"{indent}    if ({condition}) {action}");
+            sb.AppendLine($"{indent}    if ({condition}) {action};");
             consumed = 3;
             return true;
         }
@@ -1464,7 +1887,7 @@ namespace Eclh
             string condition = FormatCondition(cmpInstr, ifInstr.IfOp);
             string action     = FormatInstruction(actionInstr);
 
-            sb.AppendLine($"{indent}    if ({condition}) {action}");
+            sb.AppendLine($"{indent}    if ({condition}) {action};");
             consumed = 2;
             return true;
         }
@@ -1491,7 +1914,7 @@ namespace Eclh
             // IF opcode, leaving flags set for whatever follows at runtime.
             if (i + 1 >= end || _instructions[allAddrs[i + 1]].IsCompare)
             {
-                sb.AppendLine($"{indent}    if ({ifInstr.IfOp})   // flag-reuse, no action");
+                sb.AppendLine($"{indent}    if ({ifInstr.IfOp});   // flag-reuse, no action");
                 consumed = 1;
                 return true;
             }
@@ -1500,7 +1923,7 @@ namespace Eclh
             if (actionInstr.IsCompare) return false;
 
             string action = FormatInstruction(actionInstr);
-            sb.AppendLine($"{indent}    if ({ifInstr.IfOp}) {action}   // flag-reuse");
+            sb.AppendLine($"{indent}    if ({ifInstr.IfOp}) {action};   // flag-reuse");
             consumed = 2;
             return true;
         }
@@ -1723,7 +2146,7 @@ namespace Eclh
 
             sb.AppendLine($"{indent}    do {{");
             EmitRange(sb, allAddrs, bodyStart, bodyEnd, indent + "    ");
-            sb.AppendLine($"{indent}    }} while ({condition})");
+            sb.AppendLine($"{indent}    }} while ({condition});");
 
             consumed = end - i;
             return true;
@@ -1838,6 +2261,14 @@ namespace Eclh
                 return $"{target}()";
             }
 
+            // EXIT / RETURN — bare keywords like goto, not name(args) commands.
+            // Both are zero-operand control-flow terminals, not callable
+            // engine operations, so they're excluded from the generic
+            // name(args) fallback below and given their own dedicated branch
+            // here instead.
+            if (instr.Opcode == 0x00) return "exit";
+            if (instr.Opcode == 0x13) return "return";
+
             // IF: flag-reuse form vs normal form
             if (instr.IsIf)
             {
@@ -1907,10 +2338,41 @@ namespace Eclh
                     return $"{destStr} = {lhsStr} {op} {rhsStr}";
                 }
 
-                // MUL / DIV — no shorthand, but still normalise output
-                if (instr.Opcode == 0x05)
-                    return $"{FormatOp(instr.Operands[2])} = {FormatOp(instr.Operands[1])} {op} {FormatOp(instr.Operands[0])}";
-                return $"{FormatOp(instr.Operands[2])} = {FormatOp(instr.Operands[0])} {op} {FormatOp(instr.Operands[1])}";
+                // MUL: op0 * op1 -> op2. x *= n applies only when dest == op0
+                // (the lhs) — confirmed empirically via a cross-game ADD/MUL
+                // operand-order survey (see
+                // EclhDecompilerProgram.AnalyzeCompoundAssignPatterns):
+                // combined across Pool of Radiance and Curse of the Azure
+                // Bonds, 15/16 compound-assign-shaped MUL instances had
+                // dest == op0, vs 1/16 dest == op1 — strong enough evidence
+                // for the dominant direction, but that lone dest == op1 case
+                // is left in full "dest = lhs * rhs" form rather than assumed
+                // to be an equally valid alternate encoding. Note MUL's
+                // convention runs in the OPPOSITE direction from ADD's: MUL
+                // keeps the destination in the natural first (op0) position,
+                // it doesn't reorder to put the amount first the way ADD does.
+                if (instr.Opcode == 0x07)
+                {
+                    string lhsStr  = FormatOp(instr.Operands[0]);
+                    string rhsStr  = FormatOp(instr.Operands[1]);
+                    string destStr = FormatOp(instr.Operands[2]);
+                    if (destStr == lhsStr)
+                        return $"{destStr} *= {rhsStr}";
+                    return $"{destStr} = {lhsStr} {op} {rhsStr}";
+                }
+
+                // DIV: op0 / op1 -> op2. x /= n IS unambiguous, unlike MUL —
+                // division isn't commutative, so "x /= n" can only ever mean
+                // x = x / n (x must be the dividend, op0); there's no second
+                // valid encoding to confuse it with.
+                {
+                    string dividendStr = FormatOp(instr.Operands[0]);
+                    string divisorStr  = FormatOp(instr.Operands[1]);
+                    string destStr     = FormatOp(instr.Operands[2]);
+                    if (destStr == dividendStr)
+                        return $"{destStr} /= {divisorStr}";
+                    return $"{destStr} = {dividendStr} {op} {divisorStr}";
+                }
             }
 
             // RANDOM
@@ -2029,9 +2491,96 @@ namespace Eclh
                 return sb2.ToString();
             }
 
-            // Generic fallback: mnemonic + operands
-            var ops = string.Join(", ", instr.Operands.Select(FormatOp));
-            return $"{instr.Mnemonic.ToLower().Replace(' ', '_')} {ops}".TrimEnd();
+            // Generic fallback: uniform name(args) function-call syntax,
+            // matching the name() convention already used for GOSUB/known-
+            // engine-function calls above — every command is written as a
+            // call, including zero-arg ones ("combat()", "clearmonsters()"),
+            // rather than the old bare "mnemonic arg1, arg2" form. This now
+            // applies to direct CALL (to an address not in EngineFunctions)
+            // too — "call(...)" was previously kept space-separated to avoid
+            // colliding with the legacy call(idx){targets} ON GOSUB dispatch
+            // syntax, but that syntax is no longer parsed (superseded by the
+            // switch statement — see FormatInstruction's ON GOTO/GOSUB case
+            // above), so there's no longer any ambiguity to avoid.
+            //
+            // horizontal_menu (op1) / vertical_menu (op2) carry an explicit
+            // item-count operand that's entirely redundant with the number
+            // of trailing item operands actually present — the decoder itself
+            // reads exactly that many, so count == item count always holds by
+            // construction. It's omitted from source; EclhCompiler's LayoutCmd
+            // synthesizes it back from the trailing item count at compile
+            // time, the same way SwitchNode's table size is computed from its
+            // case list rather than written explicitly.
+            //
+            // load_monster (0x0B) / setup_monster (0x0C) frequently repeat
+            // their first argument as their third (e.g. "setup_monster(#63,
+            // #2, #63)") — when that's the case, the redundant third argument
+            // is omitted too; EclhCompiler's ParseCmdStatement fills it back
+            // in as a copy of the first when only two arguments are given.
+            // Unlike the menu commands' count, this ISN'T always redundant —
+            // op0 and op2 sometimes genuinely differ — so it's only skipped
+            // when they actually match this specific instance, not skipped
+            // unconditionally by opcode.
+            string mnemonicName = instr.Mnemonic.ToLower().Replace(' ', '_');
+            int? skipIndex = null;
+            if (instr.Opcode == 0x2B) skipIndex = 1;          // HORIZONTAL MENU: op1 is the item count
+            else if (instr.Opcode == 0x15) skipIndex = 2;     // VERTICAL MENU: op2 is the item count
+            else if ((instr.Opcode == 0x0B || instr.Opcode == 0x0C) && instr.Operands.Count == 3
+                     && SameOperand(instr.Operands[0], instr.Operands[2]))
+                skipIndex = 2;                                // LOAD/SETUP MONSTER: op2 repeats op0
+
+            var opParts = new List<string>();
+            for (int i = 0; i < instr.Operands.Count; i++)
+            {
+                if (i == skipIndex) continue;
+                opParts.Add(FormatArgOp(mnemonicName, i, instr.Operands[i]));
+            }
+            var ops = string.Join(", ", opParts);
+            return $"{mnemonicName}({ops})";
+        }
+
+        /// <summary>
+        /// True when two operands refer to the exact same thing — same kind
+        /// and same resolved value. A WordRef and a WordImm referencing the
+        /// same address are NOT considered equal, since they encode to
+        /// different bytes. Used to detect redundant-argument patterns (e.g.
+        /// load_monster/setup_monster's arg3 frequently repeating arg1) and
+        /// by the ADD/MUL compound-assign pattern survey.
+        /// </summary>
+        internal static bool SameOperand(Operand a, Operand b)
+        {
+            if (a.Kind != b.Kind) return false;
+            return a.Kind switch
+            {
+                // ByteImm's value lives in ByteVal, not Word — Word is unset
+                // (always 0) for this kind, so comparing .Word here would
+                // make any two ByteImm operands look identical regardless of
+                // their actual value (e.g. #16 vs #1 both "match"). This was
+                // a real bug: see EclhDecompiler v1.9.21's changelog.
+                OperandKind.ByteImm => a.ByteVal == b.ByteVal,
+                // StringInline's value is its text, not an address.
+                OperandKind.StringInline => a.StringVal == b.StringVal,
+                // WordRef, Code02, WordImm, StringPtr all key off Word (an
+                // address or 16-bit literal).
+                _ => a.Word == b.Word,
+            };
+        }
+
+        /// <summary>
+        /// Formats one command argument, preferring a CommandArgEnums
+        /// symbolic name (e.g. "Spell.Knock") over the plain "#N" form when
+        /// the (mnemonic, argIndex) has a registered enum and the operand's
+        /// value matches a known member. Falls back to FormatOp otherwise.
+        /// </summary>
+        private string FormatArgOp(string mnemonic, int argIndex, Operand op)
+        {
+            if (op.Kind == OperandKind.ByteImm &&
+                CommandArgEnums.TryGetValue((mnemonic, argIndex), out ArgEnum? argEnum) &&
+                argEnum.Members.TryGetValue(op.ByteVal, out string? memberName))
+            {
+                return $"{argEnum.TypeName}.{memberName}";
+            }
+            return FormatOp(op);
         }
 
         private string FormatOp(Operand op)
@@ -2290,11 +2839,11 @@ namespace Eclh
             _                   => 0
         };
 
-        private string? ClassifyMemAddr(ushort addr)
+        private (string Label, ushort RegionStart)? ClassifyMemAddr(ushort addr)
         {
             foreach (var (start, end, label) in MemRegions)
                 if (addr >= start && addr <= end)
-                    return label;
+                    return (label, start);
             return null;
         }
 
@@ -2378,6 +2927,162 @@ namespace Eclh
 
             foreach (var instr in d.Instructions.Values)
                 Console.WriteLine(instr);
+        }
+
+        // ── ADD/MUL compound-assign pattern survey ──────────────────────────
+        //
+        // Diagnostic tool, not part of normal decompile/compile — run this
+        // across a game's whole ECL file set to empirically determine ADD's
+        // and MUL's real operand-order convention for compound assignment
+        // (x = x+y vs x = y+x), the same way ADD's was pinned down in
+        // EclhDecompiler v1.6.8. MUL's convention is currently unconfirmed —
+        // see EclhCompiler v0.3.21's changelog — so x *= n intentionally has
+        // no shorthand yet.
+        //
+        // Usage (wire up your own file loading — wherever your extracted ECL
+        // bytes live):
+        //
+        //   var por  = LoadAllPoolOfRadianceEclFiles();   // IEnumerable<(string Name, byte[] Bytes)>
+        //   var coab = LoadAllCurseOfAzureBondsEclFiles();
+        //   EclhDecompilerProgram.RunCompoundAssignSurvey(por, coab);
+
+        /// <summary>
+        /// Aggregate ADD (0x04) / MUL (0x07) operand-order statistics across
+        /// however many files were scanned. Each 3-operand instance is
+        /// categorized by whether the destination (op2) equals the first
+        /// operand (op0, i.e. "x = x op y"), the second operand (op1, i.e.
+        /// "x = y op x"), both (op0 == op1, e.g. a degenerate "x = x op x"),
+        /// or neither (dest is a distinct third variable, e.g. "z = x op y"
+        /// — not a compound-assign candidate at all, just an ordinary
+        /// three-variable expression).
+        /// </summary>
+        public class CompoundAssignStats
+        {
+            public int AddTotal, AddDestIsLhs, AddDestIsRhs, AddBoth, AddNeither;
+            public int MulTotal, MulDestIsLhs, MulDestIsRhs, MulBoth, MulNeither;
+            public int FilesScanned, FilesSkipped;
+
+            public void Merge(CompoundAssignStats o)
+            {
+                AddTotal += o.AddTotal; AddDestIsLhs += o.AddDestIsLhs;
+                AddDestIsRhs += o.AddDestIsRhs; AddBoth += o.AddBoth; AddNeither += o.AddNeither;
+                MulTotal += o.MulTotal; MulDestIsLhs += o.MulDestIsLhs;
+                MulDestIsRhs += o.MulDestIsRhs; MulBoth += o.MulBoth; MulNeither += o.MulNeither;
+                FilesScanned += o.FilesScanned; FilesSkipped += o.FilesSkipped;
+            }
+
+            private static string Pct(int part, int total) =>
+                total == 0 ? "  n/a" : $"{100.0 * part / total,5:0.0}%";
+
+            public void Print(string label)
+            {
+                Console.WriteLine($"=== {label} ===");
+                Console.WriteLine($"Files scanned: {FilesScanned}   Files skipped (decode error): {FilesSkipped}");
+                Console.WriteLine();
+                Console.WriteLine($"ADD (opcode 0x04) — {AddTotal} three-operand instances:");
+                Console.WriteLine($"  x = x + y  (dest == op0/lhs) : {AddDestIsLhs,6}  ({Pct(AddDestIsLhs, AddTotal)})");
+                Console.WriteLine($"  x = y + x  (dest == op1/rhs) : {AddDestIsRhs,6}  ({Pct(AddDestIsRhs, AddTotal)})");
+                Console.WriteLine($"  x = x + x  (both)            : {AddBoth,6}  ({Pct(AddBoth, AddTotal)})");
+                Console.WriteLine($"  z = x + y  (neither — n/a)   : {AddNeither,6}  ({Pct(AddNeither, AddTotal)})");
+                Console.WriteLine();
+                Console.WriteLine($"MUL (opcode 0x07) — {MulTotal} three-operand instances:");
+                Console.WriteLine($"  x = x * y  (dest == op0/lhs) : {MulDestIsLhs,6}  ({Pct(MulDestIsLhs, MulTotal)})");
+                Console.WriteLine($"  x = y * x  (dest == op1/rhs) : {MulDestIsRhs,6}  ({Pct(MulDestIsRhs, MulTotal)})");
+                Console.WriteLine($"  x = x * x  (both)            : {MulBoth,6}  ({Pct(MulBoth, MulTotal)})");
+                Console.WriteLine($"  z = x * y  (neither — n/a)   : {MulNeither,6}  ({Pct(MulNeither, MulTotal)})");
+                Console.WriteLine();
+            }
+        }
+
+        /// <summary>
+        /// Scans one ECL file's decoded instructions for ADD/MUL patterns.
+        /// Operand identity is compared by (Kind, Word) — a WordRef and a
+        /// WordImm referencing the same address are NOT considered equal,
+        /// since they encode to different bytes and so are different
+        /// compound-assign candidates (only WordRef ever legitimately
+        /// applies, matching how a variable is normally written).
+        /// </summary>
+        public static CompoundAssignStats AnalyzeCompoundAssignPatterns(
+            byte[] rawBytes, string gameProfile = "pool_of_radiance", ushort? baseAddress = null)
+        {
+            var d = baseAddress.HasValue
+                ? new EclhDecompiler(rawBytes, baseAddress.Value, gameProfile)
+                : new EclhDecompiler(rawBytes, gameProfile);
+            d.Decompile();
+
+            var stats = new CompoundAssignStats { FilesScanned = 1 };
+
+            foreach (var instr in d.Instructions.Values)
+            {
+                if (instr.Operands.Count < 3) continue;
+                if (instr.Opcode != 0x04 && instr.Opcode != 0x07) continue;
+
+                Operand op0 = instr.Operands[0], op1 = instr.Operands[1], op2 = instr.Operands[2]; // op2 = dest
+                bool destIsLhs = EclhDecompiler.SameOperand(op2, op0);
+                bool destIsRhs = EclhDecompiler.SameOperand(op2, op1);
+                bool isAdd = instr.Opcode == 0x04;
+
+                if (isAdd) stats.AddTotal++; else stats.MulTotal++;
+
+                if (destIsLhs && destIsRhs)
+                {
+                    if (isAdd) stats.AddBoth++; else stats.MulBoth++;
+                }
+                else if (destIsLhs)
+                {
+                    if (isAdd) stats.AddDestIsLhs++; else stats.MulDestIsLhs++;
+                }
+                else if (destIsRhs)
+                {
+                    if (isAdd) stats.AddDestIsRhs++; else stats.MulDestIsRhs++;
+                }
+                else
+                {
+                    if (isAdd) stats.AddNeither++; else stats.MulNeither++;
+                }
+            }
+
+            return stats;
+        }
+
+        /// <summary>
+        /// Convenience driver: scans every file in each supplied set, prints
+        /// per-game totals plus a combined grand total, and skips (with a
+        /// logged reason) any file that fails to decode rather than aborting
+        /// the whole survey.
+        /// </summary>
+        public static void RunCompoundAssignSurvey(
+            IEnumerable<(string Name, byte[] Bytes)> poolOfRadianceFiles,
+            IEnumerable<(string Name, byte[] Bytes)> curseOfAzureBondsFiles)
+        {
+            CompoundAssignStats ScanAll(IEnumerable<(string Name, byte[] Bytes)> files, string gameProfile)
+            {
+                var total = new CompoundAssignStats();
+                foreach (var (name, bytes) in files)
+                {
+                    try
+                    {
+                        total.Merge(AnalyzeCompoundAssignPatterns(bytes, gameProfile));
+                    }
+                    catch (Exception ex)
+                    {
+                        total.FilesSkipped++;
+                        Console.WriteLine($"  [skip] {name}: {ex.Message}");
+                    }
+                }
+                return total;
+            }
+
+            var porStats = ScanAll(poolOfRadianceFiles, "pool_of_radiance");
+            porStats.Print("Pool of Radiance");
+
+            var coabStats = ScanAll(curseOfAzureBondsFiles, "curse_of_azure_bonds");
+            coabStats.Print("Curse of the Azure Bonds");
+
+            var grand = new CompoundAssignStats();
+            grand.Merge(porStats);
+            grand.Merge(coabStats);
+            grand.Print("Grand total (both games)");
         }
     }
 }
