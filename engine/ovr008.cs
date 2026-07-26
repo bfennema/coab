@@ -24,14 +24,14 @@ namespace engine
             gbl.byte_1EE8E = false;
             gbl.redrawPartySummary1 = false;
             gbl.redrawPartySummary2 = false;
-            gbl.byte_1D912 = 0x41;
-            gbl.byte_1D913 = 9;
-            gbl.paletteChanged = true;
+            gbl.byte_1D912 = 0x41; // POR: byte_13728
+            gbl.byte_1D913 = 9; // POR: byte_13729
+            gbl.paletteChanged = true; // POR: byte_14CA5
 
             gbl.encounter_flags[0] = false;
             gbl.encounter_flags[1] = false;
-            gbl.monster_icon_id = 8;
-            gbl.ecl_offset = gbl.initial_ecl_offset;
+            gbl.monster_icon_id = 8; // POR: byte_13743
+            gbl.ecl_offset = gbl.initial_ecl_offset; // POR: byte_111AD
             gbl.byte_1DA70 = false;
 
             gbl.vmCallStack.Clear();

@@ -8,6 +8,11 @@ namespace Classes.DaxFiles
     {
         private readonly static Dictionary<string, DaxFileCache> fileCache = [];
 
+        public static void ClearCache()
+        {
+            fileCache.Clear();
+        }
+
         public static async Task<bool> PreloadDax(string filename, byte filenum)
         {
             if (!fileCache.TryGetValue(filename, out DaxFileCache? dfc))

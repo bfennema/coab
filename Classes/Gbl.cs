@@ -307,7 +307,7 @@ namespace Classes
             }
         }
 
-        public byte game_area;
+        public byte game_area; // POR: byte_11B36 ?
         public byte wilderness_area; // POR: byte_111BA
         public Area1 area_ptr;
         public Area2 area2_ptr;
@@ -318,7 +318,7 @@ namespace Classes
         public byte mapDirection; // byte_1D53B , 0 N, 2 E, 4 S, 6 W
         public byte mapWallType; // byte_1D53C
         public byte mapWallRoof; // byte_1D53D
-        public GameState game_state; // 1- shop, 5 - combat
+        public GameState game_state; // 1- shop, 5 - combat // POR: 111B3
         public GameState last_game_state; // byte_1B2E4
         public SetBlock[] setBlocks = new SetBlock[3];
     }
@@ -391,7 +391,7 @@ namespace Classes
         public static byte byte_1AE1B;
         public static bool[] affects_timed_out = new bool[0x48]; /* unk_1AE24 */
 
-        public static bool reload_ecl_and_pictures; // byte_1B2EB
+        public static bool reload_ecl_and_pictures; // byte_1B2EB POR: byte_111B8
         public static byte last_wilderness_area; // POR: byte_111B9
         public static byte head_block_id; // byte_1B2EE
         public static byte body_block_id; // byte_1B2EF
@@ -425,10 +425,11 @@ namespace Classes
 
         public static byte[] attacksHit = new byte[3]; // byte_1D2CA = bytes_1D2C9[1] & byte_1D2CB = bytes_1D2C9[2]
         public static int monster_morale; // byte_1D2CC
-        public static int sky_colour; // byte_1D534
-        public static byte byte_1D535;
-        public static byte byte_1D536;
-        public static byte byte_1D537;
+        public static int sky_colour; // byte_1D534, POR: byte_13220
+        public static byte byte_1D535; // POR: byte_13221
+        public static byte byte_1D536; // POR: byte_13222
+        public static byte byte_1D537; // POR: byte_13223
+        public static byte por_byte_1359C; // POR: byte_1359C
 
         public static bool mapAreaDisplay; //byte_1D538, Show Area Map
         public static int mapPosX { get => saveData.mapPosX; set => saveData.mapPosX = value; }
@@ -499,6 +500,8 @@ namespace Classes
 
 
         public readonly static short[] symbol_set_fix = { 0x0001, 0x002E, 0x0074, 0x00BA, 0x0100 };
+
+        public readonly static ushort maxSymbolId = 0x011E;
 
         public static ushort word_1AE0F;
         public static ushort word_1AE11;
@@ -635,9 +638,9 @@ namespace Classes
         public static byte current_body_id;
         public static DaxBlock bodyX_dax;
 
-        public static bool can_bash_door;
-        public static bool can_pick_door;
-        public static bool can_knock_door;
+        public static bool can_bash_door; // POR: byte_1359E
+        public static bool can_pick_door; // POR: byte_1359F
+        public static bool can_knock_door; // POR: byte_135A0
 
 
         public static int savingThrowRoll;

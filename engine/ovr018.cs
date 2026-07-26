@@ -228,6 +228,8 @@ namespace engine
                                 await ovr017.loadGameMenu();
                                 if (gbl.game_state != GameState.StartGameMenu)
                                 {
+                                    gbl.reload_ecl_and_pictures = true;
+                                    /*
                                     if (gbl.area_ptr.field_3FA == 1)
                                     {
                                         ovr027.ClearPromptArea();
@@ -235,6 +237,8 @@ namespace engine
 
                                         return true;
                                     }
+                                    */
+                                    return true;
                                 }
                             }
                             break;

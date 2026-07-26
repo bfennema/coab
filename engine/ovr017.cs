@@ -746,8 +746,6 @@ namespace engine
         {
             System.IO.Stream file = await seg042.find_and_open_file(true, gbl.SavePath, file_name);
 
-            await Classes.MapTracker.Load(gbl.SavePath, file_name);
-
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
             gbl.reload_ecl_and_pictures = true;
@@ -764,8 +762,10 @@ namespace engine
 
             gbl.file.Close(file);
 
-            //gbl.PicsOn = ((gbl.area_ptr.pics_on >> 1) != 0);
-            //gbl.AnimationsOn = ((gbl.area_ptr.pics_on & 1) != 0);
+            await Classes.MapTracker.Load(gbl.SavePath, file_name);
+
+            gbl.PicsOn = ((gbl.area_ptr.pics_on >> 1) != 0);
+            gbl.AnimationsOn = ((gbl.area_ptr.pics_on & 1) != 0);
             gbl.game_speed_var = gbl.area_ptr.game_speed;
             gbl.area2_ptr.party_size = 0;
 
@@ -813,6 +813,22 @@ namespace engine
 
             gbl.game_area = gbl.area2_ptr.game_area;
 
+            if (gbl.wilderness_area < 2)
+            {
+                await ovr031.Load3DMap(gbl.area_ptr.current_3DMap_block_id);
+            }
+            else
+            {
+                // sub_6DA2("ICON");
+                for (int i = 0; i < 3; i++)
+                {
+                    if (gbl.setBlocks[i].blockId > 0)
+                    {
+                        await ovr031.LoadWalldef(gbl.setBlocks[i].setId, gbl.setBlocks[i].blockId);
+                    }
+                }
+            }
+            /*
             if (gbl.area_ptr.inDungeon != 0)
             {
                 if (gbl.game_state != GameState.StartGameMenu)
@@ -836,10 +852,17 @@ namespace engine
             {
                 await ovr030.load_bigpic(gbl.game.WildernessImage);
             }
+            */
 
-            Input.ClearKeyboard();
+            if (gbl.area_ptr.field_344 != 0)
+            {
+                // sub_84A(0); // river bank palette change
+            }
+
+            Input.ClearKeyboard(); // POR: sub_8A94
             ovr027.ClearPromptArea();
 
+            /*
             var game_state = gbl.game_state;
             gbl.game_state = gbl.game.LoadGameState;
 
@@ -847,6 +870,7 @@ namespace engine
             {
                 gbl.last_game_state = game_state;
             }
+            */
 
             return true;
         }

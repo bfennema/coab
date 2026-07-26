@@ -1,3 +1,4 @@
+using Avalonia.Animation;
 using Classes;
 using System;
 using System.Threading.Tasks;
@@ -6,8 +7,22 @@ namespace engine
 {
     class ovr029
     {
-        static int[] sky_colours = new int[]{ /* seg600:0A8A unk_16D9A*/
-        0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02, 0x09, 0x0E, 0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02 , 0x09, 0x0E};
+        //static int[] sky_colours = [0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02, 0x09, 0x0E, 0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02, 0x09, 0x0E];
+        //static int[] sky_colours = new int[]{ /* seg600:0A8A unk_16D9A*/
+        //0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02, 0x09, 0x0E, 0x00, 0x0F, 0x04, 0x0B, 0x0D, 0x02 , 0x09, 0x0E};
+
+        /*  0C7C:0C26		  db	0
+            0C7C:0C27 db  0Fh
+            0C7C:0C28 db  0Ch
+            0C7C:0C29 db  0Bh
+            0C7C:0C2A db  0Dh
+            0C7C:0C2B db  0Ah
+            0C7C:0C2C db	9
+            0C7C:0C2D db  0Eh
+            0C7C:0C2E db	0
+            0C7C:0C2F db  0Fh */
+        /* 0x00, 0x0F, 0x0C, 0x0B, 0x0D, 0x0A, 0x09, 0x0E, 0x00, 0x0F */
+        static int[] sky_colours = [0x00, 0x0F, 0x0C, 0x0B, 0x0D, 0x0A, 0x09, 0x0E, 0x00, 0x0F, 0x0C, 0x0B, 0x0D, 0x0A, 0x09, 0x0E];
 
         /**
           * Maps background graphic attributes to valid CGA color indices.
@@ -171,7 +186,7 @@ namespace engine
                 }
                 else if (view_mode >= 2 && view_mode <= 4)
                 {
-                    short modifier_offset = wilderness_offset[view_mode - 1];
+                    short modifier_offset = wilderness_offset[view_mode - 2];
                     short base_x_origin = gbl.area_ptr.field_186;
 
                     // Calculate centered X camera position and clamp to [0, 39] (0x27)
@@ -189,7 +204,10 @@ namespace engine
                     if (clamped_y > 0x1F) clamped_y = 0x1F;
 
                     // Perform tactical block transformation blitting onto video surface
-                    ovr031.sub_44EC0((short)clamped_x, (short)clamped_y);
+                    Display.UpdateStop();
+                    ovr031.SetupWilderness((short)clamped_x, (short)clamped_y);
+                    await ovr031.AnimateHorse();
+                    Display.UpdateStart();
                     //sub_44C10();
 
 

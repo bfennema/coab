@@ -166,6 +166,8 @@ namespace Classes
         public byte field_33A;
         [DataOffset(0x33C, DataType.Word)]
         public ushort field_33C;
+        [DataOffset(0x33E, DataType.Byte)]
+        public byte field_33E;
 
         [DataOffset(0x340, DataType.Byte)]
         public byte field_340;

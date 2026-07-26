@@ -9,11 +9,11 @@ namespace Classes
 {
     public class ThreeD
     {
-        public static async Task<bool> Load8x8D(int symbolSet, int block_id)
+        public static async Task<bool> Load8x8D(byte game_area, int symbolSet, int block_id)
         {
             if (symbolSet >= 0 && symbolSet < 5)
             {
-                var data = await Classes.DaxFiles.DaxCache.LoadDax("8X8D", gbl.game_area, block_id);
+                var data = await Classes.DaxFiles.DaxCache.LoadDax("8X8D", game_area, block_id);
 
                 if (data is not null)
                 {
@@ -21,7 +21,7 @@ namespace Classes
 
                     if (gbl.symbol_8x8_set[symbolSet] == null)
                     {
-                        Logging.Logger.LogAndExit($"Unable to load {block_id} from 8x8D{gbl.game_area}");
+                        Logging.Logger.LogAndExit($"Unable to load {block_id} from 8x8D{game_area}");
                     }
 
                     Input.ClearKeyboard();
@@ -66,16 +66,16 @@ namespace Classes
                             {
                                 if (block_id == 0)
                                 {
-                                    await Load8x8D(idx, (10 * 10) + block + 1);
+                                    await Load8x8D(gbl.game_area, idx, (10 * 10) + block + 1);
                                 }
                                 else
                                 {
-                                    await Load8x8D(idx, (block_id * 10) + block + 1);
+                                    await Load8x8D(gbl.game_area, idx, (block_id * 10) + block + 1);
                                 }
                             }
                             else
                             {
-                                await Load8x8D(idx, block_id);
+                                await Load8x8D(gbl.game_area, idx, block_id);
                             }
                         }
                     }

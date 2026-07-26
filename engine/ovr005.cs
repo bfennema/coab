@@ -317,7 +317,7 @@ namespace engine
         }
 
 
-        internal static async Task<bool> temple_heal()
+        internal static async Task<bool> temple_heal() // POR: sub_1DA37
         {
             int sl_index = 0;
 

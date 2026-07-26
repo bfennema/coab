@@ -365,8 +365,8 @@ namespace engine
             ovr027.ClearPromptArea();
             seg041.displayString("Loading...Please Wait", 0, 10, 0x18, 0);
 
-            await ThreeD.Load8x8D(4, 202);
-            await ThreeD.Load8x8D(0, 203);
+            await ThreeD.Load8x8D(1, 4, 202);
+            await ThreeD.Load8x8D(1, 0, 203);
 
             gbl.primary_dax24x24Set = await seg040.LoadDax(0, 0, 1, "SQRPACI");
             gbl.secondary_dax24x24Set = await seg040.LoadDax(0, 0, 2, "SQRPACI");

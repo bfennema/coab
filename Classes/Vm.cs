@@ -168,6 +168,18 @@ namespace Classes
             {
                 return_val = (byte)gbl.SelectedPlayer.stats.Cha.Current;
             }
+            else if (addr >= 0x20 && addr <= 0x70)
+            {
+                // memorized spells
+                return_val = 0;
+                found = false;
+            }
+            else if (addr == 0x71)
+            {
+                // thac0 ?
+                return_val = 0;
+                found = false;
+            }
             else if (addr == 0x72)
             {
                 return_val = (ushort)gbl.SelectedPlayer.race;
@@ -176,9 +188,9 @@ namespace Classes
             {
                 return_val = (ushort)gbl.SelectedPlayer._class;
             }
-            else if (addr == 0x9b)
+            else if (addr >= 0x9a && addr <= 0x9e)
             {
-                return_val = gbl.SelectedPlayer.saveVerse[(int)SaveVerseType.Petrification];
+                return_val = gbl.SelectedPlayer.saveVerse[addr - 0x9A];
             }
             else if (addr == 0xa0)
             {
@@ -188,7 +200,7 @@ namespace Classes
             {
                 return_val = gbl.SelectedPlayer.thief_skills[addr - 0xA5];
             }
-            else if (addr == 0xb8)
+            else if (addr == 0xB8)
             {
                 return_val = gbl.SelectedPlayer.control_morale;
             }
@@ -212,9 +224,37 @@ namespace Classes
             {
                 return_val = (ushort)gbl.SelectedPlayer.Money.GetCoins(Money.Platinum);
             }
+            else if (addr == 0xC4)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Cleric);
+            }
+            else if (addr == 0xC5)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Druid);
+            }
+            else if (addr == 0xC6)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Fighter);
+            }
+            else if (addr == 0xC7)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Paladin);
+            }
+            else if (addr == 0xC8)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Ranger);
+            }
             else if (addr == 0xC9)
             {
                 return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.MagicUser);
+            }
+            else if (addr == 0xCA)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Thief);
+            }
+            else if (addr == 0xCB)
+            {
+                return_val = (ushort)gbl.SelectedPlayer.SkillLevel(SkillType.Monk);
             }
             else if (addr == 0xD6)
             {
@@ -581,9 +621,9 @@ namespace Classes
             }
             else if (switch_var == 0xb8)
             {
-                if (set_value > 0xb2)
+                if (set_value > 178)
                 {
-                    set_value -= 0x32;
+                    set_value -= 50;
                 }
 
                 gbl.SelectedPlayer.control_morale = (byte)(set_value);

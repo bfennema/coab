@@ -2640,26 +2640,26 @@ namespace engine
                     {
                         if (gbl.party_killed == false)
                         {
-                            if (gbl.game_state == GameState.WildernessMap)
-                            {
-                                if (gbl.area2_ptr.field_592 < 0xff)
-                                {
-                                    if (!ovr031.TerrainImpassable())
-                                    {
-                                        gbl.area_ptr.field_186 = (byte)gbl.word_1D914;
-                                        gbl.area_ptr.field_188 = (byte)gbl.word_1D916;
-
-                                        await ovr021.step_game_time(3, 12);
-                                        //ovr025.display_map_position_time();
-                                    }
-                                }
-                                else
-                                {
-                                    gbl.area2_ptr.field_592 = 0;
-                                }
-                            }
-                            else
-                            {
+                            //if (gbl.game_state == GameState.WildernessMap)
+                            //{
+                            //    if (gbl.area2_ptr.field_592 < 0xff)
+                            //    {
+                            //        if (!ovr031.TerrainImpassable())
+                            //        {
+                            //            gbl.area_ptr.field_186 = (byte)gbl.word_1D914;
+                            //            gbl.area_ptr.field_188 = (byte)gbl.word_1D916;
+                            //
+                            //            await ovr021.step_game_time(3, 12);
+                            //            //ovr025.display_map_position_time();
+                            //        }
+                            //    }
+                            //    else
+                            //    {
+                            //        gbl.area2_ptr.field_592 = 0;
+                            //    }
+                            //}
+                            //else
+                            //{
                                 gbl.area_ptr.lastXPos = (short)gbl.mapPosX;
                                 gbl.area_ptr.lastYPos = (short)gbl.mapPosY;
 
@@ -2670,7 +2670,7 @@ namespace engine
                                 {
                                     //seg044.PlaySound(Sound.sound_a);
                                 }
-                            }
+                            //}
                             await ovr029.RedrawView();
 
                             gbl.spriteChanged = false;

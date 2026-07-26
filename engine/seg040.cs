@@ -150,7 +150,7 @@ namespace engine
         }
 
 
-        internal static void DrawColorBlock(int color, int lineCount, int colWidth, int lineY, int colX)
+        internal static void DrawColorBlock(int color, int lineCount, int colWidth, int lineY, int colX) // sub_F6F7, sub_6C72
         {
             int minY = lineY + 8;
             int maxY = minY + lineCount;

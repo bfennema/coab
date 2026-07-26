@@ -314,7 +314,7 @@ namespace engine
         }
 
 
-        internal static async Task<bool> MovePartyForward() /* sub_43813 */
+        internal static async Task<bool> MovePartyForward() /* sub_43813 POR: sub_2EDBB */
         {
             seg044.PlaySound(Sound.sound_a);
             seg049.SysDelay(50);
@@ -548,65 +548,36 @@ namespace engine
         {
             char input;
             bool var_2;
+            bool success = false;
 
-            bool var_1 = false;
-
-            if (gbl.game_state == GameState.DungeonMap)
+            if (gbl.wilderness_area != 1)
+            {
+                if (gbl.wilderness_area >= 2 && gbl.wilderness_area <= 4)
+                {
+                    if (gbl.area2_ptr.field_592 < 0xff)
+                    {
+                        await ovr031.WildernessMove();
+                        ovr025.display_map_position_time();
+                    }
+                    else
+                    {
+                        gbl.area2_ptr.field_592 = 0;
+                    }
+                }
+            }
+            else
             {
                 if (gbl.area2_ptr.field_592 < 0xff)
                 {
                     gbl.can_draw_bigpic = true;
 
-                    byte al = ovr031.WallDoorFlagsGet(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
+                    byte flags = ovr031.WallDoorFlagsGet(gbl.mapDirection, gbl.mapPosY, gbl.mapPosX);
 
-                    if (al == 1)
+                    if (flags == 1)
                     {
-                        var_1 = true;
+                        success = true;
                     }
-                    else if (al == 2)
-                    {
-                        string prompt = string.Empty;
-
-                        if (gbl.can_bash_door == true)
-                        {
-                            prompt = "Bash";
-                        }
-
-                        if (gbl.can_pick_door == true &&
-                            AnyPlayerHasSkill(SkillType.Thief))
-                        {
-                            prompt += " Pick";
-                        }
-
-                        if (gbl.can_knock_door == true &&
-                            TeamMemberHasSpell(Spells.knock))
-                        {
-                            prompt += " Knock";
-                        }
-
-                        if (prompt != "")
-                        {
-                            prompt += " Exit";
-
-                            input = ovr027.displayInput(out var_2, false, 0, gbl.defaultMenuColors, prompt, "Locked. ");
-
-                            switch (input)
-                            {
-                                case 'B':
-                                    var_1 = bash_door();
-                                    break;
-
-                                case 'P':
-                                    var_1 = pick_lock();
-                                    break;
-
-                                case 'K':
-                                    var_1 = RemoveKnockSpell();
-                                    break;
-                            }
-                        }
-                    }
-                    else if (al == 3) // unpickable
+                    else if (flags == 2)
                     {
                         string prompt = string.Empty;
 
@@ -636,23 +607,34 @@ namespace engine
                             switch (input)
                             {
                                 case 'B':
-                                    var_1 = bash_door();
+                                    success = bash_door();
                                     break;
 
                                 case 'P':
-                                    gbl.can_pick_door = false;
+                                    if (flags == 2)
+                                    {
+                                        success = pick_lock();
+                                    }
+                                    else // unpickable
+                                    {
+                                        gbl.can_pick_door = false;
+                                    }
                                     break;
 
                                 case 'K':
-                                    var_1 = RemoveKnockSpell();
+                                    success = RemoveKnockSpell();
                                     break;
                             }
                         }
                     }
 
-                    if (var_1 == true)
+                    if (success == true)
                     {
                         await MovePartyForward();
+                    }
+                    else
+                    {
+                        seg044.PlaySound(Sound.sound_attackHeld);
                     }
 
                     ovr025.display_map_position_time();
@@ -661,7 +643,6 @@ namespace engine
                 {
                     gbl.area2_ptr.field_592 = 0;
                 }
-                return true;
             }
 
             ovr030.DaxArrayFreeDaxBlocks(gbl.byte_1D556);

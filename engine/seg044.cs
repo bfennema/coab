@@ -23,7 +23,7 @@ namespace engine
             gbl.AnimationsOn = On;
         }
 
-        internal static void PlaySound(Sound arg_0) /*sub_120E0*/
+        internal static void PlaySound(Sound arg_0) // sub_120E0 POR: sub_8BBC 
         {
             if (gbl.soundType == SoundType.PC)
             {
